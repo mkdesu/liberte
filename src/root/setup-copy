@@ -1,0 +1,160 @@
+#!/bin/sh -e
+
+sinfo() {
+    echo -e "\033[1;33;41m$@\033[0m"
+}
+
+
+# Sanity check
+if [ ${PHASE} != copy ]; then
+    echo "This is phase [${PHASE}], run $0 in phase [copy]."
+    exit 1
+fi
+
+
+# gcc shared libs
+sinfo "Copying gcc shared libs"
+rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
+ldconfig
+
+
+sinfo "Unmerging development packages"
+make -C /usr/src/linux mrproper > /dev/null
+
+mv /usr/lib/libltdl.* /tmp/
+emerge -qC \
+    sys-devel/make \
+    sys-devel/autoconf \
+    sys-devel/automake \
+    sys-devel/gnuconfig \
+    sys-devel/m4 \
+    sys-devel/patch \
+    \
+    sys-devel/gcc-config \
+    sys-devel/gcc \
+    sys-devel/binutils \
+    sys-devel/libtool \
+    sys-devel/flex \
+    sys-devel/bison \
+    \
+    sys-kernel/linux-headers \
+    sys-kernel/hardened-sources \
+    sys-kernel/genkernel \
+    sys-boot/grub \
+    sys-apps/busybox \
+    \
+    sys-apps/man \
+    sys-apps/man-pages \
+	sys-apps/texinfo \
+    \
+    net-misc/openssh
+
+mv /tmp/libltdl.* /usr/lib/
+rm -rf /usr/share/{binutils-data,gcc-data}/
+rm -f /usr/lib/{?,}crt?.o
+
+
+sinfo "Unmerging orphaned packages"
+emerge -q --depclean --with-bdeps n
+
+
+sinfo "Checking linking consistency"
+revdep-rebuild -q -p -i
+
+
+sinfo "Unmerging unnecessary packages"
+pver=`emerge --version | cut -d' ' -f2`
+emerge -qC \
+    app-admin/python-updater \
+    app-admin/perl-cleaner \
+    app-arch/cpio
+
+
+# sinfo "Checking linking consistency (last chance)"
+# revdep-rebuild -q -p -i
+
+
+sinfo "Unmerging portage libs"
+emerge -qC app-portage/gentoolkit sys-apps/sandbox
+
+
+sinfo "Updating environment"
+env-update
+
+
+sinfo "Unmerging portage"
+ebuild /usr/portage/sys-apps/portage/portage-${pver}.ebuild unmerge 1>/dev/null 2>&1
+rm -r /usr/lib/portage/pym
+rmdir /usr/lib/portage
+
+
+# Use non-optimized bytecode instead of optimized
+sinfo "Removing unneeded Python files"
+for pyo in `find / -xdev -type f -name '*.pyo'`; do
+    py=`echo ${pyo} | sed 's/\.pyo$/.py/'`
+    pyc=`echo ${pyo} | sed 's/\.pyo$/.pyc/'`
+
+    if [ ! ${pyo} -ef ${pyc} ]; then
+        ln -f ${pyc} ${pyo}
+    fi
+
+    if [ -f ${py} ]; then
+        if [ ! ${py} -nt ${pyo} ]; then
+            # A bit risky (breaks "python script.py" for non-executable script.py)
+            if [ ! -x ${py} ]; then
+                rm ${py}
+            fi
+        else
+            rm ${pyo} ${pyc}
+        fi
+    fi
+done
+
+
+sinfo "Removing unneeded Perl files"
+rm `find /usr/lib -xdev -type f -name '*.ph'`
+( cd /usr/include && h2ph -aQ syscall.h syslog.h 2>/dev/null ) || true
+
+
+sinfo "Stripping Perl non-runnable code"
+for pm in `find /usr/lib -xdev -type f \( -name '*.pm' -o -name '*.pl' -not -perm -100 \)`; do
+    # Truncate after __END__
+    if grep -q '^__END__' ${pm}; then
+        pmoffset=`grep -m 1 -b '^__END__' ${pm} | cut -d: -f1`
+        truncate -cs ${pmoffset} ${pm}
+    fi
+
+    # Strip POD
+    perl -MPod::Strip -e "Pod::Strip->filter('${pm}')" > ${pm}.new
+    chmod --reference=${pm} ${pm}.new
+    mv ${pm}.new ${pm}
+
+    # Strip comments (also strips POD) - complex, slow
+    perl -MFile::Comments -MFile::Comments::Plugin::Perl \
+        -e "my \$s = File::Comments->new(); \
+            die 'Not Perl' unless(\$s->guess_type('${pm}') eq 'perl'); \
+            print \$s->stripped('${pm}')" > ${pm}.new
+    chmod --reference=${pm} ${pm}.new
+    mv ${pm}.new ${pm}
+done
+
+
+sinfo "Removing invalid symlinks, dirs and files"
+find / -xdev -type l ! -xtype f ! -xtype d -exec rm {} \;
+rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
+rm /etc/env.d/05binutils
+rm /etc/env.d/05gcc-i686-pc-linux-gnu
+rm -rf /etc/env.d/{binutils,gcc}
+rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,gcov}
+
+
+sinfo "Updating ld cache"
+eselect env update 2>/dev/null
+sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
+
+
+sinfo "Saving current packages list in /tmp/packages-list"
+find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d | sed 's:^/var/db/pkg/::'| sort > /tmp/packages-list
+
+
+sinfo "Done."

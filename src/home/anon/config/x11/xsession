@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Import environment
+. ${HOME}/config/shell/profile
+
+# Redirect X11 clients output
+exec 1>${TMPDIR}/xsession.log 2>&1
+
+# Restrict X server access
+xhost -
+
+# X settings
+xrdb /dev/null
+xset b off s 300 15 dpms 300 600 900
+xset r rate 250 50 m 3/2 0
+
+# Launch daemons
+# assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
+eval `dbus-launch --sh-syntax`
+#eval `ssh-agent -s`
+eval `gpg-agent -s --daemon`
+
+# Check XDG_*_DIR directories according to
+# ${XDG_CONFIG_HOME}/user-dirs.dirs contents
+# xdg-user-dirs-update
+
+# Launch window manager and export its PID
+wm="openbox --sm-disable"
+$wm & export WM_PID=$!
+
+# Launch WM accessories
+lxpanel &
+
+# Delay launch of other apps until the task bar is up
+# (and generate wallpaper along the way)
+gen-wallpaper
+pcmanfm -d -t &
+
+# Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
+parcellite &
+scim -d &
+wicd-client &
+
+# Wait for WM exit
+wait ${WM_PID}
+
+# Kill daemons
+kill `echo ${GPG_AGENT_INFO} | cut -d: -f2`
+#eval `ssh-agent -s -k`
+kill ${DBUS_SESSION_BUS_PID}
+
+# Remove X11 cookie
+xauth remove ${DISPLAY}

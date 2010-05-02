@@ -1,0 +1,14 @@
+--- /etc/init.d/iptables	2010-03-14 15:00:30.000000000 +0000
++++ /etc/init.d/iptables.new	2010-03-14 15:00:51.000000000 +0000
+@@ -55,9 +55,10 @@
+ }
+ 
+ start() {
+-	checkconfig || return 1
+ 	ebegin "Loading ${iptables_name} state and starting firewall"
++	if [ -f ${iptables_save} ] ; then
+ 	${iptables_bin}-restore ${SAVE_RESTORE_OPTIONS} < "${iptables_save}"
++	else /root/bin/fw-reload; fi
+ 	eend $?
+ }
+ 

@@ -1,0 +1,21 @@
+# NOTE: this file is not used by wicd
+# It is intended for direct network setup
+# (/etc/init.d/net.eth0 start)
+
+# Randomize MAC addresses (macchanger -a)
+mac_eth0="random-samekind"
+mac_eth1="random-samekind"
+mac_wlan0="random-samekind"
+
+# Use DHCP for all interfaces
+config_eth0=( "dhcp" )
+config_eth1=( "dhcp" )
+config_wlan0=( "dhcp" )
+
+dhcp_eth0="release nonis nosendhost"
+dhcp_eth1="release nonis nosendhost"
+dhcp_wlan0="release nonis nosendhost"
+
+# Prefer wpa_supplicant (WPA) over iwconfig (WEP only)
+modules_eth1=( "wpa_supplicant" )
+modules_wlan0=( "wpa_supplicant" )

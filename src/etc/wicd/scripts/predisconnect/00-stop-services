@@ -1,0 +1,6 @@
+#!/bin/sh
+
+exec 1>/dev/console 2>&1
+
+/etc/init.d/tor  stop
+/etc/init.d/ntpd stop

@@ -1,0 +1,6 @@
+! Use /etc/X11/app-defaults/*-color variants
+*customization: -color
+
+! Use x11-themes/xcursor-neutral cursor theme
+Xcursor.theme: Neutral_Plus
+!Xcursor.size: 48

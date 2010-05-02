@@ -1,0 +1,5 @@
+METALOG_OPTS=""
+FORMAT='$1 [$2] $3'
+
+# Used by /sbin/consolelog.sh
+CONSOLE="/dev/tty4"

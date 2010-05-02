@@ -1,0 +1,13 @@
+
+[default]
+quiet=yes
+ass-use-margins=yes
+stop-xscreensaver=yes
+
+font="Sans"
+
+af-add=bs2b
+vf-add=screenshot
+
+[gnome-mplayer]
+msglevel=all=5

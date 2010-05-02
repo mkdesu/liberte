@@ -1,0 +1,14 @@
+dev 990
+etc 950
+lib/modules 900
+sbin 850
+bin 800
+var 750
+usr/sbin 700
+usr/bin 650
+lib 600
+usr/lib 550
+usr/lib/xorg/modules/drivers/vesa_drv.so  549
+usr/lib/xorg/modules/drivers/fbdev_drv.so 548
+opt 500
+usr 450

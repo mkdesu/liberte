@@ -1,0 +1,16 @@
+
+[rc]
+use_copy=true
+use_primary=false
+synchronize=false
+save_history=false
+history_limit=10
+hyperlinks_only=false
+confirm_clear=false
+single_line=true
+reverse_history=false
+item_length=50
+ellipsize=2
+history_key=<Ctrl><Alt>H
+actions_key=<Ctrl><Alt>A
+menu_key=<Ctrl><Alt>P

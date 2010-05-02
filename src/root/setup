@@ -1,0 +1,226 @@
+#!/bin/sh -e
+
+kversion=2.6.28-hardened-r9
+
+sinfo() {
+    echo -e "\033[1;33;41m$@\033[0m"
+}
+
+spatch() {
+    local pname=$1; shift
+    local pcat=cat
+    if [ "`echo ${pname} | sed 's/.*\.//'`" = gz ]; then
+        pcat=zcat
+    fi
+
+    # sed causes $?==0
+    ${pcat} ${pname} | patch -Ns -r /tmp/patch-rejects "$@" | sed '/patch-rejects/d'
+    rm -f /tmp/patch-rejects
+}
+
+
+# Sanity check
+if [ ${PHASE} != src ]; then
+    echo "This is phase [${PHASE}], run $0 in phase [src]."
+    exit 1
+fi
+
+
+sinfo "Updating portage"
+emerge -q --sync
+
+
+# Filter locales before remerging libc
+sinfo "Filtering locales"
+grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
+
+
+if [ "$1" != fast ]; then
+    sinfo "Applying kernel patches"
+    emerge -q1 =sys-kernel/hardened-sources-`echo ${kversion} | sed 's/hardened-//'`
+    cp ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config
+
+    spatch ${HOME}/patches/kernel-info.patch -p0
+    spatch ${HOME}/patches/sqlzma-3.4-457/squashfs-3.4/sqlzma2k-3.4.patch -d /usr/src/linux -p1
+
+    rsync -aHSO --chmod=go=rX ${HOME}/patches/sqlzma-3.4-457/squashfs-3.4/{sqlzma.h,sqmagic.h} /usr/src/linux/fs/squashfs
+    rsync -aHSO --chmod=go=rX --exclude=Makefile ${HOME}/patches/sqlzma-3.4-457/lzma-457/ /usr/src/linux/fs/squashfs
+    cat /root/patches/sqlzma-3.4-457/lzma-457/Makefile >> /usr/src/linux/fs/squashfs/Makefile
+
+    spatch ${HOME}/patches/fbcondecor-0.9.5-2.6.28.patch -d /usr/src/linux -p1
+    spatch ${HOME}/patches/unionfs-2.5.4_for_2.6.28.10.diff.gz -d /usr/src/linux -p1
+    # http://www.mail-archive.com/unionfs@mail.fsl.cs.sunysb.edu/msg03114.html
+    spatch ${HOME}/patches/unionfs-unlink.patch -d /usr/src/linux -p4
+
+
+    # Rely on timezone-data ebuild updating /etc/localtime
+    sinfo "Compiling system"
+    emerge -q1 binutils gcc libc
+    emerge -qe system
+    rm /etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock
+    emerge -q --depclean
+
+
+    # Rebuild locales (using possibly updated locales list)
+    sinfo "Generating locales"
+    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
+    locale-gen -q
+else
+    emerge -qupvDN --with-bdeps y world
+fi
+
+
+sinfo "Compiling world"
+emerge -quDN --with-bdeps y world
+
+
+sinfo "Cleaning unnecessary packages"
+emerge -q --depclean
+
+
+sinfo "Checking linking consistency"
+revdep-rebuild -q -i
+
+etc-update
+eselect news read all
+eselect news purge
+
+
+sinfo "Compiling custom executables"
+( . /etc/make.conf && \
+    gcc -o /usr/local/sbin/udev-watchdog ${HOME}/ebuilds/udev-watchdog.c ${CFLAGS} ${LDFLAGS} -ludev && \
+    strip -s /usr/local/sbin/udev-watchdog )
+
+# s/AD/Andorra/;...
+ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
+# s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...
+lcrep=`awk '/^title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^title[[:space:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
+# "Spain" ca "__ca_ES@valencia" ca_ES.UTF-8@valencia (+ lcrep)
+awk '/UTF-8/ && !/^iw_IL/ { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a); printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); print $1 }' /usr/share/i18n/SUPPORTED | sed "${ccrep}${lcrep}" | LC_ALL=C sort | tr '\n' ' ' > /etc/locale.menu
+# "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"
+awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/zone.tab | sed "${ccrep}" | LC_ALL=C sort | tr '\n' ' ' > /etc/timezone.menu
+
+
+sinfo "Selectively disabling PAX"
+paxctl -m /usr/bin/midori /usr/bin/mplayer
+
+
+sinfo "Configuring fontconfig"
+for fconf in \
+    10-no-sub-pixel.conf \
+    20-unhint-small-dejavu-sans.conf \
+    20-unhint-small-dejavu-sans-mono.conf \
+    20-unhint-small-dejavu-serif.conf \
+    25-unhint-nonlatin.conf \
+    44-wqy-zenhei.conf \
+    57-dejavu-sans.conf \
+    57-dejavu-sans-mono.conf \
+    57-dejavu-serif.conf \
+    65-culmus.conf \
+    65-khmer.conf \
+    65-ttf-thai-tlwg.conf \
+    70-no-bitmaps.conf
+do
+    if [ ! -f /etc/fonts/conf.d/${fconf} ]; then
+        eselect fontconfig enable ${fconf}
+    fi
+done
+
+
+sinfo "Updating PCI and USB lists"
+update-pciids -q
+update-usbids -q
+
+
+# One of the dependant packages creates /x during installation
+sinfo "Installing temporary Perl packages"
+cpan -i Pod::Strip File::Comments::Plugin::Perl 1>/dev/null 2>&1
+rm -f /x
+
+
+sinfo "Patching init scripts"
+initpatches="genkernel checkroot rc autoconfig iptables hdparm tor"
+for p in ${initpatches}; do
+    spatch ${HOME}/patches/${p}.patch -p0
+done
+sed -i 's/^# include /include /' /etc/nanorc
+
+
+# Handled by autoconfig: network[disabled], acpid, hdparm
+# Handled by autoconfig (possibly using hwsetup): alsasound, gpm
+sinfo "Configuring start-up services"
+bootsvc="microcode_ctl metalog iptables consolekit"
+defaultsvc="bluetooth pcscd nscd fbcondecor autoconfig autofs wicd privoxy"
+delsvc="rmnologin netmount"
+
+for svc in ${bootsvc}; do
+    rc-update add ${svc} boot
+done
+for svc in ${defaultsvc}; do
+    rc-update add ${svc} default
+done
+for svc in ${delsvc}; do
+    rc-update del ${svc}
+done
+
+
+# Root password good for maintenance before /etc/init.d/autoconfig is in charge
+# "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
+# "users" group is necessary for Wicd DBUS communication
+sinfo "Setting up users"
+grpck -r && grpconv
+echo root:liberte | chpasswd
+groupadd -f -r games
+useradd -c "Anonymous" -d /home/anon -G wheel,users,audio,cdrom,games anon || [ $? = 9 ]
+useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
+
+
+sinfo "Installing wrappers"
+mv -n /sbin/dhcpcd{,.orig}
+ln -sf dhcpcd.wrapper /sbin/dhcpcd
+
+
+sinfo "Compiling kernel"
+genkflags="--splash=liberte --no-keymap --oldconfig --no-save-config --loglevel=0"
+export KBUILD_BUILD_VERSION=0
+export AMODULES_FS="ext2 loop squashfs sqlzma unlzma isofs unionfs"
+export AMODULES_PCMCIA="mmc_core mmc_block"
+#export AMODULES_FIREWIRE="firewire-ohci firewire-sbp2"
+sed -i 's/^MODULES_\(DMRAID\|EVMS\|LVM\|MDADM\|NET\|FS\|FIREWIRE\)=/#\0/' /usr/share/genkernel/arch/x86/modules_load
+genkernel ${genkflags} all
+
+
+sinfo "Adding uvesafb support to initrd"
+cpiodir=`mktemp -d`
+mkdir ${cpiodir}/cpio
+cd ${cpiodir}/cpio
+
+/usr/src/linux/usr/gen_init_cpio /usr/share/v86d/initramfs \
+    | cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1
+zcat /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
+find . -not -type d -o -name root | sed 's@^./@@' \
+    | cpio -oA -H newc -O ${cpiodir}/initramfs
+
+gzip -c9 ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
+cd; rm -r ${cpiodir}
+
+
+sinfo "Kernel config differences:"
+diff ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config || true
+
+
+sinfo "Cleaning modules directory"
+rm /lib/modules/*/{build,source}
+#make -C /usr/src/linux clean
+
+
+sinfo "Generating Grub configuration"
+rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
+rm /boot/grub/menu.lst
+cat /boot/grub/grub.conf \
+    | sed s@/boot/kernel-genkernel@/boot/kernel-genkernel-x86-${kversion}@ \
+    | sed s@/boot/initramfs-genkernel@/boot/initramfs-genkernel-x86-${kversion}@ \
+    > /boot/grub/menu.lst
+
+
+sinfo "Done."

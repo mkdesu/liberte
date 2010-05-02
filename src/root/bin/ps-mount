@@ -1,0 +1,233 @@
+#!/bin/bash -e
+
+# Use of auto.media is exclusive via file lock
+lock=/etc/.auto.lock
+
+# Real work is done in forked process
+if [ "$1" = fork ]; then
+    shift
+
+    # Files and scripts
+    prefix=/mnt/media
+    mounts=/etc/auto.media
+    daemon=/var/lib/init.d/started/autofs
+
+    # Mount options
+    supported=" ext2 vfat msdos ntfs iso9660 "
+    luser=anon
+    lgroup=anon
+    opts_common=noatime,nosuid,nodev,noexec
+    opts_vfat=${opts_common},flush,utf8,showexec,uid=${luser},gid=${lgroup},umask=0137,dmask=067
+    opts_ntfs=${opts_common},streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0137,dmask=067
+    opts_ntfs_ro=${opts_common},ro,streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0337,dmask=0267
+    opts_iso9660=${opts_common},ro,utf8,uid=${luser},gid=${lgroup},mode=0440,dmode=0510
+    opts_ext2=${opts_common}
+    opts_auto=${opts_vfat}
+
+    # Checking whether device is in fstab (except root fs), or is mounted
+    fstab_check() {
+        if [ -n "${FSTAB_NAME}" ]; then
+            echo fstab
+        else
+            # /proc/mounts contains only canonical device names
+            local rootdevs=`awk '/^\// { print $1 }' /proc/mounts`
+            local mdev
+
+            for mdev in ${rootdevs}; do
+                if [ ${mdev} = "${DEVNAME}" ]; then
+                    echo mtab
+                    return
+                fi
+            done
+
+            echo none
+        fi
+    }
+
+    # Nothing to do if the device is handled by fstab
+    fscheck=`fstab_check`
+    if [ "${fscheck}" = fstab ]; then
+        exit
+    fi
+
+    # Exit if fs type is available, but is not supported
+    if [ -n "${ID_FS_TYPE}" -a -n "${supported/* ${ID_FS_TYPE} */}" ]; then
+        exit
+    fi
+
+    # Assign volume label if unavailable
+    if [ -z ${ID_FS_LABEL} ]; then
+        if [ "${DEVNAME/[0-9]/X}" = /dev/fdX ]; then
+            ID_FS_LABEL="floppy${DEVNAME/\/dev\/fd/}"
+            ID_FS_LABEL="${ID_FS_LABEL/floppy0/floppy}"
+        elif [ "${ID_CDROM}" = 1 ]; then
+            ID_FS_LABEL="cdrom"
+            if [ "${ID_CDROM_DVD}" = 1 ]; then
+                ID_FS_LABEL="dvdrom"
+            fi
+        elif env | grep -q '^ID_CDROM_MEDIA_CD.*=1$'; then
+            ID_FS_LABEL=unnamed-cd
+        elif env | grep -q '^ID_CDROM_MEDIA_DVD.*=1$'; then
+            ID_FS_LABEL=unnamed-dvd
+        else
+            ID_FS_LABEL=unnamed-disk
+        fi
+    fi
+
+    # Get current autofs devices and keys (space-separated)
+    autodevs=`awk '!/^#/ { printf " " substr($3, 2) }' ${mounts}; echo -n ' '`
+    autokeys=`awk '!/^#/ && $1 != "" { printf " " $1 }' ${mounts}; echo -n ' '`
+
+    # Fixing volume label in case of collision
+    fixlabel() {
+        if [ -z "${autokeys/* ${ID_FS_LABEL} */}" ]; then
+            local suffix=1
+
+            while [ -z "${autokeys/* ${ID_FS_LABEL}-${suffix} */}" ]; do
+                let suffix++
+            done
+
+            ID_FS_LABEL="${ID_FS_LABEL}-${suffix}"
+        fi
+    }
+
+    # Reloading autofs if it is running
+    reload_autofs() {
+        local actual
+        local expected
+
+        if [ -L ${daemon} ]; then
+            # Sends SIGHUP to automount
+            ${daemon} reload
+
+            # Wait up to 5s for changes to take effect
+            local count=0
+            expected=`echo "${autokeys}" | sed 's/^ //; s/ $//' | tr ' ' '\n' | sort`
+            while [ ${count} -lt 20 ]; do
+                actual=`find ${prefix} -mindepth 1 -maxdepth 1 -type d | sed "s:^${prefix}/::" | sort`
+
+                if [ "${actual}" = "${expected}" ]; then
+                    count=100
+                else
+                    sleep 0.25
+                    let count++
+                fi
+            done
+
+            # Changes weren't reflected in /mnt/media
+            if [ ${count} != 100 ]; then
+                logger -p 4 -t auto.media "autofs reloading failed, restarting service"
+                ${daemon} restart
+            fi
+        fi
+    }
+
+    # Adding new auto.media entry
+    # (also update autokeys for reload_autofs)
+    add_entry() {
+        # Fallback, shouldn't happen
+        local type="tmpfs,${opts_common}"
+
+        case ${ID_FS_TYPE} in
+            auto)
+                type="${ID_FS_TYPE},${opts_auto}"
+                ;;
+            ext2)
+                type="${ID_FS_TYPE},${opts_ext2}"
+                ;;
+            vfat|msdos)
+                type="${ID_FS_TYPE},${opts_vfat}"
+                ;;
+            ntfs)
+                type="${ID_FS_TYPE}-3g,${opts_ntfs}"
+                ;;
+            iso9660)
+                type="${ID_FS_TYPE},${opts_iso9660}"
+                ;;
+        esac
+
+        fixlabel
+        echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
+        autokeys="${autokeys}${ID_FS_LABEL} "
+
+        # Add extra read-only mount point for NTFS (works with hibernated Windows)
+        if [ "${ID_FS_TYPE}" = ntfs ]; then
+            ID_FS_LABEL="${ID_FS_LABEL}-readonly"
+            type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
+
+            fixlabel
+            echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
+            autokeys="${autokeys}${ID_FS_LABEL} "
+        fi
+    }
+
+    # Unmount and remove existing auto.media entry (or entries, if NTFS)
+    # (also update autokeys for fixlabel after ACTION=change, and for reload_autofs)
+    remove_entry() {
+        # Unmount mount points, not devices (since there can be several per device)
+        local keys=`awk '!/^#/ && $3 == ":'"${DEVNAME}"'" { print $1 }' ${mounts}`
+        local key
+
+        for key in ${keys}; do
+            umount -l ${prefix}/${key} 2>/dev/null || true
+            autokeys="${autokeys/ ${key} / }"
+        done
+
+        # Remove entries (will be removed from dir after autofs reload)
+        grep -v " :${DEVNAME}"\$ ${mounts} > ${mounts}.$$ || true
+        mv ${mounts}.$$ ${mounts}
+    }
+        
+    # For "add" action, a line is added only for non-existing (in autofs or mounted) device
+    if [ "${ACTION}" = add ]; then
+        if [ -n "${autodevs/* ${DEVNAME} */}" -a "${fscheck}" != mtab ]; then
+            # Generate fs type for static floppy/cd directories
+            if [ "${DEVNAME/[0-9]/X}" = /dev/fdX ]; then
+                ID_FS_TYPE=auto
+            elif [ "${ID_CDROM}" = 1 ]; then
+                ID_FS_TYPE=iso9660
+            fi
+
+            # Add an entry only if fs type is available
+            if [ -n "${ID_FS_TYPE}" ]; then
+                add_entry
+                reload_autofs
+            fi
+        fi
+    # For "change" action, a line is replaced
+    elif [ "${ACTION}" = change ]; then
+        if [ -z "${autodevs/* ${DEVNAME} */}" ]; then
+            remove_entry
+            updated_autofs=1
+        fi
+
+        if [ -n "${ID_FS_TYPE}" ]; then
+            # Add an entry only if not still mounted
+            fscheck=`fstab_check`
+            if [ "${fscheck}" != mtab ]; then
+                add_entry
+                updated_autofs=1
+            fi
+        fi
+
+        if [ "${updated_autofs}" = 1 ]; then
+            reload_autofs
+        fi
+    # For "remove" action, the line corresponding to the device is removed
+    elif [ "${ACTION}" = remove ]; then
+        if [ -z "${autodevs/* ${DEVNAME} */}" ]; then
+            remove_entry
+            reload_autofs
+        fi
+    fi
+# Fork in order not to stall udev on this and related devices
+else
+    if [ ! -f ${lock} ]; then
+        umsave=`umask`
+        umask 077
+        touch ${lock}
+        umask ${umsave}
+    fi
+
+    (flock 20 && "$0" fork "$@") 20< ${lock} &
+fi

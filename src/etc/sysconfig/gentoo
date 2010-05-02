@@ -1,0 +1,6 @@
+# In absence of hwsetup
+
+MOUSE_FULLNAME=ps2
+MOUSE_DEVICE=/dev/input/mice
+
+SOUND_DRIVER=auto

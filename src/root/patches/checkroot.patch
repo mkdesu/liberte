@@ -1,0 +1,13 @@
+--- /etc/init.d/checkroot	2009-12-22 00:00:21.000000000 +0000
++++ /etc/init.d/checkroot.new	2010-03-20 14:00:54.000000000 +0000
+@@ -125,5 +125,10 @@
+ 	fi
+ }
+ 
++stop() {
++	ebegin "Zeroing-out RAM"
++	smem -ll 1>/dev/null || true
++	eend $?
++}
+ 
+ # vim:ts=4

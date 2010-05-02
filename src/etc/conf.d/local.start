@@ -1,0 +1,107 @@
+#!/bin/sh
+
+# Variables
+luser=anon
+lgroup=anon
+lmount=/home/${luser}/persist
+
+
+# Original root is mounted as /mnt/cdrom (by genkernel's initrd script)
+cdmount=`cat /proc/mounts | grep ' /mnt/cdrom '`
+fs=`echo "${cdmount}" | cut -d' ' -f3`
+
+
+# On USB boot, root is ext2 (unlike iso9660 on CD boot)
+if [ "${fs}" = "ext2" ]; then
+    # Get the FAT32 device and detach it from autofs
+    dev1=`echo "${cdmount}" | cut -d' ' -f1 | sed 's/2$/1/'`
+    ACTION=remove DEVNAME=${dev1} /root/bin/ps-mount
+
+    # Mount the FAT32 filesystem
+    # NOTE: dirs are group-accessible, files are group-readable
+    ebegin Mounting ${lmount}
+    mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${dev1} ${lmount}
+
+    # Create persist subdirs (for xdg-user-dir and claws-mail) only if everything went OK
+    if [ $? = 0 ]; then
+        rsync -aO /mnt/livecd${lmount}/ ${lmount}
+    fi
+
+    # Arm the poweroff watchdog
+    ebegin Arming power-off on ${dev1} removal
+    /root/bin/poweroff-watchdog ${dev1} &
+fi
+
+
+# Extract configuration archive, if present
+if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+    ebegin Restoring configuration from ${lmount}
+
+    sudo -n -u ${luser} /bin/tar xpjf ${lmount}/settings/config.tar.bz2 --owner ${luser} --group ${lgroup} -C /home/${luser}
+    if [ $? != 0 ]; then
+        ewarn Configuration extraction failed
+    fi
+fi
+
+
+# Autologin Liberte user (use livecd-functions' inittab backup)
+if ! grep -q mingetty /etc/inittab && [ -e /etc/inittab.old ]; then
+    ebegin Updating console autologin
+    
+    # mingetty accepts --noclear
+    cat /etc/inittab.old | grep -v '^c[3-9]:' \
+        | sed "s@/sbin/agetty \(-nl /bin/bashlogin \)\?38400 @/sbin/mingetty --autologin ${luser} --noclear @" \
+        | sed "s/^c2:\([^:]*\):respawn:\(.*\) ${luser} --noclear /c2:\1:wait:\2 root /" \
+        > /etc/inittab
+    telinit q
+fi
+
+
+# genkernel's initrc leaves /etc/mtab somewhat messed
+ebegin Updating mtab
+egrep -v ' (rootfs|autofs) ' /proc/mounts > /etc/mtab
+
+
+# Configure X server, unless "nox" is given to kernel
+cmdline=`cat /proc/cmdline`
+x11=yes
+for x in ${cmdline} ; do
+    case "${x}" in
+        nox)
+            x11=no
+            ;;
+        dox)
+            x11=yes
+            ;;
+    esac
+done
+if [ ${x11} = yes  -a  ! -e /etc/X11/xorg.conf ]; then
+    ebegin Configuring X server
+    export HOME=/root
+    if Xorg -configure 2>/dev/null && [ -e ${HOME}/xorg.conf.new ]; then
+        mv ${HOME}/xorg.conf.new /etc/X11/xorg.conf
+        cat >> /etc/X11/xorg.conf <<EOF
+Section "ServerFlags"
+    Option "DontZap"      "true"
+    Option "DontVTSwitch" "false"
+EndSection
+EOF
+    else
+        ewarn X server configuration failed
+    fi
+fi
+
+
+# Limit console logging
+dmesg -n 4
+truncate -s 0 /var/log/dmesg
+
+
+# Enable power management for wireless
+wdevs=`iwconfig 2>/dev/null | grep -oE '^[^ ]+'`
+for dev in ${wdevs}; do
+    ebegin Enabling power management for wireless: ${dev}
+    iwconfig ${dev} power on
+done
+
+# awk -F: '/eth.:|tr.:|ath.:|wlan.:/{print $1}' /proc/net/dev

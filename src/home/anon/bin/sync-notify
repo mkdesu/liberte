@@ -1,0 +1,6 @@
+#!/bin/sh
+
+sync
+sleep 2
+
+zenity --info --text="Removable media can be disconnected now.\n\nBefore disconnecting, make sure any I/O activity on the device stopped."

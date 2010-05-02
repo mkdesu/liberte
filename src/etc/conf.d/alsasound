@@ -1,0 +1,9 @@
+ENABLE_OSS_EMUL="yes"
+
+# Handled by autoconfig
+RESTORE_ON_START="no"
+
+# Meaningless without persistence
+SAVE_ON_STOP="no"
+
+LOAD_ON_START="yes"

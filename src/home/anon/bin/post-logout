@@ -1,0 +1,36 @@
+#!/bin/sh
+
+clear
+cat <<EOF
+You have logged out of X.
+EOF
+
+done=0
+while [ ${done} = 0 ]; do
+    cat <<EOF
+
+Please choose:
+    [s] shutdown
+    [r] reboot
+    [q] shell (or just hit enter)
+EOF
+    read choice
+    done=1
+
+    case "${choice}" in
+    s)
+        sudo shutdown -h now
+        sleep 5
+        ;;
+    r)
+        sudo shutdown -r now
+        sleep 5
+        ;;
+    q|"")
+        echo 'Type "exit" to login to X again.'
+        ;;
+    *)
+        done=0
+        ;;
+    esac
+done

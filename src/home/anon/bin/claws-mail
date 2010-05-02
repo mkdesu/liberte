@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/claws-mail --alternate-config-dir ${XDG_CONFIG_HOME}/claws-mail 2>/dev/null "$@"

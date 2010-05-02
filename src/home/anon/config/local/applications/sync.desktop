@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Synchronize Media
+Comment=Force synchronization prior to media removal
+Exec=sync-notify
+Terminal=false
+Type=Application
+Categories=Utility
+Icon=drive-removable-media

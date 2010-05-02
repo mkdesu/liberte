@@ -1,0 +1,14 @@
+
+[Wikipedia]
+name=Wikipedia
+text=The free encyclopedia
+uri=http://en.wikipedia.org/wiki/Special:Search/%s
+icon=
+token=wp
+
+[The Free Dictionary]
+name=The Free Dictionary
+text=Dictionary, Encyclopedia and Thesaurus
+uri=http://www.thefreedictionary.com/%s
+icon=
+token=fd

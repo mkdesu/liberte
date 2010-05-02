@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/xcdroast -n -c ${XDG_CONFIG_HOME}/xcdroast 2>/dev/null "$@"

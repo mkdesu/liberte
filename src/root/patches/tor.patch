@@ -1,0 +1,10 @@
+--- /etc/init.d/tor	2010-02-14 09:25:19.000000000 +0000
++++ /etc/init.d/tor.new	2010-03-08 23:46:17.000000000 +0000
+@@ -34,6 +34,7 @@
+ start() {
+ 	checkconfig || return 1
+         ebegin "Starting Tor"
++	/root/bin/sync-tor
+         HOME=/var/lib/tor
+ 	start-stop-daemon --start --pidfile "${PIDFILE}" --quiet --exec /usr/bin/tor  -- -f "${CONFFILE}" --runasdaemon 1 --PidFile "${PIDFILE}" > /dev/null 2>&1
+         eend $?

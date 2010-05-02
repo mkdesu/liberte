@@ -1,0 +1,4 @@
+$include /etc/inputrc
+
+set completion-ignore-case on
+set show-all-if-unmodified on

@@ -1,0 +1,31 @@
+confdir         /etc/privoxy
+logdir          /var/log/privoxy
+
+actionsfile     match-all.action        # Actions that are applied to all sites and maybe overruled later on.
+actionsfile     default.action          # Main actions file
+actionsfile     user.action             # User customizations
+
+filterfile      default.filter          # Main filters file
+
+logfile         privoxy.log
+
+listen-address  127.0.0.1:8118
+toggle          1
+enforce-blocks  0
+
+buffer-limit    4096
+
+forward-socks5  /                       localhost:9050  .
+forward-socks5  check.torproject.org    localhost:9050  .
+forward-socks5  torcheck.xenobite.eu    localhost:9050  .
+forward-socks5  .onion                  localhost:9050  .
+
+forward         127.0.0.1/              .
+forward         localhost/              .
+#forward        192.168.*.*/            .
+
+forwarded-connect-retries               2
+accept-intercepted-requests             0
+
+keep-alive-timeout                      5
+socket-timeout                          300

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<toolbar>
+	<item file="mail_reply" text="Reply" action="A_REPLY_MESSAGE"/>
+	<item file="mail_reply_to_all" text="All" action="A_REPLY_ALL"/>
+	<item file="mail_reply_to_author" text="Sender" action="A_REPLY_SENDER"/>
+	<item file="mail_forward" text="Forward" action="A_FORWARD"/>
+	<separator/>
+	<item file="trash_btn" text="Wastebin" action="A_TRASH"/>
+	<item file="spam_btn" text="Spam" action="A_LEARN_SPAM"/>
+	<item file="down_arrow" text="Next" action="A_GOTO_NEXT"/>
+</toolbar>

@@ -1,0 +1,5 @@
+gtk-theme-name      = "MurrinaCandy"
+gtk-icon-theme-name = "gnome"
+# gtk-sound-theme-name = "freedesktop"
+
+include "/home/anon/config/gtk-2.0/gtkrc.mine"

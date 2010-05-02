@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Choose language
+newloc=`cat /etc/locale.menu | xargs -n 10000 -x \
+    zenity --list --width=570 --height=450 --window-icon=question \
+    --title "UI language chooser (1/2)" \
+    --text="<big><b>Select your user interface language.</b></big>\n\
+It will become active on next login.\n\n\
+<i>Note that depending on the application you use, \
+the language locale may be exposed via network.</i>" \
+    --column="Country" --column="Language" --column="Locale" \
+    --print-column=3 --hide-column=3`
+useloc=$?
+
+# Choose timezone
+extratz='Worldwide Zulu "Universal Coordinated Time"'
+newtz=`(echo "${extratz}"; cat /etc/timezone.menu) | xargs -n 10000 -x \
+    zenity --list --width=750 --height=450 --window-icon=question \
+    --title "Time zone chooser (2/2)" \
+    --text="<big><b>Select your time zone.</b></big>\n\
+It will become active on next login.\n\n\
+<i>Note that depending on the application you use, \
+the time zone may be exposed via network.</i>" \
+    --column="Country" --column="Time Zone" --column="Comment" \
+    --print-column=2`
+usetz=$?
+
+if [ ${useloc} = 0 ]; then
+    echo "Configuring locale: LANG=${newloc}"
+    sed -i "s:^export LANG=.*:export LANG=${newloc}:" ${XDG_CONFIG_HOME}/shell/locale
+
+    if ! grep -q LANG=${newloc} ${XDG_CONFIG_HOME}/shell/locale; then
+        echo "export LANG=${newloc}" >> ${XDG_CONFIG_HOME}/shell/locale
+    fi
+fi
+
+if [ ${usetz} = 0 ]; then
+    echo "Configuring timezone: TZ=${newtz}"
+    sed -i "s:^export TZ=.*:export TZ=${newtz}:" ${XDG_CONFIG_HOME}/shell/locale
+
+    if ! grep -q TZ=${newtz} ${XDG_CONFIG_HOME}/shell/locale; then
+        echo "export TZ=${newtz}" >> ${XDG_CONFIG_HOME}/shell/locale
+    fi
+fi

@@ -1,0 +1,3 @@
+# Low timeout in order to allow for fast removable media
+# extraction. Possibly somewhat problematic with CDs.
+/mnt/media	/etc/auto.media	--ghost --timeout=5

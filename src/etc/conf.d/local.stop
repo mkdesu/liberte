@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Variables
+luser=anon
+lgroup=anon
+lmount=/home/${luser}/persist
+
+
+# Save configuration (an incremental snapshot)
+ebegin Saving configuration to ${lmount}
+
+# snapshot list in ${tmpdir}/list, snapshot archive in ${tmpdir}/config.tar.bz2
+tmpdir=`mktemp -d` \
+    && LC_ALL=en_GB.UTF-8 rsync -rlpcgo -x -in --exclude-from=/home/${luser}/config/persist.excludes /home/${luser}/config /mnt/livecd/home/${luser} | egrep '^[>c.]' | sed 's/[^ ]* //' > ${tmpdir}/list \
+    && tar cpjf ${tmpdir}/config.tar.bz2 -C /home/${luser} --no-recursion -T ${tmpdir}/list
+
+# proceed with saving only if everything went OK, and archive has non-zero size
+if [ $? = 0  -a  -s ${tmpdir}/config.tar.bz2 ]; then
+    chown ${luser}:${lgroup} ${tmpdir}/config.tar.bz2
+    chmod 600                ${tmpdir}/config.tar.bz2
+
+    # if previous archive exists, replace it if new one is different
+    if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+        if ! cmp -s ${lmount}/settings/config.tar.bz2 ${tmpdir}/config.tar.bz2; then
+            mv ${lmount}/settings/config.tar.bz2 ${lmount}/settings/config-old.tar.bz2
+            mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
+        else
+            rm ${tmpdir}/config.tar.bz2
+        fi
+    # otherwise copy archive over only if it's non-empty
+    elif [ -s ${tmpdir}/list ]; then
+        mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
+    else
+        rm ${tmpdir}/config.tar.bz2
+    fi
+
+    rm ${tmpdir}/list
+    rmdir ${tmpdir}
+else
+    ewarn Failed to save configuration
+fi
+
+
+# Unmount the persistent fs
+if grep -q ${lmount} /proc/mounts; then
+    ebegin Unmounting ${lmount}
+    umount -l ${lmount}
+fi

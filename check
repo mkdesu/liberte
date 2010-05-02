@@ -1,0 +1,53 @@
+#!/bin/sh
+
+sinfo() {
+    echo -e "\033[1;33;41m$@\033[0m"
+}
+
+
+# Must have root directory as an argument
+if [ "$1" = "" ]; then
+    echo "$0 <livecd root>"
+    exit 1
+fi
+
+
+# Variables
+LIVECD=$1/clean
+
+
+sinfo "Checking ${LIVECD}"
+
+sinfo "Bad symlinks:"
+chroot ${LIVECD} find / -type l -not -xtype f -not -xtype d
+
+sinfo "Archives:"
+find ${LIVECD} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \) \
+    -not \( -path '*/charmaps/*' -o \
+            -path '*/keymaps/*' -o \
+            -path '*/consolefonts/*' -o\
+            -path '*/usr/share/fonts/*' \)
+
+sinfo "Sources:"
+find ${LIVECD} -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py'
+
+sinfo "Objects:"
+find ${LIVECD} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
+
+sinfo "Docs:"
+find ${LIVECD} -name '*.info' -o -name '*.htm*' -o \( -name '*.1' -not -name '*.so.*' \)
+
+sinfo "Hidden:"
+find ${LIVECD} -name '.*'
+
+sinfo "Backup:"
+find ${LIVECD} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*'
+
+sinfo "Cache:"
+find ${LIVECD} -name '*.cache'
+
+sinfo "Logs:"
+find ${LIVECD} -name '*.log*' -o -type f \( -path '*var/run/*' -o -path '*/var/log/*' \)
+
+sinfo "SUID/SGID:"
+find ${LIVECD} -type f \( -perm -4000 -o -perm -2000 \) -ls

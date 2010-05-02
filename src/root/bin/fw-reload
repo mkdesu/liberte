@@ -1,0 +1,75 @@
+#!/bin/sh
+
+# Default policies
+iptables -P INPUT   DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT  DROP
+
+# Flush all rules
+iptables -F
+iptables -X
+
+# Define custom chains
+iptables -N LOGDROP
+# iptables -A LOGDROP -j LOG      --log-prefix "fw-drop: " --log-level debug --log-uid
+iptables -A LOGDROP -j DROP
+
+iptables -N LOGREJECT
+iptables -A LOGREJECT -j LOG    --log-prefix "fw-deny: " --log-level debug --log-uid
+iptables -A LOGREJECT -j REJECT --reject-with icmp-admin-prohibited
+
+
+# --- IP ---
+
+# Allow existing/related connections packets through (TCP + UDP-in + ICMP-in errors)
+iptables -A INPUT  -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p udp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p icmp --icmp-type destination-unreachable -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p icmp --icmp-type time-exceeded           -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p icmp --icmp-type source-quench           -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p icmp --icmp-type parameter-problem       -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Allow rate-limited incoming unicast ICMP ping, and related echo reply
+iptables -A INPUT  -p icmp --icmp-type echo-request -m addrtype --dst-type LOCAL -m limit --limit 20/minute -j ACCEPT
+iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+# --- Loopback ---
+
+# Protect Tor hidden service and Privoxy ports from unintended access
+# (owner match doesn't work with the INPUT chain)
+iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor  -d 127.0.0.1 --dport 80   -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner ! --uid-owner anon -d 127.0.0.1 --dport 8118 -j LOGREJECT
+
+# Tor access via SOCKS to selected users only
+iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner anon    --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -p tcp -d 127.0.0.1 --dport 9050 -j LOGREJECT
+
+# Pass other loopback packets through
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+
+# --- External Communications ---
+
+# DHCP and NTP client communication
+iptables -A OUTPUT -p udp --sport bootpc --dport bootps -j ACCEPT
+iptables -A OUTPUT -p udp --sport ntp    --dport ntp    -j ACCEPT
+
+# DNS use for Tor and the NTP server
+# (uid-owner does not work for dns with nscd; ntpd resolves hostnames as root)
+iptables -A OUTPUT -p udp -m owner --uid-owner root       --dport domain -j ACCEPT
+iptables -A OUTPUT -p udp -m owner --uid-owner tor        --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner root --syn --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner tor  --syn --dport domain -j ACCEPT
+
+# Let Tor initiate connections to its ReachableAddresses ports
+iptables -A OUTPUT -p tcp --syn -m owner --uid-owner tor -m multiport --dports 80,443 -j ACCEPT
+
+
+# Log all other packets at level 7
+iptables -A INPUT   -j LOGDROP
+iptables -A FORWARD -j LOGDROP
+iptables -A OUTPUT  -j LOGREJECT

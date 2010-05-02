@@ -1,0 +1,33 @@
+# The ${HOME}/config directory is synchronized to <persist>/settings/config.tar.bz2
+# upon shutdown. If you want to exclude some files or directories, add them here
+# in rsync format. The root is ${HOME}.
+
+# Generated wallpaper
+/config/images/liberte-logo-wallpaper.png
+
+# Browsing
+/config/midori/tabtrash.xbel
+/config/midori/history.db
+
+# Mail
+/config/claws-mail/menurc
+/config/claws-mail/*.bak
+/config/claws-mail/addrbook/*.bak
+/config/claws-mail/*_history
+/config/claws-mail/*.log
+/config/claws-mail/tmp/
+/config/claws-mail/mimetmp/
+/config/claws-mail/tempfolder/
+/config/claws-mail/*cache/
+/config/claws-mail/claws-mail-[0-9]*
+/config/claws-mail/tagsdb/
+
+# Logs
+/config/mc/history
+/config/audacious/log
+
+# Qalculate plots
+/config/qalculate/tmp/
+
+# Miscellaneous
+/config/mplayer/registry

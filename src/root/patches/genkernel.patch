@@ -1,0 +1,112 @@
+--- /usr/share/genkernel/defaults/initrd.scripts	2010-04-29 14:55:39.000000000 +0000
++++ /usr/share/genkernel/defaults/initrd.scripts.new	2010-04-29 14:56:17.000000000 +0000
+@@ -75,11 +75,14 @@
+ 
+ 		[ ! -d "${mntdir}" ] && mkdir -p ${mntdir} 2>/dev/null >/dev/null
+ 
+-		for x in $*
++		local devices="$*" tested=""
++		while true; do
++		for x in ${devices}
+ 		do
+ 			# Check for a block device to mount
+-			if [ -b "${x}" ]
++			if [ -b "${x}" ] && ! echo "${tested}" | grep -q " ${x} "
+ 			then
++				tested="${tested} ${x} "
+ 				skip=0
+ 				bsn=`basename "${x}"`
+ 				#
+@@ -113,13 +116,17 @@
+ 						#set REAL_ROOT, CRYPT_ROOT_KEYDEV or whatever ${vrbl} is
+ 						eval ${vrbl}'='"${x}"
+ 						good_msg "Media found on ${x}" ${CRYPT_SILENT}
+-						break
++						break 2
+ 					else
+ 						umount ${mntdir}
+ 					fi
+ 				fi
+ 			fi
+ 		done
++
++		# We don't have "udevadm settle" with mdev, so just loop
++		sdelay; devices=`devicelist`
++		done
+ 	fi
+ 
+ 	eval local result='$'${vrbl}
+@@ -148,7 +155,7 @@
+ 	# a bunch of extra devices
+ 	[ -n "${CDROOT_DEV}" ] && DEVICES="${CDROOT_DEV}"
+ 
+-	findmediamount "cdrom" "${SUBDIR}/livecd" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
++	findmediamount "cdrom" "${SUBDIR}/liberte-boot.tag" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
+ }
+ 
+ bootstrapKey() {
+@@ -943,8 +950,8 @@
+ 
+ #		mkdir -p ${MEMORY}
+ 		mkdir -p ${UNION}
+-		good_msg "Loading fuse module"
+-		modprobe fuse > /dev/null 2>&1
++		good_msg "Loading unionfs module"
++		modprobe unionfs > /dev/null 2>&1
+ #                 if [ -n "${UNIONFS}" ] 	 
+ #                 then 	 
+ #                         CHANGESDEV=${UNIONFS} 	 
+@@ -971,17 +978,21 @@
+ #                         mount -t tmpfs tmpfs $MEMORY 	 
+ #                 fi 	 
+   	 
+-		mkdir /tmp
+ 		mkdir -p ${UNION}
+ #		mkdir -p $CHANGES
+ #		mount -t unionfs -o dirs=$CHANGES=rw unionfs ${UNION}
+ 		good_msg "Creating union mount"
+-		unionfs -o allow_other,cow,noinitgroups,suid,dev,default_permissions,use_ino ${rw_dir}=RW:${ro_dir}=RO ${UNION} 2>/dev/null
++		mount -t unionfs -o dirs=${rw_dir}=rw:${ro_dir}=ro unionfs ${UNION}
+ 		ret=$?
+ 		if [ "${ret}" -ne 0 ]
+ 		then
+ 			bad_msg "Can't setup union mount!"
+ 			USE_UNIONFS_NORMAL=0
++		else
++			for mnt in $(cut -d' ' -f2 /proc/mounts | grep "^${rw_dir}/" | sed "s@^${rw_dir}@@"); do
++				mount --move ${rw_dir}${mnt} ${UNION}${mnt}
++			done
++			mount --move ${rw_dir} ${UNION}/mnt/hidden${rw_dir}
+ 		fi
+ 	else
+ 		USE_UNIONFS_NORMAL=0
+--- /usr/share/genkernel/defaults/linuxrc	2010-04-29 14:54:10.000000000 +0000
++++ /usr/share/genkernel/defaults/linuxrc.new	2010-04-29 14:57:53.000000000 +0000
+@@ -183,13 +183,13 @@
+ 			keymap=`parse_opt "${x}"`
+ 		;;
+ 		unionfs)
+-			if [ ! -x /sbin/unionfs ]
+-			then
+-				USE_UNIONFS_NORMAL=0
+-				bad_msg 'unionfs binary not found: aborting use of unionfs!'
+-			else
++#			if [ ! -x /sbin/unionfs ]
++#			then
++#				USE_UNIONFS_NORMAL=0
++#				bad_msg 'unionfs binary not found: aborting use of unionfs!'
++#			else
+ 				USE_UNIONFS_NORMAL=1
+-			fi
++#			fi
+ 			;;
+ 		nounionfs)
+ 			USE_UNIONFS_NORMAL=0
+@@ -321,6 +321,7 @@
+ 		mkdir -p "${NEW_ROOT}/${i}"
+ 		chmod 755 "${NEW_ROOT}/${i}"
+ 	done
++	chmod 755 ${NEW_ROOT}; chmod 1777 ${NEW_ROOT}/tmp; chmod 700 ${NEW_ROOT}/dev; rmdir ${NEW_ROOT}/tmp/.initrd
+ 	[ ! -e "${NEW_ROOT}/dev/null" ] && mknod "${NEW_ROOT}"/dev/null c 1 3
+ 	[ ! -e "${NEW_ROOT}/dev/console" ] && mknod "${NEW_ROOT}"/dev/console c 5 1
+ 

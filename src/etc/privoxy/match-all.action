@@ -1,0 +1,21 @@
+#############################################################################
+# $Id: match-all.action,v 1.2 2009/02/14 10:41:07 fabiankeil Exp $
+#
+# This file contains the actions that are applied to all requests and
+# may be overruled later on by other actions files. Less experienced
+# users should only edit this file through the actions file editor.
+#
+#############################################################################
+{ \
++change-x-forwarded-for{block} \
++fast-redirects{check-decoded-url} \
++hide-from-header{block} \
++hide-referer{forge} \
++hide-user-agent{Mozilla/5.0 (X11; U; Linux i686; en-US)} \
++hide-accept-language{en-US,en} \
++overwrite-last-modified{randomize} \
++session-cookies-only \
++set-image-blocker{pattern} \
++filter{webbugs} \
+}
+/ # Match all URLs

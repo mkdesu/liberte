@@ -1,0 +1,233 @@
+# Installation dependencies
+# (can be removed later)
+sys-kernel/hardened-sources
+app-portage/gentoolkit
+sys-kernel/genkernel
+sys-boot/grub
+
+# LiveCD tools
+sys-apps/memtest86+
+app-misc/livecd-tools
+
+# Framebuffer
+sys-apps/v86d
+media-gfx/splashutils
+
+# Firmware
+sys-apps/microcode-ctl
+net-wireless/ipw2100-firmware
+net-wireless/ipw2200-firmware
+net-wireless/iwl3945-ucode
+net-wireless/iwl4965-ucode
+net-wireless/iwl5000-ucode
+net-wireless/iwl5150-ucode
+net-wireless/b43-firmware
+
+# Disk utilities
+sys-apps/hdparm
+sys-apps/sdparm
+app-admin/ide-smart
+virtual/eject
+app-misc/secure-delete
+app-arch/zip
+app-arch/p7zip
+app-arch/unrar
+sys-fs/ntfs3g
+net-fs/autofs
+
+# Security utilities
+app-admin/sudo
+sys-apps/paxctl
+sys-apps/gradm
+net-dialup/mingetty
+sys-fs/cryptsetup
+app-crypt/gnupg
+
+# Network utilities
+net-firewall/iptables
+net-analyzer/macchanger
+sys-apps/ethtool
+net-wireless/madwifi-ng-tools
+net-wireless/aircrack-ng
+net-dialup/pptpclient
+net-misc/wicd
+net-misc/ntp
+net-misc/tor
+net-proxy/tsocks
+net-proxy/privoxy
+net-misc/youtube-dl
+
+# Peripheral utilities
+sys-apps/x86info
+sys-power/cpufrequtils
+sys-apps/pciutils
+sys-fs/lsscsi
+sys-apps/usbutils
+sys-apps/pcmciautils
+net-wireless/bluez
+net-wireless/bluez-firmware
+dev-libs/opensc
+sys-power/acpid
+sys-apps/lm_sensors
+media-sound/alsa-utils
+
+# Text utilities
+app-text/convmv
+app-text/tree
+sys-process/lsof
+
+# Applications
+lxde-base/lxterminal
+x11-misc/parcellite
+x11-misc/xvkbd
+app-arch/xarchiver
+app-misc/mc
+app-cdr/xcdroast
+# app-cdr/graveman
+app-cdr/isomaster
+media-sound/audacious
+media-video/gnome-mplayer
+media-gfx/gpicview
+app-editors/gedit
+app-text/epdfview
+# app-office/abiword (wants asio)
+app-office/abiword-plugins
+app-office/gnumeric
+mail-client/claws-mail-notification
+mail-client/claws-mail-acpi-notifier
+mail-client/claws-mail-att-remover
+mail-client/claws-mail-archive
+sci-calculators/qalculate-gtk
+www-client/midori
+
+# Games
+games-board/xmahjongg
+
+# X11 (a subset of xorg-x11 metapackage)
+x11-base/xorg-server
+
+# X11 [applications]
+# (configuration)
+x11-apps/xset
+x11-apps/setxkbmap
+x11-apps/xmodmap
+x11-apps/xrdb
+x11-apps/xcmsdb
+x11-apps/xbacklight
+x11-misc/xcalib
+x11-apps/xgamma
+
+# (session)
+x11-apps/xauth
+x11-apps/xhost
+x11-apps/sessreg
+
+# (server queries)
+x11-apps/xdpyinfo
+x11-apps/xdriinfo
+x11-apps/xwininfo
+x11-apps/xvinfo
+x11-apps/mesa-progs
+x11-apps/xev
+
+# (clients management)
+# x11-apps/appres
+# x11-apps/listres
+x11-apps/xprop
+x11-apps/xlsclients
+x11-apps/xkill
+
+# (utilities)
+x11-apps/xrefresh
+x11-apps/xsetroot
+x11-apps/xlsfonts
+x11-apps/xfd
+
+# X11 [truetype fonts]
+# Inconsolata:    extremely good Latin monospace terminal font
+# DejaVu:         comprehensive Sans/Serif/Mono
+# SIL Charis:     comprehensive Roman/Cyrillic optimized for printing
+# SIL Gentium:    very readable Latin/Greek
+# SIL Arabic:     extended Arabic script, Scheherazade/Lateef
+# Farsi:          Persian script, Elham/Homa/Koodak/Nazli/Roya/Terafik/Titr
+# CLM Culmus:     Hebrew script, David/Frank Ruehl/Miriam(=Sans/Serif/Mono)/...
+# Meltho:         Syriac script, Serto.../Estrangelo.../East Syriac Adiabene
+# SIL Abyssinica: Ethiopic script
+# SIL Padauk:     all standard Myanmar characters [Graphite not supported]
+# WenQuanYi:      CJKV glyphs, Hei-Ti (Sans)
+# Lohit:          Hindi script, Assamese/Bengali/Gujarati/Hindi/Kannada/Konkani/Kashmiri/Maithili/Malayalam/Marathi/Nepali/Oriya/Punjabi/Sindhi/Tamil/Telugu
+# Bangla:         Bengali script, Akaash/Ani/Likhan/Mitra Mono/Mukti Narrow
+# ThaiFonts:      Thai script, Garuda/Kinnari/Loma/Norasi/Umpush/Waree/Purisa/Sawasdee/Tlwg
+# Khmer OS:       Khmer script (Cambodia), Battambang/Bokor/Content/Fasthand/Freehand/Metal Chrieng/Muol/Siemreap/System
+# TibMachUni:     Tibetan, Dzongkha and Ladakhi scripts
+# LKLUG:          [Extra] Sinhala (Sri Lanka) script
+# Mv:             [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas
+# [Cham:          www.ling.hawaii.edu/~uhdoc/champa/chamHI.ttf, incorrect codepoints]
+# Essays1743:     Nice decorative Latin font
+media-fonts/inconsolata
+media-fonts/dejavu
+# media-fonts/libertine-ttf
+# media-fonts/freefont-ttf
+media-fonts/sil-charis
+media-fonts/sil-gentium
+media-fonts/sil-arabicfonts
+media-fonts/farsi-fonts
+# media-fonts/kacst-fonts
+media-fonts/culmus
+media-fonts/font-misc-meltho
+media-fonts/sil-abyssinica
+# media-fonts/font-misc-ethiopic
+media-fonts/sil-padauk
+media-fonts/wqy-zenhei
+# media-fonts/arphicfonts
+# media-fonts/ja-ipafonts
+# media-fonts/umeplus-fonts
+# media-fonts/baekmuk-fonts
+media-fonts/lohit-fonts
+media-fonts/free-bangla-font
+media-fonts/thaifonts-scalable
+media-fonts/khmer
+media-fonts/tibetan-machine-font
+media-fonts/ttf-sinhala-lklug
+media-fonts/mcst-dhivehi-fonts
+media-fonts/essays1743
+
+# Internationalization
+# (qt4 needs scim-bridge)
+# app-i18n/scim-tables
+app-i18n/scim-m17n     
+app-i18n/scim-pinyin
+app-i18n/scim-anthy
+app-i18n/scim-hangul
+app-i18n/scim-input-pad
+# app-i18n/scim-bridge
+
+# X11 window management
+lxde-base/lxpanel
+lxde-base/lxshortcut
+lxde-base/lxtask
+x11-misc/pcmanfm
+x11-wm/openbox
+
+# X11 configuration
+lxde-base/lxrandr
+lxde-base/lxinput
+lxde-base/lxappearance
+gnome-extra/gconf-editor
+x11-misc/obconf
+x11-misc/xdg-utils
+x11-misc/xdg-user-dirs
+gnome-extra/zenity
+
+# X11 themes
+x11-themes/xcursor-neutral
+x11-themes/murrine-themes
+x11-themes/gnome-icon-theme
+x11-themes/sound-theme-freedesktop
+x11-themes/claws-mail-themes
+
+# Debugging
+# (should be removed in release)
+app-admin/paxtest
+net-analyzer/netcat
+# net-analyzer/wireshark

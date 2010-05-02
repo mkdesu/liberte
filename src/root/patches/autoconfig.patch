@@ -1,0 +1,28 @@
+--- /etc/init.d/autoconfig	2010-04-10 15:01:36.000000000 +0000
++++ /etc/init.d/autoconfig.new	2010-04-10 15:03:38.000000000 +0000
+@@ -234,7 +234,6 @@
+ 	svcs="${svcs} $(check_svc ${HALD} hald)"
+ 	svcs="${svcs} $(check_svc ${IDEDMA} hdparm)"
+ 	svcs="${svcs} $(check_svc ${NFS} nfsmount)"
+-	svcs="${svcs} $(check_svc ${PASSWD} pwgen)"
+ 	svcs="${svcs} $(check_svc ${PCMCIA} pcmcia)"
+ 	svcs="${svcs} $(check_svc ${SSH} sshd)"
+ 	svcs="${svcs} $(check_svc ${X11} mkxf86config x-setup)"
+@@ -538,7 +537,7 @@
+ 	then
+ 		for nics in ${NETDEVICES}
+ 		do
+-			if [ "${DHCP}" = "yes" ]
++			if [ "${DHCP}" = "explicit" ]
+ 			then
+ 				einfo "Network device ${HILITE}${nics}${NORMAL} detected, DHCP broadcasting for IP ..."
+ 				if [ -f /var/run/dhcpcd-${nics}.pid ]
+@@ -561,7 +560,7 @@
+ 		then
+ 			echo "root:${PASSWORD}" | chpasswd  > /dev/null 2>&1
+ 		else
+-			/etc/init.d/pwgen start
++			usermod -L root
+ 		fi
+ 		if [ "${SSHD}" = "yes" ]
+ 		then

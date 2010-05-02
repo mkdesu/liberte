@@ -1,0 +1,160 @@
+Liberté Linux Features
+----------------------
+
+Liberté Linux is a secure, lightweight, and easy to use Gentoo-based Linux
+distribution intended as a communication aid in hostile environments. You
+can install it on a USB key (which can double as a regular USB storage in
+any OS), and boot Liberté on any computer or laptop. Its internet connection
+(if available) is then used to set up a Tor circuit, and you are assigned a
+persistent global ID. Using this ID, you can stealthily communicate with
+other Liberté users. The distribution includes all the necessary image and
+document processing applications, and can also be used as a secure browsing
+platform.
+
+Author:  Maxim Kammerer <mk@dee.su>
+License: GPL
+
+
+Boot
+----
+
+* Gentoo Hardened kernel 2.6.28-r9
+      + UnionFS 2.5.4 + unlink patch
+      + uvesafb framebuffer driver
+      + fbcondecor framebuffer console decoration
+
+* Genkernel's initramfs
+      + Kernel-level UnionFS is used
+      + Read-only root is compressed with SquashFS-LZMA
+
+* Autodetection of hardware
+      + Conservative CPU governor is used to save power
+      + Hard disks are switched to quiet mode and are spun down
+      + Power management is enabled on wireless devices
+      + X is set up using Xorg -configure
+      + hwsetup is not used at all
+      + Some microcode is included
+
+* FAT32 Windows-visible USB partition is used for persistent storage
+  of user's config directory changes.
+      + Histories and logs are either not created, or not saved
+
+* A power-off watchdog is armed on an abrupt removal of USB boot device
+      + Memory is zeroed-out upon normal shutdown
+
+* No uncontrolled growth in the RAM part of UnionFS
+      + All logs are limited in size
+      + Memory requirements: ~128MB
+
+* System is locked down during boot
+      + Root password is disabled (main user doesn't have a password)
+      + Processes drop privileges (tor, privoxy, ntp, messagebus, nscd)
+      + Root console is available for 2 minutes after boot, for
+        troubleshooting (e.g., run "passwd root", then audit logs)
+
+* No user interaction is necessary during boot
+      + Applications are pre-configured and ready to use
+      + Main user is is automatically logged into X
+      + All static and removable disks are available via udev+autofs
+
+
+Network
+-------
+
+* Netfilter IP firewall protects the host, prevents DNS and other leaks
+      + Default deny on incoming and outgoing external connections
+      + Rate-limited ping reply is allowed
+      + DHCP, NTP and Tor external communication is allowed
+      + Only NTP and Tor are allowed to use DNS
+      + Only Tor can connect to hidden service daemon [loopback]
+      + Only main user and Privoxy can connect to Tor [loopback]
+      + Only main user can connect to Privoxy         [loopback]
+      + Additional IPv4 protection using kernel parameters
+
+* Tor hidden service hostname persistence
+      + Saved to user's config directory after first Tor execution
+      + Restored upon each subsequent boot
+      + Tor does not act as a relay
+
+* Wicd manages internet connectivity
+      + Wired connections are set up automatically
+      + Wireless password is intuitively configured via X GUI
+      + DHCP transmits are locked down (hostname, identification,
+        ARP, IPv4LL are disabled)
+      + MAC address is changed before each DHCP setup
+      + NTP and Tor are automatically restarted after reconnect
+
+* NTP connects to known server pool
+      + [0-4].pool.ntp.org
+      + DHCP may also provide an NTP server address
+      + Hardware clock is assumed UTC, and not saved upon shutdown
+      + First adjustment can be big, so non-UTC clock is fine
+
+
+Applications
+------------
+
+* i686 architecture is assumed
+      + PentiumPro or better
+      + MMX support is not necessary
+      + x86 (32-bit) binaries
+
+* Fully modular X
+      + Only TrueType fonts (for all languages supported by SCIM)
+      + Custom ebuilds: Sinhala, Dhiveni
+
+* LXDE- and GTK+-based desktop
+      + No GNOME or KDE
+      + lxpanel, openbox, pcmanfm, xarchiver, lxterminal, ...
+      + Midnight Commander is available for console use
+
+* Multilingualization (input languages) using SCIM
+      + All languages that are supported by m17n-lib
+      + Native support for CJK languages (pinyin, anthy, hangul)
+      + An input pad and virtual keyboard are available as well
+
+* Application-level (user interface) internationalization
+      + All unicode locales are compiled in
+      + Locale and timezone are easily changed using custom tool,
+        and UI languages are changed on next login
+
+* Other applications
+      + Text editor:        gedit
+      + Calculator:         Qalculate!
+      + Documents editor:   AbiWord
+      + Spreadsheet editor: Gnumeric
+      + PDF viewer:         ePDFView
+      + Web browser:        Midori
+      + Email client:       Claws Mail
+      + Music player:       Audacious
+      + Video player:       Gnome MPlayer
+      + CD/DVD burner:      X-CD-Roast
+
+
+Branding
+--------
+
+* GRUB splash image:
+      http://www.queervisions.com/2007/9-grub-splash-images/ (Grass)
+          [freely shared]
+
+* Framebuffer splash:
+      http://en.wikipedia.org/wiki/File:Communist_star.svg
+          [public domain]
+          silent:  180x180,
+          verbose:   42x42, (Serif 29pt font in Gimp)
+
+* Liberté logo is based upon:
+      http://commons.wikimedia.org/wiki/File:UN_emblem_blue.svg
+          [public domain]
+      http://commons.wikimedia.org/wiki/File:Anonymous_Flag.svg
+          [public domain]
+      http://commons.wikimedia.org/wiki/File:Blank_globe.svg
+          [public domain]
+      http://commons.wikimedia.org/wiki/File:URSS_aviation_Kremlin_red_star.svg
+          [public domain]
+      http://zelda.wikia.com/wiki/File:Black_Triforce.svg
+          [public domain]
+      http://www.thibault.org/fonts/essays/
+          [LGPL-2.1]
+  This logo artwork is therefore released under the CC-BY-SA-3.0 license.

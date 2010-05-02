@@ -1,0 +1,18 @@
+Q: Do I need Gentoo to build Liberté Linux?
+A: No, the build scripts are distribution-neutral.
+
+Q: How long does is the full build process?
+A: On the order of 5 hours on dual-core 2.66GHz Intel E8200.
+
+Q: Is it possible to run "./setup" more than once in same
+   source directory?
+A: Yes.
+
+Q: Is it necessary to run the full build process every time one
+   wants to build an updated CD/USB image?
+A: No, it is OK to update the source tree manually (or run
+   "./setup fast" and then follow the usual
+   mkroot copy/mkroot clean/mkdist process).
+
+Q: I would like to go over the emerge messages carefully.
+A: See /var/log/emerge.log and /var/log/portage/elog/summary.log

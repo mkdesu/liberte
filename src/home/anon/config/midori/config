@@ -1,0 +1,29 @@
+
+[settings]
+default-encoding=UTF-8
+enable-spell-checking=true
+spell-checking-languages=en
+last-window-width=1092
+last-window-height=893
+show-bookmarkbar=true
+homepage=https://ssl.scroogle.org/
+download-folder=/home/anon/persist/desktop
+ask-for-destination-folder=true
+text-editor=gedit %U
+location-entry-search=http://www.google.com/search?q=%s
+preferred-encoding=MIDORI_ENCODING_UNICODE
+open-tabs-in-the-background=true
+enable-plugins=false
+accept-cookies=MIDORI_ACCEPT_COOKIES_SESSION
+maximum-cookie-age=3
+maximum-history-age=1
+http-proxy=127.0.0.1:8118
+auto-detect-proxy=false
+identify-as=MIDORI_IDENT_CUSTOM
+user-agent=Mozilla/5.0 (X11; U; Linux i686; en-US)
+preferred-languages=en-US,en
+
+[extensions]
+libcookie-manager.so=true
+libshortcuts.so=true
+libstatusbar-features.so=true

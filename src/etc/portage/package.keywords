@@ -1,0 +1,21 @@
+# Firmware
+net-wireless/iwl5150-ucode
+net-wireless/bluez-firmware
+net-wireless/b43-firmware
+net-wireless/b43-fwcutter
+
+
+# Utilities
+app-i18n/scim-bridge
+x11-misc/xvkbd
+x11-misc/xdg-user-dirs
+sys-power/cpudyn
+
+
+# Applications
+app-editors/gedit-plugins
+app-office/abiword
+app-office/abiword-plugins
+www-client/midori
+#www-plugins/gnash
+#www-plugins/swfdec-mozilla

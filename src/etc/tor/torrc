@@ -1,0 +1,33 @@
+## Default user the server will run as
+User tor
+
+PIDFile            /var/run/tor/tor.pid
+Log notice syslog
+#Log notice file   /var/log/tor/tor.log
+
+## "SocksPort 0" for server-only setup
+SocksListenAddress 127.0.0.1
+SocksPort          9050
+
+## The directory for keeping all the keys/etc.
+DataDirectory      /var/lib/tor/data
+
+## Hidden service on local port 80
+HiddenServiceDir   /var/lib/tor/hidden_service/
+HiddenServicePort  80 127.0.0.1:80
+
+## Easy operation behind firewalls, also disguise
+## connections somewhat.
+ReachableAddresses *:80, *:443
+
+## Reject resolved DNS connections
+SafeSocks 1
+
+# Do not relay. From Tor FAQ:
+#   Three different research papers describe ways to identify the relays in a
+#   circuit by running traffic through candidate relays and looking for dips
+#   in the traffic while the circuit is active. These clogging attacks are not
+#   that scary in the Tor context so long as relays are never clients too. But
+#   if we're trying to encourage more clients to turn on relay functionality
+#   too (whether as bridge relays or as normal relays), then we need to
+#   understand this threat better and learn how to mitigate it.

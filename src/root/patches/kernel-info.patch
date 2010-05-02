@@ -1,0 +1,29 @@
+*** /usr/src/linux/scripts/mkcompile_h	2008-12-24 23:26:37.000000000 +0000
+--- /usr/src/linux/scripts/mkcompile_h.new	2009-12-28 18:07:34.000000000 +0000
+***************
+*** 61,75 ****
+  
+    echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
+    echo \#define LINUX_COMPILE_BY \"`whoami`\"
+!   echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
+  
+!   if [ -x /bin/dnsdomainname ]; then
+!     echo \#define LINUX_COMPILE_DOMAIN \"`dnsdomainname | $UTS_TRUNCATE`\"
+!   elif [ -x /bin/domainname ]; then
+!     echo \#define LINUX_COMPILE_DOMAIN \"`domainname | $UTS_TRUNCATE`\"
+!   else
+!     echo \#define LINUX_COMPILE_DOMAIN
+!   fi
+  
+    echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
+  ) > .tmpcompile
+--- 61,69 ----
+  
+    echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
+    echo \#define LINUX_COMPILE_BY \"`whoami`\"
+!   echo \#define LINUX_COMPILE_HOST \"liberte\"
+  
+!   echo \#define LINUX_COMPILE_DOMAIN
+  
+    echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
+  ) > .tmpcompile

@@ -1,0 +1,20 @@
+
+[Default Applications]
+text/plain=gedit.desktop
+application/x-bzip-compressed-tar=xarchiver.desktop
+image/bmp=gpicview.desktop
+image/gif=gpicview.desktop
+image/jpeg=gpicview.desktop
+image/jpg=gpicview.desktop
+image/png=gpicview.desktop
+image/tiff=gpicview.desktop
+image/x-bmp=gpicview.desktop
+image/x-pcx=gpicview.desktop
+image/x-tga=gpicview.desktop
+image/x-portable-pixmap=gpicview.desktop
+image/x-portable-bitmap=gpicview.desktop
+image/x-targa=gpicview.desktop
+image/x-portable-greymap=gpicview.desktop
+application/pcx=gpicview.desktop
+image/svg+xml=/usr/bin/rsvg-view
+image/svg-xml=/usr/bin/rsvg-view

@@ -1,0 +1,7 @@
+CLOCK="local"
+TIMEZONE="Zulu"
+
+CLOCK_OPTS=""
+
+# Set to "no" if using Chrony
+CLOCK_SYSTOHC="no"

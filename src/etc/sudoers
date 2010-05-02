@@ -1,0 +1,19 @@
+# sudoers file.
+#
+# This file MUST be edited with the 'visudo' command as root.
+# Failure to use 'visudo' may result in syntax or file permission errors
+# that prevent sudo from running.
+
+# Host alias specification
+
+# User alias specification
+
+# Cmnd alias specification
+
+# Defaults specification
+
+# Runas alias specification
+
+# User privilege specification
+root	ALL=(ALL) ALL
+%wheel	liberte = NOPASSWD: /sbin/shutdown -h now, /sbin/shutdown -r now

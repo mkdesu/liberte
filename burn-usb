@@ -1,0 +1,148 @@
+#!/bin/bash -e
+
+if [ $# != 2 ]; then
+    cat <<EOF
+This script writes a USB partition image on a USB device,
+so that the partition is bootable, and is located after
+a FAT32 partition. This makes the disk accessible under
+Windows, and also provides persistent storage to LiveUSB.
+
+You need the following installed:
+    GNU Parted           (sys-apps/parted)
+    GNU Grub Legacy      (sys-boot/grub-0.xx)
+    DOS Filesystem Tools (sys-fs/dosfstools)
+
+Run burnusb as root:
+    burnusb liveusb.img /dev/sdb
+
+It is also possible to put the partition on a disk image,
+such as VMWare disk, e.g. (you still need to be root):
+
+    rm -f liveusb.vmdk liveusb-flat.vmdk
+    vmware-vdiskmanager -c -a ide -t 2 -s 256MB liveusb.vmdk
+    burnusb liveusb.img liveusb-flat.vmdk
+
+All partitions will be 4K-aligned.
+
+WARNING: All data on the target device will be lost!
+EOF
+    exit 1
+fi
+
+if [ ! -f $1 -o ! -e $2 ]; then
+    echo "$1 is not a file, or $2 doesn't exist."
+    exit 1
+fi
+
+# Arguments
+image="$1"
+disk="$2"
+block=4096
+doslabel=
+
+
+# User confirmation
+cat <<EOF
+Overwriting the disk with USB partition image.
+WARNING: All data on the target device will be lost!
+
+EOF
+
+if [ -b "${disk}" ]; then
+    devpath=`udevadm info -q path -n "${disk}"`
+    if [ -e "/sys/${devpath}/removable" ]; then
+        if [ "`cat /sys/${devpath}/removable`" = 0 ]; then
+            echo -e "WARNING: ${disk} is not a removable device"'!'"\n"
+        fi
+    fi
+
+    devtype=`udevadm info -q property -n "${disk}" | grep '^DEVTYPE=' | sed 's/^DEVTYPE=//'`
+    if [ -n "${devtype}" -a "${devtype}" != disk ]; then
+        echo -e "WARNING: ${disk} is a ${devtype}, not a disk"'!'"\n"
+    fi
+
+
+    serial=`udevadm info -q property -n "${disk}" | grep '^ID_SERIAL=' | sed 's/^ID_SERIAL=//'`
+    if [ -n "${serial}" ]; then
+        echo "Device ID:   ${serial}"
+    fi
+
+    devsize=`parted -ms "${disk}" unit MiB print | head -2 | tail -1 | cut -d: -f2`
+    if [ -n "${devsize}" ]; then
+        echo "Device size: ${devsize}"
+    elif [ -e "/sys/${devpath}/size" ]; then
+        echo "Device size: $(((`cat /sys/${devpath}/size`+1024) / 2048))MiB (assuming 512B sectors)"
+    fi
+else
+    devsize=`du --apparent-size -B 1048576 "${disk}" | cut -f1`
+    echo "Device size: ${devsize}MiB (disk image)"
+fi
+
+echo -e "\nContinue? [y/N] "
+read confirm
+if [ "${confirm}" != y -a "${confirm}" != Y -a "${confirm}" != yes -a "${confirm}" != YES -a "${confirm}" != Yes ]; then
+    exit 1
+fi
+echo
+
+
+# We need 512B MBR + e2fs_stage1_5 (currently 19 * 512B) before 1st partition
+bootblocks=$[(20*512 + ${block}-1) / ${block}]
+
+# Get image size in 4K blocks (rounded up)
+imageblocks=`du --apparent-size -B ${block} "${image}" | cut -f1`
+
+
+# Create new disk label, and get its size (in 4K blocks, rounded down) along the way
+echo "*** Creating MSDOS partition label ***"
+diskbytes=`parted -ms "${disk}" unit B mklabel msdos print | tail -1 | cut -d: -f2 | tr -d B`
+diskblocks=$[${diskbytes} / ${block}]
+
+
+echo "*** Creating disk partitions ***"
+parted -s "${disk}" \
+    unit   B \
+    mkpart primary fat32 $[${bootblocks} * ${block}] $[(${diskblocks} - ${imageblocks}) * ${block} - 1] \
+    mkpart primary ext2  $[(${diskblocks} - ${imageblocks}) * ${block}] $[${diskblocks} * ${block} - 1] \
+    set    2 boot on \
+    unit   kiB \
+    print
+
+
+echo "*** Formatting FAT32 filesystem ***"
+if ! losetup -f 1>/dev/null 2>&1; then
+    modprobe loop
+    sleep 1
+fi
+loopdev=`losetup -f`
+
+losetup -o $[${bootblocks} * ${block}] \
+        -s $[(${diskblocks} - ${imageblocks} - ${bootblocks}) * ${block}] \
+        -v ${loopdev} "${disk}"
+mkdosfs -F 32 -n "${doslabel}" ${loopdev}
+sleep 1
+while ! losetup -d ${loopdev};  do echo "Retrying..."; sleep 1;  done
+
+
+echo "*** Copying partition image ***"
+losetup -o $[(${diskblocks} - ${imageblocks}) * ${block}] \
+        -s $[${imageblocks} * ${block}] \
+        -v ${loopdev} "${disk}"
+dd if="${image}" of=${loopdev} bs=1M
+while ! losetup -d ${loopdev};  do echo "Retrying..."; sleep 1;  done
+
+
+# The (hd0) line in the bogus device prevents GRUB
+# from performing BIOS drives detection
+echo "*** Installing GRUB stages 1 and 1.5 ***"
+grub --batch --no-floppy --device-map=<(echo "(hd0) /dev/null") <<EOF
+device (hd0) ${disk}
+root (hd0,1)
+setup (hd0)
+quit
+EOF
+
+
+echo "*** Synchronizing ***"
+sync
+echo "*** Done ***"

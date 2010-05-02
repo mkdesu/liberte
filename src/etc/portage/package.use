@@ -1,0 +1,49 @@
+# X/Gtk/Qt/Tk/Curses interface
+sys-apps/groff                  -X
+sys-process/psmisc              -X
+net-misc/openssh                -X
+sys-devel/gcc                   -gtk
+sys-libs/glibc                  -gd
+app-misc/livecd-tools           -X -opengl
+app-text/hunspell               -ncurses
+dev-lang/python                 -ncurses -readline
+dev-libs/libxml2                -readline
+sci-visualization/gnuplot       -readline -pdf
+dev-db/sqlite                   -readline
+net-libs/webkit-gtk             -gstreamer
+
+# Drivers
+x11-base/xorg-drivers           -video_cards_vmware
+
+# Unnecessary functionality
+net-misc/rsync                  -iconv
+sys-libs/ncurses                minimal
+media-libs/libsndfile           minimal
+dev-libs/libcdio                minimal
+sys-apps/iproute2               minimal
+sys-apps/parted                 -debug
+mail-client/claws-mail          -ssl
+net-misc/neon                   -pkcs11
+app-editors/nano                -spell
+
+# Extra functionality
+dev-lang/python                 sqlite
+media-libs/openjpeg             tools
+sci-visualization/gnuplot       gd
+app-text/poppler                cairo
+app-office/abiword              plugins
+app-portage/layman              subversion
+
+# (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
+media-video/mplayer             -v4l2 -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
+media-video/mplayer             -opengl -video_cards_mga -video_cards_s3virge -video_cards_tdfx
+
+# Internationalization
+app-i18n/scim-tables            linguas_*
+app-text/aspell                 -linguas_* linguas_en
+sys-apps/portage                -linguas_*
+sys-apps/man-pages              -linguas_*
+
+# Quirks
+dev-libs/libxml2                python
+x11-libs/cairo                  -xcb

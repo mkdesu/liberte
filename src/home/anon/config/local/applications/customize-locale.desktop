@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=Change Locale
+Comment=Select user interface language and time zone
+Exec=customize-locale
+Terminal=false
+Type=Application
+Icon=preferences-desktop-locale
+Categories=GTK;Settings;
+Encoding=UTF-8

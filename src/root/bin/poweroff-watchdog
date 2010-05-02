@@ -1,0 +1,42 @@
+#!/bin/sh -e
+
+# Power off immediately after the specified partition is detached.
+# Relies on simplified "udevadm monitor" - udev-watchdog.
+# This script could of course be called from udev rules, but then
+# it would be much less reliable for the intended usage, where the
+# partition is the read-only branch of root fs.
+
+if [ $# != 1 ]; then
+    echo "$0 <device partition>"
+    exit 1
+fi
+
+if [ ! -b "$1" ]; then
+    echo "$1 is not a block device"
+    exit 1
+fi
+
+devpath=`udevadm info -q path -n "$1"`
+if ! udevadm info -q property -p "${devpath}" | grep -q '^DEVTYPE=partition$'; then
+    echo "$1 is not a block partition"
+    exit 1
+fi
+
+# Copy the executables to RAM
+# (the executables depend only on libc)
+ramdir=`mktemp -d --tmpdir=/dev/shm`
+cp --preserve=all /sbin/poweroff ${ramdir}
+
+# Prevent possible access to locale files
+export LC_ALL=C
+
+exec </dev/null 1>/dev/null 2>&1
+
+# Power off only if the watchdog exited cleanly,
+# detecting the removal of the device.
+if udev-watchdog "${devpath}"; then
+
+    # Immediate halt without fs sync (which hopefully prevents device access)
+    # Expected to be cached: /etc/ld.so.preload (negative), /etc/ld.so.cache, /lib/libc.so.6
+    exec ${ramdir}/poweroff -n -f
+fi

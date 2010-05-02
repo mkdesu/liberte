@@ -1,0 +1,14 @@
+unset backup
+unset historylog
+
+set   nowrap
+set   tabsize 4
+
+set   autoindent
+set   boldtext
+set   morespace
+set   mouse
+set   nonewlines
+set   quickblank
+set   smarthome
+set   smooth

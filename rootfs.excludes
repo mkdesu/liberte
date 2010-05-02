@@ -1,0 +1,123 @@
+# Documentation directories
+/usr/share/doc/
+/usr/share/man/
+/usr/share/info/
+/usr/lib/perl*/*/pod/
+/usr/lib/perl*/**/*.pod
+/usr/share/gtk-doc/
+/usr/share/gettext/
+/usr/share/nano/man-html/
+/usr/share/gnumeric/*/doc
+# (no gnome-extra/yelp with "-gnome")
+/usr/share/omf/
+/usr/share/gnome*/
+/usr/share/control-center-*/
+
+# Portage directories
+/usr/portage/
+/var/db/pkg/
+/usr/lib/portage/
+/usr/lib/pkgconfig/
+/usr/share/pkgconfig/
+/var/lib/portage/
+/var/lib/gentoo/
+/var/lib/layman/
+/etc/portage/
+/etc/make.*
+/etc/env.d/
+/etc/sandbox.d/
+/var/log/portage/
+/var/log/sandbox/
+/var/log/news/
+
+# Sources and development tools
+/usr/include/
+/usr/src/
+/lib/modules/*/source/
+/lib/modules/*/build/
+/usr/lib/**/include/
+/usr/lib/python*/config/
+/usr/lib/python*/distutils/
+/usr/lib/python*/pydoc*
+/usr/lib/python*/doctest.*
+/usr/lib/python*/unittest.*
+/usr/lib/python*/lib2to3/
+/usr/lib/python*/test/
+/usr/lib/python*/**/test/
+/usr/lib/python*/**/tests/
+/usr/lib/python*/**/src/
+/usr/lib/python*/**/docs/
+/usr/lib/python*/site-packages/pkg_resources.*
+/usr/lib/python*/site-packages/*.egg-info
+/usr/lib/python*/site-packages/setuptools/
+/usr/lib/python*/site-packages/**/setup.*
+/usr/lib/python*/site-packages/**/setupscons.*
+/usr/lib/python*/site-packages/gtk-*/codegen/
+/usr/lib/python*/site-packages/numpy/doc/
+/usr/lib/python*/site-packages/numpy/testing/
+/usr/lib/python*/site-packages/numpy/f2py/
+/usr/lib/python*/site-packages/numpy/distutils/
+/usr/lib/python*/site-packages/numpy/numarray/numpy/
+/usr/lib/perl*/**/CORE/
+/usr/lib/perl*/**/unicore/*.txt
+/usr/lib/perl*/**/unicore/mktables*
+/usr/lib/perl*/**/Unicode/Collate/*.txt
+/usr/share/aclocal/
+/usr/share/baselayout/
+/usr/share/awk/
+/usr/share/getopt/
+/usr/share/gnuplot/
+/usr/share/i18n/
+/usr/share/icu/
+/usr/share/lsof/
+/usr/share/ntp/
+/usr/share/readline/
+/usr/share/glib-*/gettext/
+/usr/share/gtk-*/demo/
+/usr/lib/pygtk/*/*demo*
+
+# Static libraries
+/usr/lib/**.a
+/usr/lib/**.la
+/usr/**/lib/**.a
+/usr/**/lib/**.la
+
+# Cached directories
+# (here we rely on unchanged mtime of /usr/share/icons/*)
+/usr/share/icons/*/[1-9]*x[1-9]*/
+
+# Pruned directories (see rootfs.includes)
+/usr/share/consolefonts/**
+/usr/share/consoletrans/
+/usr/share/unimaps/
+/usr/share/keymaps/**
+/usr/share/X11/locale/*/
+/usr/share/claws-mail/themes/**
+
+# Temporary directories
+/tmp/**
+/var/tmp/**
+/var/cache/**
+/var/log/*.log
+/var/run/*.pid
+
+# Miscellaneous
+.keep*
+.empty_on_purpose
+/root/**
+/etc/*-
+/etc/issue.logo
+/etc/skel/
+/etc/locale.gen
+/etc/sgml/
+/var/run/bootstrap-progress
+/usr/lib/cracklib_dict.*
+/mnt/floppy/
+/mnt/cdrom/
+# (GeoIP is not used in Tor setup)
+/usr/share/tor/
+/usr/share/misc/*.ids.*
+
+# Workarounds
+# (vesa takes precedence over radeon in xorg-server-1.7.6)
+# /usr/lib/xorg/modules/drivers/vesa_drv.so

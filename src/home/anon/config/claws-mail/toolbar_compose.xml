@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<toolbar>
+	<item file="mail_send" text="Send" action="A_SEND"/>
+	<item file="mail_send_queue" text="Send later" action="A_SENDL"/>
+	<item file="mail" text="Draft" action="A_DRAFT"/>
+	<separator/>
+	<item file="insert_file" text="Insert" action="A_INSERT"/>
+	<item file="mail_attach" text="Attach" action="A_ATTACH"/>
+	<separator/>
+	<item file="address_book" text="Address" action="A_ADDRBOOK"/>
+</toolbar>

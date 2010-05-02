@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# The reason for this wrapper is that dhcpcd determines the HW address
+# *before* calling the hooks in /lib/dhcpcd/dhcpcd-hooks (although the
+# DHCP broadcast occurs later). On the other hand, Wicd's scripts are
+# not easily customizable (no interface argument), and arguably MAC
+# address randomization is useful only for DHCP.
+
+# Another reason is that wicd doesn't properly support
+# (use_)dhcphostname in wired/wireless-settings.conf
+
+# Wicd always calls "dhcpcd -k xxx", then "dhcpcd xxx (-h hostname)".
+if [ $# = 2 -a "$1" = "-k" ]; then
+    /sbin/dhcpcd.orig "$@"
+    ifconfig "$2" down
+    macchanger -a "$2"
+elif [ $# = 3 -a "$2" = "-h" ]; then
+    exec /sbin/dhcpcd.orig "$1"
+else
+    exec /sbin/dhcpcd.orig "$@"
+fi

@@ -1,0 +1,6 @@
+# IPv4 and IPv6 localhost aliases
+127.0.0.1	localhost
+::1		localhost
+
+# hostname, dnsdomainname, hostname -f
+127.0.0.1	liberte.local liberte

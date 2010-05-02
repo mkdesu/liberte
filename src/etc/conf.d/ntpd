@@ -1,0 +1,2 @@
+# Allow the first time offset to be "big"
+NTPD_OPTS="-u ntp:ntp -g"
