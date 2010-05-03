@@ -7,7 +7,7 @@ set   tabsize 4
 set   autoindent
 set   boldtext
 set   morespace
-set   mouse
+# set   mouse
 set   nonewlines
 set   quickblank
 set   smarthome
