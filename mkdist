@@ -15,117 +15,17 @@ fi
 # Variables
 SRC=`realpath $0`
 SRC=`dirname ${SRC}`
-LIVECD=$1/clean
 DIST=$1/dist
-CDROOT=${DIST}/livecd
-USBROOT=${DIST}/liveusb
 
-volume="Liberte"
-application="Liberte Linux/x86 2010.0"
-publisher="Maxim Kammerer"
-block=4096
-ext2extra=38
+version=`grep -o '\<[0-9][0-9][0-9][0-9]\.[0-9]\+\>' ${SRC}/src/etc/issue`
+distname=liberte-${version}
 
 
-if which mksquashfs-lzma-3.1 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools with LZMA"
-    mksquashfs=mksquashfs-lzma-3.1
-elif which mksquashfs-lzma 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools with LZMA"
-    mksquashfs=mksquashfs-lzma
-elif which mksquashfs-3.1 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools without LZMA"
-    mksquashfs=mksquashfs-3.1
-elif which mksquashfs 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools without LZMA"
-    mksquashfs=mksquashfs
-else
-    echo "SquashFS Tools v3.4 not found"
-    exit 1
-fi
+sinfo "Building distribution ${distname}"
+mkdir -p ${DIST}/${distname}
+ln -sf ../liveusb.img  ${DIST}/${distname}/
+ln -sf ${SRC}/burn-usb ${DIST}/${distname}/ 
 
-mksqversion=`${mksquashfs} -version | head -1 | cut -d' ' -f3`
-if [ "${mksqversion}" != 3.4 ]; then
-    echo "Need SquashFS Tools v3.4, but detected v${mksqversion}"
-    exit 1
-fi
-
-
-# stage2_eltorito will be modified by genisoimage
-sinfo "Copying CD /boot"
-mkdir -p -m 755 ${CDROOT}
-rsync -aHAXS -v --delete-excluded \
-    --include=/boot/grub/{menu.lst,default,splash.xpm.gz,stage2_eltorito} \
-    --exclude=/boot/grub/\* \
-    ${LIVECD}/boot ${CDROOT}
-sed -i 's/TAG/[CD]/; s/ROOTFS/iso9660/; /savedefault/d' ${CDROOT}/boot/grub/menu.lst
-
-
-sinfo "Copying CD add-ons"
-rsync -aHS -O --no-o --no-g --chmod=go=rX -v \
-    --delete-excluded -C -f "P /boot/" -f "P /root.squashfs" \
-    ${SRC}/dist/ ${CDROOT}
-
-
-# Using default block size of 128KiB
-sinfo "Creating SquashFS image"
-
-${mksquashfs} ${LIVECD} ${CDROOT}/root.squashfs -noappend \
-    -no-exports -no-progress \
-    -sort ${SRC}/rootfs.sort -e boot
-chmod 644 ${CDROOT}/root.squashfs
-
-
-# Not using -sort, alphabetical sort is OK in this case
-sinfo "Creating ISO image"
-mkisofs -quiet -ldots -allow-multidot -d -l -N -r \
-    -iso-level 4 -no-pad -hide-rr-moved  \
-    -V "${volume}" -publisher "${publisher}" -A "${application}" \
-    -no-emul-boot -boot-load-size 4 -boot-info-table \
-    -c boot.catalog -hide boot.catalog -hidden boot.catalog \
-    -b boot/grub/stage2_eltorito -o ${DIST}/livecd.iso ${CDROOT}
-isovfy ${DIST}/livecd.iso
-
-
-sinfo "Copying USB /boot and SquashFS"
-mkdir -p -m 755 ${USBROOT}
-rsync -aHAXS -v --delete-excluded \
-    --include=/boot/grub/{menu.lst,default,splash.xpm.gz,stage{1,2},e2fs_stage1_5} \
-    --exclude=/boot/grub/\* \
-    ${LIVECD}/boot ${USBROOT}
-sed -i 's/TAG/[USB]/; s/ROOTFS/ext2/' ${USBROOT}/boot/grub/menu.lst
-ln -f ${CDROOT}/root.squashfs ${USBROOT}
-
-
-sinfo "Copying USB add-ons"
-rsync -aHS -O --no-o --no-g --chmod=go=rX -v \
-    --delete-excluded -C -f "P /boot/" -f "P /root.squashfs" \
-    ${SRC}/dist/ ${USBROOT}
-
-
-# The 4K-aligned image includes empirical ext2 extra space
-sinfo "Creating USB image and file system"
-usbrootsize=`du -sB ${block} ${USBROOT} | cut -f1`
-usbimage=${DIST}/liveusb.img
-truncate -s 0 ${usbimage} && truncate -s $[${block} * (${usbrootsize} + ${ext2extra})] ${usbimage}
-
-if ! losetup -f 1>/dev/null 2>&1; then
-    modprobe loop
-    sleep 1
-fi
-mke2fs -q -b ${block} -m0 -T largefile -L "${volume}" -O ^resize_inode,^dir_index,sparse_super -F ${usbimage}
-tune2fs -c 0 -i 0 ${usbimage}
-
-
-sinfo "Copying USB root to USB image"
-mpoint=`mktemp -d`
-mount -t ext2 -o loop,noatime ${usbimage} ${mpoint}
-if ! rsync -aHAXS -v --partial --delete-excluded ${USBROOT}/ ${mpoint}; then
-    lastgood=`du -B ${block} ${USBROOT}/boot/memtest86plus/memtest.bin | cut -f1`
-    lastbad=`du -B ${block} ${mpoint}/boot/memtest86plus/memtest.bin | cut -f1`
-    sinfo "*** Set ext2extra=$[${ext2extra} + ${lastgood} - ${lastbad} + 1]***"
-fi
-umount ${mpoint} && rmdir ${mpoint}
-
+tar -C ${DIST} --owner root --group root -chf ${DIST}/${distname}.tar ${distname}
 
 sinfo "Done."

@@ -8,9 +8,9 @@ a FAT32 partition. This makes the disk accessible under
 Windows, and also provides persistent storage to LiveUSB.
 
 You need the following installed:
-    GNU Parted           (sys-apps/parted)
-    GNU Grub Legacy      (sys-boot/grub-0.xx)
-    DOS Filesystem Tools (sys-fs/dosfstools)
+    GNU Parted           (Gentoo: sys-apps/parted)
+    GNU Grub Legacy      (Gentoo: sys-boot/grub-0.xx)
+    DOS Filesystem Tools (Gentoo: sys-fs/dosfstools)
 
 Run burnusb as root:
     burnusb liveusb.img /dev/sdb

@@ -16,7 +16,7 @@ Q: Is it necessary to run the full build process every time one
    wants to build an updated CD/USB image?
 A: No, it is OK to update the source tree manually (or run
    "./setup fast" and then follow the usual
-   mkroot copy/mkroot clean/mkdist process).
+   mkroot copy/mkroot clean/mkimage process).
 
 Q: I would like to go over the emerge messages carefully.
 A: See /var/log/emerge.log and /var/log/portage/elog/summary.log

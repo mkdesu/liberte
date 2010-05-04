@@ -87,7 +87,7 @@ and the temporary files should be created in /tmp/livecd.
 
 6. Master the ISO (CD) and IMG (USB) files
 
-       $HOME/liberte/mkdist /tmp/livecd
+       $HOME/liberte/mkimage /tmp/livecd
        [livecd.iso and liveusb.img are now in /tmp/livecd/dist]
 
 
