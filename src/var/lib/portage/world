@@ -74,7 +74,6 @@ media-sound/alsa-utils
 # Text utilities
 app-text/convmv
 app-text/tree
-sys-process/lsof
 
 # Applications
 lxde-base/lxterminal

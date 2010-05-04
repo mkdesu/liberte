@@ -4,6 +4,10 @@ A: No, the build scripts are distribution-neutral.
 Q: How long does is the full build process?
 A: On the order of 5 hours on dual-core 2.66GHz Intel E8200.
 
+Q: Can I use network proxies during the build?
+A: Yes, the "enter" script passes the environment variables
+   RSYNC_PROXY, http_proxy, and ftp_proxy through.
+
 Q: Is it possible to run "./setup" more than once in same
    source directory?
 A: Yes.

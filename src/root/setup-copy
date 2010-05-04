@@ -59,7 +59,7 @@ emerge -q --depclean --with-bdeps n
 
 
 sinfo "Checking linking consistency"
-revdep-rebuild -q -p -i
+revdep-rebuild -q -i
 
 
 sinfo "Unmerging unnecessary packages"
