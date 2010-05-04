@@ -13,7 +13,7 @@ dev-db/sqlite                   -readline
 net-libs/webkit-gtk             -gstreamer
 
 # Drivers
-x11-base/xorg-drivers           -video_cards_vmware
+x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
 
 # Unnecessary functionality
 net-misc/rsync                  -iconv
