@@ -16,16 +16,32 @@ fi
 SRC=`realpath $0`
 SRC=`dirname ${SRC}`
 DIST=$1/dist
+SVN=https://liberte.svn.sourceforge.net/svnroot/liberte/tags
 
 version=`grep -o '\<[0-9][0-9][0-9][0-9]\.[0-9]\+\>' ${SRC}/src/etc/issue`
 distname=liberte-${version}
 
 
+if [ "${version}" = "" ]; then
+    sinfo "Could not determine distribution version"
+    exit 1
+fi
+
+
 sinfo "Building distribution ${distname}"
-mkdir -p ${DIST}/${distname}
+rm -rf ${DIST}/${distname}
+mkdir ${DIST}/${distname}
 ln -sf ../liveusb.img  ${DIST}/${distname}/
 ln -sf ${SRC}/burn-usb ${DIST}/${distname}/ 
-
 tar -C ${DIST} --owner root --group root -chf ${DIST}/${distname}.tar ${distname}
+rm -r ${DIST}/${distname}
+
+
+sinfo "Building source distribution ${distname}-src"
+rm -rf ${DIST}/${distname}-src
+svn export -q ${SVN}/${distname} ${DIST}/${distname}-src
+tar -C ${DIST} --owner root --group root -chjf ${DIST}/${distname}-src.tar.bz2 ${distname}-src
+rm -r ${DIST}/${distname}-src
+
 
 sinfo "Done."
