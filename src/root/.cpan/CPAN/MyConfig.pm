@@ -34,7 +34,7 @@ $CPAN::Config = {
   'tar' => q[/bin/tar],
   'term_is_latin' => q[0],
   'unzip' => q[/usr/bin/unzip],
-  'urllist' => [q[http://mirror.switch.ch/ftp/mirror/CPAN/]],
+  'urllist' => [q[http://mirrors.ibiblio.org/pub/mirrors/CPAN/], q[http://mirror.switch.ch/ftp/mirror/CPAN/]],
   'wget' => q[/usr/bin/wget],
 };
 1;

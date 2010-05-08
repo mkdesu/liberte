@@ -15,7 +15,8 @@ fi
 # Variables
 mkdir -p $1
 LIVECD=`realpath $1`
-MIRROR=http://mirror.switch.ch/ftp/mirror/gentoo
+MIRROR=http://distro.ibiblio.org/pub/linux/distributions/gentoo
+#MIRROR=http://mirror.switch.ch/ftp/mirror/gentoo
 
 FROM=`realpath $0`
 FROM=`dirname ${FROM}`
