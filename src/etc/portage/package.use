@@ -29,6 +29,7 @@ app-editors/nano                -spell
 # Extra functionality
 dev-lang/python                 sqlite
 media-libs/openjpeg             tools
+gnome-base/librsvg              tools
 sci-visualization/gnuplot       gd
 app-text/poppler                cairo
 app-office/abiword              plugins

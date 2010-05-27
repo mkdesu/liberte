@@ -9,7 +9,7 @@ Windows, and also provides persistent storage to LiveUSB.
 
 You need the following installed:
     GNU Parted           (Gentoo: sys-apps/parted)
-    GNU Grub Legacy      (Gentoo: sys-boot/grub:0)
+    GNU GRUB Legacy      (Gentoo: sys-boot/grub:0)
     DOS Filesystem Tools (Gentoo: sys-fs/dosfstools)
 
 Run burnusb as root:

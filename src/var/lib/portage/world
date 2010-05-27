@@ -89,7 +89,8 @@ media-video/gnome-mplayer
 media-gfx/gpicview
 app-editors/gedit
 app-text/epdfview
-# app-office/abiword (wants asio)
+# http://bugs.gentoo.org/show_bug.cgi?id=316287
+# dev-cpp/asio
 app-office/abiword-plugins
 app-office/gnumeric
 mail-client/claws-mail-notification
