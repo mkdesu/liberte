@@ -189,7 +189,8 @@ media-fonts/thaifonts-scalable
 media-fonts/khmer
 media-fonts/tibetan-machine-font
 media-fonts/ttf-sinhala-lklug
-media-fonts/mcst-dhivehi-fonts
+# (MCST site unavailable)
+# media-fonts/mcst-dhivehi-fonts
 media-fonts/essays1743
 
 # Internationalization

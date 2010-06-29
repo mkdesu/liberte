@@ -11,6 +11,7 @@ dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
 net-libs/webkit-gtk             -gstreamer
+gnome-extra/libgsf              -gtk
 
 # Drivers
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
@@ -21,9 +22,10 @@ sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
 dev-libs/libcdio                minimal
 sys-apps/iproute2               minimal
+gnome-extra/zenity              -compat
 sys-apps/parted                 -debug
 mail-client/claws-mail          -ssl
-net-misc/neon                   -pkcs11
+net-libs/neon                   -pkcs11
 app-editors/nano                -spell
 
 # Extra functionality
@@ -34,6 +36,7 @@ sci-visualization/gnuplot       gd
 app-text/poppler                cairo
 app-office/abiword              plugins
 app-portage/layman              subversion
+app-arch/p7zip                  rar
 
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
 media-video/mplayer             -v4l2 -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
