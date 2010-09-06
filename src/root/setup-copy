@@ -46,8 +46,6 @@ emerge -qC \
     sys-apps/man \
     sys-apps/man-pages \
 	sys-apps/texinfo \
-    \
-    net-misc/openssh
 
 mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/

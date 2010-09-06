@@ -32,6 +32,7 @@ app-misc/secure-delete
 app-arch/zip
 app-arch/p7zip
 app-arch/unrar
+sys-fs/dosfstools
 sys-fs/ntfs3g
 net-fs/autofs
 
@@ -87,7 +88,7 @@ app-cdr/isomaster
 media-sound/audacious
 media-video/gnome-mplayer
 media-gfx/gpicview
-app-editors/gedit
+app-editors/gedit-plugins
 app-text/epdfview
 # http://bugs.gentoo.org/show_bug.cgi?id=316287
 # dev-cpp/asio
@@ -161,7 +162,7 @@ x11-apps/xfd
 # Khmer OS:       Khmer script (Cambodia), Battambang/Bokor/Content/Fasthand/Freehand/Metal Chrieng/Muol/Siemreap/System
 # TibMachUni:     Tibetan, Dzongkha and Ladakhi scripts
 # LKLUG:          [Extra] Sinhala (Sri Lanka) script
-# Mv:             [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas
+# [Mv:            [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas]
 # [Cham:          www.ling.hawaii.edu/~uhdoc/champa/chamHI.ttf, incorrect codepoints]
 # Essays1743:     Nice decorative Latin font
 media-fonts/inconsolata

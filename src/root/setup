@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-kversion=2.6.28-hardened-r9
+kversion=2.6.32-hardened-r9
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -28,6 +28,8 @@ fi
 
 sinfo "Updating portage"
 emerge -q --sync
+eselect news read all
+eselect news purge
 
 
 # Filter locales before remerging libc
@@ -36,19 +38,16 @@ grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
 
 
 if [ "$1" != fast ]; then
+    # Maintainer note: after kernel update+compile, do
+    # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
     sinfo "Applying kernel patches"
     emerge -q1 =sys-kernel/hardened-sources-`echo ${kversion} | sed 's/hardened-//'`
     cp ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config
 
     spatch ${HOME}/patches/kernel-info.patch -p0
-    spatch ${HOME}/patches/sqlzma-3.4-457/squashfs-3.4/sqlzma2k-3.4.patch -d /usr/src/linux -p1
 
-    rsync -aHSO --chmod=go=rX ${HOME}/patches/sqlzma-3.4-457/squashfs-3.4/{sqlzma.h,sqmagic.h} /usr/src/linux/fs/squashfs
-    rsync -aHSO --chmod=go=rX --exclude=Makefile ${HOME}/patches/sqlzma-3.4-457/lzma-457/ /usr/src/linux/fs/squashfs
-    cat /root/patches/sqlzma-3.4-457/lzma-457/Makefile >> /usr/src/linux/fs/squashfs/Makefile
-
-    spatch ${HOME}/patches/fbcondecor-0.9.5-2.6.28.patch -d /usr/src/linux -p1
-    spatch ${HOME}/patches/unionfs-2.5.4_for_2.6.28.10.diff.gz -d /usr/src/linux -p1
+    spatch ${HOME}/patches/fbcondecor-0.9.6-2.6.31.2.patch -d /usr/src/linux -p1
+    spatch ${HOME}/patches/unionfs-2.5.5_for_2.6.32.18.diff.gz -d /usr/src/linux -p1
     # http://www.mail-archive.com/unionfs@mail.fsl.cs.sunysb.edu/msg03114.html
     spatch ${HOME}/patches/unionfs-unlink.patch -d /usr/src/linux -p4
 
@@ -86,8 +85,6 @@ sinfo "Checking linking consistency"
 revdep-rebuild -q -i
 
 etc-update
-eselect news read all
-eselect news purge
 
 
 sinfo "Compiling custom executables"

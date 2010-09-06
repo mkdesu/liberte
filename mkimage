@@ -21,32 +21,22 @@ CDROOT=${DIST}/livecd
 USBROOT=${DIST}/liveusb
 
 volume="Liberte"
-application="Liberte Linux/x86 2010.0"
+application="Liberte Linux"
 publisher="Maxim Kammerer"
 block=4096
 ext2extra=38
 
 
-if which mksquashfs-lzma-3.1 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools with LZMA"
-    mksquashfs=mksquashfs-lzma-3.1
-elif which mksquashfs-lzma 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools with LZMA"
-    mksquashfs=mksquashfs-lzma
-elif which mksquashfs-3.1 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools without LZMA"
-    mksquashfs=mksquashfs-3.1
-elif which mksquashfs 1>/dev/null 2>&1; then
-    sinfo "Using SquashFS Tools without LZMA"
+if which mksquashfs 1>/dev/null 2>&1; then
     mksquashfs=mksquashfs
 else
-    echo "SquashFS Tools v3.4 not found"
+    echo "SquashFS Tools not found"
     exit 1
 fi
 
 mksqversion=`${mksquashfs} -version | head -1 | cut -d' ' -f3`
-if [ "${mksqversion}" != 3.4 ]; then
-    echo "Need SquashFS Tools v3.4, but detected v${mksqversion}"
+if [ "${mksqversion}" != 4.0 ]; then
+    echo "Need SquashFS Tools v4.0, but detected v${mksqversion}"
     exit 1
 fi
 

@@ -1,7 +1,5 @@
 # Patches are for specific kernel version
-# The microcode: http://bugs.gentoo.org/246045
->sys-kernel/hardened-sources-2.6.28-r9
->=net-wireless/iwl3945-ucode-15.28.2.8
+>sys-kernel/hardened-sources-2.6.32-r9
 
 # Python 3
 >=dev-lang/python-3

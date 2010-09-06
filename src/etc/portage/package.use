@@ -17,24 +17,28 @@ gnome-extra/libgsf              -gtk
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
 
 # Unnecessary functionality
+sys-fs/ntfs3g                   -udev
 net-misc/rsync                  -iconv
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
-dev-libs/libcdio                minimal
 sys-apps/iproute2               minimal
 gnome-extra/zenity              -compat
 sys-apps/parted                 -debug
-mail-client/claws-mail          -ssl
+mail-client/claws-mail          -ssl -gnutls -imap
+gnome-base/gvfs                 -http
 net-libs/neon                   -pkcs11
 app-editors/nano                -spell
 
 # Extra functionality
+sys-fs/udev                     extras               # pcmanfm
+media-libs/jpeg                 static-libs          # splashutils
 dev-lang/python                 sqlite
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 sci-visualization/gnuplot       gd
 app-text/poppler                cairo
 app-office/abiword              plugins
+app-editors/gedit               python               # gedit-plugins
 app-portage/layman              subversion
 app-arch/p7zip                  rar
 
