@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-kversion=2.6.32-hardened-r9
+kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -223,6 +223,7 @@ rm /boot/grub/menu.lst
 cat /boot/grub/grub.conf \
     | sed s@/boot/kernel-genkernel@/boot/kernel-genkernel-x86-${kversion}@ \
     | sed s@/boot/initramfs-genkernel@/boot/initramfs-genkernel-x86-${kversion}@ \
+    | sed "s@VERSION@${VERSION}@" \
     > /boot/grub/menu.lst
 
 

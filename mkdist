@@ -18,7 +18,7 @@ SRC=`dirname ${SRC}`
 DIST=$1/dist
 SVN=https://liberte.svn.sourceforge.net/svnroot/liberte/tags
 
-version=`grep -o '\<[0-9][0-9][0-9][0-9]\.[0-9]\+\>' ${SRC}/src/etc/issue`
+version=`cat ${SRC}/version`
 distname=liberte-${version}
 
 

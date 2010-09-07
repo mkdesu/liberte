@@ -17,7 +17,8 @@ LIVECD=$1/src
 SRC=`realpath $0`
 SRC=`dirname ${SRC}`/src
 
-environment="LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
+version=`cat ${SRC}/../version`
+environment="VERSION=${version} LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
 for env in LANG TERM RSYNC_PROXY http_proxy ftp_proxy; do
     if printenv ${env} 1>/dev/null; then
         environment="${environment} ${env}=`printenv ${env}`"

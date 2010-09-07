@@ -1,5 +1,2 @@
-# Patches are for specific kernel version
->sys-kernel/hardened-sources-2.6.32-r9
-
 # Python 3
 >=dev-lang/python-3

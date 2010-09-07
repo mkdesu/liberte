@@ -6,6 +6,9 @@ if which env-update >&/dev/null; then
 
     export PERL5LIB=/var/tmp/cpan/lib
 
+    sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
+    echo ">sys-kernel/hardened-sources-`cat ${HOME}/config/kversion`" > /etc/portage/package.mask/kernel
+
     find /etc/sudoers    -perm 644 -exec chmod 440 {} \;
     find /etc/.auto.lock -perm 644 -exec chmod 600 {} \;
 
