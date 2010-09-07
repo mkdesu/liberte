@@ -1,3 +1,4 @@
+/DefaultIMEngineFactory/en_GB = IMEngine-M17N-en-ispell
 /FrontEnd/ChangeFactoryGlobally = false
 /FrontEnd/OnTheSpot = true
 /FrontEnd/Socket/ConfigReadOnly = false
@@ -45,4 +46,4 @@
 /Panel/Gtk/ToolBar/ShowPropertyLabel = true
 /Panel/Gtk/ToolBar/ShowSetupIcon = true
 /Panel/Gtk/ToolBar/ShowStickIcon = false
-/UpdateTimeStamp = 1263298129:439307
+/UpdateTimeStamp = 1283878720:416085

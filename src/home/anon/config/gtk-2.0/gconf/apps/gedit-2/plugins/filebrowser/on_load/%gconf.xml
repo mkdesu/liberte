@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="virtual_root" mtime="1283878072" type="string">
+		<stringvalue>file:///home/anon/persist/desktop</stringvalue>
+	</entry>
+	<entry name="root" mtime="1283878072" type="string">
+		<stringvalue>file:///</stringvalue>
+	</entry>
+	<entry name="tree_view" mtime="1283878072" type="bool" value="true"/>
+</gconf>

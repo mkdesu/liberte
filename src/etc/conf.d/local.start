@@ -13,8 +13,10 @@ fs=`echo "${cdmount}" | cut -d' ' -f3`
 
 # On USB boot, root is ext2 (unlike iso9660 on CD boot)
 if [ "${fs}" = "ext2" ]; then
-    # Get the FAT32 device and detach it from autofs
+    # Get the FAT32 device
     dev1=`echo "${cdmount}" | cut -d' ' -f1 | sed 's/2$/1/'`
+
+    # Detach the FAT32 partition from autofs
     ACTION=remove DEVNAME=${dev1} /root/bin/ps-mount
 
     # Mount the FAT32 filesystem

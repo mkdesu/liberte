@@ -109,13 +109,14 @@ parted -s "${disk}" \
     print
 
 
-echo "*** Formatting FAT32 filesystem ***"
 if ! losetup -f 1>/dev/null 2>&1; then
     modprobe loop
     sleep 1
 fi
 loopdev=`losetup -f`
 
+
+echo "*** Formatting FAT32 filesystem ***"
 losetup -o $[${bootblocks} * ${block}] \
         -s $[(${diskblocks} - ${imageblocks} - ${bootblocks}) * ${block}] \
         -v ${loopdev} "${disk}"

@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="side_pane_visible" mtime="1283877987" type="bool" value="false"/>
+</gconf>

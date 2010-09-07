@@ -34,7 +34,7 @@ lxpanel &
 # Delay launch of other apps until the task bar is up
 # (and generate wallpaper along the way)
 gen-wallpaper
-pcmanfm -d -t &
+pcmanfm -d --desktop &
 
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &

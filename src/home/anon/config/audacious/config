@@ -67,6 +67,10 @@ enabled_gplugins=statusicon.so (#0),hotkey.so (#0)
 save_window_position=TRUE
 player_visible=TRUE
 vis_position=0
+player_x=100
+player_y=100
+player_width=450
+player_height=150
 [alsa-gapless]
 pcm=default
 mixer=default

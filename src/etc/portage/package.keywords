@@ -17,5 +17,7 @@ app-editors/gedit-plugins
 app-office/abiword
 app-office/abiword-plugins
 www-client/midori
+net-misc/youtube-dl
+
 #www-plugins/gnash
 #www-plugins/swfdec-mozilla
