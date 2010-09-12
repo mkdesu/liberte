@@ -229,7 +229,8 @@ x11-themes/sound-theme-freedesktop
 x11-themes/claws-mail-themes
 
 # Debugging
-# (should be removed in release)
+# (can be removed in release)
 app-admin/paxtest
 net-analyzer/netcat
+dev-util/strace
 # net-analyzer/wireshark

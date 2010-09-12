@@ -8,19 +8,24 @@ a FAT32 partition. This makes the disk accessible under
 Windows, and also provides persistent storage to LiveUSB.
 
 You need the following installed:
-    GNU Parted           (Gentoo: sys-apps/parted)
-    GNU GRUB Legacy      (Gentoo: sys-boot/grub:0)
-    DOS Filesystem Tools (Gentoo: sys-fs/dosfstools)
+    GNU Parted           2.x (Gentoo: sys-apps/parted)
+    GNU GRUB Legacy      0.x (Gentoo: sys-boot/grub)
+    DOS Filesystem Tools 3.x (Gentoo: sys-fs/dosfstools)
 
 Run burnusb as root:
-    burnusb liveusb.img /dev/sdb
+    burn-usb liveusb.img /dev/sdb
 
 It is also possible to put the partition on a disk image,
 such as VMWare disk, e.g. (you still need to be root):
 
     rm -f liveusb.vmdk liveusb-flat.vmdk
     vmware-vdiskmanager -c -a ide -t 2 -s 256MB liveusb.vmdk
-    burnusb liveusb.img liveusb-flat.vmdk
+    burn-usb liveusb.img liveusb-flat.vmdk
+
+In addition, this script supports actual disk partitions as
+a source:
+
+    burn-usb /dev/sda2 /dev/sdb
 
 All partitions will be 4K-aligned.
 
@@ -29,16 +34,70 @@ EOF
     exit 1
 fi
 
-if [ ! -f $1 -o ! -e $2 ]; then
-    echo "$1 is not a file, or $2 doesn't exist."
+if [ ! -e $1 -o ! -e $2 ]; then
+    echo "$1 or $2 doesn't exist."
     exit 1
 fi
 
 # Arguments
 image="$1"
 disk="$2"
+partition=2
 block=4096
 doslabel=
+
+
+# We need 512B MBR + e2fs_stage1_5 before the 1st partition,
+# which is by covered the 32KiB DOS compatibility region
+bootblocks=$[(32*1024 + ${block}-1) / ${block}]
+
+
+# Get image size in 4K blocks (rounded up)
+if [ -b "${image}" ]; then
+    devtype=`udevadm info -q property -n "${image}" | grep '^DEVTYPE=' | cut -d= -f2`
+    if [ -n "${devtype}" -a "${devtype}" != partition ]; then
+        echo -e "WARNING: ${image} is a ${devtype}, not a partition"'!'"\n"
+    fi
+
+    imageblocks=$[(`blockdev --getsize64 "${image}"` + ${block}-1) / ${block}]
+else
+    imageblocks=`du --apparent-size -B ${block} "${image}" | cut -f1`
+fi
+echo "Image size:  $[${imageblocks} / (1024*1024 / ${block})]MiB"
+
+
+# Get target device size in 4K blocks (rounded down)
+if [ -b "${disk}" ]; then
+    devpath=`udevadm info -q path -n "${disk}"`
+    if [ -e "/sys/${devpath}/removable" ]; then
+        if [ "`cat /sys/${devpath}/removable`" = 0 ]; then
+            echo -e "WARNING: ${disk} is not a removable device"'!'"\n"
+        fi
+    fi
+
+    devtype=`udevadm info -q property -n "${disk}" | grep '^DEVTYPE=' | cut -d= -f2`
+    if [ -n "${devtype}" -a "${devtype}" != disk ]; then
+        echo -e "WARNING: ${disk} is a ${devtype}, not a disk"'!'"\n"
+    fi
+
+
+    serial=`udevadm info -q property -n "${disk}" | grep '^ID_SERIAL=' | cut -d= -f2`
+    if [ -n "${serial}" ]; then
+        echo "Device ID:   ${serial}"
+    fi
+
+    diskblocks=$[`blockdev --getsz "${disk}"` / (${block} / 512)]
+else
+    diskblocks=$[`du -b "${disk}" | cut -f1` / ${block}]
+fi
+echo "Device size: $[${diskblocks} / (1024*1024 / ${block})]MiB"
+
+
+# Sanity check: boot size + image size < target device size
+if [ $[${bootblocks} + ${imageblocks}] -gt ${diskblocks} ]; then
+    echo "ERROR: Source image won't fit on the target device"
+    exit 1
+fi
 
 
 # User confirmation
@@ -48,59 +107,29 @@ WARNING: All data on the target device will be lost!
 
 EOF
 
-if [ -b "${disk}" ]; then
-    devpath=`udevadm info -q path -n "${disk}"`
-    if [ -e "/sys/${devpath}/removable" ]; then
-        if [ "`cat /sys/${devpath}/removable`" = 0 ]; then
-            echo -e "WARNING: ${disk} is not a removable device"'!'"\n"
-        fi
-    fi
-
-    devtype=`udevadm info -q property -n "${disk}" | grep '^DEVTYPE=' | sed 's/^DEVTYPE=//'`
-    if [ -n "${devtype}" -a "${devtype}" != disk ]; then
-        echo -e "WARNING: ${disk} is a ${devtype}, not a disk"'!'"\n"
-    fi
-
-
-    serial=`udevadm info -q property -n "${disk}" | grep '^ID_SERIAL=' | sed 's/^ID_SERIAL=//'`
-    if [ -n "${serial}" ]; then
-        echo "Device ID:   ${serial}"
-    fi
-
-    devsize=`parted -ms "${disk}" unit MiB print | head -2 | tail -1 | cut -d: -f2`
-    if [ -n "${devsize}" ]; then
-        echo "Device size: ${devsize}"
-    elif [ -e "/sys/${devpath}/size" ]; then
-        echo "Device size: $(((`cat /sys/${devpath}/size`+1024) / 2048))MiB (assuming 512B sectors)"
-    fi
-else
-    devsize=`du --apparent-size -B 1048576 "${disk}" | cut -f1`
-    echo "Device size: ${devsize}MiB (disk image)"
-fi
-
 echo -e "\nContinue? [y/N] "
 read confirm
-if [ "${confirm}" != y -a "${confirm}" != Y -a "${confirm}" != yes -a "${confirm}" != YES -a "${confirm}" != Yes ]; then
+case "${confirm}" in
+y|Y|yes|YES|Yes)
+    echo
+    ;;
+*)
     exit 1
-fi
-echo
-
-
-# We need 512B MBR + e2fs_stage1_5 (currently 19 * 512B) before 1st partition
-bootblocks=$[(20*512 + ${block}-1) / ${block}]
-
-# Get image size in 4K blocks (rounded up)
-imageblocks=`du --apparent-size -B ${block} "${image}" | cut -f1`
+esac
 
 
 # Create new disk label, and get its size (in 4K blocks, rounded down) along the way
 echo "*** Creating MSDOS partition label ***"
 diskbytes=`parted -ms "${disk}" unit B mklabel msdos print | tail -1 | cut -d: -f2 | tr -d B`
-diskblocks=$[${diskbytes} / ${block}]
+if [ ${diskblocks} != $[${diskbytes} / ${block}] ]; then
+    echo "ERROR: Disk size after partition creation is wrong"
+    exit 1
+fi
 
 
+# The "-a" switch is available since GNU Parted 2.1, remove it otherwise
 echo "*** Creating disk partitions ***"
-parted -s "${disk}" \
+parted -a minimal -s "${disk}" \
     unit   B \
     mkpart primary fat32 $[${bootblocks} * ${block}] $[(${diskblocks} - ${imageblocks}) * ${block} - 1] \
     mkpart primary ext2  $[(${diskblocks} - ${imageblocks}) * ${block}] $[${diskblocks} * ${block} - 1] \
@@ -138,7 +167,7 @@ while ! losetup -d ${loopdev};  do echo "Retrying..."; sleep 1;  done
 echo "*** Installing GRUB stages 1 and 1.5 ***"
 grub --batch --no-floppy --device-map=<(echo "(hd0) /dev/null") <<EOF
 device (hd0) ${disk}
-root (hd0,1)
+root (hd0,$[${partition}-1])
 setup (hd0)
 quit
 EOF
