@@ -41,7 +41,7 @@
  	[ -n "${CDROOT_DEV}" ] && DEVICES="${CDROOT_DEV}"
  
 -	findmediamount "cdrom" "${SUBDIR}/livecd" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
-+	findmediamount "cdrom" "${SUBDIR}/liberte-boot.tag" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
++	findmediamount "cdrom" "${SUBDIR}/liberte/liberte.tag" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
  }
  
  bootstrapKey() {

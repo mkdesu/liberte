@@ -225,9 +225,10 @@ rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
 mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
 
-cp -p /usr/share/syslinux/{menu,chain,reboot}.c32 /boot/syslinux/
+cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
 
 cat ${HOME}/config/syslinux.cfg \
+    | sed /^#/d \
     | sed s@PREFIX@/liberte@ \
     | sed s@kernel-KVERSION@kernel-x86-${kversion}@ \
     | sed s@initramfs-KVERSION@initramfs-x86-${kversion}@ \

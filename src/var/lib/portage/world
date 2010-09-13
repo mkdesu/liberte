@@ -6,6 +6,7 @@ sys-kernel/genkernel
 sys-boot/syslinux
 
 # LiveCD tools
+sys-apps/memtest86+
 app-misc/livecd-tools
 
 # Framebuffer

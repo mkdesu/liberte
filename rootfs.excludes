@@ -105,6 +105,7 @@
 .keep*
 .empty_on_purpose
 /root/**
+/boot/memtest86plus/memtest.*
 /etc/*-
 /etc/issue.logo
 /etc/skel/

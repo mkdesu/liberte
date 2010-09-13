@@ -36,7 +36,8 @@ zip -FS -rD9 -q ${distname}.zip liberte
 sinfo "Building source distribution ${distname}-src.tar.bz2"
 rm -rf ${DIST}/${distname}-src
 svn export -q ${SRC} ${DIST}/${distname}-src
-tar -C ${DIST} --owner root --group root -cjpf ${DIST}/${distname}-src.tar.bz2 ${distname}-src
+chmod -R go=u-w ${DIST}/${distname}-src
+tar -C ${DIST} -p --owner root --group root -cjf ${DIST}/${distname}-src.tar.bz2 ${distname}-src
 rm -r ${DIST}/${distname}-src
 
 
