@@ -188,7 +188,7 @@ genkflags="--splash=liberte --no-keymap --oldconfig --no-save-config --loglevel=
 sed -i 's/^DISKLABEL="yes"/DISKLABEL="no"/' /etc/genkernel.conf
 
 export KBUILD_BUILD_VERSION=0
-export AMODULES_FS="vfat fat nls_iso8859-1 nls_cp437 loop squashfs unionfs"
+export AMODULES_FS="vfat fat nls_utf8 nls_cp437 loop squashfs unionfs"
 export AMODULES_PCMCIA="mmc_core mmc_block"
 #export AMODULES_FIREWIRE="firewire-ohci firewire-sbp2"
 sed -i 's/^MODULES_\(DMRAID\|EVMS\|LVM\|MDADM\|NET\|FS\|FIREWIRE\)=/#\0/' /usr/share/genkernel/arch/x86/modules_load

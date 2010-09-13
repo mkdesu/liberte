@@ -6,6 +6,7 @@ net-wireless/b43-fwcutter
 
 
 # Utilities
+sys-boot/syslinux
 app-i18n/scim-bridge
 x11-misc/xvkbd
 x11-misc/xdg-user-dirs
