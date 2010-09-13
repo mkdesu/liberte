@@ -40,7 +40,7 @@ emerge -qC \
     sys-kernel/linux-headers \
     sys-kernel/hardened-sources \
     sys-kernel/genkernel \
-    sys-boot/grub \
+    sys-boot/syslinux \
     sys-apps/busybox \
     \
     sys-apps/man \

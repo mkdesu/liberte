@@ -3,10 +3,9 @@
 sys-kernel/hardened-sources
 app-portage/gentoolkit
 sys-kernel/genkernel
-sys-boot/grub
+sys-boot/syslinux
 
 # LiveCD tools
-sys-apps/memtest86+
 app-misc/livecd-tools
 
 # Framebuffer

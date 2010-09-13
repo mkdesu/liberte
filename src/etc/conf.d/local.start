@@ -11,28 +11,26 @@ cdmount=`cat /proc/mounts | grep ' /mnt/cdrom '`
 fs=`echo "${cdmount}" | cut -d' ' -f3`
 
 
-# On USB boot, root is ext2 (unlike iso9660 on CD boot)
-if [ "${fs}" = "ext2" ]; then
-    # Get the FAT32 device
-    dev1=`echo "${cdmount}" | cut -d' ' -f1 | sed 's/2$/1/'`
+# On USB boot, root is vfat
+dev1=`echo "${cdmount}" | cut -d' ' -f1`
 
-    # Detach the FAT32 partition from autofs
-    ACTION=remove DEVNAME=${dev1} /root/bin/ps-mount
+# Detach the FAT32 partition from autofs
+ACTION=remove DEVNAME=${dev1} /root/bin/ps-mount
 
-    # Mount the FAT32 filesystem
-    # NOTE: dirs are group-accessible, files are group-readable
-    ebegin Mounting ${lmount}
-    mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${dev1} ${lmount}
+# FIXME
+# Mount the FAT32 filesystem
+# NOTE: dirs are group-accessible, files are group-readable
+# ebegin Mounting ${lmount}
+# mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${dev1} ${lmount}
 
-    # Create persist subdirs (for xdg-user-dir and claws-mail) only if everything went OK
-    if [ $? = 0 ]; then
-        rsync -aO /mnt/livecd${lmount}/ ${lmount}
-    fi
-
-    # Arm the poweroff watchdog
-    ebegin Arming power-off on ${dev1} removal
-    /root/bin/poweroff-watchdog ${dev1} &
+# Create persist subdirs (for xdg-user-dir and claws-mail) only if everything went OK
+if [ $? = 0 ]; then
+    rsync -aO /mnt/livecd${lmount}/ ${lmount}
 fi
+
+# Arm the poweroff watchdog
+ebegin Arming power-off on ${dev1} removal
+/root/bin/poweroff-watchdog ${dev1} &
 
 
 # Extract configuration archive, if present

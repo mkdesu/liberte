@@ -185,11 +185,14 @@ ln -sf dhcpcd.wrapper /sbin/dhcpcd
 
 sinfo "Compiling kernel"
 genkflags="--splash=liberte --no-keymap --oldconfig --no-save-config --loglevel=0"
+sed -i 's/^DISKLABEL="yes"/DISKLABEL="no"/' /etc/genkernel.conf
+
 export KBUILD_BUILD_VERSION=0
-export AMODULES_FS="ext2 loop squashfs sqlzma unlzma isofs unionfs"
+export AMODULES_FS="vfat fat nls_iso8859-1 nls_cp437 loop squashfs unionfs"
 export AMODULES_PCMCIA="mmc_core mmc_block"
 #export AMODULES_FIREWIRE="firewire-ohci firewire-sbp2"
 sed -i 's/^MODULES_\(DMRAID\|EVMS\|LVM\|MDADM\|NET\|FS\|FIREWIRE\)=/#\0/' /usr/share/genkernel/arch/x86/modules_load
+
 genkernel ${genkflags} all
 
 
@@ -214,17 +217,22 @@ diff ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config || true
 
 sinfo "Cleaning modules directory"
 rm /lib/modules/*/{build,source}
-#make -C /usr/src/linux clean
 
 
-sinfo "Generating Grub configuration"
+sinfo "Generating SYSLINUX configuration"
 rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
-rm /boot/grub/menu.lst
-cat /boot/grub/grub.conf \
-    | sed s@/boot/kernel-genkernel@/boot/kernel-genkernel-x86-${kversion}@ \
-    | sed s@/boot/initramfs-genkernel@/boot/initramfs-genkernel-x86-${kversion}@ \
+
+mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
+mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
+
+cp -p /usr/share/syslinux/{menu,chain,reboot}.c32 /boot/syslinux/
+
+cat ${HOME}/config/syslinux.cfg \
+    | sed s@PREFIX@/liberte@ \
+    | sed s@kernel-KVERSION@kernel-x86-${kversion}@ \
+    | sed s@initramfs-KVERSION@initramfs-x86-${kversion}@ \
     | sed "s@VERSION@${VERSION}@" \
-    > /boot/grub/menu.lst
+    > /boot/syslinux/syslinux.cfg
 
 
 sinfo "Done."
