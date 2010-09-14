@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
+consolefont=default8x16.psfu
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -24,12 +25,6 @@ if [ ${PHASE} != src ]; then
     echo "This is phase [${PHASE}], run $0 in phase [src]."
     exit 1
 fi
-
-
-# Get console font name before possible /etc/conf.d/consolefont overwrite
-consolefont=`grep CONSOLEFONT /etc/conf.d/consolefont | cut -d= -f2 | tr -d ' \t"'`
-consolefont=`find /usr/share/consolefonts/ -maxdepth 1 -name "${consolefont}.psf*.gz" | head -n 1`
-consolefont=`basename ${consolefont} .gz`
 
 
 sinfo "Updating portage"
@@ -232,8 +227,8 @@ mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
 
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
-rm -f /boot/syslinux/*.psf*
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
+rm -f /boot/syslinux/${consolefont}
 gunzip /boot/syslinux/${consolefont}.gz
 
 cat ${HOME}/config/syslinux.cfg \
@@ -243,6 +238,7 @@ cat ${HOME}/config/syslinux.cfg \
     | sed s@initramfs-KVERSION@initramfs-x86-${kversion}@ \
     | sed "s@VERSION@${VERSION}@" \
     | sed s@CONSOLEFONT@${consolefont}@ \
+    | iconv -f UTF-8 -t CP437 \
     > /boot/syslinux/syslinux.cfg
 
 
