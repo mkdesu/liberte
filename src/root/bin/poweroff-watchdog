@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-# Power off immediately after the specified partition is detached.
+# Power off immediately after the specified disk/partition is detached.
 # Relies on simplified "udevadm monitor" - udev-watchdog.
 # This script could of course be called from udev rules, but then
 # it would be much less reliable for the intended usage, where the
@@ -17,8 +17,9 @@ if [ ! -b "$1" ]; then
 fi
 
 devpath=`udevadm info -q path -n "$1"`
-if ! udevadm info -q property -p "${devpath}" | grep -q '^DEVTYPE=partition$'; then
-    echo "$1 is not a block partition"
+devtype=`udevadm info -q property -p "${devpath}" | grep '^DEVTYPE=' | cut -d= -f2`
+if [ "${devtype}" != disk  -a  "${devtype}" != partition ]; then
+    echo "$1 is not a block disk/partition"
     exit 1
 fi
 

@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 	fd_set readfds;
 
 	const char *filter_subsys    = "block";
-	const char *filter_devtype   = "partition";
+	/* const char *filter_devtype   = "partition"; */
     const char *filter_action    = "remove";
     const char *filter_devsuffix = argv[1];
 
@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
 		goto out;
 	}
 
-	if (udev_monitor_filter_add_match_subsystem_devtype(kernel_monitor, filter_subsys, filter_devtype) < 0)
-		fprintf(stderr, "error: unable to apply subsystem filter '%s:%s'\n", filter_subsys, filter_devtype);
+	if (udev_monitor_filter_add_match_subsystem_devtype(kernel_monitor, filter_subsys, NULL /* filter_devtype */) < 0)
+		fprintf(stderr, "error: unable to apply subsystem filter '%s:%s'\n", filter_subsys, "NULL" /* filter_devtype */);
 
 	if (udev_monitor_enable_receiving(kernel_monitor) < 0) {
 		fprintf(stderr, "error: unable to subscribe to kernel events\n");
