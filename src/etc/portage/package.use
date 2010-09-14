@@ -43,7 +43,7 @@ app-portage/layman              subversion
 app-arch/p7zip                  rar
 
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
-media-video/mplayer             -v4l2 -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
+media-video/mplayer             -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
 media-video/mplayer             -opengl -video_cards_mga -video_cards_s3virge -video_cards_tdfx
 
 # Internationalization

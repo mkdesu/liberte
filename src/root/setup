@@ -26,6 +26,12 @@ if [ ${PHASE} != src ]; then
 fi
 
 
+# Get console font name before possible /etc/conf.d/consolefont overwrite
+consolefont=`grep CONSOLEFONT /etc/conf.d/consolefont | cut -d= -f2 | tr -d ' \t"'`
+consolefont=`find /usr/share/consolefonts/ -maxdepth 1 -name "${consolefont}.psf*.gz" | head -n 1`
+consolefont=`basename ${consolefont} .gz`
+
+
 sinfo "Updating portage"
 emerge -q --sync
 eselect news read all
@@ -226,6 +232,9 @@ mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
 
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
+rm -f /boot/syslinux/*.psf*
+cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
+gunzip /boot/syslinux/${consolefont}.gz
 
 cat ${HOME}/config/syslinux.cfg \
     | sed /^#/d \
@@ -233,6 +242,7 @@ cat ${HOME}/config/syslinux.cfg \
     | sed s@kernel-KVERSION@kernel-x86-${kversion}@ \
     | sed s@initramfs-KVERSION@initramfs-x86-${kversion}@ \
     | sed "s@VERSION@${VERSION}@" \
+    | sed s@CONSOLEFONT@${consolefont}@ \
     > /boot/syslinux/syslinux.cfg
 
 

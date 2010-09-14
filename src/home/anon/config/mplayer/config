@@ -9,5 +9,7 @@ font="Sans"
 af-add=bs2b
 vf-add=screenshot
 
+tv=driver=v4l2
+
 [gnome-mplayer]
 msglevel=all=5
