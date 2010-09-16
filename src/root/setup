@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
-consolefont=default8x16.psfu
+consolefont=ter-i16n.psf
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -226,18 +226,19 @@ rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
 mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
 
+mkdir -p /boot/syslinux
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
 rm -f /boot/syslinux/${consolefont}
 gunzip /boot/syslinux/${consolefont}.gz
 
 cat ${HOME}/config/syslinux.cfg \
-    | sed /^#/d \
-    | sed s@PREFIX@/liberte@ \
-    | sed s@kernel-KVERSION@kernel-x86-${kversion}@ \
-    | sed s@initramfs-KVERSION@initramfs-x86-${kversion}@ \
-    | sed "s@VERSION@${VERSION}@" \
-    | sed s@CONSOLEFONT@${consolefont}@ \
+    | sed "/^#/d ;\
+           s@PREFIX@/liberte@ ;\
+           s@kernel-KVERSION@kernel-x86-${kversion}@ ;\
+           s@initramfs-KVERSION@initramfs-x86-${kversion}@ ;\
+           s@VERSION@${VERSION}@ ;\
+           s@CONSOLEFONT@${consolefont}@" \
     | iconv -f UTF-8 -t CP437 \
     > /boot/syslinux/syslinux.cfg
 

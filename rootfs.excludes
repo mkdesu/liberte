@@ -82,10 +82,6 @@
 /usr/**/lib/**.a
 /usr/**/lib/**.la
 
-# Cached directories
-# (here we rely on unchanged mtime of /usr/share/icons/*)
-/usr/share/icons/*/[1-9]*x[1-9]*/
-
 # Pruned directories (see rootfs.includes)
 /usr/share/consolefonts/**
 /usr/share/consoletrans/

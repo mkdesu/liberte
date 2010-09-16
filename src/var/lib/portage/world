@@ -4,6 +4,7 @@ sys-kernel/hardened-sources
 app-portage/gentoolkit
 sys-kernel/genkernel
 sys-boot/syslinux
+media-fonts/terminus-font
 
 # LiveCD tools
 sys-apps/memtest86+

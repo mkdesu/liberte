@@ -38,7 +38,7 @@ sinfo "Copying USB /boot"
 mkdir -p -m 755 ${USBROOT}
 rsync -aHAXS -v --delete-excluded \
     ${LIVECD}/boot ${USBROOT}
-sed -i 's/TAG/[USB]/; s/ROOTFS/vfat/' ${USBROOT}/boot/syslinux/syslinux.cfg
+sed -i 's/TAG //; s/ROOTFS/vfat/' ${USBROOT}/boot/syslinux/syslinux.cfg
 
 
 sinfo "Copying USB add-ons"
@@ -54,6 +54,11 @@ ${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.squashfs -noappend \
     -no-exports -no-progress \
     -sort ${SRC}/rootfs.sort -e boot
 chmod 644 ${USBROOT}/boot/root-x86.squashfs
+
+
+sinfo "Converting text files to DOS line endings"
+find ${USBROOT} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
+    -exec sed -i 's/$/\r/' {} \;
 
 
 sinfo "Done."

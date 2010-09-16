@@ -5,6 +5,7 @@ net-misc/openssh                -X
 sys-devel/gcc                   -gtk
 sys-libs/glibc                  -gd
 app-misc/livecd-tools           -X -opengl
+media-fonts/terminus-font       -X -pcf
 app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
 dev-libs/libxml2                -readline
@@ -51,6 +52,7 @@ app-i18n/scim-tables            linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
 sys-apps/man-pages              -linguas_*
+media-fonts/terminus-font       quote ru-dv ru-i
 
 # Quirks
 dev-libs/libxml2                python
