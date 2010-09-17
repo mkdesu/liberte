@@ -5,6 +5,7 @@ cat <<EOF
 You have logged out of X.
 EOF
 
+ret=0
 done=0
 while [ ${done} = 0 ]; do
     cat <<EOF
@@ -12,6 +13,7 @@ while [ ${done} = 0 ]; do
 Please choose:
     [s] shutdown
     [r] reboot
+    [x] login to X again
     [q] shell (or just hit enter)
 EOF
     read choice
@@ -26,11 +28,16 @@ EOF
         sudo shutdown -r now
         sleep 5
         ;;
+    x)
+        ret=1
+        ;;
     q|"")
-        echo 'Type "exit" to login to X again.'
+        echo 'Press Ctrl-D to login to X again.'
         ;;
     *)
         done=0
         ;;
     esac
 done
+
+exit ${ret}

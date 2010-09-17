@@ -60,8 +60,11 @@ if [ -z "${NO_STARTX}" ]; then
         echo -ne "\033[?17;0;64c"
     fi
 
-    if [ -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; then
+    while [ -z "${stopx}" -a -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; do
         ck-launch-session startx 1>${TMPDIR}/xorg.log 2>&1
-        post-logout
-    fi
+        if post-logout; then
+            stopx=1
+        fi
+    done
+    unset stopx
 fi

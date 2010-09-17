@@ -96,7 +96,7 @@ sinfo "Compiling custom executables"
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
 # s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...
-lcrep=`awk '/^title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^title[[:space:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
+lcrep=`awk '/^[[:space:]]*title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^[[:space:]]*title[[:space:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
 # "Spain" ca "__ca_ES@valencia" ca_ES.UTF-8@valencia (+ lcrep)
 awk '/UTF-8/ && !/^iw_IL/ { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a); printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); print $1 }' /usr/share/i18n/SUPPORTED | sed "${ccrep}${lcrep}" | LC_ALL=C sort | tr '\n' ' ' > /etc/locale.menu
 # "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"

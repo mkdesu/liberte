@@ -1,3 +1,5 @@
 #!/bin/sh
 
+# zenity --list --height=220 --window-icon=question --title="Logout" --text="<b>X Logout</b>" --print-column=1 --hide-column=1 --column="Key" --column="Action" shutdown "Shutdown" reboot "Reboot" login "Logout and re-login" logout "Logout to shell"
+
 kill ${WM_PID}
