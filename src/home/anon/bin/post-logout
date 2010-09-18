@@ -1,43 +1,31 @@
 #!/bin/sh
 
-clear
-cat <<EOF
-You have logged out of X.
-EOF
+if [ -e ${TMPDIR}/logout-choice ]; then
+    choice=`cat ${TMPDIR}/logout-choice`
+fi
+
 
 ret=0
-done=0
-while [ ${done} = 0 ]; do
-    cat <<EOF
 
-Please choose:
-    [s] shutdown
-    [r] reboot
-    [x] login to X again
-    [q] shell (or just hit enter)
-EOF
-    read choice
-    done=1
+case "${choice}" in
+shutdown)
+    sudo shutdown -h now
+    sleep 5
+    ;;
+reboot)
+    sudo shutdown -r now
+    sleep 5
+    ;;
+login)
+    ret=1
+    ;;
+logout|"")
+    echo 'Press Ctrl-D to login to X again.'
+    ;;
+*)
+    echo "Unexpected logout choice: [${choice}]"
+    ;;
+esac
 
-    case "${choice}" in
-    s)
-        sudo shutdown -h now
-        sleep 5
-        ;;
-    r)
-        sudo shutdown -r now
-        sleep 5
-        ;;
-    x)
-        ret=1
-        ;;
-    q|"")
-        echo 'Press Ctrl-D to login to X again.'
-        ;;
-    *)
-        done=0
-        ;;
-    esac
-done
 
 exit ${ret}
