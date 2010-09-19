@@ -2,6 +2,7 @@
 
 # Use of auto.media is exclusive via file lock
 lock=/etc/.auto.lock
+lockfd=20
 
 # Real work is done in forked process
 if [ "$1" = fork ]; then
@@ -84,7 +85,7 @@ if [ "$1" = fork ]; then
             local suffix=1
 
             while [ -z "${autokeys/* ${ID_FS_LABEL}-${suffix} */}" ]; do
-                let suffix++
+                let suffix=suffix+1
             done
 
             ID_FS_LABEL="${ID_FS_LABEL}-${suffix}"
@@ -97,26 +98,28 @@ if [ "$1" = fork ]; then
         local expected
 
         if [ -L ${daemon} ]; then
-            # Sends SIGHUP to automount
+            # Sends SIGHUP to automount (autofs 5.0.3: only effective when adding mount points)
             ${daemon} reload
 
-            # Wait up to 5s for changes to take effect
+            # Wait up to 2s for changes to take effect
             local count=0
             expected=`echo "${autokeys}" | sed 's/^ //; s/ $//' | tr ' ' '\n' | sort`
-            while [ ${count} -lt 20 ]; do
+            while [ ${count} -lt 8 ]; do
                 actual=`find ${prefix} -mindepth 1 -maxdepth 1 -type d | sed "s:^${prefix}/::" | sort`
 
                 if [ "${actual}" = "${expected}" ]; then
                     count=100
                 else
                     sleep 0.25
-                    let count++
+                    let count=count+1
                 fi
             done
 
             # Changes weren't reflected in /mnt/media
             if [ ${count} != 100 ]; then
                 logger -p 4 -t auto.media "autofs reloading failed, restarting service"
+                flock -u ${lockfd}
+                # Deadlock if the lock is still held at this point
                 ${daemon} restart
             fi
         fi
@@ -177,7 +180,7 @@ if [ "$1" = fork ]; then
         grep -v " :${DEVNAME}"\$ ${mounts} > ${mounts}.$$ || true
         mv ${mounts}.$$ ${mounts}
     }
-        
+
     # For "add" action, a line is added only for non-existing (in autofs or mounted) device
     if [ "${ACTION}" = add ]; then
         if [ -n "${autodevs/* ${DEVNAME} */}" -a "${fscheck}" != mtab ]; then
@@ -229,5 +232,5 @@ else
         umask ${umsave}
     fi
 
-    (flock 20 && "$0" fork "$@") 20< ${lock} &
+    (flock ${lockfd} && "$0" fork "$@") ${lockfd}< ${lock} &
 fi

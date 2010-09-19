@@ -8,7 +8,7 @@ if [ -n "${PATH##*${HOME}/bin:*}" ]; then
 fi
 
 # Configuration dirs
-# TMPDIR is given by pam_mktemp
+# TMPDIR is given by pam_mktemp (but not kept through newgrp!)
 export XDG_CONFIG_HOME=${HOME}/config
 export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
 export XDG_CACHE_HOME=${TMPDIR}/cache
