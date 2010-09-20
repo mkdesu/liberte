@@ -50,10 +50,10 @@ rsync -aHS -O --no-o --no-g --chmod=go=rX -v \
 # Using default block size of 128KiB
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.squashfs -noappend \
+${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs -noappend \
     -no-exports -no-progress \
     -sort ${SRC}/rootfs.sort -e boot
-chmod 644 ${USBROOT}/boot/root-x86.squashfs
+chmod 644 ${USBROOT}/boot/root-x86.sfs
 
 
 sinfo "Converting text files to DOS line endings"

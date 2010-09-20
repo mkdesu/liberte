@@ -12,41 +12,46 @@ if [ ${PHASE} != copy ]; then
 fi
 
 
-# gcc shared libs
+sinfo "Cleaning up portage configuration"
+sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
+
+
+sinfo "Unmerging build and temporary dependencies"
+make -C /usr/src/linux mrproper > /dev/null
+emerge -q --depclean --with-bdeps n
+
+
+sinfo "Recompiling build-dependent packages"
+emerge -quDN world
+
+
 sinfo "Copying gcc shared libs"
 rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
 ldconfig
 
 
 sinfo "Unmerging development packages"
-make -C /usr/src/linux mrproper > /dev/null
-
 mv /usr/lib/libltdl.* /tmp/
 emerge -qC \
-    sys-devel/make \
-    sys-devel/autoconf \
-    sys-devel/automake \
+    sys-devel/make      \
+    sys-devel/autoconf  \
+    sys-devel/automake  \
     sys-devel/gnuconfig \
-    sys-devel/m4 \
-    sys-devel/patch \
+    sys-devel/m4        \
+    sys-devel/patch     \
     \
-    sys-devel/gcc-config \
-    sys-devel/gcc \
+    sys-devel/gcc      \
     sys-devel/binutils \
-    sys-devel/libtool \
-    sys-devel/flex \
-    sys-devel/bison \
+    sys-devel/libtool  \
+    sys-devel/flex     \
+    sys-devel/bison    \
     \
     sys-kernel/linux-headers \
-    sys-kernel/hardened-sources \
-    sys-kernel/genkernel \
-    sys-apps/busybox \
-    sys-boot/syslinux \
-    media-fonts/terminus-font \
+    sys-apps/busybox         \
     \
-    sys-apps/man \
+    sys-apps/man       \
     sys-apps/man-pages \
-	sys-apps/texinfo \
+	sys-apps/texinfo   \
 
 mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/
@@ -57,24 +62,24 @@ sinfo "Unmerging orphaned packages"
 emerge -q --depclean --with-bdeps n
 
 
-sinfo "Checking linking consistency"
-revdep-rebuild -q -i
-
-
 sinfo "Unmerging unnecessary packages"
 pver=`emerge --version | cut -d' ' -f2`
 emerge -qC \
     app-admin/python-updater \
-    app-admin/perl-cleaner \
-    app-arch/cpio
+    app-admin/perl-cleaner   \
+    app-arch/cpio            \
+    net-misc/openssh         \
+    virtual/mta
 
 
-# sinfo "Checking linking consistency (last chance)"
-# revdep-rebuild -q -p -i
+sinfo "Checking linking consistency"
+revdep-rebuild -q -i
 
 
 sinfo "Unmerging portage libs"
-emerge -qC app-portage/gentoolkit sys-apps/sandbox
+emerge -qC \
+    app-portage/gentoolkit \
+    sys-apps/sandbox
 
 
 sinfo "Updating environment"
@@ -90,6 +95,11 @@ rmdir /usr/lib/portage
 sinfo "Trimming icons cache"
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
     -exec gtk-update-icon-cache -q -f -i {} \;
+
+
+sinfo "Uncompressing selected files"
+gunzip `find /usr/share/consolefonts -name '*.gz'` \
+       `find /usr/share/keymaps      -name '*.gz'`
 
 
 # Use non-optimized bytecode instead of optimized

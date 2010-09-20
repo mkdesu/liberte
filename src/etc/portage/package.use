@@ -3,8 +3,6 @@ sys-apps/groff                  -X
 sys-process/psmisc              -X
 net-misc/openssh                -X
 sys-devel/gcc                   -gtk
-sys-libs/glibc                  -gd
-app-misc/livecd-tools           -X -opengl
 media-fonts/terminus-font       -X -pcf
 app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
@@ -24,7 +22,6 @@ sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
 sys-apps/iproute2               minimal
 gnome-extra/zenity              -compat
-sys-apps/parted                 -debug
 mail-client/claws-mail          -ssl -gnutls -imap
 gnome-base/gvfs                 -http
 net-libs/neon                   -pkcs11
@@ -33,14 +30,12 @@ app-editors/nano                -spell
 # Extra functionality
 sys-fs/udev                     extras               # pcmanfm
 media-libs/jpeg                 static-libs          # splashutils
-dev-lang/python                 sqlite
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 sci-visualization/gnuplot       gd
 app-text/poppler                cairo
 app-office/abiword              plugins
 app-editors/gedit               python               # gedit-plugins
-app-portage/layman              subversion
 app-arch/p7zip                  rar
 
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
@@ -55,5 +50,5 @@ sys-apps/man-pages              -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Quirks
-dev-libs/libxml2                python
 x11-libs/cairo                  -xcb
+dev-libs/libxml2                python               # TEMP (gnome-doc-utils bdep)

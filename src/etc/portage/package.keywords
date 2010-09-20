@@ -1,24 +1,23 @@
 # Firmware
 net-wireless/iwl5150-ucode
-net-wireless/bluez-firmware
+net-wireless/iwl6000-ucode
+net-wireless/iwl6050-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 
 
 # Utilities
 sys-boot/syslinux
-app-i18n/scim-bridge
-x11-misc/xvkbd
 x11-misc/xdg-user-dirs
-sys-power/cpudyn
+x11-misc/xvkbd
+media-fonts/khmer
 
 
 # Applications
 app-editors/gedit-plugins
-app-office/abiword
-app-office/abiword-plugins
-www-client/midori
 net-misc/youtube-dl
 
-#www-plugins/gnash
-#www-plugins/swfdec-mozilla
+
+# app-i18n/scim-bridge
+# www-plugins/gnash
+# www-plugins/swfdec-mozilla

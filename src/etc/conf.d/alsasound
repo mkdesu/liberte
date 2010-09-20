@@ -1,4 +1,4 @@
-ENABLE_OSS_EMUL="yes"
+ENABLE_OSS_EMUL="no"
 
 # Handled by autoconfig
 RESTORE_ON_START="no"
@@ -6,4 +6,5 @@ RESTORE_ON_START="no"
 # Meaningless without persistence
 SAVE_ON_STOP="no"
 
+# Refers to ALSA modules
 LOAD_ON_START="yes"

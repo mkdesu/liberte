@@ -14,40 +14,39 @@ fi
 
 # Variables
 LIVECD=$1/clean
+FIND="chroot ${LIVECD} find / -xdev"
 
 
 sinfo "Checking ${LIVECD}"
 
 sinfo "Bad symlinks:"
-chroot ${LIVECD} find / -type l -not -xtype f -not -xtype d
+${FIND} -type l ! -xtype f ! -xtype d
 
 sinfo "Archives:"
-find ${LIVECD} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \) \
-    -not \( -path '*/charmaps/*' -o \
-            -path '*/keymaps/*' -o \
-            -path '*/consolefonts/*' -o\
-            -path '*/usr/share/fonts/*' \)
+${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' -o -name '*.lzma' \)
 
 sinfo "Sources:"
-find ${LIVECD} -name '*.h' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py'
+${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py'
 
 sinfo "Objects:"
-find ${LIVECD} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
+${FIND} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
 
 sinfo "Docs:"
-find ${LIVECD} -name '*.info' -o -name '*.htm*' -o \( -name '*.1' -not -name '*.so.*' \)
+${FIND} -name '*.info' -o -name '*.htm*' -o \( -name '*.1' ! -name '*.so.*' \)
 
 sinfo "Hidden:"
-find ${LIVECD} -name '.*'
+${FIND} -name '.*'
 
 sinfo "Backup:"
-find ${LIVECD} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*'
+${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*'
 
 sinfo "Cache:"
-find ${LIVECD} -name '*.cache'
+${FIND} -name '*.cache'
 
 sinfo "Logs:"
-find ${LIVECD} -name '*.log*' -o -type f \( -path '*var/run/*' -o -path '*/var/log/*' \)
+${FIND} -name '*.log*' -o -type f \( -path '*var/run/*' -o -path '*/var/log/*' \)
 
 sinfo "SUID/SGID:"
-find ${LIVECD} -type f \( -perm -4000 -o -perm -2000 \) -ls
+${FIND} -type f -perm /u+s -printf '%M %u %g\t%p\n'
+${FIND} -type f -perm /g+s -printf '%M %u %g\t%p\n'
+${FIND} -type d -perm /a+s -printf '%M %u %g\t%p\n'

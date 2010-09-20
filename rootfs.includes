@@ -8,8 +8,8 @@
 /var/cache/fontconfig/***
 
 # Pruned directories exceptions
-/usr/share/consolefonts/*16*.psfu*
-/usr/share/consolefonts/cp1250.psfu.gz
+/usr/share/consolefonts/*16*.psfu
+/usr/share/consolefonts/cp1250.psfu
 /usr/share/keymaps/include/***
 /usr/share/keymaps/i386/***
 /usr/share/keymaps/mac/***

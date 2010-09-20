@@ -44,38 +44,13 @@ if [ -e ${lmount}/settings/config.tar.bz2 ]; then
 fi
 
 
-# Autologin Liberte user (use livecd-functions' inittab backup)
-if ! grep -q mingetty /etc/inittab && [ -e /etc/inittab.old ]; then
-    ebegin Updating console autologin
-    
-    # mingetty accepts --noclear
-    cat /etc/inittab.old | grep -v '^c[3-9]:' \
-        | sed "s@/sbin/agetty \(-nl /bin/bashlogin \)\?38400 @/sbin/mingetty --autologin ${luser} --noclear @" \
-        | sed "s/^c2:\([^:]*\):respawn:\(.*\) ${luser} --noclear /c2:\1:wait:\2 root /" \
-        > /etc/inittab
-    telinit q
-fi
-
-
-# genkernel's initrc leaves /etc/mtab somewhat messed
+# genkernel's init leaves /etc/mtab somewhat messed
 ebegin Updating mtab
 egrep -v ' (rootfs|autofs) ' /proc/mounts > /etc/mtab
 
 
-# Configure X server, unless "nox" is given to kernel
-cmdline=`cat /proc/cmdline`
-x11=yes
-for x in ${cmdline} ; do
-    case "${x}" in
-        nox)
-            x11=no
-            ;;
-        dox)
-            x11=yes
-            ;;
-    esac
-done
-if [ ${x11} = yes  -a  ! -e /etc/X11/xorg.conf ]; then
+# Configure X server, unless "nox" is given to kernel (rely on xdm-setup)
+if [ ! -e /etc/.noxdm  -a  ! -e /etc/X11/xorg.conf ]; then
     ebegin Configuring X server
     export HOME=/root
     if Xorg -configure 2>/dev/null && [ -e ${HOME}/xorg.conf.new ]; then
@@ -98,10 +73,14 @@ truncate -s 0 /var/log/dmesg
 
 
 # Enable power management for wireless
+# awk -F: '/eth.:|tr.:|ath.:|wlan.:/{print $1}' /proc/net/dev
 wdevs=`iwconfig 2>/dev/null | grep -oE '^[^ ]+'`
 for dev in ${wdevs}; do
     ebegin Enabling power management for wireless: ${dev}
     iwconfig ${dev} power on
 done
 
-# awk -F: '/eth.:|tr.:|ath.:|wlan.:/{print $1}' /proc/net/dev
+
+# Lock root account's password
+ebegin Disabling root password
+usermod -L root

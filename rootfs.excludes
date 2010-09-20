@@ -62,6 +62,7 @@
 /usr/lib/perl*/**/unicore/*.txt
 /usr/lib/perl*/**/unicore/mktables*
 /usr/lib/perl*/**/Unicode/Collate/*.txt
+/usr/lib/icu/
 /usr/share/aclocal/
 /usr/share/baselayout/
 /usr/share/awk/
@@ -114,7 +115,6 @@
 # (GeoIP is not used in Tor setup)
 /usr/share/tor/
 /usr/share/misc/*.ids.*
-
-# Workarounds
-# (vesa takes precedence over radeon in xorg-server-1.7.6)
-# /usr/lib/xorg/modules/drivers/vesa_drv.so
+/usr/share/fonts/*/fonts.dir
+/usr/share/fonts/*/fonts.scale
+/usr/share/fonts/*/encodings.dir

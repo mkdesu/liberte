@@ -30,7 +30,7 @@ fi
 
 sinfo "Building binary distribution ${distname}.zip"
 cd ${DIST}
-zip -FS -rD9 -q ${distname}.zip liberte
+zip -FS -r9 -q ${distname}.zip liberte
 
 
 sinfo "Building source distribution ${distname}-src.tar.bz2"

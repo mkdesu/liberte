@@ -2,6 +2,8 @@
 
 kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
 consolefont=ter-i16n.psf
+lzmamem=20MiB
+
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -143,18 +145,16 @@ sed -i "s/^\(mydomain\|myhostname\|myuname\|cf_email\|perladmin\)=\(.*\)/\1='non
 
 
 sinfo "Patching init scripts"
-initpatches="genkernel checkroot rc autoconfig iptables hdparm tor"
+initpatches="genkernel checkroot rc inittab iptables hdparm tor"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
 sed -i 's/^# include /include /' /etc/nanorc
 
 
-# Handled by autoconfig: network[disabled], acpid, hdparm
-# Handled by autoconfig (possibly using hwsetup): alsasound, gpm
 sinfo "Configuring start-up services"
-bootsvc="microcode_ctl metalog iptables consolekit"
-defaultsvc="bluetooth pcscd nscd fbcondecor autoconfig autofs wicd privoxy"
+bootsvc="microcode_ctl metalog iptables consolekit hdparm"
+defaultsvc="acpid alsasound gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy xdm-setup"
 delsvc="rmnologin netmount"
 
 for svc in ${bootsvc}; do
@@ -168,14 +168,14 @@ for svc in ${delsvc}; do
 done
 
 
-# Root password good for maintenance before /etc/init.d/autoconfig is in charge
+# Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
 # "users" group is necessary for Wicd DBUS communication
 sinfo "Setting up users"
 grpck -r && grpconv
 echo root:liberte | chpasswd
 groupadd -f -r games
-useradd -c "Anonymous" -d /home/anon -G wheel,users,audio,cdrom,games anon || [ $? = 9 ]
+useradd -c "Anonymous" -d /home/anon -G users,audio,video,cdrom,games anon || [ $? = 9 ]
 useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 
 
@@ -208,8 +208,9 @@ zcat /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
 find . -not -type d -o -name root | sed 's@^./@@' \
     | cpio -oA -H newc -O ${cpiodir}/initramfs
 
-gzip -c9 ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
+lzma -ce ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
 cd; rm -r ${cpiodir}
+lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 
 
 sinfo "Kernel config differences:"
@@ -223,8 +224,8 @@ rm /lib/modules/*/{build,source}
 sinfo "Generating SYSLINUX configuration"
 rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
 
-mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86-${kversion}
-mv /boot/initramfs-genkernel-x86-${kversion} /boot/initramfs-x86-${kversion}
+mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86.zi
+mv /boot/initramfs-genkernel-x86-${kversion} /boot/initrd-x86.lzm
 
 mkdir -p /boot/syslinux
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
@@ -235,8 +236,6 @@ gunzip /boot/syslinux/${consolefont}.gz
 cat ${HOME}/config/syslinux.cfg \
     | sed "/^#/d ;\
            s@PREFIX@/liberte@ ;\
-           s@kernel-KVERSION@kernel-x86-${kversion}@ ;\
-           s@initramfs-KVERSION@initramfs-x86-${kversion}@ ;\
            s@VERSION@${VERSION}@ ;\
            s@CONSOLEFONT@${consolefont}@" \
     | iconv -f UTF-8 -t CP437 \

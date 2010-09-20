@@ -1,4 +1,0 @@
-# In absence of hwsetup
-
-MOUSETYPE=${MOUSE_FULLNAME}
-DEVICE=${MOUSE_DEVICE}

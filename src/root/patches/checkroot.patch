@@ -5,9 +5,9 @@
  }
  
 +stop() {
-+	ebegin "Zeroing-out RAM"
-+	smem -ll 1>/dev/null || true
-+	eend $?
++	ebegin "Zeroing-out RAM (expecting out-of-memory)"
++	( exec 2>/dev/null; smem -ll 1>&2 )
++	eend 0
 +}
  
  # vim:ts=4

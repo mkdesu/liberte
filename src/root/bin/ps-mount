@@ -232,5 +232,6 @@ else
         umask ${umsave}
     fi
 
-    (flock ${lockfd} && "$0" fork "$@") ${lockfd}< ${lock} &
+    # Bash doesn't understand ${lockfd}<
+    (flock ${lockfd} && "$0" fork "$@") 20< ${lock} &
 fi
