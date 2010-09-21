@@ -14,6 +14,6 @@
 
 # Runas alias specification
 
-# User privilege specification
+# User privilege specification (group prefix = %)
 root	ALL=(ALL) ALL
-%wheel	liberte = NOPASSWD: /sbin/shutdown -h now, /sbin/shutdown -r now
+anon	liberte = NOPASSWD: /sbin/shutdown -h now, /sbin/shutdown -r now

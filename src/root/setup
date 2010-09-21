@@ -208,7 +208,9 @@ zcat /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
 find . -not -type d -o -name root | sed 's@^./@@' \
     | cpio -oA -H newc -O ${cpiodir}/initramfs
 
-lzma -ce ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
+# "lzma -e" is not supported by the kernel (likely because lc bits > 3)
+# kernel's lzma call is in /usr/src/linux/scripts/Makefile.lib (lzma -9)
+lzma -c ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
 cd; rm -r ${cpiodir}
 lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 

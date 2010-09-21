@@ -1,5 +1,2 @@
-# GRUB 2
->=sys-boot/grub-1
-
 # Python 3
 >=dev-lang/python-3
