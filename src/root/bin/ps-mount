@@ -57,7 +57,7 @@ if [ "$1" = fork ]; then
     fi
 
     # Assign volume label if unavailable
-    if [ -z ${ID_FS_LABEL} ]; then
+    if [ -z "${ID_FS_LABEL}" ]; then
         if [ "${DEVNAME/[0-9]/X}" = /dev/fdX ]; then
             ID_FS_LABEL="floppy${DEVNAME/\/dev\/fd/}"
             ID_FS_LABEL="${ID_FS_LABEL/floppy0/floppy}"
@@ -177,8 +177,7 @@ if [ "$1" = fork ]; then
         done
 
         # Remove entries (will be removed from dir after autofs reload)
-        grep -v " :${DEVNAME}"\$ ${mounts} > ${mounts}.$$ || true
-        mv ${mounts}.$$ ${mounts}
+        sed -i "\& :${DEVNAME}"'$&d' ${mounts}
     }
 
     # For "add" action, a line is added only for non-existing (in autofs or mounted) device

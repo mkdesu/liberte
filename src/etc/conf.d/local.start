@@ -6,31 +6,24 @@ lgroup=anon
 lmount=/home/${luser}/persist
 
 
-# Original root is mounted as /mnt/cdrom (by genkernel's initrd script)
-cdmount=`cat /proc/mounts | grep ' /mnt/cdrom '`
-fs=`echo "${cdmount}" | cut -d' ' -f3`
-
-
-# On USB boot, root is vfat
-dev1=`echo "${cdmount}" | cut -d' ' -f1`
-
-# Detach the FAT32 partition from autofs
-ACTION=remove DEVNAME=${dev1} /root/bin/ps-mount
+# Media root is mounted as /mnt/cdrom (by genkernel's initrd script)
+cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
 
 # FIXME
 # Mount the FAT32 filesystem
 # NOTE: dirs are group-accessible, files are group-readable
 # ebegin Mounting ${lmount}
-# mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${dev1} ${lmount}
+# mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${cddev} ${lmount}
 
 # Create persist subdirs (for xdg-user-dir and claws-mail) only if everything went OK
 if [ $? = 0 ]; then
     rsync -aO /mnt/livecd${lmount}/ ${lmount}
 fi
 
+
 # Arm the poweroff watchdog
-ebegin Arming power-off on ${dev1} removal
-/root/bin/poweroff-watchdog ${dev1} &
+ebegin Arming power-off on ${cddev} removal
+/root/bin/poweroff-watchdog ${cddev} &
 
 
 # Extract configuration archive, if present
