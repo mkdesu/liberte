@@ -14,7 +14,10 @@ sys-apps/v86d
 media-gfx/splashutils
 
 # Firmware
+# (no fw for AR9170_USB in portage)
 sys-apps/microcode-ctl
+x11-drivers/radeon-ucode
+net-wireless/b43-firmware
 net-wireless/ipw2100-firmware
 net-wireless/ipw2200-firmware
 net-wireless/iwl1000-ucode
@@ -24,7 +27,12 @@ net-wireless/iwl5000-ucode
 net-wireless/iwl5150-ucode
 net-wireless/iwl6000-ucode
 net-wireless/iwl6050-ucode
-net-wireless/b43-firmware
+net-wireless/rt61-firmware
+net-wireless/rt73-firmware
+net-wireless/atmel-firmware
+net-wireless/zd1201-firmware
+net-wireless/zd1211-firmware
+net-wireless/prism54-firmware
 net-wireless/bluez-firmware
 
 # Disk utilities
@@ -61,7 +69,9 @@ net-misc/youtube-dl
 
 # Peripheral utilities
 sys-apps/x86info
+sys-apps/dmidecode
 sys-power/cpufrequtils
+# app-emulation/virt-what [hardened gcc 4.3.4]
 sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils
