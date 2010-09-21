@@ -155,7 +155,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl metalog iptables consolekit hdparm"
-defaultsvc="acpid alsasound gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy xdm-setup"
+defaultsvc="acpid alsasound aumix gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy xdm-setup"
 delsvc="rmnologin netmount"
 
 for svc in ${bootsvc}; do
