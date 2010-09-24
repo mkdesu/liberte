@@ -1,6 +1,6 @@
 @ECHO OFF
 
-IF NOT EXIST %~d0\liberte\liberte.tag GOTO baddir
+IF NOT EXIST %~d0\liberte\setup.bat GOTO baddir
 
 ECHO SYSLINUX setup requires administrator privileges for raw disk access.
 ECHO If you see a message about MBR update failure below, please

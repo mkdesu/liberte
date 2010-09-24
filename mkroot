@@ -6,26 +6,23 @@ sinfo() {
 
 
 # Must have root directory as an argument
-if [ "$1" = "" ]; then
+if [ -z "$1"  -o  \( -n "$2" -a "$2" != fresh -a "$2" != copy -a "$2" != clean -a "$2" != semiclean \) ]; then
     echo "$0 <livecd root> [fresh|copy|clean|semiclean]"
     exit 1
 fi
 
 
 # Variables
-mkdir -p $1
-LIVECD=`realpath $1`
+FROM=`dirname $0`
+LIVECD=$1
+
 MIRROR=http://distro.ibiblio.org/pub/linux/distributions/gentoo
 #MIRROR=http://mirror.switch.ch/ftp/mirror/gentoo
-
-FROM=`realpath $0`
-FROM=`dirname ${FROM}`
-
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
 
-# Copying and clean-copying
+# Copying and pruning
 if [ "$2" = copy ]; then
     sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
     rsync -aHAXS -x -v --delete-excluded \
@@ -35,22 +32,22 @@ if [ "$2" = copy ]; then
     sinfo "Done."
     exit
 elif [ "$2" = clean ]; then
-    sinfo "Clean-copying ${LIVECD}/copy to ${LIVECD}/clean"
+    sinfo "Pruning ${LIVECD}/copy"
     rsync -aHAXS -x -v --delete-excluded \
         --include-from=${FROM}/rootfs.includes \
         --exclude-from=${FROM}/rootfs.excludes \
-        ${LIVECD}/copy/ ${LIVECD}/clean | head
+        ${LIVECD}/copy/ ${LIVECD}/copy | head
 
     ${FROM}/check ${LIVECD}
 
     sinfo "Done."
     exit
 elif [ "$2" = semiclean ]; then
-    sinfo "Shortcut-copying ${LIVECD}/src to ${LIVECD}/clean"
+    sinfo "Shortcut-pruning ${LIVECD}/src to ${LIVECD}/copy"
     rsync -aHAXS -x -v --delete-excluded \
         --include-from=${FROM}/rootfs.includes \
         --exclude-from=${FROM}/rootfs.excludes \
-        ${LIVECD}/src/ ${LIVECD}/clean | head
+        ${LIVECD}/src/ ${LIVECD}/copy | head
 
     ${FROM}/check ${LIVECD}
 
@@ -59,45 +56,42 @@ elif [ "$2" = semiclean ]; then
 fi
 
 
-# Download stage3 + portage snapshot
-mkdir -p ${LIVECD}/mirror
-cd ${LIVECD}/mirror
-
-# latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
-sinfo "Saving ${PWD}/latest-stage3.txt"
-wget -N -nv ${stage3base}/latest-stage3.txt
-stage3=`grep stage3-i686 latest-stage3.txt | sed s@stage3-i686@hardened/stage3-i686-hardened@`
-stage3file=`basename ${stage3}`
-
-# If a new stage3 is available, remove old mirrors
-if [ ! -f ${stage3file} ]; then
-    rm -f stage3-i686-hardened-*.tar.bz2
-fi
-
-
-sinfo "Saving ${PWD}/${stage3file}"
-wget -N -nv ${stage3base}/${stage3}
-
-
-sinfo "Saving ${PWD}/portage-latest.tar.bz2"
-wget -N -nv ${portage}
-
-
 # Extract stage3 + portage snapshot to fresh directory
-if [ "$2" = fresh ]; then
+if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
+    # Download stage3 + portage snapshot
+    mkdir -p ${LIVECD}/mirror
+
+    # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
+    sinfo "Saving ${LIVECD}/mirror/latest-stage3.txt"
+    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/latest-stage3.txt
+    stage3=`grep stage3-i686 ${LIVECD}/mirror/latest-stage3.txt | sed s@stage3-i686@hardened/stage3-i686-hardened@`
+    stage3file=`basename ${stage3}`
+
+    # If a new stage3 is available, remove old mirrors
+    if [ ! -e ${LIVECD}/mirror/${stage3file} ]; then
+        rm -f ${LIVECD}/mirror/stage3-i686-hardened-*.tar.bz2
+    fi
+
+    sinfo "Saving ${LIVECD}/mirror/${stage3file}"
+    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}
+
+    sinfo "Saving ${LIVECD}/mirror/portage-latest.tar.bz2"
+    wget -N -nv -P ${LIVECD}/mirror ${portage}
+
+
 	sinfo "Deleting ${LIVECD}/src"
     rm -rf --one-file-system ${LIVECD}/src
     mkdir -m 755 ${LIVECD}/src
 
     sinfo "Extracting stage3 to ${LIVECD}/src"
-    tar xpjf ${stage3file} -C ${LIVECD}/src --exclude ./dev
+    tar xpjf ${LIVECD}/mirror/${stage3file} -C ${LIVECD}/src --exclude ./dev
     mkdir -m 755 ${LIVECD}/src/dev
     mknod -m 600 ${LIVECD}/src/dev/null    c 1 3
     mknod -m 600 ${LIVECD}/src/dev/tty1    c 4 1
     mknod -m 200 ${LIVECD}/src/dev/console c 5 1
 
     sinfo "Extracting portage to ${LIVECD}/src/usr"
-    tar xpjf portage-latest.tar.bz2 -C ${LIVECD}/src/usr
+    tar xpjf ${LIVECD}/mirror/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
 
     mkdir -m 2775 ${LIVECD}/src/usr/portage/distfiles
     chown 250:250 ${LIVECD}/src/usr/portage/distfiles

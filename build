@@ -1,0 +1,51 @@
+#!/bin/sh -e
+
+sinfo() {
+    echo -e "\033[1;37;43m$@\033[0m"
+}
+
+
+# Must have root directory as an argument
+# "fresh" parameter can be given in subsequent invocation
+# (erasing ${LIVECD}/src will do the same)
+if [ -z "$1"  -o  \( -n "$2"  -a  "$2" != fresh \) ]; then
+    echo "$0 <livecd root> [fresh]"
+    exit 1
+fi
+
+
+# Variables
+SRC=`dirname $0`
+LIVECD=$1
+
+
+# If "fresh" parameter is passed, rewrites ${LIVECD}/src
+sinfo "Downloading and extracting stage3 and portage snapshots"
+${SRC}/mkroot ${LIVECD} $2
+
+# If "fresh" parameter is passed, rebuilds system from scratch
+sinfo "Installing packages"
+${SRC}/enter ${LIVECD} -c ./setup $2
+
+# Reverse emerge rewriting /etc files during full build
+sinfo "Restoring configuration files"
+${SRC}/enter ${LIVECD} -c true
+
+# Destructive operations are done on ${LIVECD}/copy
+sinfo "Synchronizing to a temporary copy"
+${SRC}/mkroot ${LIVECD} copy
+
+# Cleans up ${LIVECD}/copy from inside
+sinfo "Uninstalling development packages"
+${SRC}/enter ${LIVECD} copy -c ./setup-copy
+
+# Cleans up ${LIVECD}/copy from outside
+sinfo "Pruning the temporary copy"
+${SRC}/mkroot ${LIVECD} clean
+
+# Builds "liberte" dir in ${LIVECD}/dist to deploy
+sinfo "Mastering deployment directory"
+${SRC}/mkimage ${LIVECD}
+
+# OK to copy "liberte" dir and run setup.sh
+sinfo "Done: ZIP archive in ${LIVECD}/dist"

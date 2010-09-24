@@ -40,13 +40,15 @@ sinfo "Filtering locales"
 grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
 
 
-if [ "$1" != fast ]; then
+if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     # Maintainer note: after kernel update+compile, do
     # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
-    sinfo "Applying kernel patches"
+    sinfo "Downloading kernel ${kversion}"
     emerge -q1 =sys-kernel/hardened-sources-`echo ${kversion} | sed 's/hardened-//'`
     cp ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config
 
+
+    sinfo "Applying kernel patches"
     spatch ${HOME}/patches/kernel-info.patch -p0
     sed -i 's/lzma -9/lzma/' /usr/src/linux-${kversion}/scripts/Makefile.lib
 
@@ -69,6 +71,7 @@ if [ "$1" != fast ]; then
     grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
     locale-gen -q
 else
+    sinfo "Skipping full rebuild (use \"fresh\")"
     sinfo "Listing updates"
     emerge -qupvDN --with-bdeps y world
 

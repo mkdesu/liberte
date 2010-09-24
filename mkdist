@@ -6,31 +6,19 @@ sinfo() {
 
 
 # Must have root directory as an argument
-if [ "$1" = "" ]; then
+if [ -z "$1" ]; then
     echo "$0 <livecd root>"
     exit 1
 fi
 
 
 # Variables
-SRC=`realpath $0`
-SRC=`dirname ${SRC}`
+SRC=`dirname $0`
 DIST=$1/dist
 # SVN=https://liberte.svn.sourceforge.net/svnroot/liberte/tags
 
 version=`cat ${SRC}/version`
 distname=liberte-${version}
-
-
-if [ "${version}" = "" ]; then
-    sinfo "Could not determine distribution version"
-    exit 1
-fi
-
-
-sinfo "Building binary distribution ${distname}.zip"
-cd ${DIST}
-zip -FS -r9 -q ${distname}.zip liberte
 
 
 sinfo "Building source distribution ${distname}-src.tar.bz2"
