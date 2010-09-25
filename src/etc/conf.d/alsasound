@@ -1,9 +1,8 @@
-ENABLE_OSS_EMUL="no"
-
-# Handled by autoconfig
-RESTORE_ON_START="no"
+# Need OSS mixer for aumix
+ENABLE_OSS_EMUL="yes"
 
 # Meaningless without persistence
+RESTORE_ON_START="no"
 SAVE_ON_STOP="no"
 
 # Refers to ALSA modules

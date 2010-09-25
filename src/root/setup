@@ -3,6 +3,7 @@
 kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
 consolefont=ter-i16n.psf
 lzmamem=20MiB
+protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock"
 
 
 sinfo() {
@@ -21,6 +22,17 @@ spatch() {
     rm -f /tmp/patch-rejects
 }
 
+rebuild_locales() {
+    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen.new
+    if cmp -s /etc/locale.gen{.new,}; then
+        rm /etc/locale.gen.new  
+    else
+        sinfo "Rebuilding locales"
+        mv /etc/locale.gen{.new,}
+        locale-gen -q
+    fi
+}
+
 
 # Sanity check
 if [ ${PHASE} != src ]; then
@@ -33,11 +45,6 @@ sinfo "Updating portage"
 emerge -q --sync
 eselect news read all
 eselect news purge
-
-
-# Filter locales before remerging libc
-sinfo "Filtering locales"
-grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
 
 
 if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
@@ -58,18 +65,25 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     spatch ${HOME}/patches/unionfs-unlink.patch -d /usr/src/linux -p4
 
 
+    # Filter locales before remerging libc
+    sinfo "Filtering locales"
+    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
+
+
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
     emerge -q1 binutils gcc libc
     emerge -qe system
-    rm /etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock
+    rm ${protected}
+
+
+    sinfo "Cleaning unnecessary packages"
+    emerge -q1C --deselect=n "=dev-lang/python-3*"
     emerge -q --depclean
 
 
-    # Rebuild locales (using possibly updated locales list)
-    sinfo "Generating locales"
-    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
-    locale-gen -q
+    # Rebuild locales if locales list was updated
+    rebuild_locales
 else
     sinfo "Skipping full rebuild (use \"fresh\")"
     sinfo "Listing updates"
@@ -91,7 +105,9 @@ emerge -q --depclean
 sinfo "Checking linking consistency"
 revdep-rebuild -q -i
 
+rm -f ${protected}
 etc-update
+rebuild_locales
 
 
 sinfo "Compiling custom executables"

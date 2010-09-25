@@ -59,7 +59,11 @@ echo "${environment}" | tr ' ' '\n' | sed 's/^/    /'
 
 
 sinfo "Launching chrooted shell in ${LIVECD}"
-env -i ${environment} setarch i686 chroot ${LIVECD} /bin/bash -l "$@" || true
+retval=0
+env -i ${environment} setarch i686 chroot ${LIVECD} /bin/bash -l "$@" || retval=$?
+if [ ${retval} != 0 ]; then
+    sinfo "Failed."
+fi
 
 
 sinfo "Unmounting system directories"
@@ -69,3 +73,6 @@ fi
 for dir in dev/shm dev/pts dev sys proc; do
     umount ${LIVECD}/${dir}
 done
+
+
+exit ${retval}

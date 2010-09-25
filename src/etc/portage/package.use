@@ -11,6 +11,7 @@ sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
 net-libs/webkit-gtk             -gstreamer
 gnome-extra/libgsf              -gtk
+media-libs/jasper               -opengl
 
 # Drivers
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
