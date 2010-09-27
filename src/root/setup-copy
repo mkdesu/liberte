@@ -142,14 +142,6 @@ for pm in `find /usr/lib -xdev -type f \( -name '*.pm' -o -name '*.pl' -not -per
     perl -MPod::Strip -e "Pod::Strip->filter('${pm}')" > ${pm}.new
     chmod --reference=${pm} ${pm}.new
     mv ${pm}.new ${pm}
-
-    # Strip comments (also strips POD) - complex, slow
-    perl -MFile::Comments -MFile::Comments::Plugin::Perl \
-        -e "my \$s = File::Comments->new(); \
-            die 'Not Perl' unless(\$s->guess_type('${pm}') eq 'perl'); \
-            print \$s->stripped('${pm}')" > ${pm}.new
-    chmod --reference=${pm} ${pm}.new
-    mv ${pm}.new ${pm}
 done
 
 

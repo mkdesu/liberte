@@ -158,10 +158,11 @@ update-usbids -q
 
 # One of the dependant packages creates /x during installation
 sinfo "Installing temporary Perl packages"
-cpan -i Pod::Strip File::Comments::Plugin::Perl 1>/dev/null 2>&1
+cpan -i Pod::Strip 1>/dev/null 2>&1
 rm -f /x
 
-sed -i "s/^\(mydomain\|myhostname\|myuname\|cf_email\|perladmin\)=\(.*\)/\1='none'/" /usr/lib/perl*/*/*/Config_heavy.pl
+sed -i "s/^\(mydomain\|myhostname\|myuname\|cf_email\|perladmin\)=\(.*\)/\1='none'/ ;\
+       s/^\(## Target system *: \).*/\1none/" /usr/lib/perl*/*/*/Config_heavy.pl
 
 
 sinfo "Patching init scripts"
@@ -195,7 +196,8 @@ sinfo "Setting up users"
 grpck -r && grpconv
 echo root:liberte | chpasswd
 groupadd -f -r games
-useradd -c "Anonymous" -d /home/anon -G users,audio,video,cdrom,games anon || [ $? = 9 ]
+useradd -c "Anonymous" -d /home/anon anon || [ $? = 9 ]
+usermod -G users,audio,video,cdrom,games anon
 useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 
 
