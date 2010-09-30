@@ -266,9 +266,37 @@
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>Konqueror</name>
+          <name>PCManFM</name>
         </startupnotify>
-        <command>kfmclient openProfile filemanagement</command>
+        <command>pcmanfm</command>
+      </action>
+    </keybind>
+    <keybind key="W-t">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Terminal</name>
+        </startupnotify>
+        <command>lxterminal</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioRaiseVolume">
+      <action name="Execute">
+        <command>/usr/bin/aumix -v+5</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioLowerVolume">
+      <action name="Execute">
+        <command>/usr/bin/aumix -v-5</command>
+      </action>
+    </keybind>
+    <keybind key="XF86AudioMute">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Aumix</name>
+        </startupnotify>
+        <command>aumix -v0</command>
       </action>
     </keybind>
   </keyboard>

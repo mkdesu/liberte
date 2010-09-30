@@ -49,3 +49,8 @@ if grep -q " ${lmount} " /proc/mounts; then
     ebegin Unmounting ${lmount}
     umount -l ${lmount}
 fi
+
+
+# Remount media root read-only
+ebegin Remounting /mnt/cdrom read-only
+mount -o remount,ro /mnt/cdrom

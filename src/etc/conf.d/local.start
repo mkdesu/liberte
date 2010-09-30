@@ -6,7 +6,10 @@ lgroup=anon
 lmount=/home/${luser}/persist
 
 
-# Media root is mounted as /mnt/cdrom (by genkernel's initrd script)
+# Media root is on /mnt/cdrom (by genkernel's initrd),
+# remount read-write (assuming vfat)
+ebegin Remounting /mnt/cdrom read-write
+mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
 cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
 
 # FIXME
@@ -15,10 +18,8 @@ cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
 # ebegin Mounting ${lmount}
 # mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${cddev} ${lmount}
 
-# Create persist subdirs (for xdg-user-dir and claws-mail) only if everything went OK
-if [ $? = 0 ]; then
-    rsync -aO /mnt/livecd${lmount}/ ${lmount}
-fi
+# Recreate persist subdirs (for xdg-user-dir and claws-mail)
+rsync -aO /mnt/livecd${lmount}/ ${lmount}
 
 
 # Arm the poweroff watchdog
