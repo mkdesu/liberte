@@ -24,6 +24,7 @@ media-libs/libsndfile           minimal
 sys-apps/iproute2               minimal
 gnome-extra/zenity              -compat
 mail-client/claws-mail          -ssl -gnutls -imap
+app-emulation/qemu-kvm          -ssl -bluetooth
 gnome-base/gvfs                 -http
 net-libs/neon                   -pkcs11
 app-editors/nano                -spell

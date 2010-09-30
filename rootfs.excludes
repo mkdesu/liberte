@@ -90,6 +90,7 @@
 /usr/share/keymaps/**
 /usr/share/X11/locale/*/
 /usr/share/claws-mail/themes/**
+/usr/share/qemu/**
 
 # Temporary directories
 /tmp/**

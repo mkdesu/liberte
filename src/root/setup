@@ -156,10 +156,8 @@ update-pciids -q
 update-usbids -q
 
 
-# One of the dependant packages creates /x during installation
 sinfo "Installing temporary Perl packages"
 cpan -i Pod::Strip 1>/dev/null 2>&1
-rm -f /x
 
 sed -i "s/^\(mydomain\|myhostname\|myuname\|cf_email\|perladmin\)=\(.*\)/\1='none'/ ;\
        s/^\(## Target system *: \).*/\1none/" /usr/lib/perl*/*/*/Config_heavy.pl

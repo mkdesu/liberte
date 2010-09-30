@@ -10,6 +10,7 @@ net-wireless/prism54-firmware
 
 # Utilities
 sys-boot/syslinux
+app-emulation/qemu-kvm
 app-emulation/virt-what
 x11-misc/xdg-user-dirs
 x11-misc/xvkbd

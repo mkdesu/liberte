@@ -52,6 +52,7 @@ app-admin/sudo
 sys-apps/paxctl
 sys-fs/cryptsetup
 app-crypt/gnupg
+app-emulation/qemu-kvm
 
 # Network utilities
 net-firewall/iptables

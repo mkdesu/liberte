@@ -16,3 +16,8 @@
 /usr/share/X11/locale/C/***
 /usr/share/X11/locale/*.UTF-8/***
 /usr/share/claws-mail/themes/A_Ducks_Claw/***
+/usr/share/qemu/*bios.bin
+/usr/share/qemu/*boot.bin
+/usr/share/qemu/vapic.bin
+/usr/share/qemu/pxe-rtl8139.bin
+/usr/share/qemu/keymaps/***
