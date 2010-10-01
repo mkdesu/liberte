@@ -8,6 +8,7 @@ lmount=/home/${luser}/persist
 
 # Media root is on /mnt/cdrom (by genkernel's initrd),
 # remount read-write (assuming vfat)
+# NOTE: flush and umask are not passed on remount for some reason
 ebegin Remounting /mnt/cdrom read-write
 mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
 cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`

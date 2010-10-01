@@ -1,3 +1,5 @@
+# The / entry prevents boot script complaint
+none        /              unionfs   defaults  0 0
 
 none        /proc          proc      defaults  0 0
 none        /dev/shm       tmpfs     defaults  0 0

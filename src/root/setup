@@ -189,13 +189,18 @@ done
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
-# "users" group is necessary for Wicd DBUS communication
+# "wheel" group: necessary for su/sudo PAM authentication
+# "users" group: necessary for Wicd DBUS communication
+# "audio" group: ALSA/OSS devices access
+# "video" group: V4L2 devices access (webcam - mplayer tv://)
+# "cdrom" group: raw CD devices accedd (cd playing + cd/dvd writing)
+# "games" group: prevent games complaining about not keeping scores
 sinfo "Setting up users"
 grpck -r && grpconv
 echo root:liberte | chpasswd
 groupadd -f -r games
 useradd -c "Anonymous" -d /home/anon anon || [ $? = 9 ]
-usermod -G users,audio,video,cdrom,games anon
+usermod -G wheel,users,audio,video,cdrom,games anon
 useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 
 

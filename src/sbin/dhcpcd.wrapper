@@ -13,7 +13,12 @@
 if [ $# = 2 -a "$1" = "-k" ]; then
     /sbin/dhcpcd.orig "$@"
     ifconfig "$2" down
-    macchanger -a "$2"
+
+    # Randomize MAC address only if it's a wireless interface
+    # (needs the deprecated WIRELESS_EXT_SYSFS in kernel)
+    if [ -e "/sys/class/net/$2/wireless" ]; then
+        macchanger -a "$2"
+    fi
 elif [ $# = 3 -a "$2" = "-h" ]; then
     exec /sbin/dhcpcd.orig "$1"
 else
