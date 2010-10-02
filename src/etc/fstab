@@ -1,6 +1,9 @@
-# The / entry prevents boot script complaint
-none        /              unionfs   defaults  0 0
+# The / entry prevents /etc/init.d/checkroot's "mount -f /" complaint
+# (the /etc/mtab entry is overwritten in /etc/conf.d/local.start anyway)
+unionfs  /         unionfs  defaults  0 0
 
-none        /proc          proc      defaults  0 0
-none        /dev/shm       tmpfs     defaults  0 0
+# Used by poweroff watchdog
+tmpfs    /dev/shm  tmpfs    defaults  0 0
 
+# /proc, /sys, /dev, and /dev/pts are mounted by /sbin/rc
+# see RC_USE_FSTAB in /etc/conf.d/rc
