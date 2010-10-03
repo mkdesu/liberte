@@ -38,7 +38,7 @@ sinfo "Hidden:"
 ${FIND} -name '.*'
 
 sinfo "Backup:"
-${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*'
+${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*' -o -name '*.orig'
 
 sinfo "Cache:"
 ${FIND} -name '*.cache'

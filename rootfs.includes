@@ -19,5 +19,5 @@
 /usr/share/qemu/*bios.bin
 /usr/share/qemu/*boot.bin
 /usr/share/qemu/vapic.bin
-/usr/share/qemu/pxe-i82559er.bin
+/usr/share/qemu/pxe-virtio.bin
 /usr/share/qemu/keymaps/***

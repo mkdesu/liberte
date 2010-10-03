@@ -1,5 +1,5 @@
---- /usr/share/genkernel/defaults/initrd.scripts	2010-04-29 14:55:39.000000000 +0000
-+++ /usr/share/genkernel/defaults/initrd.scripts.new	2010-04-29 14:56:17.000000000 +0000
+--- /usr/share/genkernel/defaults/initrd.scripts	2010-09-27 05:56:08.000000000 +0000
++++ /usr/share/genkernel/defaults/initrd.scripts.new	2010-10-03 07:15:50.000000000 +0000
 @@ -75,11 +75,14 @@
  
  		[ ! -d "${mntdir}" ] && mkdir -p ${mntdir} 2>/dev/null >/dev/null
@@ -36,7 +36,16 @@
  	fi
  
  	eval local result='$'${vrbl}
-@@ -148,7 +155,7 @@
+@@ -139,6 +146,8 @@
+ 	DEVICES="$DEVICES /dev/ubd* /dev/ubd/*"
+ 	# iSeries devices
+ 	DEVICES="$DEVICES /dev/iseries/vcd*"
++	# virtio devices
++	DEVICES="$DEVICES /dev/vd*"
+ 	echo ${DEVICES}
+ }
+ 
+@@ -148,7 +157,7 @@
  	# a bunch of extra devices
  	[ -n "${CDROOT_DEV}" ] && DEVICES="${CDROOT_DEV}"
  
@@ -45,7 +54,7 @@
  }
  
  bootstrapKey() {
-@@ -943,8 +950,8 @@
+@@ -1012,8 +1021,8 @@
  
  #		mkdir -p ${MEMORY}
  		mkdir -p ${UNION}
@@ -56,7 +65,7 @@
  #                 if [ -n "${UNIONFS}" ] 	 
  #                 then 	 
  #                         CHANGESDEV=${UNIONFS} 	 
-@@ -971,17 +978,21 @@
+@@ -1040,17 +1049,21 @@
  #                         mount -t tmpfs tmpfs $MEMORY 	 
  #                 fi 	 
    	 

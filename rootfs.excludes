@@ -67,6 +67,7 @@
 /usr/share/baselayout/
 /usr/share/awk/
 /usr/share/getopt/
+/usr/share/genkernel/
 /usr/share/gnuplot/
 /usr/share/i18n/
 /usr/share/icu/

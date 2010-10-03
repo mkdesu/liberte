@@ -1,0 +1,48 @@
+#!/bin/sh
+
+title="Virtualized Liberté"
+mem=128M
+bootdir=/mnt/cdrom/liberte/boot
+
+# index=2 also disables the default SCSI /dev/sr0
+cdrom="if=virtio,format=raw,index=2,media=cdrom,aio=native,cache=none"
+
+params="looptype=noloop loop=/etc/hosts cdroot
+        cdroot_type=squashfs unionfs nopata nosata nousb
+        video=uvesafb:800x600-32,mtrr:3,ywrap quiet
+        splash=silent,theme:liberte console=tty1"
+
+export QEMU_AUDIO_DRV=alsa
+
+
+if [ -n "$1" ]; then
+    bootdir="$1"
+    shift
+fi
+
+if [ ! -d "${bootdir}" ]; then
+    echo "Error:  ${bootdir} not found (already virtualized?)"
+    echo "Format: $0 [bootdir] [extra kernel params]"
+    exit 1
+fi
+
+
+kvm=
+if [ ! -e /dev/kvm ]; then
+    vmflag=`grep '^flags\>' /proc/cpuinfo | egrep -o '\<(vmx|svm)\>' | uniq`
+    if [ "${vmflag}" = vmx ]; then
+        sudo modprobe kvm-intel
+    elif [ "${vmflag}" = svm ]; then
+        sudo modprobe kvm-amd
+    else
+        kvm="-no-kvm -cpu qemu32"
+    fi
+fi
+
+
+exec qemu-kvm ${kvm} -name "${title}" -sdl -m ${mem}         \
+    -vga std -soundhw es1370 -net nic,model=virtio -net user \
+    -kernel "${bootdir}/kernel-x86.zi"             \
+    -initrd "${bootdir}/initrd-x86.lzm"            \
+    -drive file="${bootdir}/root-x86.sfs,${cdrom}" \
+    -append "`echo ${params} $*`"
