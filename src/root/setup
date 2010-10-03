@@ -52,7 +52,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
     sinfo "Downloading kernel ${kversion}"
     emerge -q1 =sys-kernel/hardened-sources-`echo ${kversion} | sed 's/hardened-//'`
-    cp ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config
+    cp ${HOME}/config/linux-${kversion}.config /usr/src/linux/.config
 
 
     sinfo "Downloading kernel patches"
@@ -249,7 +249,7 @@ lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/patches/linux-${kversion}.config /usr/src/linux/.config || true
+diff ${HOME}/config/linux-${kversion}.config /usr/src/linux/.config || true
 
 
 sinfo "Cleaning modules directory"

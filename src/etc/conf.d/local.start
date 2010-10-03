@@ -6,21 +6,24 @@ lgroup=anon
 lmount=/home/${luser}/persist
 
 
-# Media root is on /mnt/cdrom (by genkernel's initrd),
-# remount read-write (assuming vfat)
-# NOTE: flush and umask are not passed on remount for some reason
-ebegin Remounting /mnt/cdrom read-write
-mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
 cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
+cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
 
-# FIXME
-# Mount the FAT32 filesystem
-# NOTE: dirs are group-accessible, files are group-readable
-# ebegin Mounting ${lmount}
-# mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} ${cddev} ${lmount}
+# In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
+if [ ${cdtype} = vfat ]; then
+    # Remount media root read-write (assuming vfat)
+    # NOTE: flush and umask are not passed on remount for some reason
+    ebegin Remounting /mnt/cdrom read-write
+    mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
 
-# Recreate persist subdirs (for xdg-user-dir and claws-mail)
-rsync -aO /mnt/livecd${lmount}/ ${lmount}
+    # FIXME (cryptsetup)
+    # NOTE: dirs are group-accessible, files are group-readable
+    # ebegin Mounting ${lmount}
+    # mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} xxx ${lmount}
+
+    # Recreate persist subdirs (for xdg-user-dir and claws-mail)
+    rsync -aO /mnt/livecd${lmount}/ ${lmount}
+fi
 
 
 # Arm the poweroff watchdog
