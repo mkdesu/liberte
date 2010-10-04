@@ -53,6 +53,7 @@ app-admin/sudo
 sys-apps/paxctl
 sys-fs/cryptsetup
 app-crypt/gnupg
+sys-apps/rng-tools
 app-emulation/qemu-kvm
 
 # Network utilities

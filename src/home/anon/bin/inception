@@ -40,6 +40,7 @@ if [ ! -e /dev/kvm ]; then
 fi
 
 
+# TODO: add "-device virtio-rng" once it's supported by QEMU
 exec qemu-kvm ${kvm} -name "${title}" -sdl -m ${mem} -balloon virtio \
     -vga std -soundhw es1370 -net nic,model=virtio -net user         \
     -kernel "${bootdir}/kernel-x86.zi"             \

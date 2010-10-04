@@ -4,7 +4,7 @@
 luser=anon
 lgroup=anon
 lmount=/home/${luser}/persist
-
+otfefile=/mnt/cdrom/liberte/otfe/liberte.otfe
 
 # Save configuration (an incremental snapshot)
 ebegin Saving configuration to ${lmount}
@@ -48,9 +48,14 @@ fi
 if grep -q " ${lmount} " /proc/mounts; then
     ebegin Unmounting ${lmount}
     umount -l ${lmount}
+
+    ebegin Detaching encrypted storage
+    cryptsetup luksClose otfe
+    losetup -d `losetup -j ${otfefile} | cut -d: -f1`
 fi
 
 
 # Remount media root read-only
+# (apparently, does not conflict with write cache)
 ebegin Remounting /mnt/cdrom read-only
 mount -o remount,ro /mnt/cdrom

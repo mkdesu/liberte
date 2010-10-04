@@ -5,9 +5,13 @@ luser=anon
 lgroup=anon
 lmount=/home/${luser}/persist
 
+otfefile=/mnt/cdrom/liberte/otfe/liberte.otfe
+otfesize=10M
+otfelabel=LiberteOTFE
 
 cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
 cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
+
 
 # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
 if [ ${cdtype} = vfat ]; then
@@ -16,13 +20,38 @@ if [ ${cdtype} = vfat ]; then
     ebegin Remounting /mnt/cdrom read-write
     mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
 
-    # FIXME (cryptsetup)
-    # NOTE: dirs are group-accessible, files are group-readable
-    # ebegin Mounting ${lmount}
-    # mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} xxx ${lmount}
+    # Initialize LUKS image mapping (create if it doesn't exist)
+    if [ ! -e ${otfefile} ]; then
+        ebegin Initializing encrypted storage
+        mkdir -p `dirname ${otfefile}`
+        truncate -s ${otfesize} ${otfefile}
 
-    # Recreate persist subdirs (for xdg-user-dir and claws-mail)
-    rsync -aO /mnt/livecd${lmount}/ ${lmount}
+        loop=`losetup -f ${otfefile} --show`
+        while ! cryptsetup -qy -c aes-xts-plain -h sha256 luksFormat ${loop}; do true; done
+
+        ebegin Attaching encrypted storage: ${otfefile}
+        cryptsetup -T 100 luksOpen ${loop} otfe
+
+        mkdosfs -n "${otfelabel}" /dev/mapper/otfe
+        cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+    else
+        ebegin Attaching encrypted storage: ${otfefile}
+        loop=`losetup -f ${otfefile} --show`
+        cryptsetup -T 100 luksOpen ${loop} otfe
+    fi
+
+    # Mount OTFE FAT/FAT32 filesystem
+    # NOTE: dirs are group-accessible, files are group-readable
+    if [ -e /dev/mapper/otfe ]; then
+        # Detach the OTFE partition from autofs
+        ACTION=remove DEVNAME=`realpath /dev/mapper/otfe` /root/bin/ps-mount
+
+        ebegin Mounting ${lmount}
+        mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/otfe ${lmount}
+
+        # Recreate persist subdirs (for xdg-user-dir and claws-mail)
+        rsync -aO /mnt/livecd${lmount}/ ${lmount}
+    fi
 fi
 
 
