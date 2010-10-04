@@ -40,8 +40,8 @@ if [ ! -e /dev/kvm ]; then
 fi
 
 
-exec qemu-kvm ${kvm} -name "${title}" -sdl -m ${mem}         \
-    -vga std -soundhw es1370 -net nic,model=virtio -net user \
+exec qemu-kvm ${kvm} -name "${title}" -sdl -m ${mem} -balloon virtio \
+    -vga std -soundhw es1370 -net nic,model=virtio -net user         \
     -kernel "${bootdir}/kernel-x86.zi"             \
     -initrd "${bootdir}/initrd-x86.lzm"            \
     -drive file="${bootdir}/root-x86.sfs,${cdrom}" \

@@ -1,7 +1,11 @@
-# Load default CPU frequency scaling governor
+# Default CPU frequency scaling governor
 acpi-cpufreq
 
 # "conservative" and "performance" are compiled in,
 # "powersave" and "userspace" are modules
 # cpufreq_powersave
 # cpufreq_userspace
+
+# LVM device mapper, needed by cryptsetup
+# (the relevant init.d scripts are for baselayout-2)
+dm-mod

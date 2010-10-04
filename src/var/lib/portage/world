@@ -46,6 +46,7 @@ app-arch/p7zip
 app-arch/unrar
 sys-fs/ntfs3g
 net-fs/autofs
+sys-fs/dosfstools
 
 # Security utilities
 app-admin/sudo

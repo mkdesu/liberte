@@ -97,7 +97,7 @@ if [ "$1" = fork ]; then
         local actual
         local expected
 
-        if [ -L ${daemon} ]; then
+        if [ -e ${daemon} ]; then
             # Sends SIGHUP to automount (autofs 5.0.3: only effective when adding mount points)
             ${daemon} reload
 

@@ -2,5 +2,10 @@
 
 exec 1>/dev/console 2>&1
 
-/etc/init.d/tor  stop
-/etc/init.d/ntpd stop
+if [ -e /var/lib/init.d/started/tor ]; then
+    /etc/init.d/tor stop
+fi
+
+if [ -e /var/lib/init.d/started/ntpd ]; then
+    /etc/init.d/ntpd stop
+fi
