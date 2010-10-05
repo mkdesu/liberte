@@ -177,8 +177,8 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl metalog iptables consolekit hdparm"
-defaultsvc="acpid rngd alsasound aumix gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy xdm-setup"
-delsvc="rmnologin netmount"
+defaultsvc="liberte acpid rngd alsasound aumix gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
+delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do
     rc-update add ${svc} boot
@@ -189,6 +189,7 @@ done
 for svc in ${delsvc}; do
     rc-update del ${svc}
 done
+depscan.sh
 
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
@@ -219,7 +220,7 @@ sed -i 's/^DISKLABEL="yes"/DISKLABEL="no"/' /etc/genkernel.conf
 
 # Use MODULES_ISCSI for virtio, so as not to modify initrd.defaults
 export KBUILD_BUILD_VERSION=0
-export AMODULES_FS="vfat fat nls_utf8 nls_cp437 loop squashfs unionfs"
+export AMODULES_FS="vfat fat nls_utf8 nls_cp437 nls_iso8859-1 loop squashfs unionfs"
 export AMODULES_PCMCIA="mmc_core mmc_block"
 export AMODULES_ISCSI="virtio_blk virtio virtio_pci virtio_ring"
 #export AMODULES_FIREWIRE="firewire-ohci firewire-sbp2"

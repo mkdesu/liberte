@@ -20,6 +20,8 @@ USBROOT=$1/dist/liberte
 version=`cat ${SRC}/version`
 distname=liberte-${version}
 
+vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,umask=0133,dmask=022
+
 
 if which mksquashfs 1>/dev/null 2>&1; then
     mksquashfs=mksquashfs
@@ -39,7 +41,7 @@ sinfo "Copying USB /boot"
 mkdir -p -m 755 ${USBROOT}
 rsync -aHAXS -v --delete-excluded \
     ${LIVECD}/boot ${USBROOT}
-sed -i 's/TAG //; s/ROOTFS/vfat/' ${USBROOT}/boot/syslinux/syslinux.cfg
+sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/syslinux/syslinux.cfg
 
 
 sinfo "Copying USB add-ons"

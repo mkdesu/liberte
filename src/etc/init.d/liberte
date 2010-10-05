@@ -1,0 +1,249 @@
+#!/sbin/runscript
+
+
+depend() {
+    # gentoo=nox -> /etc/.noxdm
+	need xdm-setup
+
+    # NOTE: should be "use lvm", but since we are in baselayout-1,
+    # just list dm-mod in modules.autoload, and keep this as a reminder
+    after lvm
+    need modules
+
+    # use entropy for encrypted storage, if available
+    after urandom rngd
+
+    # password entry is on console
+    after clock numlock gpm consolefont fbcondecor
+    before xdm
+
+    # Tor config (if any) must be extracted before running Tor
+    before wicd tor
+}
+
+
+# Fix a bug in /sbin/splash-functions.sh
+spl_util=/sbin/splash_util.static
+splash_get_mode() {
+    local ctty=`${spl_bindir}/fgconsole`
+    local mode=`${spl_util} -c getmode`
+
+    if [ "${mode}" = silent ]; then
+        echo silent
+    elif ${spl_decor} -c getstate --tty=${ctty} 2>/dev/null | grep -q off; then
+        echo off
+    else
+        echo verbose
+    fi
+}
+
+
+# Prompt to print before password requests
+eprompt() {
+    local stars=`echo "$@" | sed 's/./-/g'`
+    echo
+    ewarn "${stars}"
+    ewarn "$@"
+    ewarn "${stars}"
+    echo
+}
+
+
+# Shared variables
+luser=anon
+lgroup=anon
+lmount=/home/${luser}/persist
+otfefile=/mnt/cdrom${OTFEFILE}
+
+
+start() {
+    vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8
+
+    cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
+    cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
+
+
+    # Lock root account's password
+    ebegin Disabling root password
+    usermod -L root
+    eend $?
+
+
+    # genkernel's init leaves /etc/mtab somewhat messed
+    ebegin Updating mtab
+    egrep -v ' (rootfs|autofs) ' /proc/mounts > /etc/mtab
+    eend $?
+
+
+    # Limit console logging
+    ebegin Reducing console logging level
+    dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
+    eend $?
+
+
+    # Arm the poweroff watchdog
+    ebegin Arming power-off on removal: ${cddev}
+    /root/bin/poweroff-watchdog ${cddev} &
+    eend $?
+
+
+    # Configure X server, unless "nox" is given to kernel (rely on xdm-setup)
+    if [ ! -e /etc/.noxdm  -a  ! -e /etc/X11/xorg.conf ]; then
+        ebegin Configuring X server
+        if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
+            mv /root/xorg.conf.new /etc/X11/xorg.conf
+            cat >> /etc/X11/xorg.conf <<EOF
+Section "ServerFlags"
+    Option "DontZap"      "true"
+    Option "DontVTSwitch" "false"
+EndSection
+EOF
+            eend 0
+        else
+            eend 1
+        fi
+    fi
+
+
+    # Enable power management for wireless
+    # awk -F: '/eth.:|tr.:|ath.:|wlan.:/{print $1}' /proc/net/dev
+    wdevs=`iwconfig 2>/dev/null | grep -oE '^[^ ]+'`
+    for dev in ${wdevs}; do
+        ebegin Enabling wireless power management: ${dev}
+        iwconfig ${dev} power on
+        eend $?
+    done
+
+
+    # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
+    if [ ${cdtype} = vfat ]; then
+        # Remount media root read-write (assuming vfat)
+        # NOTE: flush and umask are not passed on remount for some reason
+        ebegin Remounting /mnt/cdrom read-write
+        mount -o remount,rw,${vfatflags},umask=0133,dmask=022 /mnt/cdrom
+        eend $?
+
+        # Initialize LUKS image mapping (create if it doesn't exist)
+        splash svc_input_begin ${SVCNAME}
+        if [ ! -e ${otfefile} ]; then
+            ebegin Initializing encrypted storage
+            mkdir -p `dirname ${otfefile}`
+            truncate -s ${OTFESIZE} ${otfefile}
+            loop=`losetup -f ${otfefile} --show`
+            eend $?
+
+            eprompt Please specify new password for ${otfefile}
+            while ! cryptsetup -qy -c aes-xts-plain -h sha256 luksFormat ${loop}; do true; done
+
+            eprompt Please provide the password for ${otfefile}
+            cryptsetup -T 100 luksOpen ${loop} otfe
+
+            ebegin Formatting encrypted storage: ${otfefile}
+            mkdosfs -n "${OTFELABEL}" /dev/mapper/otfe 1>/dev/null
+            eend $?
+
+            ebegin Backing up crypto header: ${otfefile}-hdr.bak
+            rm -f ${otfefile}-hdr.bak
+            cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+            eend $?
+        else
+            eprompt Please provide a password for ${otfefile}
+            loop=`losetup -f ${otfefile} --show`
+            if ! cryptsetup -T 100 luksOpen ${loop} otfe; then
+                eend 1 "Failed to attach encrypted storage: ${otfefile}"
+            fi
+        fi
+        splash svc_input_end ${SVCNAME}
+
+        # Mount OTFE FAT/FAT32 filesystem
+        # NOTE: dirs are group-accessible, files are group-readable
+        if [ -e /dev/mapper/otfe ]; then
+            # Detach the OTFE partition from autofs
+            ACTION=remove DEVNAME=`realpath /dev/mapper/otfe` /root/bin/ps-mount
+
+            ebegin Mounting encrypted storage: ${lmount}
+            mount -t vfat -o ${vfatflags},umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/otfe ${lmount}
+            eend $?
+
+            # Recreate persist subdirs (for xdg-user-dir and claws-mail)
+            ebegin Verifying persistence directories
+            rsync -aO /mnt/livecd${lmount}/ ${lmount}
+            eend $?
+        fi
+    fi
+
+
+    # Extract configuration archive, if present
+    if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+        # Sanity check (Wicd shouldn't start before local)
+        if [ -d /home/${luser}/config/tor/hidden_service ]; then
+            eend 1 "Persistent configuration error: restart Tor"
+        fi
+
+        ebegin Restoring persistent configuration: ${lmount}
+        sudo -n -u ${luser} /bin/tar xpjf ${lmount}/settings/config.tar.bz2 --owner ${luser} --group ${lgroup} -C /home/${luser}
+        eend $?
+    fi
+}
+
+stop() {
+    # Save configuration (an incremental snapshot)
+    ebegin Saving configuration to ${lmount}
+
+    # snapshot list in ${tmpdir}/list, snapshot archive in ${tmpdir}/config.tar.bz2
+    tmpdir=`mktemp -d` \
+        && LC_ALL=en_GB.UTF-8 rsync -rlpcgo -x -in                   \
+        --exclude-from=/home/${luser}/config/persist.excludes \
+        /home/${luser}/config /mnt/livecd/home/${luser}       \
+        | sed '/^[^>c.]/d; s/[^ ]* //' > ${tmpdir}/list           \
+        && tar cpjf ${tmpdir}/config.tar.bz2 -C /home/${luser} --no-recursion -T ${tmpdir}/list
+
+    # proceed with saving only if everything went OK, and archive has non-zero size
+    if [ $? = 0  -a  -s ${tmpdir}/config.tar.bz2 ]; then
+        chown ${luser}:${lgroup} ${tmpdir}/config.tar.bz2
+        chmod 600                ${tmpdir}/config.tar.bz2
+
+        # if previous archive exists, replace it if new one is different
+        if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+            if ! cmp -s ${lmount}/settings/config.tar.bz2 ${tmpdir}/config.tar.bz2; then
+                mv ${lmount}/settings/config.tar.bz2 ${lmount}/settings/config-old.tar.bz2
+                mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
+            else
+                rm ${tmpdir}/config.tar.bz2
+            fi
+        # otherwise copy archive over only if it's non-empty
+        elif [ -s ${tmpdir}/list ]; then
+            mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
+        else
+            rm ${tmpdir}/config.tar.bz2
+        fi
+
+        rm ${tmpdir}/list
+        rmdir ${tmpdir}
+
+        # rmdir is unlikely to succeed if anything went wrong
+        eend $?
+    else
+        eend 1
+    fi
+
+
+    # Unmount the persistent fs
+    if grep -q " ${lmount} " /proc/mounts; then
+        ebegin Unmounting ${lmount}
+        umount -l ${lmount}
+        eend $?
+
+        ebegin Detaching encrypted storage
+        cryptsetup luksClose otfe
+        losetup -d `losetup -j ${otfefile} | cut -d: -f1`
+        eend $?
+    fi
+
+
+    # Remount media root read-only
+    # (apparently, does not conflict with write cache)
+    ebegin Remounting /mnt/cdrom read-only
+    mount -o remount,ro /mnt/cdrom
+    eend $?
+}

@@ -1,0 +1,4 @@
+# Encrypted storage parameters
+OTFEFILE=/liberte/otfe/liberte.otfe
+OTFESIZE=10M
+OTFELABEL=LiberteOTFE

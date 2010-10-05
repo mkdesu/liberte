@@ -17,11 +17,11 @@ if [ "$1" = fork ]; then
     rsync -aHS --no-o --no-g --no-p --chmod=go= ${dest}/${dir} ${src}
     chown -hR ${suser} ${src}/${dir}
 # Already configured
-elif [ -d ${src}/${dir} ]; then
+elif [ -e ${src}/${dir} ]; then
     # Target exists: check equivalence
-    if [ -d ${dest}/${dir} ]; then
+    if [ -e ${dest}/${dir} ]; then
         if ! cmp -s ${src}/${dir}/hostname ${dest}/${dir}/hostname; then
-            echo "Warning: Existing Tor onion address is different from the one previously saved!"
+            logger -p 3 -t sync-tor "existing Tor onion address is different from the one previously saved"
             exit 1
         fi
     # Otherwise, propagate

@@ -22,10 +22,10 @@ if [ "$1" = fork ]; then
     luser=anon
     lgroup=anon
     opts_common=noatime,nosuid,nodev,noexec
-    opts_vfat=${opts_common},flush,utf8,showexec,uid=${luser},gid=${lgroup},umask=0137,dmask=067
+    opts_vfat=${opts_common},flush,iocharset=iso8859-1,utf8,showexec,uid=${luser},gid=${lgroup},umask=0137,dmask=067
     opts_ntfs=${opts_common},streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0137,dmask=067
     opts_ntfs_ro=${opts_common},ro,streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0337,dmask=0267
-    opts_iso9660=${opts_common},ro,utf8,uid=${luser},gid=${lgroup},mode=0440,dmode=0510
+    opts_iso9660=${opts_common},ro,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},mode=0440,dmode=0510
     opts_ext2=${opts_common}
     opts_auto=${opts_vfat}
 

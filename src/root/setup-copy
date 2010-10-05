@@ -159,6 +159,10 @@ eselect env update 2>/dev/null
 sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
 
 
+sinfo "Updating init scripts dependencies cache"
+depscan.sh
+
+
 sinfo "Saving current packages list in /tmp/packages-list"
 find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d | sed 's:^/var/db/pkg/::'| sort > /tmp/packages-list
 

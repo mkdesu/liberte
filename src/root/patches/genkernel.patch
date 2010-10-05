@@ -1,5 +1,5 @@
---- /usr/share/genkernel/defaults/initrd.scripts	2010-09-27 05:56:08.000000000 +0000
-+++ /usr/share/genkernel/defaults/initrd.scripts.new	2010-10-03 07:15:50.000000000 +0000
+--- /usr/share/genkernel/defaults/initrd.scripts	2010-10-05 14:18:34.000000000 +0000
++++ /usr/share/genkernel/defaults/initrd.scripts.new	2010-10-05 14:18:46.000000000 +0000
 @@ -75,11 +75,14 @@
  
  		[ ! -d "${mntdir}" ] && mkdir -p ${mntdir} 2>/dev/null >/dev/null
@@ -17,6 +17,15 @@
  				skip=0
  				bsn=`basename "${x}"`
  				#
+@@ -104,7 +107,7 @@
+ #				else
+ #					mount -r -t auto ${x} ${mntdir} &>/dev/null
+ #				fi
+-				mount -r -t ${CDROOT_TYPE} ${x} ${mntdir} >/dev/null 2>&1
++				mount -r -t ${CDROOT_TYPE} -o ${CDROOT_FLAGS:-noatime} ${x} ${mntdir} >/dev/null 2>&1
+ 				if [ "$?" = '0' ]
+ 				then
+ 					# Check for the media
 @@ -113,13 +116,17 @@
  						#set REAL_ROOT, CRYPT_ROOT_KEYDEV or whatever ${vrbl} is
  						eval ${vrbl}'='"${x}"
@@ -89,9 +98,19 @@
  		fi
  	else
  		USE_UNIONFS_NORMAL=0
---- /usr/share/genkernel/defaults/linuxrc	2010-04-29 14:54:10.000000000 +0000
-+++ /usr/share/genkernel/defaults/linuxrc.new	2010-04-29 14:57:53.000000000 +0000
-@@ -183,13 +183,13 @@
+--- /usr/share/genkernel/defaults/linuxrc	2010-10-05 14:17:56.000000000 +0000
++++ /usr/share/genkernel/defaults/linuxrc.new	2010-10-05 14:20:11.000000000 +0000
+@@ -73,6 +73,9 @@
+ 		cdroot_type\=*)
+ 			CDROOT_TYPE=`parse_opt "${x}"`
+ 		;;
++		cdroot_flags\=*)
++			CDROOT_FLAGS=`parse_opt "${x}"`
++		;;
+ 		# Start livecd loop, looptype options
+ 		loop\=*)
+ 			LOOP=`parse_opt "${x}"`
+@@ -215,13 +218,13 @@
  			keymap=`parse_opt "${x}"`
  		;;
  		unionfs)
@@ -111,7 +130,7 @@
  			;;
  		nounionfs)
  			USE_UNIONFS_NORMAL=0
-@@ -321,6 +321,7 @@
+@@ -357,6 +360,7 @@
  		mkdir -p "${NEW_ROOT}/${i}"
  		chmod 755 "${NEW_ROOT}/${i}"
  	done

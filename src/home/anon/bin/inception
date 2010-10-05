@@ -1,11 +1,10 @@
 #!/bin/sh
 
-title="Virtualized Liberté"
+title="UNSAFE Virtualized Liberté"
 mem=128M
 bootdir=/mnt/cdrom/liberte/boot
 
-# index=2 also disables the default SCSI /dev/sr0
-cdrom="if=virtio,format=raw,index=2,media=cdrom,aio=native,cache=none"
+cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
 
 params="looptype=noloop loop=/etc/hosts cdroot
         cdroot_type=squashfs unionfs nopata nosata nousb
@@ -41,8 +40,9 @@ fi
 
 
 # TODO: add "-device virtio-rng" once it's supported by QEMU
-exec qemu-kvm ${kvm} -name "${title}" -sdl -m ${mem} -balloon virtio \
-    -vga std -soundhw es1370 -net nic,model=virtio -net user         \
+exec qemu-kvm ${kvm} -name "${title}" -m ${mem}    \
+    -nodefaults -sdl -monitor vc -balloon virtio   \
+    -vga std -soundhw es1370 -net nic,model=virtio -net user \
     -kernel "${bootdir}/kernel-x86.zi"             \
     -initrd "${bootdir}/initrd-x86.lzm"            \
     -drive file="${bootdir}/root-x86.sfs,${cdrom}" \
