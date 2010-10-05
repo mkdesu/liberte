@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# Apparently, very weird things can happen if some output goes
+# to console ("grep: command not found" in splash-functions.sh...)
+exec 1>/dev/null 2>&1
+
 # Use of auto.media is exclusive via file lock
 lock=/etc/.auto.lock
 lockfd=20

@@ -1,6 +1,8 @@
 #!/bin/sh
 
-exec 1>/dev/console 2>&1
+exec 1>/dev/null 2>&1
+
+logger -p 6 -t wicd.scripts "starting NTP and Tor services"
 
 /etc/init.d/ntpd start
 /etc/init.d/tor  start
