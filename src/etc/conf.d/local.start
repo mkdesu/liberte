@@ -1,5 +1,22 @@
 #!/bin/sh
 
+
+# Fix a bug in /sbin/splash-functions.sh
+spl_util=/sbin/splash_util.static
+splash_get_mode() {
+    local ctty=`${spl_bindir}/fgconsole`
+    local mode=`${spl_util} -c getmode`
+
+    if [ "${mode}" = silent ]; then
+        echo silent
+    elif ${spl_decor} -c getstate --tty=${ctty} 2>/dev/null | grep -q off; then
+        echo off
+    else
+        echo verbose
+    fi
+}
+
+
 # Variables
 luser=anon
 lgroup=anon
@@ -13,62 +30,9 @@ cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
 cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
 
 
-# In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
-if [ ${cdtype} = vfat ]; then
-    # Remount media root read-write (assuming vfat)
-    # NOTE: flush and umask are not passed on remount for some reason
-    ebegin Remounting /mnt/cdrom read-write
-    mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
-
-    # Initialize LUKS image mapping (create if it doesn't exist)
-    if [ ! -e ${otfefile} ]; then
-        ebegin Initializing encrypted storage
-        mkdir -p `dirname ${otfefile}`
-        truncate -s ${otfesize} ${otfefile}
-
-        loop=`losetup -f ${otfefile} --show`
-        while ! cryptsetup -qy -c aes-xts-plain -h sha256 luksFormat ${loop}; do true; done
-
-        ebegin Attaching encrypted storage: ${otfefile}
-        cryptsetup -T 100 luksOpen ${loop} otfe
-
-        mkdosfs -n "${otfelabel}" /dev/mapper/otfe
-        cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
-    else
-        ebegin Attaching encrypted storage: ${otfefile}
-        loop=`losetup -f ${otfefile} --show`
-        cryptsetup -T 100 luksOpen ${loop} otfe
-    fi
-
-    # Mount OTFE FAT/FAT32 filesystem
-    # NOTE: dirs are group-accessible, files are group-readable
-    if [ -e /dev/mapper/otfe ]; then
-        # Detach the OTFE partition from autofs
-        ACTION=remove DEVNAME=`realpath /dev/mapper/otfe` /root/bin/ps-mount
-
-        ebegin Mounting ${lmount}
-        mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/otfe ${lmount}
-
-        # Recreate persist subdirs (for xdg-user-dir and claws-mail)
-        rsync -aO /mnt/livecd${lmount}/ ${lmount}
-    fi
-fi
-
-
 # Arm the poweroff watchdog
 ebegin Arming power-off on ${cddev} removal
 /root/bin/poweroff-watchdog ${cddev} &
-
-
-# Extract configuration archive, if present
-if [ -e ${lmount}/settings/config.tar.bz2 ]; then
-    ebegin Restoring configuration from ${lmount}
-
-    sudo -n -u ${luser} /bin/tar xpjf ${lmount}/settings/config.tar.bz2 --owner ${luser} --group ${lgroup} -C /home/${luser}
-    if [ $? != 0 ]; then
-        ewarn Configuration extraction failed
-    fi
-fi
 
 
 # genkernel's init leaves /etc/mtab somewhat messed
@@ -111,3 +75,58 @@ done
 # Lock root account's password
 ebegin Disabling root password
 usermod -L root
+
+
+# In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
+if [ ${cdtype} = vfat ]; then
+    # Remount media root read-write (assuming vfat)
+    # NOTE: flush and umask are not passed on remount for some reason
+    ebegin Remounting /mnt/cdrom read-write
+    mount -o remount,rw,flush,noatime,noexec,utf8,umask=0133,dmask=022 /mnt/cdrom
+
+    # Initialize LUKS image mapping (create if it doesn't exist)
+    splash svc_input_begin ${SVCNAME}
+    if [ ! -e ${otfefile} ]; then
+        ebegin Initializing encrypted storage
+        mkdir -p `dirname ${otfefile}`
+        truncate -s ${otfesize} ${otfefile}
+
+        loop=`losetup -f ${otfefile} --show`
+        while ! cryptsetup -qy -c aes-xts-plain -h sha256 luksFormat ${loop}; do true; done
+
+        ebegin Attaching encrypted storage: ${otfefile}
+        cryptsetup -T 100 luksOpen ${loop} otfe
+
+        mkdosfs -n "${otfelabel}" /dev/mapper/otfe
+        cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+    else
+        ebegin Attaching encrypted storage: ${otfefile}
+        loop=`losetup -f ${otfefile} --show`
+        cryptsetup -T 100 luksOpen ${loop} otfe
+    fi
+    splash svc_input_end ${SVCNAME}
+
+    # Mount OTFE FAT/FAT32 filesystem
+    # NOTE: dirs are group-accessible, files are group-readable
+    if [ -e /dev/mapper/otfe ]; then
+        # Detach the OTFE partition from autofs
+        ACTION=remove DEVNAME=`realpath /dev/mapper/otfe` /root/bin/ps-mount
+
+        ebegin Mounting ${lmount}
+        mount -t vfat -o noexec,flush,noatime,utf8,umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/otfe ${lmount}
+
+        # Recreate persist subdirs (for xdg-user-dir and claws-mail)
+        rsync -aO /mnt/livecd${lmount}/ ${lmount}
+    fi
+fi
+
+
+# Extract configuration archive, if present
+if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+    ebegin Restoring configuration from ${lmount}
+
+    sudo -n -u ${luser} /bin/tar xpjf ${lmount}/settings/config.tar.bz2 --owner ${luser} --group ${lgroup} -C /home/${luser}
+    if [ $? != 0 ]; then
+        ewarn Configuration extraction failed
+    fi
+fi
