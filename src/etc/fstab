@@ -7,3 +7,5 @@ tmpfs    /dev/shm  tmpfs    defaults  0 0
 
 # /proc, /sys, /dev, and /dev/pts are mounted by /sbin/rc
 # see RC_USE_FSTAB in /etc/conf.d/rc
+
+# Persistence mount is added below by /etc/init.d/liberte

@@ -149,6 +149,12 @@ if [ "$1" = fork ]; then
                 ;;
             ntfs)
                 type="${ID_FS_TYPE}-3g,${opts_ntfs}"
+
+                # Possibly make mount point read-only for NTFS (e.g., hibernated Windows)
+                if ! ntfs-3g.probe -w "${DEVNAME}"; then
+                    ID_FS_LABEL="${ID_FS_LABEL}-readonly"
+                    type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
+                fi
                 ;;
             iso9660)
                 type="${ID_FS_TYPE},${opts_iso9660}"
@@ -158,16 +164,6 @@ if [ "$1" = fork ]; then
         fixlabel
         echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
         autokeys="${autokeys}${ID_FS_LABEL} "
-
-        # Add extra read-only mount point for NTFS (works with hibernated Windows)
-        if [ "${ID_FS_TYPE}" = ntfs ]; then
-            ID_FS_LABEL="${ID_FS_LABEL}-readonly"
-            type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
-
-            fixlabel
-            echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
-            autokeys="${autokeys}${ID_FS_LABEL} "
-        fi
     }
 
     # Unmount and remove existing auto.media entry (or entries, if NTFS)

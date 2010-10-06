@@ -21,6 +21,7 @@ x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
 
 # Unnecessary functionality
 sys-fs/ntfs3g                   -udev
+sys-fs/ntfsprogs                minimal -crypt
 net-misc/rsync                  -iconv
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal

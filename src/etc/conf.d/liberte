@@ -1,7 +1,7 @@
 # Encrypted storage parameters
 OTFEFILE=/liberte/otfe/persist.vol
 OTFESIZE=10M
-OTFELABEL=LiberteOTFE
+OTFELABEL="LiberteOTFE"
 
 # Encryption cipher + block mode, and password hash
 OTFECIPHER=aes-xts-plain

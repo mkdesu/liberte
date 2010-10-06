@@ -20,6 +20,7 @@ USBROOT=$1/dist/liberte
 version=`cat ${SRC}/version`
 distname=liberte-${version}
 
+# see the /root/bin/ps-mount script
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,umask=0133,dmask=022
 
 

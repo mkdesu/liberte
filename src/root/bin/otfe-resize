@@ -3,15 +3,27 @@
 # This script should be safe to run via sudo
 # (with env_reset and secure_path set)
 
-# NOTE: There is no need to update OTFE header backup
-
 
 otfeconfig=/etc/conf.d/liberte
+
+# Mirrors /etc/init.d/liberte
+luser=anon
+lmount=/home/${luser}/persist
 
 
 # Accept only single parameter
 if [ $# != 1 ]; then
-    echo "Format: otfe-resize <new size in MiB>"
+    cat<<EOF
+Format: otfe-resize <new size in MiB>
+
+The OTFE volume resize process should be safe.
+In case anything fails (e.g., insufficient disk space, or busy device
+during unmount), just fix the problem and retry. No single step depends
+on subsequent steps to succeed.
+
+The OTFE header is unaffected by the resize, so any existing header
+backup is still valid.
+EOF
     exit 1
 fi
 
@@ -28,14 +40,22 @@ if [ -z "${size}" ]; then
 fi
 
 
-# Get OTFE file information (only OTFEVOLUME is used)
+# Get OTFEVOLUME (everything else is deduced)
 source ${otfeconfig}
 
 
 # Retrieve devices stack
 otfe=`cryptsetup status ${OTFEVOLUME} | head -n 1 | awk '{ print $1 }'`
 loop=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:space:]]*device:/ { print $2 }'`
-file=`losetup "${loop}" | tr -d '()' | awk '{ print $3 }'`
+file=`losetup "${loop}" | cut -d' ' -f3 | sed 's/^(//; s/)$//'`
+
+
+# Sanity checks
+if [ ! -b "${otfe}"  -o  ! -b "${loop}"  -o  ! -f "${file}" \
+     -o  "`dirname "${otfe}"`" != /dev/mapper ]; then
+    echo "Sanity checks failed: ${otfe}, ${loop}, ${file}"
+    exit 1
+fi
 
 
 # Ensure that new size is bigger
@@ -43,21 +63,45 @@ oldsize=`du --apparent-size -B 1M "${file}" | cut -f1`
 
 if [ ${size} -lt ${oldsize} ]; then
     echo "${file} = ${oldsize} MiB > ${size} MiB"
+    echo "Downsizing is not yet supported"
     exit 1
 fi
 
 
 # Increase OTFE file size
+echo "Resizing ${file} to ${size}M"
 truncate -s ${size}M "${file}"
 
 
 # Make loop device aware of the file resize
+echo "Notifying ${loop} of the new size"
 losetup -c "${loop}"
 
 
 # Resize the OTFE volume according to loop device size
+echo "Resizing [${OTFEVOLUME}] volume"
 cryptsetup resize ${OTFEVOLUME}
 
 
-# TODO: Resize FAT/FAT32 filesystem on encrypted volume
-# ${otfe}
+# Unmount the filesystem if it's mounted
+unmount=0
+if grep -q " ${lmount} " /proc/mounts; then
+    echo "Unmounting ${lmount}"
+    umount ${lmount}
+    unmount=1
+fi
+
+
+# Resize the NTFS filesystem on encrypted volume
+echo "Resizing the NTFS filesystem on ${otfe}"
+ntfsresize -f -P "${otfe}"
+
+
+# Mount the filesystem if it was previously unmounted
+if [ ${unmount} = 1 ]; then
+    echo "Re-mounting ${lmount}"
+    mount ${lmount}
+fi
+
+
+echo "Done"

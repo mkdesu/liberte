@@ -60,7 +60,9 @@ otfefile=/mnt/cdrom${OTFEFILE}
 
 
 start() {
-    vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8
+    # see the /root/bin/ps-mount script
+    # these flags are mirrored in /root/bin/otfe-resize
+    ntfsflags=noatime,noexec,nosuid,nodev,streams_interface=windows,fmask=0137,dmask=067,uid=${luser},gid=${lgroup}
 
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
     cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
@@ -123,8 +125,14 @@ EOF
         # Remount media root read-write (assuming vfat)
         # NOTE: flush and umask are not passed on remount for some reason
         ebegin Remounting /mnt/cdrom read-write
-        mount -o remount,rw,${vfatflags},umask=0133,dmask=022 /mnt/cdrom
+        mount -o remount,rw /mnt/cdrom
         eend $?
+
+        # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
+        # device later, and for otfe-resize script to be able to mount it
+        if ! grep -q "^/dev/mapper/${OTFEVOLUME} " /etc/fstab; then
+            echo "/dev/mapper/${OTFEVOLUME} ${lmount} ntfs-3g noauto,${ntfsflags} 0 0" >> /etc/fstab
+        fi
 
         # Initialize LUKS image mapping (create if it doesn't exist)
         splash svc_input_begin ${SVCNAME}
@@ -141,8 +149,8 @@ EOF
             eprompt Please provide the password for ${otfefile}
             cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
 
-            ebegin Formatting encrypted storage: ${otfefile}
-            mkdosfs -n "${OTFELABEL}" /dev/mapper/${OTFEVOLUME} 1>/dev/null
+            ebegin Formatting encrypted storage as NTFS: ${otfefile}
+            mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
             eend $?
 
             ebegin Backing up crypto header: ${otfefile}-hdr.bak
@@ -161,11 +169,8 @@ EOF
         # Mount OTFE FAT/FAT32 filesystem
         # NOTE: dirs are group-accessible, files are group-readable
         if [ -e /dev/mapper/${OTFEVOLUME} ]; then
-            # Detach the OTFE partition from autofs
-            ACTION=remove DEVNAME=`realpath /dev/mapper/${OTFEVOLUME}` /root/bin/ps-mount
-
             ebegin Mounting encrypted storage: ${lmount}
-            mount -t vfat -o ${vfatflags},umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/${OTFEVOLUME} ${lmount}
+            mount ${lmount}
             eend $?
 
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
