@@ -76,7 +76,7 @@ start() {
 
     # genkernel's init leaves /etc/mtab somewhat messed
     ebegin Updating mtab
-    egrep -v ' (rootfs|autofs) ' /proc/mounts > /etc/mtab
+    egrep -v ' (rootfs|autofs|/mnt/hidden/newroot) ' /proc/mounts > /etc/mtab
     eend $?
 
 
