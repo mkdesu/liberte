@@ -1,0 +1,63 @@
+#!/bin/sh -e
+
+# This script should be safe to run via sudo
+# (with env_reset and secure_path set)
+
+# NOTE: There is no need to update OTFE header backup
+
+
+otfeconfig=/etc/conf.d/liberte
+
+
+# Accept only single parameter
+if [ $# != 1 ]; then
+    echo "Format: otfe-resize <new size in MiB>"
+    exit 1
+fi
+
+
+# Sanitize the parameter and discard it
+size=`echo "$1" | tr -cd '[:digit:]' | cut -c -13`
+shift
+
+
+# Check that the parameter has digits
+if [ -z "${size}" ]; then
+    echo "Sanitized parameter is empty"
+    exit 1
+fi
+
+
+# Get OTFE file information (only OTFEVOLUME is used)
+source ${otfeconfig}
+
+
+# Retrieve devices stack
+otfe=`cryptsetup status ${OTFEVOLUME} | head -n 1 | awk '{ print $1 }'`
+loop=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:space:]]*device:/ { print $2 }'`
+file=`losetup "${loop}" | tr -d '()' | awk '{ print $3 }'`
+
+
+# Ensure that new size is bigger
+oldsize=`du --apparent-size -B 1M "${file}" | cut -f1`
+
+if [ ${size} -lt ${oldsize} ]; then
+    echo "${file} = ${oldsize} MiB > ${size} MiB"
+    exit 1
+fi
+
+
+# Increase OTFE file size
+truncate -s ${size}M "${file}"
+
+
+# Make loop device aware of the file resize
+losetup -c "${loop}"
+
+
+# Resize the OTFE volume according to loop device size
+cryptsetup resize ${OTFEVOLUME}
+
+
+# TODO: Resize FAT/FAT32 filesystem on encrypted volume
+# ${otfe}

@@ -1,4 +1,12 @@
 # Encrypted storage parameters
-OTFEFILE=/liberte/otfe/liberte.otfe
+OTFEFILE=/liberte/otfe/persist.vol
 OTFESIZE=10M
 OTFELABEL=LiberteOTFE
+
+# Encryption cipher + block mode, and password hash
+OTFECIPHER=aes-xts-plain
+OTFEHASH=sha256
+
+# LVM partition name
+# (also used by otfe-resize)
+OTFEVOLUME=otfe

@@ -19,6 +19,9 @@ depend() {
 
     # Tor config (if any) must be extracted before running Tor
     before wicd tor
+
+    # Avoid ps-mount reloading autofs upon LVM partition attachment
+    before autofs
 }
 
 
@@ -133,13 +136,13 @@ EOF
             eend $?
 
             eprompt Please specify new password for ${otfefile}
-            while ! cryptsetup -qy -c aes-xts-plain -h sha256 luksFormat ${loop}; do true; done
+            while ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do true; done
 
             eprompt Please provide the password for ${otfefile}
-            cryptsetup -T 100 luksOpen ${loop} otfe
+            cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
 
             ebegin Formatting encrypted storage: ${otfefile}
-            mkdosfs -n "${OTFELABEL}" /dev/mapper/otfe 1>/dev/null
+            mkdosfs -n "${OTFELABEL}" /dev/mapper/${OTFEVOLUME} 1>/dev/null
             eend $?
 
             ebegin Backing up crypto header: ${otfefile}-hdr.bak
@@ -149,7 +152,7 @@ EOF
         else
             eprompt Please provide a password for ${otfefile}
             loop=`losetup -f ${otfefile} --show`
-            if ! cryptsetup -T 100 luksOpen ${loop} otfe; then
+            if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
                 eend 1 "Failed to attach encrypted storage: ${otfefile}"
             fi
         fi
@@ -157,12 +160,12 @@ EOF
 
         # Mount OTFE FAT/FAT32 filesystem
         # NOTE: dirs are group-accessible, files are group-readable
-        if [ -e /dev/mapper/otfe ]; then
+        if [ -e /dev/mapper/${OTFEVOLUME} ]; then
             # Detach the OTFE partition from autofs
-            ACTION=remove DEVNAME=`realpath /dev/mapper/otfe` /root/bin/ps-mount
+            ACTION=remove DEVNAME=`realpath /dev/mapper/${OTFEVOLUME}` /root/bin/ps-mount
 
             ebegin Mounting encrypted storage: ${lmount}
-            mount -t vfat -o ${vfatflags},umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/otfe ${lmount}
+            mount -t vfat -o ${vfatflags},umask=0137,dmask=067,uid=${luser},gid=${lgroup} /dev/mapper/${OTFEVOLUME} ${lmount}
             eend $?
 
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
@@ -235,7 +238,7 @@ stop() {
         eend $?
 
         ebegin Detaching encrypted storage
-        cryptsetup luksClose otfe
+        cryptsetup luksClose ${OTFEVOLUME}
         losetup -d `losetup -j ${otfefile} | cut -d: -f1`
         eend $?
     fi

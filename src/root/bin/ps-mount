@@ -30,16 +30,18 @@ if [ "$1" = fork ]; then
     opts_auto=${opts_vfat}
 
     # Checking whether device is in fstab (except root fs), or is mounted
+    DEVLINKS=" ${DEVLINKS}"
     fstab_check() {
         if [ -n "${FSTAB_NAME}" ]; then
             echo fstab
         else
-            # /proc/mounts contains only canonical device names
+            # /proc/mounts contains only device names
+            # (no UUID or LABEL, but may contain symlinks)
             local rootdevs=`awk '/^\// { print $1 }' /proc/mounts`
             local mdev
 
             for mdev in ${rootdevs}; do
-                if [ ${mdev} = "${DEVNAME}" ]; then
+                if [ ${mdev} = "${DEVNAME}" -o -z "${DEVLINKS/* ${mdev} */}" ]; then
                     echo mtab
                     return
                 fi
