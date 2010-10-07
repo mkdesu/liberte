@@ -47,6 +47,7 @@ eprompt() {
     echo
     ewarn "${stars}"
     ewarn "$@"
+    ewarn "Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
     ewarn "${stars}"
     echo
 }

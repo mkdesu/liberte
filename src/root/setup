@@ -25,7 +25,7 @@ spatch() {
 rebuild_locales() {
     grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen.new
     if cmp -s /etc/locale.gen{.new,}; then
-        rm /etc/locale.gen.new  
+        rm /etc/locale.gen.new
     else
         sinfo "Rebuilding locales"
         mv /etc/locale.gen{.new,}
@@ -232,17 +232,20 @@ genkernel ${genkflags} all
 sinfo "Adding uvesafb support to initrd"
 cpiodir=`mktemp -d`
 mkdir ${cpiodir}/cpio
-cd ${cpiodir}/cpio
 
+# Also add the alternative splash theme (genkernel can copy only one)
 /usr/src/linux/usr/gen_init_cpio /usr/share/v86d/initramfs \
-    | cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1
+    | (cd ${cpiodir}/cpio; cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1)
+mkdir -p ${cpiodir}/cpio/etc/splash
+cp -pr /etc/splash/liberty ${cpiodir}/cpio/etc/splash/
 zcat /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
-find . -not -type d -o -name root | sed 's@^./@@' \
-    | cpio -oA -H newc -O ${cpiodir}/initramfs
+find ${cpiodir}/cpio -not -type d -o -name root -o -path '*/etc/splash/*' \
+    | sed "s@^${cpiodir}/cpio/@@" \
+    | (cd ${cpiodir}/cpio; cpio -oA -H newc -O ${cpiodir}/initramfs)
 
 # "lzma -e" is not supported by the kernel (likely because lc bits > 3)
 lzma -c ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
-cd; rm -r ${cpiodir}
+rm -r ${cpiodir}
 
 
 sinfo "Verifying LZMA decompression memory requirements"

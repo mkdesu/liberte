@@ -58,6 +58,8 @@
 /usr/lib/python*/site-packages/numpy/f2py/
 /usr/lib/python*/site-packages/numpy/distutils/
 /usr/lib/python*/site-packages/numpy/numarray/numpy/
+/usr/share/pygtk/
+/usr/share/pygobject/
 /usr/lib/perl*/**/CORE/
 /usr/lib/perl*/**/unicore/*.txt
 /usr/lib/perl*/**/unicore/mktables*
@@ -89,6 +91,8 @@
 /usr/share/unimaps/
 /usr/share/keymaps/**
 /usr/share/X11/locale/*/
+/usr/share/fc-lang/
+/usr/share/mime/packages/
 /usr/share/claws-mail/themes/**
 /usr/share/qemu/**
 

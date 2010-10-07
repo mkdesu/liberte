@@ -1,7 +1,7 @@
 #!/bin/sh
 
 title="UNSAFE Virtualized Liberté"
-mem=128M
+mem=192M
 bootdir=/mnt/cdrom/liberte/boot
 
 cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
@@ -9,7 +9,7 @@ cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
 params="looptype=noloop loop=/etc/hosts cdroot
         cdroot_type=squashfs unionfs nopata nosata nousb
         video=uvesafb:800x600-32,mtrr:3,ywrap quiet
-        splash=silent,theme:liberte console=tty1"
+        splash=silent,theme:liberty console=tty1"
 
 export QEMU_AUDIO_DRV=alsa
 

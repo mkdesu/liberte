@@ -95,6 +95,7 @@ rmdir /usr/lib/portage
 sinfo "Trimming icons cache"
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
     -exec gtk-update-icon-cache -q -f -i {} \;
+gtk-update-icon-cache -q -f -i -t /usr/share/gconf-editor/icons/hicolor
 
 
 sinfo "Uncompressing selected files"
