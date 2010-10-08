@@ -5,6 +5,11 @@ sinfo() {
 }
 
 
+# Requires gentoolkit
+ebuild_portage=`equery which portage`
+ebuild_sensors=`equery which lm_sensors`
+
+
 # Sanity check
 if [ ${PHASE} != copy ]; then
     echo "This is phase [${PHASE}], run $0 in phase [copy]."
@@ -16,11 +21,13 @@ sinfo "Cleaning up portage configuration"
 sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 
 
+# Unmerge non-runtime dependencies (and cleanup the kernel directory)
 sinfo "Unmerging build and temporary dependencies"
 make -C /usr/src/linux mrproper > /dev/null
 emerge -q --depclean --with-bdeps n
 
 
+# This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"
 emerge -quDN world
 
@@ -30,8 +37,11 @@ rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
 ldconfig
 
 
+# Unmerge some packages that are listed in the "system" profile
+# No package can be emerged afterwards
 sinfo "Unmerging development packages"
 mv /usr/lib/libltdl.* /tmp/
+
 emerge -qC \
     sys-devel/make      \
     sys-devel/autoconf  \
@@ -40,18 +50,18 @@ emerge -qC \
     sys-devel/m4        \
     sys-devel/patch     \
     \
-    sys-devel/gcc      \
-    sys-devel/binutils \
-    sys-devel/libtool  \
-    sys-devel/flex     \
-    sys-devel/bison    \
+    sys-devel/gcc       \
+    sys-devel/binutils  \
+    sys-devel/libtool   \
+    sys-devel/flex      \
+    sys-devel/bison     \
     \
     sys-kernel/linux-headers \
     sys-apps/busybox         \
     \
-    sys-apps/man       \
-    sys-apps/man-pages \
-	sys-apps/texinfo   \
+    sys-apps/man        \
+    sys-apps/man-pages  \
+    sys-apps/texinfo
 
 mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/
@@ -62,24 +72,46 @@ sinfo "Unmerging orphaned packages"
 emerge -q --depclean --with-bdeps n
 
 
-sinfo "Unmerging unnecessary packages"
-pver=`emerge --version | cut -d' ' -f2`
-emerge -qC \
-    app-admin/python-updater \
-    app-admin/perl-cleaner   \
-    app-arch/cpio            \
-    net-misc/openssh         \
-    virtual/mta
-
-
+# Any problem will cause a fatal error
 sinfo "Checking linking consistency"
 revdep-rebuild -q -i
 
 
-sinfo "Unmerging portage libs"
+# Unmerge portage utilities (revdep-rebuild is unavailable afterwards)
+# Also unmerge Perl (it is used by gentoolkit, so can't unmerge earlier)
+sinfo "Unmerging portage tools and development tools of abomination"
 emerge -qC \
     app-portage/gentoolkit \
-    sys-apps/sandbox
+    dev-lang/perl
+
+
+sinfo "Unmerging orphaned packages"
+# Perl is only needed for sensors-detect - a fair price to pay
+# to dispose of this abomination of a language
+sed -i s:dev-lang/perl:: ${ebuild_sensors}
+ebuild ${ebuild_sensors} manifest
+
+emerge -q --depclean --with-bdeps n
+
+
+# Unmerge packages that other package depend upon
+# ("emerge --depclean" cannot be used afterwards)
+# Dependencies:
+# python-updater - python
+# cpio           - none
+# openssh        - openssl, xauth
+# ssmtp          - openssl, mailbase
+# mailbase       - none
+# sandbox        - xz-utils, pax-utils
+# portage        - python, sandbox, pax-utils, rsync
+sinfo "Unmerging unnecessary packages"
+emerge -qC \
+    app-admin/python-updater \
+    app-arch/cpio            \
+    net-misc/openssh         \
+    virtual/mta              \
+    net-mail/mailbase
+emerge -qC sys-apps/sandbox
 
 
 sinfo "Updating environment"
@@ -87,7 +119,7 @@ env-update
 
 
 sinfo "Unmerging portage"
-ebuild /usr/portage/sys-apps/portage/portage-${pver}.ebuild unmerge 1>/dev/null 2>&1
+ebuild ${ebuild_portage} unmerge 1>/dev/null 2>&1
 rm -r /usr/lib/portage/pym
 rmdir /usr/lib/portage
 
@@ -123,26 +155,6 @@ for pyo in `find / -xdev -type f -name '*.pyo'`; do
             rm ${pyo} ${pyc}
         fi
     fi
-done
-
-
-sinfo "Removing unneeded Perl files"
-rm `find /usr/lib -xdev -type f -name '*.ph'`
-( cd /usr/include && h2ph -aQ syscall.h syslog.h 2>/dev/null ) || true
-
-
-sinfo "Stripping Perl non-runnable code"
-for pm in `find /usr/lib -xdev -type f \( -name '*.pm' -o -name '*.pl' -not -perm -100 \)`; do
-    # Truncate after __END__
-    if grep -q '^__END__' ${pm}; then
-        pmoffset=`grep -m 1 -b '^__END__' ${pm} | cut -d: -f1`
-        truncate -cs ${pmoffset} ${pm}
-    fi
-
-    # Strip POD
-    perl -MPod::Strip -e "Pod::Strip->filter('${pm}')" > ${pm}.new
-    chmod --reference=${pm} ${pm}.new
-    mv ${pm}.new ${pm}
 done
 
 

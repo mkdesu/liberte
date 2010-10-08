@@ -50,6 +50,7 @@ sys-fs/dosfstools
 net-fs/autofs
 
 # Security utilities
+app-admin/metalog
 app-admin/sudo
 sys-apps/paxctl
 sys-fs/cryptsetup
@@ -63,7 +64,6 @@ net-analyzer/macchanger
 sys-apps/ethtool
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
-net-dialup/pptpclient
 net-misc/wicd
 net-misc/ntp
 net-misc/tor
@@ -87,7 +87,6 @@ sys-apps/lm_sensors
 media-sound/alsa-utils
 
 # Text utilities
-app-text/convmv
 app-text/tree
 
 # Applications

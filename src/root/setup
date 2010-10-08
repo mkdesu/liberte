@@ -160,13 +160,6 @@ update-pciids -q
 update-usbids -q
 
 
-sinfo "Installing temporary Perl packages"
-cpan -i Pod::Strip 1>/dev/null 2>&1
-
-sed -i "s/^\(mydomain\|myhostname\|myuname\|cf_email\|perladmin\)=\(.*\)/\1='none'/ ;\
-       s/^\(## Target system *: \).*/\1none/" /usr/lib/perl*/*/*/Config_heavy.pl
-
-
 sinfo "Patching init scripts"
 initpatches="genkernel checkroot rc inittab iptables hdparm tor"
 for p in ${initpatches}; do

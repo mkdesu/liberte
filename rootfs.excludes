@@ -2,8 +2,6 @@
 /usr/share/doc/
 /usr/share/man/
 /usr/share/info/
-/usr/lib/perl*/*/pod/
-/usr/lib/perl*/**/*.pod
 /usr/share/gtk-doc/
 /usr/share/gettext/
 /usr/share/nano/man-html/
@@ -60,10 +58,7 @@
 /usr/lib/python*/site-packages/numpy/numarray/numpy/
 /usr/share/pygtk/
 /usr/share/pygobject/
-/usr/lib/perl*/**/CORE/
-/usr/lib/perl*/**/unicore/*.txt
-/usr/lib/perl*/**/unicore/mktables*
-/usr/lib/perl*/**/Unicode/Collate/*.txt
+/usr/lib/perl*/
 /usr/lib/icu/
 /usr/share/aclocal/
 /usr/share/baselayout/
