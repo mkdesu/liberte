@@ -5,11 +5,6 @@ sinfo() {
 }
 
 
-# Requires gentoolkit
-ebuild_portage=`equery which portage`
-ebuild_sensors=`equery which lm_sensors`
-
-
 # Sanity check
 if [ ${PHASE} != copy ]; then
     echo "This is phase [${PHASE}], run $0 in phase [copy]."
@@ -19,6 +14,30 @@ fi
 
 sinfo "Cleaning up portage configuration"
 sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
+
+
+# equery requires gentoolkit, so do it early
+sinfo "Patching selected ebuilds"
+
+# portage:    ebuild patched to exclude python RDEPEND
+# lm_sensors: ebuild patched to exclude perl   RDEPEND
+# libglade:   ebuild patched to exclude python RDEPEND
+ebuild_portage=`equery which sys-apps/portage`
+ebuild_sensors=`equery which sys-apps/lm_sensors`
+ebuild_libglade=`equery which gnome-base/libglade`
+
+# Make portage think it doesn't need Python
+# (allows depclean after python unmerge + shadow copy)
+sed -i 's/\${python_dep}//' ${ebuild_portage}
+ebuild ${ebuild_portage} manifest
+
+# Perl is only needed by sensors-detect and sensors-conf-convert
+sed -i s:dev-lang/perl:: ${ebuild_sensors}
+ebuild ${ebuild_sensors} manifest
+
+# Python is only needed by libglade-convert
+sed -i 's@>=dev-lang/python[[:alnum:].-]*@@' ${ebuild_libglade}
+ebuild ${ebuild_libglade} manifest
 
 
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)
@@ -79,22 +98,22 @@ revdep-rebuild -q -i
 
 # Unmerge portage utilities (revdep-rebuild is unavailable afterwards)
 # Also unmerge Perl (it is used by gentoolkit, so can't unmerge earlier)
-sinfo "Unmerging portage tools and development tools of abomination"
+sinfo "Unmerging portage tools and development tools that are abomination"
 emerge -qC \
     app-portage/gentoolkit \
     dev-lang/perl
 
+# TODO: remove /var/db/pkg/dev-lang/python-*
+#       remove python-updater from final unmerges
+#       manually remove python files at the end
+# (once wicd etc. are removed)
+
 
 sinfo "Unmerging orphaned packages"
-# Perl is only needed for sensors-detect - a fair price to pay
-# to dispose of this abomination of a language
-sed -i s:dev-lang/perl:: ${ebuild_sensors}
-ebuild ${ebuild_sensors} manifest
-
 emerge -q --depclean --with-bdeps n
 
 
-# Unmerge packages that other package depend upon
+# Unmerge packages that other package depend upon, but are not needed
 # ("emerge --depclean" cannot be used afterwards)
 # Dependencies:
 # python-updater - python
@@ -109,7 +128,7 @@ emerge -qC \
     app-admin/python-updater \
     app-arch/cpio            \
     net-misc/openssh         \
-    virtual/mta              \
+    mail-mta/ssmtp           \
     net-mail/mailbase
 emerge -qC sys-apps/sandbox
 

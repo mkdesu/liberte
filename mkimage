@@ -68,5 +68,9 @@ find ${USBROOT} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
 sinfo "Building binary distribution ${distname}.zip"
 (cd `dirname ${USBROOT}`; zip -FS -r9 -q ${distname}.zip `basename ${USBROOT}`)
 
+zipfile=`dirname ${USBROOT}`/${distname}.zip
+echo "Disk usage: `du -s --apparent-size -B 1M ${USBROOT} | cut -f1` MiB"
+echo "ZIP size:   `du    --apparent-size -B 1M ${zipfile} | cut -f1` MiB"
+
 
 sinfo "Done."

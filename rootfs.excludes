@@ -91,6 +91,12 @@
 /usr/share/claws-mail/themes/**
 /usr/share/qemu/**
 
+# Perl and Python-related files
+# (unusable after ebuild patching, see setup-copy)
+/usr/sbin/sensors-detect
+/usr/bin/sensors-conf-convert
+/usr/bin/libglade-convert
+
 # Temporary directories
 /tmp/**
 /var/tmp/**
