@@ -27,6 +27,7 @@
 /var/log/portage/
 /var/log/sandbox/
 /var/log/news/
+/usr/share/eselect/modules/env.eselect
 
 # Sources and development tools
 /usr/include/
