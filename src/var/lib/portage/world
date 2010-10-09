@@ -70,7 +70,6 @@ net-misc/tor
 net-proxy/tsocks
 net-proxy/privoxy
 net-misc/youtube-dl
-mail-mta/pseudo-mta
 
 # Peripheral utilities
 sys-apps/x86info

@@ -38,6 +38,7 @@ app-editors/nano                -spell
 sys-fs/udev                     extras               # pcmanfm
 media-libs/jpeg                 static-libs          # splashutils
 net-libs/libsoup                ssl                  # (gnutls, used by midori)
+net-misc/wget                   ssl                  # portage
 net-misc/curl                   ssl                  # (used by gnupg)
 net-libs/neon                   ssl                  # (used by audacious)
 net-wireless/wpa_supplicant     ssl

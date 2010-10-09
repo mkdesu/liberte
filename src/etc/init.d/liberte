@@ -45,10 +45,10 @@ splash_get_mode() {
 eprompt() {
     local stars=`echo "$@" | sed 's/./-/g'`
     echo
-    ewarn "${stars}"
+    einfo "${stars}"
     ewarn "$@"
     ewarn "Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
-    ewarn "${stars}"
+    einfo "${stars}"
     echo
 }
 
@@ -138,26 +138,34 @@ EOF
         # Initialize LUKS image mapping (create if it doesn't exist)
         splash svc_input_begin ${SVCNAME}
         if [ ! -e ${otfefile} ]; then
-            ebegin Initializing encrypted storage
-            mkdir -p `dirname ${otfefile}`
-            truncate -s ${OTFESIZE} ${otfefile}
-            loop=`losetup -f ${otfefile} --show`
-            eend $?
+            freespace=`df -P -B 1M /mnt/cdrom | awk '/\// { print $4 }'`
 
-            eprompt Please specify new password for ${otfefile}
-            while ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do true; done
+            # FAT/FAT32 has no sparse files, so insufficient space will fail here
+            ebegin Initializing ${OTFESIZE} MiB encrypted storage
+            if mkdir -p `dirname ${otfefile}` && truncate -s ${OTFESIZE} ${otfefile}; then
+                loop=`losetup -f ${otfefile} --show`
+                eend $?
 
-            eprompt Please provide the password for ${otfefile}
-            cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+                eprompt Please specify new password for ${otfefile}
+                while ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do true; done
 
-            ebegin Formatting encrypted storage as NTFS: ${otfefile}
-            mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
-            eend $?
+                einfo 'LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
 
-            ebegin Backing up crypto header: ${otfefile}-hdr.bak
-            rm -f ${otfefile}-hdr.bak
-            cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
-            eend $?
+                eprompt Please provide the password for ${otfefile}
+                cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+
+                ebegin Formatting encrypted storage as NTFS: ${otfefile}
+                mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                eend $?
+
+                ebegin Backing up crypto header: ${otfefile}-hdr.bak
+                rm -f ${otfefile}-hdr.bak
+                cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+                eend $?
+            else
+                rm -f ${otfefile}
+                eend 1 "Failed to create ${OTFESIZE} MiB encrypted storage"
+            fi
         else
             eprompt Please provide a password for ${otfefile}
             loop=`losetup -f ${otfefile} --show`

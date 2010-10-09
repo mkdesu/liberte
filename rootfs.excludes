@@ -125,3 +125,40 @@
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
+
+# Perl scripts
+# (media-gfx/splashutils: themes creation and conversion)
+/usr/bin/splash_resize
+/usr/bin/bootsplash2fbsplash
+# (net-misc/ntp: servers chain tracer, ntpq loop wrapper)
+/usr/bin/ntptrace
+/usr/bin/ntp-wait
+# (dev-util/strace: nice strace output)
+/usr/bin/strace-graph
+# (app-text/aspell: old dictionaries import)
+/usr/bin/aspell-import
+# (dev-libs/openssl: optional functionality for update-ca-certificates,
+#                    helper for "openssl ca", improvement of CA.sh)
+/usr/bin/c_rehash
+/etc/ssl/misc/CA.pl
+# (media-libs/gd: raster fonts converter)
+/usr/bin/bdftogd
+# (sys-libs/glibc: malloc debugging)
+/usr/bin/mtrace
+# (dev-libs/glib: C source code manipulation)
+/usr/bin/glib-mkenums
+# (net-wireless/atmel-firmware: unnecessary script alternative)
+/usr/sbin/atmel_fwl.pl
+# (sys-apps/less: LESSCOLOR != 0 + obscure conditions)
+/usr/bin/code2color
+# (mail-client/claws-mail: external helper scripts)
+/usr/lib/claws-mail/tools/*.pl
+/usr/lib/claws-mail/tools/tb2claws-mail
+# (app-misc/mc: extfs extension-specific handlers)
+/usr/share/mc/extfs/a
+/usr/share/mc/extfs/apt
+/usr/share/mc/extfs/deb*
+/usr/share/mc/extfs/dpkg
+/usr/share/mc/extfs/*fs
+/usr/share/mc/extfs/rpms
+/usr/share/mc/extfs/uzip

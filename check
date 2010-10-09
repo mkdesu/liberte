@@ -26,7 +26,7 @@ sinfo "Archives:"
 ${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' -o -name '*.lzma' \)
 
 sinfo "Sources:"
-${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py' -o -name '*.defs'
+${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py' -o -name '*.defs' -o -name '*.pl' -o -name '*.pm'
 
 sinfo "Objects:"
 ${FIND} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
