@@ -44,10 +44,10 @@ splash_get_mode() {
 eprompt() {
     local stars=`echo "$@" | sed 's/./-/g'`
     echo
-    echo "**${stars}"
-    echo "* $@"
-    echo "* Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
-    echo "* ${stars}"
+    echo " * ${stars}"
+    echo " * $@"
+    echo " * Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
+    echo " * ${stars}"
     echo
 }
 
@@ -62,6 +62,7 @@ otfefile=/mnt/cdrom${OTFEFILE}
 start() {
     # see the /root/bin/ps-mount script
     # these flags are mirrored in /root/bin/otfe-resize
+    # NOTE: dirs are group-accessible, files are group-readable
     ntfsflags=noatime,noexec,nosuid,nodev,streams_interface=windows,fmask=0137,dmask=067,uid=${luser},gid=${lgroup}
 
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
@@ -137,33 +138,49 @@ EOF
         # Initialize LUKS image mapping (create if it doesn't exist)
         splash svc_input_begin ${SVCNAME}
         if [ ! -e ${otfefile} ]; then
+            # FAT free space is precise, but df rounds up - ignore this issue
             freespace=`df -P -B 1M /mnt/cdrom | awk '/\// { print $4 }'`
+            otfesize=$[ ${freespace} * ${OTFESIZE%/*} / ${OTFESIZE#*/} ]
 
-            # FAT/FAT32 has no sparse files, so insufficient space will fail here
-            ebegin Initializing ${OTFESIZE} MiB encrypted storage
-            if mkdir -p `dirname ${otfefile}` && truncate -s ${OTFESIZE} ${otfefile}; then
+            # 3 MiB is the minimum possible size (rounded up to MiB)
+            if [ ${otfesize} -lt 3 ]; then
+                otfesize=3
+            fi
+
+            # FAT has no sparse files, so insufficient space will fail here
+            ebegin "Initializing ${otfesize} MiB encrypted storage (${OTFESIZE} of free space)"
+            if mkdir -p `dirname ${otfefile}` && truncate -s ${otfesize}M ${otfefile}; then
                 loop=`losetup -f ${otfefile} --show`
                 eend $?
 
                 eprompt Please specify new password for ${otfefile}
-                while ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do true; done
+                inittries=10
+                while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do
+                    let inittries=inittries-1
+                done
 
-                echo '* LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
+                if [ ${inittries} -ne 0 ]; then
+                    echo -e '\n * LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
 
-                eprompt Please provide the password for ${otfefile}
-                cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+                    eprompt Please provide the password for ${otfefile}
+                    cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
 
-                ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
-                eend $?
+                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
+                    LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                    eend $?
 
-                ebegin Backing up crypto header: ${otfefile}-hdr.bak
-                rm -f ${otfefile}-hdr.bak
-                cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
-                eend $?
+                    ebegin Backing up crypto header: ${otfefile}-hdr.bak
+                    rm -f ${otfefile}-hdr.bak
+                    cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+                    eend $?
+                else
+                    losetup -d ${loop}
+                    rm ${otfefile}
+                    eerror Failed to initialize encrypted storage
+                fi
             else
                 rm -f ${otfefile}
-                eend 1 "Failed to create ${OTFESIZE} MiB encrypted storage"
+                eend 1 "Failed to create ${otfesize} MiB encrypted storage"
             fi
         else
             eprompt Please provide a password for ${otfefile}
@@ -174,8 +191,7 @@ EOF
         fi
         splash svc_input_end ${SVCNAME}
 
-        # Mount OTFE FAT/FAT32 filesystem
-        # NOTE: dirs are group-accessible, files are group-readable
+        # Mount OTFE filesystem
         if [ -e /dev/mapper/${OTFEVOLUME} ]; then
             ebegin Mounting encrypted storage: ${lmount}
             mount ${lmount}
@@ -190,6 +206,7 @@ EOF
 
 
     # Extract configuration archive, if present
+    # This comes last, so that failure invalidates service start
     if [ -e ${lmount}/settings/config.tar.bz2 ]; then
         # Sanity check (Wicd shouldn't start before local)
         if [ -d /home/${luser}/config/tor/hidden_service ]; then
@@ -209,9 +226,9 @@ stop() {
     # snapshot list in ${tmpdir}/list, snapshot archive in ${tmpdir}/config.tar.bz2
     tmpdir=`mktemp -d` \
         && LC_ALL=en_GB.UTF-8 rsync -rlpcgo -x -in                   \
-        --exclude-from=/home/${luser}/config/persist.excludes \
-        /home/${luser}/config /mnt/livecd/home/${luser}       \
-        | sed '/^[^>c.]/d; s/[^ ]* //' > ${tmpdir}/list           \
+               --exclude-from=/home/${luser}/config/persist.excludes \
+               /home/${luser}/config /mnt/livecd/home/${luser}       \
+           | sed '/^[^>c.]/d; s/[^ ]* //' > ${tmpdir}/list           \
         && tar cpjf ${tmpdir}/config.tar.bz2 -C /home/${luser} --no-recursion -T ${tmpdir}/list
 
     # proceed with saving only if everything went OK, and archive has non-zero size

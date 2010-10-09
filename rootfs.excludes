@@ -124,11 +124,10 @@
 
 # Statically linked binaries (and symlinks)
 # (/sbin/splash-functions.sh and /usr/bin/splash_manager patched
-# to use the dynamic versions in /usr; helper only used in initrd)
+# to use the dynamic versions in /usr; helper is needed by FBCONDECOR)
 /sbin/*.static
 /bin/*.static
 /sbin/fbsplashctl
-/sbin/fbcondecor_helper
 /sbin/ldconfig
 /sbin/sln
 
