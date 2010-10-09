@@ -4,6 +4,7 @@ if which env-update >&/dev/null; then
 	env-update
 	source /etc/profile
 
+    # see /root/.cpan/CPAN/MyConfig.pm (currently unused)
     export PERL5LIB=/var/tmp/cpan/lib
 
     sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue

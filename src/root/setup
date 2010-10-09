@@ -83,7 +83,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
     sinfo "Cleaning unnecessary packages"
     emerge -q1C --deselect=n "=dev-lang/python-3*"
-    emerge -q --depclean
+    emerge -qc
 
 
     # Rebuild locales if locales list was updated
@@ -103,7 +103,7 @@ emerge -quDN --with-bdeps y world
 
 
 sinfo "Cleaning unnecessary packages"
-emerge -q --depclean
+emerge -qc
 
 
 sinfo "Checking linking consistency"

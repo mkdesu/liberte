@@ -19,31 +19,37 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # equery requires gentoolkit, so do it early
 sinfo "Patching selected ebuilds"
 
-# portage:    ebuild patched to exclude python RDEPEND
-# lm_sensors: ebuild patched to exclude perl   RDEPEND
-# libglade:   ebuild patched to exclude python RDEPEND
+# portage:    ebuild patched to exclude python  RDEPEND
+# lm_sensors: ebuild patched to exclude perl    RDEPEND
+# libglade:   ebuild patched to exclude python  RDEPEND
+# gvfs:       ebuild patched to exclude openssh RDEPEND
 ebuild_portage=`equery which sys-apps/portage`
 ebuild_sensors=`equery which sys-apps/lm_sensors`
 ebuild_libglade=`equery which gnome-base/libglade`
+ebuild_gvfs=`equery which gnome-base/gvfs`
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
 sed -i 's/\${python_dep}//' ${ebuild_portage}
-ebuild ${ebuild_portage} manifest
 
 # Perl is only needed by sensors-detect and sensors-conf-convert
 sed -i s:dev-lang/perl:: ${ebuild_sensors}
-ebuild ${ebuild_sensors} manifest
 
 # Python is only needed by libglade-convert
 sed -i 's@>=dev-lang/python[[:alnum:].-]*@@' ${ebuild_libglade}
-ebuild ${ebuild_libglade} manifest
+
+# OpenSSH is only needed for ssh:// support
+sed -i s:net-misc/openssh:: ${ebuild_gvfs}
+
+for ebuild in ${!ebuild_*}; do
+    eval ebuild \$${ebuild} manifest
+done
 
 
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)
 sinfo "Unmerging build and temporary dependencies"
 make -C /usr/src/linux mrproper > /dev/null
-emerge -q --depclean --with-bdeps n
+emerge -qc --with-bdeps n
 
 
 # This recompiles packages with TEMP flags in package.use
@@ -56,7 +62,7 @@ rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
 ldconfig
 
 
-# Unmerge some packages that are listed in the "system" profile
+# Unmerge some packages that are listed in the system profile
 # No package can be emerged afterwards
 sinfo "Unmerging development packages"
 mv /usr/lib/libltdl.* /tmp/
@@ -80,7 +86,9 @@ emerge -qC \
     \
     sys-apps/man        \
     sys-apps/man-pages  \
-    sys-apps/texinfo
+    sys-apps/texinfo    \
+    \
+    net-misc/openssh
 
 mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/
@@ -88,7 +96,7 @@ rm -f /usr/lib/{?,}crt?.o
 
 
 sinfo "Unmerging orphaned packages"
-emerge -q --depclean --with-bdeps n
+emerge -qc --with-bdeps n
 
 
 # Any problem will cause a fatal error
@@ -115,26 +123,20 @@ emerge -qC \
 
 
 sinfo "Unmerging orphaned packages"
-emerge -q --depclean --with-bdeps n
+emerge -qc --with-bdeps n
 
 
 # Unmerge packages that other package depend upon, but are not needed
-# ("emerge --depclean" cannot be used afterwards)
+# ("emerge -c" cannot be used afterwards)
 # Dependencies:
 # python-updater - python
 # cpio           - none
-# openssh        - openssl, xauth
-# ssmtp          - openssl, mailbase
-# mailbase       - none
 # sandbox        - xz-utils, pax-utils
 # portage        - python, sandbox, pax-utils, rsync
 sinfo "Unmerging unnecessary packages"
 emerge -qC \
     app-admin/python-updater \
-    app-arch/cpio            \
-    net-misc/openssh         \
-    mail-mta/ssmtp           \
-    net-mail/mailbase
+    app-arch/cpio
 emerge -qC sys-apps/sandbox
 
 
