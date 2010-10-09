@@ -23,6 +23,7 @@
 /etc/portage/
 /etc/make.*
 /etc/env.d/
+/etc/ld.so.conf*
 /etc/sandbox.d/
 /var/log/portage/
 /var/log/sandbox/
@@ -71,6 +72,7 @@
 /usr/share/lsof/
 /usr/share/ntp/
 /usr/share/readline/
+/usr/share/splashutils/
 /usr/share/glib-*/gettext/
 /usr/share/gtk-*/demo/
 /usr/lib/pygtk/*/*demo*
@@ -91,12 +93,6 @@
 /usr/share/mime/packages/
 /usr/share/claws-mail/themes/**
 /usr/share/qemu/**
-
-# Perl and Python-related files
-# (unusable after ebuild patching, see setup-copy)
-/usr/sbin/sensors-detect
-/usr/bin/sensors-conf-convert
-/usr/bin/libglade-convert
 
 # Temporary directories
 /tmp/**
@@ -125,6 +121,22 @@
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
+
+# Statically linked binaries (and symlinks)
+# (/sbin/splash-functions.sh and /usr/bin/splash_manager patched
+# to use the dynamic versions in /usr; helper only used in initrd)
+/sbin/*.static
+/bin/*.static
+/sbin/fbsplashctl
+/sbin/fbcondecor_helper
+/sbin/ldconfig
+/sbin/sln
+
+# Perl and Python-related files
+# (unusable after ebuild patching, see setup-copy)
+/usr/sbin/sensors-detect
+/usr/bin/sensors-conf-convert
+/usr/bin/libglade-convert
 
 # Perl scripts
 # (media-gfx/splashutils: themes creation and conversion)

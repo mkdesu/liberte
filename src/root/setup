@@ -193,12 +193,13 @@ depscan.sh
 # "video" group: V4L2 devices access (webcam - mplayer tv://)
 # "cdrom" group: raw CD devices accedd (cd playing + cd/dvd writing)
 # "games" group: prevent games complaining about not keeping scores
+# "kvm"   group: (TODO) let anon run qemu before a designated user is configured
 sinfo "Setting up users"
 grpck -r && grpconv
 echo root:liberte | chpasswd
 groupadd -f -r games
 useradd -c "Anonymous" -d /home/anon anon || [ $? = 9 ]
-usermod -G wheel,users,audio,video,cdrom,games anon
+usermod -G wheel,users,audio,video,cdrom,games,kvm anon
 useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 
 

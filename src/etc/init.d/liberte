@@ -26,7 +26,6 @@ depend() {
 
 
 # Fix a bug in /sbin/splash-functions.sh
-spl_util=/sbin/splash_util.static
 splash_get_mode() {
     local ctty=`${spl_bindir}/fgconsole`
     local mode=`${spl_util} -c getmode`
@@ -45,10 +44,10 @@ splash_get_mode() {
 eprompt() {
     local stars=`echo "$@" | sed 's/./-/g'`
     echo
-    einfo "${stars}"
-    ewarn "$@"
-    ewarn "Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
-    einfo "${stars}"
+    echo "**${stars}"
+    echo "* $@"
+    echo "* Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
+    echo "* ${stars}"
     echo
 }
 
@@ -149,7 +148,7 @@ EOF
                 eprompt Please specify new password for ${otfefile}
                 while ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do true; done
 
-                einfo 'LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
+                echo '* LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
 
                 eprompt Please provide the password for ${otfefile}
                 cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
@@ -170,7 +169,7 @@ EOF
             eprompt Please provide a password for ${otfefile}
             loop=`losetup -f ${otfefile} --show`
             if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
-                eend 1 "Failed to attach encrypted storage: ${otfefile}"
+                eerror Failed to attach encrypted storage: ${otfefile}
             fi
         fi
         splash svc_input_end ${SVCNAME}
@@ -194,7 +193,7 @@ EOF
     if [ -e ${lmount}/settings/config.tar.bz2 ]; then
         # Sanity check (Wicd shouldn't start before local)
         if [ -d /home/${luser}/config/tor/hidden_service ]; then
-            eend 1 "Persistent configuration error: restart Tor"
+            ewarn Existing Tor configuration in ${lmount}
         fi
 
         ebegin Restoring persistent configuration: ${lmount}
