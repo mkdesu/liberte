@@ -23,10 +23,11 @@ if [ "$1" = fork ]; then
     lgroup=anon
     opts_common=noatime,nosuid,nodev,noexec
     opts_vfat=${opts_common},flush,iocharset=iso8859-1,utf8,showexec,uid=${luser},gid=${lgroup},umask=0137,dmask=067
-    opts_ntfs=${opts_common},streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0137,dmask=067
-    opts_ntfs_ro=${opts_common},ro,streams_interface=windows,uid=${luser},gid=${lgroup},fmask=0337,dmask=0267
+    opts_ntfs=${opts_common},uid=${luser},gid=${lgroup},fmask=0137,dmask=067
+    opts_ntfs_ro=${opts_common},ro,uid=${luser},gid=${lgroup},fmask=0337,dmask=0267
     opts_iso9660=${opts_common},ro,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},mode=0440,dmode=0510
-    opts_ext2=${opts_common}
+    opts_udf=${opts_common},ro,iocharset=iso8859-1,uid=${luser},gid=${lgroup},umask=0337
+    opts_ext2=${opts_common},acl,user_xattr
     opts_auto=${opts_vfat}
 
     # Checking whether device is in fstab (except root fs), or is mounted
@@ -137,15 +138,15 @@ if [ "$1" = fork ]; then
         # Fallback, shouldn't happen
         local type="tmpfs,${opts_common}"
 
-        case ${ID_FS_TYPE} in
-            auto)
-                type="${ID_FS_TYPE},${opts_auto}"
+        case "${ID_FS_TYPE}" in
+            auto|ext2|vfat|iso9660|udf)
+                eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
                 ;;
-            ext2)
-                type="${ID_FS_TYPE},${opts_ext2}"
+            ext3|ext4)
+                type="ext2,${opts_ext2},ro"
                 ;;
-            vfat|msdos)
-                type="${ID_FS_TYPE},${opts_vfat}"
+            msdos)
+                type="vfat,${opts_vfat}"
                 ;;
             ntfs)
                 type="${ID_FS_TYPE}-3g,${opts_ntfs}"
@@ -155,9 +156,6 @@ if [ "$1" = fork ]; then
                     ID_FS_LABEL="${ID_FS_LABEL}-readonly"
                     type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
                 fi
-                ;;
-            iso9660)
-                type="${ID_FS_TYPE},${opts_iso9660}"
                 ;;
         esac
 

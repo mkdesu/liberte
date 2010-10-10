@@ -19,32 +19,36 @@ FIND="chroot ${LIVECD} find / -xdev"
 
 sinfo "Checking ${LIVECD}"
 
-sinfo "Bad symlinks:"
+sinfo "Invalid files and symlinks:"
+${FIND} ! \( -type d -o -type f -o -type l \
+             -o \( -path '/dev/*' -a \( -type c -o -type b \) \) \)
 ${FIND} -type l ! -xtype f ! -xtype d
 
 sinfo "Archives:"
-${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' -o -name '*.lzma' \)
+${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
+           -o -name '*.lzma' -o -name '*.xz' \)
 
 sinfo "Sources:"
-${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' -o -name '*.m4' -o -name '*.el' -o -name '*.py' -o -name '*.defs' -o -name '*.pl' -o -name '*.pm'
+${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' \
+        -o -name '*.m4' -o -name '*.el' -o -name '*.py' \
+        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm'
 
 sinfo "Objects:"
 ${FIND} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
 
 sinfo "Docs:"
-${FIND} -name '*.info' -o -name '*.htm*' -o \( -name '*.1' ! -name '*.so.*' \)
+${FIND} -name '*.info*' -o -name '*.htm*' -o -name '*.1.bz2'
 
 sinfo "Hidden:"
-${FIND} -name '.*'
+${FIND} -name '.*' ! \( -path '/home/anon/*' -o -path '/root/*' \)
 
-sinfo "Backup:"
-${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' -o -name '*;*' -o -name '*.orig'
-
-sinfo "Cache:"
-${FIND} -name '*.cache'
+sinfo "Cache, backup, and temp:"
+${FIND} -name '*cache' ! -type d
+${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' \
+        -o -name '*;*' -o -name '*.orig' -o -path '*/tmp/*'
 
 sinfo "Logs:"
-${FIND} -name '*.log*' -o -type f \( -path '*var/run/*' -o -path '*/var/log/*' \)
+${FIND} -name '*.log*' -o -type f \( -path '/var/run/*' -o -path '/var/log/*' \)
 
 sinfo "SUID/SGID:"
 ${FIND} -type f -perm /u+s -printf '%M %u %g\t%p\n'

@@ -63,7 +63,7 @@ start() {
     # see the /root/bin/ps-mount script
     # these flags are mirrored in /root/bin/otfe-resize
     # NOTE: dirs are group-accessible, files are group-readable
-    ntfsflags=noatime,noexec,nosuid,nodev,streams_interface=windows,fmask=0137,dmask=067,uid=${luser},gid=${lgroup}
+    ntfsflags=noatime,noexec,nosuid,nodev,fmask=0137,dmask=067,uid=${luser},gid=${lgroup}
 
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
     cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
@@ -122,13 +122,19 @@ EOF
 
 
     # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
+    remount=1
     if [ ${cdtype} = vfat ]; then
         # Remount media root read-write (assuming vfat)
-        # NOTE: flush and umask are not passed on remount for some reason
         ebegin Remounting /mnt/cdrom read-write
         mount -o remount,rw /mnt/cdrom
-        eend $?
+        remount=$?
+        eend ${remount}
+    fi
 
+
+    # Proceed with OTFE attachment only if remount-rw succeeded
+    # (a read-only persist directory is more problematic than tmpfs)
+    if [ ${remount} = 0 ]; then
         # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
         # device later, and for otfe-resize script to be able to mount it
         if ! grep -q "^/dev/mapper/${OTFEVOLUME} " /etc/fstab; then
@@ -162,16 +168,17 @@ EOF
                 if [ ${inittries} -ne 0 ]; then
                     echo -e '\n * LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
 
-                    eprompt Please provide the password for ${otfefile}
-                    cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
-
-                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                    LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
-                    eend $?
-
                     ebegin Backing up crypto header: ${otfefile}-hdr.bak
                     rm -f ${otfefile}-hdr.bak
                     cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+                    eend $?
+
+                    eprompt Please re-enter the password for ${otfefile}
+                    cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+
+                    # LC_ALL enables UTF-8 label support
+                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
+                    LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
                     eend $?
                 else
                     losetup -d ${loop}
@@ -202,59 +209,55 @@ EOF
             rsync -aO /mnt/livecd${lmount}/ ${lmount}
             eend $?
         fi
+    else
+        ewarn Skipping OTFE persistence setup
     fi
 
 
     # Extract configuration archive, if present
     # This comes last, so that failure invalidates service start
-    if [ -e ${lmount}/settings/config.tar.bz2 ]; then
+    if [ -e ${lmount}/settings/config.tar.xz ]; then
         # Sanity check (Wicd shouldn't start before local)
         if [ -d /home/${luser}/config/tor/hidden_service ]; then
             ewarn Existing Tor configuration in ${lmount}
         fi
 
-        ebegin Restoring persistent configuration: ${lmount}
-        sudo -n -u ${luser} /bin/tar xpjf ${lmount}/settings/config.tar.bz2 --owner ${luser} --group ${lgroup} -C /home/${luser}
+        ebegin Restoring persistent configuration: ${lmount}/settings
+        sudo -n -u ${luser} /bin/bsdtar -xpSf ${lmount}/settings/config.tar.xz -C /home/${luser}
         eend $?
     fi
 }
 
 stop() {
     # Save configuration (an incremental snapshot)
-    ebegin Saving configuration to ${lmount}
+    ebegin Saving configuration to ${lmount}/settings
 
-    # snapshot list in ${tmpdir}/list, snapshot archive in ${tmpdir}/config.tar.bz2
-    tmpdir=`mktemp -d` \
-        && LC_ALL=en_GB.UTF-8 rsync -rlpcgo -x -in                   \
+    # snapshot list in ${savelist}, archive in ${lmount}/settings/config.tar.xz.new
+    # rsync notice: symlinks, chown+chmod+acl+xattr
+    #       ignore: mtime, devices+specials
+    #       assume: UTF-8 filenames (enabled by LC_ALL)
+    savelist=`mktemp` \
+        && LC_ALL=en_GB.UTF-8 rsync -rlpgoAX -c -x -in               \
                --exclude-from=/home/${luser}/config/persist.excludes \
                /home/${luser}/config /mnt/livecd/home/${luser}       \
-           | sed '/^[^>c.]/d; s/[^ ]* //' > ${tmpdir}/list           \
-        && tar cpjf ${tmpdir}/config.tar.bz2 -C /home/${luser} --no-recursion -T ${tmpdir}/list
+           | sed '/^[^>c.]/d; s/[^ ]* //' > ${savelist}              \
+        && bsdtar -cJf ${lmount}/settings/config.tar.xz.new          \
+                  -C /home/${luser} -n -T ${savelist}                \
+        && rm ${savelist}
 
-    # proceed with saving only if everything went OK, and archive has non-zero size
-    if [ $? = 0  -a  -s ${tmpdir}/config.tar.bz2 ]; then
-        chown ${luser}:${lgroup} ${tmpdir}/config.tar.bz2
-        chmod 600                ${tmpdir}/config.tar.bz2
+    # proceed only if the archive was successfully written to ${lmount}
+    if [ $? = 0 ]; then
+        # currently, does nothing
+        chown ${luser}:${lgroup} ${lmount}/settings/config.tar.xz.new
+        chmod 600                ${lmount}/settings/config.tar.xz.new
 
-        # if previous archive exists, replace it if new one is different
-        if [ -e ${lmount}/settings/config.tar.bz2 ]; then
-            if ! cmp -s ${lmount}/settings/config.tar.bz2 ${tmpdir}/config.tar.bz2; then
-                mv ${lmount}/settings/config.tar.bz2 ${lmount}/settings/config-old.tar.bz2
-                mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
-            else
-                rm ${tmpdir}/config.tar.bz2
-            fi
-        # otherwise copy archive over only if it's non-empty
-        elif [ -s ${tmpdir}/list ]; then
-            mv ${tmpdir}/config.tar.bz2 ${lmount}/settings/config.tar.bz2
-        else
-            rm ${tmpdir}/config.tar.bz2
+        # store a backup of previous archive, if it exists,
+        # but don't overwrite the backup if unnecessary
+        if ! cmp -s ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz; then
+            mv ${lmount}/settings/config.tar.xz ${lmount}/settings/config.tar.xz.bak
         fi
+        mv ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz
 
-        rm ${tmpdir}/list
-        rmdir ${tmpdir}
-
-        # rmdir is unlikely to succeed if anything went wrong
         eend $?
     else
         eend 1

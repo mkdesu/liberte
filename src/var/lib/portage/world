@@ -41,6 +41,7 @@ sys-apps/sdparm
 app-admin/ide-smart
 virtual/eject
 app-misc/secure-delete
+app-arch/libarchive
 app-arch/zip
 app-arch/p7zip
 app-arch/unrar
