@@ -21,6 +21,9 @@ MIRROR=http://distro.ibiblio.org/pub/linux/distributions/gentoo
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
+gpg_wwwserver='http://wwwkeys.eu.pgp.net/pks/lookup?op=get&search=0x${key}'
+gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
+
 
 # Copying and pruning
 if [ "$2" = copy ]; then
@@ -75,34 +78,46 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Saving ${LIVECD}/mirror/${stage3file}"
-    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}{,.CONTENTS,.DIGESTS.asc}
+    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}{.DIGESTS.asc,.CONTENTS,}
 
     sinfo "Saving ${LIVECD}/mirror/portage-latest.tar.bz2"
-    wget -N -nv -P ${LIVECD}/mirror ${portage}{,.gpgsig}
+    wget -N -nv -P ${LIVECD}/mirror ${portage}{.gpgsig,}
 
 
-    if which gpg2 1>/dev/null 2>&1; then
-        sinfo "Verifying PGP signatures"
-
+    if which gpg 1>/dev/null 2>&1; then
+        sinfo "Fetching GPG public keys and verifying fingerprints"
+        # gpg fails if it can't create a lock file near the keyring, so using
+        #  --no-default-keyring --keyring ${FROM}/pubring.gpg is problematic
         mkdir -p -m 700 ${LIVECD}/mirror/gnupg
-        cp -u ${FROM}/pubring.gpg ${LIVECD}/mirror/gnupg/
 
-        gpg2 -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-             --verify ${LIVECD}/mirror/${stage3file}.DIGESTS.asc
-
-        gpg2 -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-             --verify ${LIVECD}/mirror/portage-latest.tar.bz2{.gpgsig,}
-
-
-        sinfo "Verifying stage3 MD5 and SHA1 digests"
-        (cd ${LIVECD}/mirror; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
-        (cd ${LIVECD}/mirror; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
+        # Don't rely on the HKP outbounding port being open
+        for key in ${gpg_keys}; do
+            if [ ! -e ${LIVECD}/mirror/${key}.asc ]; then
+                eval wget -nv -O ${LIVECD}/mirror/${key}.asc \"${gpg_wwwserver}\"
+            fi
+            gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/${key}.asc
+            gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint 0x${key} 1>/dev/null
+        done
 
 
-        sinfo "Verifying stage3 files list"
-        tar --utc -tjvf ${LIVECD}/mirror/${stage3file} > ${LIVECD}/mirror/${stage3file}.CONTENTS.actual
-        cmp -s ${LIVECD}/mirror/${stage3file}.CONTENTS{,.actual}
+        sinfo "Verifying GPG signatures"
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+            --verify ${LIVECD}/mirror/${stage3file}.DIGESTS.asc
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+            --verify ${LIVECD}/mirror/portage-latest.tar.bz2{.gpgsig,}
+    else
+        sinfo "GPG not found, skipping signatures verification"
     fi
+
+
+    sinfo "Verifying stage3 MD5 and SHA1 digests"
+    (cd ${LIVECD}/mirror; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
+    (cd ${LIVECD}/mirror; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
+
+
+    sinfo "Verifying stage3 files list"
+    tar --utc -tjvf ${LIVECD}/mirror/${stage3file} > ${LIVECD}/mirror/${stage3file}.CONTENTS.actual
+    cmp -s ${LIVECD}/mirror/${stage3file}.CONTENTS{,.actual}
 
 
 	sinfo "Deleting ${LIVECD}/src"

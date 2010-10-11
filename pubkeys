@@ -1,0 +1,11 @@
+# Gentoo Release Engineering: Release security & signing
+# http://www.gentoo.org/proj/en/releng/#doc_chap5
+
+# Gentoo Linux Release Engineering (Gentoo Linux Release Signing Key) <releng@gentoo.org>
+D99E AC73 79A8 50BC E47D  A5F2 9E64 38C8 1707 2058
+
+# Gentoo Linux Release Engineering (Automated Weekly Release Key) <releng@gentoo.org>
+13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910
+
+# Gentoo Portage Snapshot Signing Key (Automated Signing Key)
+AE54 54F9 67B5 6AB0 9AE1  6064 0838 C26E 239C 75C4
