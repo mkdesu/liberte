@@ -61,6 +61,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     # Download stage3 + portage snapshot
     mkdir -p ${LIVECD}/mirror
 
+
     # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
     sinfo "Saving ${LIVECD}/mirror/latest-stage3.txt"
     wget -N -nv -P ${LIVECD}/mirror ${stage3base}/latest-stage3.txt
@@ -69,29 +70,56 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
     # If a new stage3 is available, remove old mirrors
     if [ ! -e ${LIVECD}/mirror/${stage3file} ]; then
-        rm -f ${LIVECD}/mirror/stage3-i686-hardened-*.tar.bz2
+        rm -f ${LIVECD}/mirror/stage3-i686-hardened-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
     fi
 
+
     sinfo "Saving ${LIVECD}/mirror/${stage3file}"
-    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}
+    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}{,.CONTENTS,.DIGESTS.asc}
 
     sinfo "Saving ${LIVECD}/mirror/portage-latest.tar.bz2"
-    wget -N -nv -P ${LIVECD}/mirror ${portage}
+    wget -N -nv -P ${LIVECD}/mirror ${portage}{,.gpgsig}
+
+
+    if which gpg2 1>/dev/null 2>&1; then
+        sinfo "Verifying PGP signatures"
+
+        mkdir -p -m 700 ${LIVECD}/mirror/gnupg
+        cp -u ${FROM}/pubring.gpg ${LIVECD}/mirror/gnupg/
+
+        gpg2 -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+             --verify ${LIVECD}/mirror/${stage3file}.DIGESTS.asc
+
+        gpg2 -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+             --verify ${LIVECD}/mirror/portage-latest.tar.bz2{.gpgsig,}
+
+
+        sinfo "Verifying stage3 MD5 and SHA1 digests"
+        (cd ${LIVECD}/mirror; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
+        (cd ${LIVECD}/mirror; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
+
+
+        sinfo "Verifying stage3 files list"
+        tar --utc -tjvf ${LIVECD}/mirror/${stage3file} > ${LIVECD}/mirror/${stage3file}.CONTENTS.actual
+        cmp -s ${LIVECD}/mirror/${stage3file}.CONTENTS{,.actual}
+    fi
 
 
 	sinfo "Deleting ${LIVECD}/src"
     rm -rf --one-file-system ${LIVECD}/src
     mkdir -m 755 ${LIVECD}/src
 
+
     sinfo "Extracting stage3 to ${LIVECD}/src"
-    tar xpSjf ${LIVECD}/mirror/${stage3file} -C ${LIVECD}/src --exclude ./dev
+    tar -xpSjf ${LIVECD}/mirror/${stage3file} -C ${LIVECD}/src --exclude ./dev
     mkdir -m 755 ${LIVECD}/src/dev
     mknod -m 600 ${LIVECD}/src/dev/null    c 1 3
     mknod -m 600 ${LIVECD}/src/dev/tty1    c 4 1
     mknod -m 200 ${LIVECD}/src/dev/console c 5 1
 
+
     sinfo "Extracting portage to ${LIVECD}/src/usr"
-    tar xpSjf ${LIVECD}/mirror/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
+    tar -xpSjf ${LIVECD}/mirror/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
 
     mkdir -m 2775 ${LIVECD}/src/usr/portage/distfiles
     chown 250:250 ${LIVECD}/src/usr/portage/distfiles
