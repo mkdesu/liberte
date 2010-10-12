@@ -4,5 +4,5 @@ Comment=Force synchronization prior to media removal
 Exec=sync-notify
 Terminal=false
 Type=Application
-Categories=Utility
+Categories=GTK;Utility;System
 Icon=drive-removable-media

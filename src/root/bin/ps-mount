@@ -15,7 +15,8 @@ if [ "$1" = fork ]; then
     # Files and scripts
     prefix=/mnt/media
     mounts=/etc/auto.media
-    daemon=/var/lib/init.d/started/autofs
+    daemon=/etc/init.d/autofs
+    started=/var/lib/init.d/started/autofs
 
     # Mount options
     supported=" ext2 vfat msdos ntfs iso9660 "
@@ -65,7 +66,9 @@ if [ "$1" = fork ]; then
 
     # Assign volume label if unavailable
     if [ -z "${ID_FS_LABEL}" ]; then
-        if [ "${DEVNAME/[0-9]/X}" = /dev/fdX ]; then
+        if [ -n "${ID_MODEL}" ]; then
+            ID_FS_LABEL="${ID_VENDOR:+${ID_VENDOR/%/_}}${ID_MODEL}"
+        elif [ "${DEVNAME/[0-9]/X}" = /dev/fdX ]; then
             ID_FS_LABEL="floppy${DEVNAME/\/dev\/fd/}"
             ID_FS_LABEL="${ID_FS_LABEL/floppy0/floppy}"
         elif [ "${ID_CDROM}" = 1 ]; then
@@ -104,7 +107,7 @@ if [ "$1" = fork ]; then
         local actual
         local expected
 
-        if [ -e ${daemon} ]; then
+        if [ -e ${started} ]; then
             # Sends SIGHUP to automount (autofs 5.0.3: only effective when adding mount points)
             ${daemon} reload
 

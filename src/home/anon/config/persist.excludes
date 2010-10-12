@@ -24,8 +24,9 @@
 
 # Backups
 /config/gnupg/random_seed
-/config/gnupg/*.gpg~
-/config/gnupg/*.gpg.lock
+/config/gnupg/*~
+/config/gnupg/*.bak
+/config/gnupg/*.lock
 
 # Logs
 /config/mc/history
