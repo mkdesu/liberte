@@ -1,4 +1,4 @@
-# The ${HOME}/config directory is synchronized to <persist>/settings/config.tar.bz2
+# The ${HOME}/config directory is synchronized to <persist>/settings/config.tar.xz
 # upon shutdown. If you want to exclude some files or directories, add them here
 # in rsync format. The root is ${HOME}.
 
@@ -21,6 +21,11 @@
 /config/claws-mail/*cache/
 /config/claws-mail/claws-mail-[0-9]*
 /config/claws-mail/tagsdb/
+
+# Backups
+/config/gnupg/random_seed
+/config/gnupg/*.gpg~
+/config/gnupg/*.gpg.lock
 
 # Logs
 /config/mc/history

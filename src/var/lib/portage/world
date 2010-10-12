@@ -111,6 +111,7 @@ mail-client/claws-mail-notification
 mail-client/claws-mail-acpi-notifier
 mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
+app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/midori
 
@@ -215,7 +216,6 @@ app-i18n/scim-pinyin
 app-i18n/scim-anthy
 app-i18n/scim-hangul
 app-i18n/scim-input-pad
-# app-i18n/scim-bridge
 
 # X11 window management
 x11-wm/openbox

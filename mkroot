@@ -28,7 +28,7 @@ gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
 # Copying and pruning
 if [ "$2" = copy ]; then
     sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -v --delete-excluded \
+    rsync -aHAXS -x -i --delete-excluded \
         --exclude="/usr/portage/distfiles/**" \
         ${LIVECD}/src/ ${LIVECD}/copy | head -n 20
 
@@ -36,7 +36,7 @@ if [ "$2" = copy ]; then
     exit
 elif [ "$2" = clean ]; then
     sinfo "Pruning ${LIVECD}/copy"
-    rsync -aHAXS -x -v --delete-excluded \
+    rsync -aHAXS -x -i --delete-excluded \
         --include-from=${FROM}/rootfs.includes \
         --exclude-from=${FROM}/rootfs.excludes \
         ${LIVECD}/copy/ ${LIVECD}/copy | head
@@ -47,7 +47,7 @@ elif [ "$2" = clean ]; then
     exit
 elif [ "$2" = semiclean ]; then
     sinfo "Shortcut-pruning ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -v --delete-excluded \
+    rsync -aHAXS -x -i --delete-excluded \
         --include-from=${FROM}/rootfs.includes \
         --exclude-from=${FROM}/rootfs.excludes \
         ${LIVECD}/src/ ${LIVECD}/copy | head

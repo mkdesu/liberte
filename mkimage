@@ -40,13 +40,13 @@ fi
 
 sinfo "Copying USB /boot"
 mkdir -p -m 755 ${USBROOT}
-rsync -aHAXS -v --delete-excluded \
+rsync -aHAXS -i --delete-excluded \
     ${LIVECD}/boot ${USBROOT}
 sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/syslinux/syslinux.cfg
 
 
 sinfo "Copying USB add-ons"
-rsync -aHS -O --no-o --no-g --chmod=go=rX -v \
+rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -v \
     --delete-excluded -C -f "P /boot/" \
     ${SRC}/dist/ ${USBROOT}
 
