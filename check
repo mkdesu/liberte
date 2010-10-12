@@ -17,6 +17,22 @@ LIVECD=$1/copy
 FIND="chroot ${LIVECD} find / -xdev"
 
 
+if [ -n "${BASH}" ]; then
+    check_shlib() {
+        local acc=
+        for f in $*; do
+            if [ -z "${f/#${acc}*/}" ]; then
+                acc=${f}
+            else
+                echo "${f/#${LIVECD}/}"
+            fi
+        done
+    }
+else
+    check_shlib() { true; }
+fi
+
+
 sinfo "Checking ${LIVECD}"
 
 sinfo "Invalid files and symlinks:"
@@ -35,6 +51,11 @@ ${FIND} -name '*.h' -o -name '*.inc' -o -name '*.c' -o -name '*.cpp' \
 
 sinfo "Objects:"
 ${FIND} -name '*.o' -o -name '*.a' -o -name '*.la' -o -name '*.pc'
+
+sinfo "Duplicate libraries:"
+for lib in `${FIND} -name 'lib*.so'`; do
+    check_shlib ${LIVECD}${lib}*
+done
 
 sinfo "Docs:"
 ${FIND} -name '*.info*' -o -name '*.htm*' -o -name '*.1.bz2'
