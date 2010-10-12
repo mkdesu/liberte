@@ -85,7 +85,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     if which gpg 1>/dev/null 2>&1; then
-        sinfo "Fetching GPG public keys and verifying fingerprints"
+        sinfo "Fetching PGP public keys and verifying fingerprints"
         # gpg fails if it can't create a lock file near the keyring, so using
         #  --no-default-keyring --keyring ${FROM}/pubring.gpg is problematic
         mkdir -p -m 700 ${LIVECD}/mirror/gnupg
@@ -96,17 +96,22 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
                 eval wget -nv -O ${LIVECD}/mirror/${key}.asc \"${gpg_wwwserver}\"
             fi
             gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/${key}.asc
-            gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint 0x${key} 1>/dev/null
+
+            fpr=`gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint --with-colons 0x${key} | grep '^fpr:' | cut -d: -f 10`
+            if [ ${key} != "${fpr}" ]; then
+                echo "Fingerprint mismatch: [${key}] != [${fpr}]"
+                exit 1
+            fi
         done
 
 
-        sinfo "Verifying GPG signatures"
+        sinfo "Verifying PGP signatures"
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
             --verify ${LIVECD}/mirror/${stage3file}.DIGESTS.asc
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
             --verify ${LIVECD}/mirror/portage-latest.tar.bz2{.gpgsig,}
     else
-        sinfo "GPG not found, skipping signatures verification"
+        sinfo "GnuPG not found, skipping signatures verification"
     fi
 
 
