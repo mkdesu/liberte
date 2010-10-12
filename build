@@ -14,6 +14,12 @@ if [ -z "$1"  -o  \( -n "$2"  -a  "$2" != fresh \) ]; then
 fi
 
 
+if [ `id -u` != 0 ]; then
+    echo "Must be root"
+    exit 1
+fi
+
+
 # Variables
 SRC=`dirname $0`
 LIVECD=$1
