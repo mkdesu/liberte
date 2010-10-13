@@ -1,0 +1,18 @@
+# Exclusions: src -> copy
+# Patterns should not disturb unmerges
+# (aggregates with exclusions for copy -> clean)
+
+# Bind-mount /usr/portage and /usr/portage/distfiles
+/usr/portage/**
+
+# Sources
+/usr/src/linux*
+
+# Documentation
+/usr/share/man/**/*.*
+/usr/share/doc/**
+/usr/share/gtk-doc/**
+/usr/share/gnome/help/**
+
+# Annoying messages during unmerge
+/etc/sgml/sgml-docbook.cat

@@ -1,3 +1,5 @@
+# Exclusions: copy -> clean
+
 # Documentation directories
 /usr/share/doc/
 /usr/share/man/
@@ -77,7 +79,7 @@
 /usr/share/gtk-*/demo/
 /usr/lib/pygtk/*/*demo*
 
-# Static libraries
+# Static libraries and libtool files
 /usr/lib/**.a
 /usr/lib/**.la
 /usr/**/lib/**.a

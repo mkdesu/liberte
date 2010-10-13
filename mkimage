@@ -46,7 +46,7 @@ sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/sysli
 
 
 sinfo "Copying USB add-ons"
-rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -v \
+rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
     --delete-excluded -C -f "P /boot/" \
     ${SRC}/dist/ ${USBROOT}
 

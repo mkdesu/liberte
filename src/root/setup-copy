@@ -17,23 +17,26 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 
 
 # equery requires gentoolkit, so do it early
-sinfo "Patching selected ebuilds"
-
+# NOTE: the below patches are intended for depclean
 # portage:    ebuild patched to exclude python  RDEPEND
 # lm_sensors: ebuild patched to exclude perl    RDEPEND
 # libglade:   ebuild patched to exclude python  RDEPEND
 # gvfs:       ebuild patched to exclude openssh RDEPEND
-ebuild_portage=`equery which sys-apps/portage`
-ebuild_sensors=`equery which sys-apps/lm_sensors`
-ebuild_libglade=`equery which gnome-base/libglade`
-ebuild_gvfs=`equery which gnome-base/gvfs`
+sinfo "Patching copies of selected ebuilds"
+ebuilds="sys-apps/portage sys-apps/lm_sensors gnome-base/libglade gnome-base/gvfs"
+
+# /usr/portage is bind-mounted ro
+for ebuild in ${ebuilds}; do
+    rsync -a /usr/portage/${ebuild} ${HOME}/ebuilds/`dirname ${ebuild}`
+    eval ebuild_`basename ${ebuild}`=`equery which ${ebuild}`
+done
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
 sed -i 's/\${python_dep}//' ${ebuild_portage}
 
 # Perl is only needed by sensors-detect and sensors-conf-convert
-sed -i s:dev-lang/perl:: ${ebuild_sensors}
+sed -i s:dev-lang/perl:: ${ebuild_lm_sensors}
 
 # Python is only needed by libglade-convert
 sed -i 's@>=dev-lang/python[[:alnum:].-]*@@' ${ebuild_libglade}
@@ -48,7 +51,6 @@ done
 
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)
 sinfo "Unmerging build and temporary dependencies"
-make -C /usr/src/linux mrproper > /dev/null
 emerge -qc --with-bdeps n
 
 

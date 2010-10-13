@@ -6,8 +6,8 @@ sinfo() {
 
 
 # Must have root directory as an argument
-if [ -z "$1"  -o  \( -n "$2" -a "$2" != fresh -a "$2" != copy -a "$2" != clean -a "$2" != semiclean \) ]; then
-    echo "$0 <livecd root> [fresh|copy|clean|semiclean]"
+if [ -z "$1"  -o  \( -n "$2" -a "$2" != fresh -a "$2" != copy -a "$2" != clean \) ]; then
+    echo "$0 <livecd root> [fresh|copy|clean]"
     exit 1
 fi
 
@@ -28,29 +28,19 @@ gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
 # Copying and pruning
 if [ "$2" = copy ]; then
     sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded \
-        --exclude="/usr/portage/distfiles/**" \
+    rsync -aHAXS -x -i --delete-excluded          \
+        --exclude-from=${FROM}/rootfs-cp.excludes \
         ${LIVECD}/src/ ${LIVECD}/copy | head -n 20
 
     sinfo "Done."
     exit
 elif [ "$2" = clean ]; then
     sinfo "Pruning ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded \
-        --include-from=${FROM}/rootfs.includes \
-        --exclude-from=${FROM}/rootfs.excludes \
+    rsync -aHAXS -x -i --delete-excluded          \
+        --include-from=${FROM}/rootfs.includes    \
+        --exclude-from=${FROM}/rootfs.excludes    \
+        --exclude-from=${FROM}/rootfs-cp.excludes \
         ${LIVECD}/copy/ ${LIVECD}/copy | head
-
-    ${FROM}/check ${LIVECD}
-
-    sinfo "Done."
-    exit
-elif [ "$2" = semiclean ]; then
-    sinfo "Shortcut-pruning ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded \
-        --include-from=${FROM}/rootfs.includes \
-        --exclude-from=${FROM}/rootfs.excludes \
-        ${LIVECD}/src/ ${LIVECD}/copy | head
 
     ${FROM}/check ${LIVECD}
 
