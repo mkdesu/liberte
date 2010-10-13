@@ -21,7 +21,7 @@ MIRROR=http://distro.ibiblio.org/pub/linux/distributions/gentoo
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
-gpg_wwwserver='http://wwwkeys.eu.pgp.net/pks/lookup?op=get&search=0x${key}'
+gpg_wwwserver='http://wwwkeys.eu.pgp.net/pks/lookup?op=get&search=0x${fpr}'
 gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
 
 
@@ -62,67 +62,71 @@ fi
 # Extract stage3 + portage snapshot to fresh directory
 if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     # Download stage3 + portage snapshot
-    mkdir -p ${LIVECD}/mirror
-
+    mkdir -p ${LIVECD}/mirror/{stage3,portage,keys}
+    mkdir -p -m 700 ${LIVECD}/mirror/gnupg
 
     # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
-    sinfo "Saving ${LIVECD}/mirror/latest-stage3.txt"
-    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/latest-stage3.txt
-    stage3=`grep stage3-i686 ${LIVECD}/mirror/latest-stage3.txt | sed s@stage3-i686@hardened/stage3-i686-hardened@`
+    sinfo "Fetching latest-stage3.txt"
+    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3.txt
+    stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt | sed s@stage3-i686@hardened/stage3-i686-hardened@`
     stage3file=`basename ${stage3}`
 
     # If a new stage3 is available, remove old mirrors
-    if [ ! -e ${LIVECD}/mirror/${stage3file} ]; then
-        rm -f ${LIVECD}/mirror/stage3-i686-hardened-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
+    if [ ! -e ${LIVECD}/mirror/stage3/${stage3file} ]; then
+        rm -f ${LIVECD}/mirror/stage3/stage3-i686-hardened-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
     fi
 
 
-    sinfo "Saving ${LIVECD}/mirror/${stage3file}"
-    wget -N -nv -P ${LIVECD}/mirror ${stage3base}/${stage3}{.DIGESTS.asc,.CONTENTS,}
+    sinfo "Downloading ${stage3file}"
+    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}{.DIGESTS.asc,.CONTENTS,}
 
-    sinfo "Saving ${LIVECD}/mirror/portage-latest.tar.bz2"
-    wget -N -nv -P ${LIVECD}/mirror ${portage}{.gpgsig,}
+    sinfo "Downloading portage-latest.tar.bz2"
+    wget -N -nv -P ${LIVECD}/mirror/portage ${portage}{.gpgsig,}
 
 
     if which gpg 1>/dev/null 2>&1; then
-        sinfo "Fetching PGP public keys and verifying fingerprints"
-        # gpg fails if it can't create a lock file near the keyring, so using
-        #  --no-default-keyring --keyring ${FROM}/pubring.gpg is problematic
-        mkdir -p -m 700 ${LIVECD}/mirror/gnupg
-
         # Don't rely on the HKP outbounding port being open
+        sinfo "Fetching PGP public keys and verifying fingerprints"
         for key in ${gpg_keys}; do
-            if [ ! -e ${LIVECD}/mirror/${key}.asc ]; then
-                eval wget -nv -O ${LIVECD}/mirror/${key}.asc \"${gpg_wwwserver}\"
-            fi
-            gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/${key}.asc
+            org=`echo ${key} | cut -d: -f1`
+            fpr=`echo ${key} | cut -d: -f2`
+            keyid=`echo ${fpr} | sed 's/.*\(.\{8,8\}\)$/\1/'`
 
-            fpr=`gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint --with-colons 0x${key} | grep '^fpr:' | cut -d: -f 10`
-            if [ ${key} != "${fpr}" ]; then
-                echo "Fingerprint mismatch: [${key}] != [${fpr}]"
+            if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
+                eval wget -nv -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
+            fi
+            gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
+
+            fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint --with-colons 0x${fpr} | grep '^fpr:' | cut -d: -f 10`
+            if [ ${fpr} != "${fpr2}" ]; then
+                echo "Fingerprint mismatch: [${fpr}] != [${fpr2}]"
                 exit 1
             fi
         done
 
 
-        sinfo "Verifying PGP signatures"
+        sinfo "Verifying stage3 and portage PGP signatures"
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-            --verify ${LIVECD}/mirror/${stage3file}.DIGESTS.asc
+            --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-            --verify ${LIVECD}/mirror/portage-latest.tar.bz2{.gpgsig,}
+            --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2{.gpgsig,}
     else
         sinfo "GnuPG not found, skipping signatures verification"
     fi
 
 
     sinfo "Verifying stage3 MD5 and SHA1 digests"
-    (cd ${LIVECD}/mirror; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
-    (cd ${LIVECD}/mirror; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
+    (cd ${LIVECD}/mirror/stage3; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
+    (cd ${LIVECD}/mirror/stage3; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
 
 
-    sinfo "Verifying stage3 files list"
-    tar --utc -tjvf ${LIVECD}/mirror/${stage3file} > ${LIVECD}/mirror/${stage3file}.CONTENTS.actual
-    cmp -s ${LIVECD}/mirror/${stage3file}.CONTENTS{,.actual}
+    if tar --version | grep -q '(GNU tar)'; then
+        sinfo "Verifying stage3 files list"
+        LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+        cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS{,.actual}
+    else
+        sinfo "GNU tar not found, skipping stage3 files list verification"
+    fi
 
 
 	sinfo "Deleting ${LIVECD}/src"
@@ -131,7 +135,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Extracting stage3 to ${LIVECD}/src"
-    tar -xpSjf ${LIVECD}/mirror/${stage3file} -C ${LIVECD}/src --exclude ./dev
+    tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude ./dev
     mkdir -m 755 ${LIVECD}/src/dev
     mknod -m 600 ${LIVECD}/src/dev/null    c 1 3
     mknod -m 600 ${LIVECD}/src/dev/tty1    c 4 1
@@ -139,7 +143,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Extracting portage to ${LIVECD}/src/usr"
-    tar -xpSjf ${LIVECD}/mirror/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
+    tar -xpSjf ${LIVECD}/mirror/portage/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
 
     mkdir -m 2775 ${LIVECD}/src/usr/portage/distfiles
     chown 250:250 ${LIVECD}/src/usr/portage/distfiles

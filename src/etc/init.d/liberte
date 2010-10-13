@@ -253,7 +253,8 @@ stop() {
 
         # store a backup of previous archive, if it exists,
         # but don't overwrite the backup if unnecessary
-        if ! cmp -s ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz; then
+        if [ -e ${lmount}/settings/config.tar.xz ] && \
+                ! cmp -s ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz; then
             mv ${lmount}/settings/config.tar.xz ${lmount}/settings/config.tar.xz.bak
         fi
         mv ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz

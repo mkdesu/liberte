@@ -108,7 +108,7 @@ if [ "$1" = fork ]; then
         local expected
 
         if [ -e ${started} ]; then
-            # Sends SIGHUP to automount (autofs 5.0.3: only effective when adding mount points)
+            # Sends SIGHUP to automount (autofs 5.0.4: only effective when adding mount points)
             ${daemon} reload
 
             # Wait up to 2s for changes to take effect
