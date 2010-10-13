@@ -8,6 +8,7 @@
 # Browsing
 /config/midori/tabtrash.xbel
 /config/midori/history.db
+/config/local/webkit/
 
 # Mail
 /config/claws-mail/menurc
