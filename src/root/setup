@@ -41,6 +41,12 @@ if [ ${PHASE} != src ]; then
 fi
 
 
+# Intentionally fail if there is there are multiple hardened profiles
+sinfo "Setting a hardened profile"
+hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/'`
+eselect profile set ${hardened}
+
+
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     sinfo "Updating portage"
 
@@ -52,6 +58,7 @@ eselect news purge
 
 
 if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
+    # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after kernel update+compile, do
     # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
     sinfo "Downloading kernel ${kversion}"
@@ -62,6 +69,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     sinfo "Downloading kernel patches"
     wget -N -q -P /usr/src/linux `awk '/^# URL / { print $3 }' ${HOME}/patches/kernel-patches.sha256`
     sha256sum --quiet -c ${HOME}/patches/kernel-patches.sha256
+
 
     sinfo "Applying kernel patches"
     spatch ${HOME}/patches/kernel-info.patch -p0
@@ -78,20 +86,56 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
 
 
+    sinfo "Recompiling toolchain"
+    oldgcc=`find /var/db/pkg/sys-devel -maxdepth 1 -type d -name 'gcc-[0-9]*'`
+    emerge -q1 sys-devel/binutils
+    emerge -q1 sys-devel/gcc
+
+    # consider removing old gcc only if it still exists after emerge
+    # (emerge was in a new slot, or same version)
+    if [ -e "${oldgcc}" ]; then
+        chost=`portageq envvar CHOST`
+        oldgccprof=`gcc-config -c`
+        newgccprof=`find /etc/env.d/gcc -type f -name "${chost}-*"           \
+            ! -name "${oldgccprof}" ! -name "${oldgccprof}-*" -printf '%f\n' \
+            | sort | head -n 1`
+
+        # unmerge only if the "new" gcc has a different version
+        if [ -n "${newgccprof}" ]; then
+            gcc-config "${newgccprof}"
+            emerge -qC --deselect=n =sys-devel/`basename ${oldgcc}`
+        fi
+    fi
+    source /etc/profile
+
+    emerge -q1 virtual/libc
+
+
+    sinfo "Removing unnecessary packages"
+    emerge -qC --deselect=n "=dev-lang/python-3*"
+
+
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
-    emerge -q1 binutils gcc libc
-    emerge -qe system
+    emerge -qepv system
+    emerge -qe   system
     rm -f ${protected}
 
 
-    sinfo "Cleaning unnecessary packages"
-    emerge -q1C --deselect=n "=dev-lang/python-3*"
+    sinfo "Removing non-system packages"
+    mv /var/lib/portage/world{,.off}
     emerge -qc
+    mv /var/lib/portage/world{.off,}
 
 
     # Rebuild locales if locales list was updated
     rebuild_locales
+
+
+    # Shouldn't contain any rebuilds
+    sinfo "Listing updates"
+    emerge -qupvDN --with-bdeps y world
+
 else
     sinfo "Skipping full rebuild (use \"fresh\")"
     sinfo "Listing updates"
@@ -106,7 +150,7 @@ sinfo "Compiling world"
 emerge -quDN --with-bdeps y world
 
 
-sinfo "Cleaning unnecessary packages"
+sinfo "Removing unnecessary packages"
 emerge -qc
 
 

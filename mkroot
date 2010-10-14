@@ -16,8 +16,7 @@ fi
 FROM=`dirname $0`
 LIVECD=$1
 
-MIRROR=http://distro.ibiblio.org/pub/linux/distributions/gentoo
-#MIRROR=http://mirror.switch.ch/ftp/mirror/gentoo
+MIRROR=http://mirrors.kernel.org/gentoo
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
@@ -59,12 +58,12 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
     sinfo "Fetching latest-stage3.txt"
     wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3.txt
-    stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt | sed s@stage3-i686@hardened/stage3-i686-hardened@`
+    stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt`
     stage3file=`basename ${stage3}`
 
     # If a new stage3 is available, remove old mirrors
     if [ ! -e ${LIVECD}/mirror/stage3/${stage3file} ]; then
-        rm -f ${LIVECD}/mirror/stage3/stage3-i686-hardened-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
+        rm -f ${LIVECD}/mirror/stage3/stage3-i686-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
     fi
 
 
@@ -120,7 +119,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     fi
 
 
-	sinfo "Deleting ${LIVECD}/src"
+	sinfo "Removing ${LIVECD}/src"
     rm -rf --one-file-system ${LIVECD}/src
     mkdir -m 755 ${LIVECD}/src
 

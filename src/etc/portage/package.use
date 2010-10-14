@@ -34,6 +34,7 @@ media-libs/libsdl               -audio -joystick
 gnome-base/gvfs                 -http
 net-libs/neon                   -pkcs11
 app-editors/nano                -spell
+dev-libs/libxslt                -crypt
 dev-python/twisted              -crypt               # FEATURES=test
 
 # Extra functionality
