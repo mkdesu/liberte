@@ -51,7 +51,7 @@ app-text/poppler                cairo
 app-office/abiword              plugins
 app-editors/gedit               python               # gedit-plugins
 app-arch/p7zip                  rar
-# app-portage/eix                 sqlite
+# app-portage/eix               sqlite
 
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
 media-video/mplayer             -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2

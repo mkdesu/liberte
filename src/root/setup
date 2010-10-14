@@ -41,19 +41,14 @@ if [ ${PHASE} != src ]; then
 fi
 
 
-sinfo "Updating portage"
-emerge -q --sync
+if [ "$1" != fresh  -a  -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
+    sinfo "Updating portage"
+
+    gpg -q --homedir /etc/portage/gnupg --import /var/tmp/addons/keys/gentoo-*.asc
+    eix-sync -qw -C -q
+fi
 eselect news read all
 eselect news purge
-
-if [ -e /usr/bin/eix-update ]; then
-    sinfo "Updating portage cache"
-    
-    if [ "${FEATURES}" = metadata-transfer ]; then
-        emerge -q --metadata
-    fi
-    eix-update -q
-fi
 
 
 if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then

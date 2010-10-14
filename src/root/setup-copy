@@ -157,7 +157,7 @@ env-update
 
 sinfo "Unmerging portage"
 sed -i '\:^... /usr/lib/portage/:d' /var/db/pkg/sys-apps/`echo ${ebuild_portage} | sed 's:.*/::; s:\.ebuild$::'`/CONTENTS
-FEATURES="-sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>/dev/null
+FEATURES="${FEATURES} -sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>/dev/null
 rm -r /usr/lib/portage/
 
 

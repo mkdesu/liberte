@@ -37,9 +37,10 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i --exclude={/root/,/home/anon/,/mnt/hidden/,/etc/{sudoers,.auto.lock}} -C ${SRC}/ ${LIVECD}
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root       ${LIVECD}
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden ${LIVECD}/mnt
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i --exclude={/root/,/home/anon/,/mnt/hidden/,/etc/{sudoers,.auto.lock},/etc/portage/gnupg/} -C ${SRC}/ ${LIVECD}
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
 
     rsync -aHS -O --no-o --no-g --chmod=ug=r,o=     -i ${SRC}/etc/sudoers    ${LIVECD}/etc
     rsync -aHS -O --no-o --no-g --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock ${LIVECD}/etc
