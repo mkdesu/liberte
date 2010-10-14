@@ -16,7 +16,6 @@
 # Portage directories
 /usr/portage/
 /var/db/pkg/
-/usr/lib/portage/
 /usr/lib/pkgconfig/
 /usr/share/pkgconfig/
 /var/lib/portage/
@@ -35,8 +34,6 @@
 # Sources and development tools
 /usr/include/
 /usr/src/
-/lib/modules/*/source/
-/lib/modules/*/build/
 /usr/lib/**/include/
 /usr/lib/python*/config/
 /usr/lib/python*/distutils/
@@ -62,7 +59,6 @@
 /usr/lib/python*/site-packages/numpy/numarray/numpy/
 /usr/share/pygtk/
 /usr/share/pygobject/
-/usr/lib/perl*/
 /usr/lib/icu/
 /usr/share/aclocal/
 /usr/share/baselayout/
@@ -141,9 +137,11 @@
 /usr/bin/libglade-convert
 
 # Perl scripts
-# (media-gfx/splashutils: themes creation and conversion)
+# (media-gfx/splashutils: themes creation and conversion,
+#                         + cpio-using initramfs generator)
 /usr/bin/splash_resize
 /usr/bin/bootsplash2fbsplash
+/usr/sbin/splash_geninitramfs
 # (net-misc/ntp: servers chain tracer, ntpq loop wrapper)
 /usr/bin/ntptrace
 /usr/bin/ntp-wait

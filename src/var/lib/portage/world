@@ -3,7 +3,11 @@ sys-kernel/hardened-sources   # TEMP
 sys-kernel/genkernel          # TEMP
 sys-boot/syslinux             # TEMP
 media-fonts/terminus-font     # TEMP
-app-portage/gentoolkit        # at end of setup-copy
+app-portage/gentoolkit        # (explicit unmerge in setup-copy)
+app-portage/portage-utils     # TEMP
+app-portage/eix               # TEMP
+# dev-python/pysqlite           # TEMP
+
 
 # LiveCD tools
 sys-apps/memtest86+

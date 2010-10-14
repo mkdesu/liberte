@@ -3,7 +3,7 @@
 kversion=`sed s/-/-hardened-/ ${HOME}/config/kversion`
 consolefont=ter-i16n.psf
 lzmamem=20MiB
-protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock"
+protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock /etc/._cfg????_eixrc"
 
 
 sinfo() {
@@ -46,6 +46,15 @@ emerge -q --sync
 eselect news read all
 eselect news purge
 
+if [ -e /usr/bin/eix-update ]; then
+    sinfo "Updating portage cache"
+    
+    if [ "${FEATURES}" = metadata-transfer ]; then
+        emerge -q --metadata
+    fi
+    eix-update -q
+fi
+
 
 if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     # Maintainer note: after kernel update+compile, do
@@ -78,7 +87,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     sinfo "Compiling system"
     emerge -q1 binutils gcc libc
     emerge -qe system
-    rm ${protected}
+    rm -f ${protected}
 
 
     sinfo "Cleaning unnecessary packages"
@@ -116,7 +125,7 @@ rebuild_locales
 
 sinfo "Compiling custom executables"
 ( . /etc/make.conf && \
-    gcc -o /usr/local/sbin/udev-watchdog ${HOME}/ebuilds/udev-watchdog.c ${CFLAGS} ${LDFLAGS} -ludev && \
+    gcc -o /usr/local/sbin/udev-watchdog /var/tmp/ebuilds/udev-watchdog.c ${CFLAGS} ${LDFLAGS} -ludev && \
     strip -s /usr/local/sbin/udev-watchdog )
 
 # s/AD/Andorra/;...

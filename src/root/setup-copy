@@ -16,24 +16,34 @@ sinfo "Cleaning up portage configuration"
 sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 
 
-# equery requires gentoolkit, so do it early
+# equery requires gentoolkit, copy ebuilds early
 # NOTE: the below patches are intended for depclean
-# portage:    ebuild patched to exclude python  RDEPEND
-# lm_sensors: ebuild patched to exclude perl    RDEPEND
-# libglade:   ebuild patched to exclude python  RDEPEND
-# gvfs:       ebuild patched to exclude openssh RDEPEND
+# portage:     exclude python  RDEPEND
+# gentoolkit:  exclude perl    RDEPEND
+# lm_sensors:  exclude perl    RDEPEND
+# libglade:    exclude python  RDEPEND
+# gvfs:        exclude openssh RDEPEND
+# splashutils: exclude cpio    RDEPEND
 sinfo "Patching copies of selected ebuilds"
-ebuilds="sys-apps/portage sys-apps/lm_sensors gnome-base/libglade gnome-base/gvfs"
+ebuilds="sys-apps/portage
+         app-portage/gentoolkit
+         sys-apps/lm_sensors
+         gnome-base/libglade
+         gnome-base/gvfs
+         media-gfx/splashutils"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
-    rsync -a /usr/portage/${ebuild} ${HOME}/ebuilds/`dirname ${ebuild}`
+    rsync -a /usr/portage/${ebuild} /var/tmp/ebuilds/`dirname ${ebuild}`
     eval ebuild_`basename ${ebuild}`=`equery which ${ebuild}`
 done
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
 sed -i 's/\${python_dep}//' ${ebuild_portage}
+
+# Perl is not needed at all
+sed -i s:dev-lang/perl:: ${ebuild_gentoolkit}
 
 # Perl is only needed by sensors-detect and sensors-conf-convert
 sed -i s:dev-lang/perl:: ${ebuild_lm_sensors}
@@ -43,6 +53,9 @@ sed -i 's@>=dev-lang/python[[:alnum:].-]*@@' ${ebuild_libglade}
 
 # OpenSSH is only needed for ssh:// support
 sed -i s:net-misc/openssh:: ${ebuild_gvfs}
+
+# cpio is only needed for splash_geninitramfs
+sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild \$${ebuild} manifest
@@ -90,7 +103,8 @@ emerge -qC \
     sys-apps/man-pages  \
     sys-apps/texinfo    \
     \
-    net-misc/openssh
+    net-misc/openssh    \
+    app-arch/cpio
 
 mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/
@@ -107,11 +121,9 @@ revdep-rebuild -q -i
 
 
 # Unmerge portage utilities (revdep-rebuild is unavailable afterwards)
-# Also unmerge Perl (it is used by gentoolkit, so can't unmerge earlier)
-sinfo "Unmerging portage tools and development tools that are abomination"
-emerge -qC \
-    app-portage/gentoolkit \
-    dev-lang/perl
+sinfo "Unmerging portage tools"
+emerge -qC app-portage/gentoolkit
+
 
 # TODO: remove /var/db/pkg/dev-lang/python-*
 #       remove python-updater from final unmerges
@@ -132,13 +144,10 @@ emerge -qc --with-bdeps n
 # ("emerge -c" cannot be used afterwards)
 # Dependencies:
 # python-updater - python
-# cpio           - none
 # sandbox        - xz-utils, pax-utils
 # portage        - python, sandbox, pax-utils, rsync
 sinfo "Unmerging unnecessary packages"
-emerge -qC \
-    app-admin/python-updater \
-    app-arch/cpio
+emerge -qC app-admin/python-updater
 emerge -qC sys-apps/sandbox
 
 
@@ -147,9 +156,9 @@ env-update
 
 
 sinfo "Unmerging portage"
-ebuild ${ebuild_portage} unmerge 1>/dev/null 2>&1
-rm -r /usr/lib/portage/pym
-rmdir /usr/lib/portage
+sed -i '\:^... /usr/lib/portage/:d' /var/db/pkg/sys-apps/`echo ${ebuild_portage} | sed 's:.*/::; s:\.ebuild$::'`/CONTENTS
+FEATURES="-sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>/dev/null
+rm -r /usr/lib/portage/
 
 
 sinfo "Initializing a secondary PGP keyring"

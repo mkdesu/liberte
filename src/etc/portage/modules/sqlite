@@ -1,0 +1,2 @@
+# SQLite support (optional)
+# MODULE portdbapi.auxdbmodule = portage.cache.sqlite.database

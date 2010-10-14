@@ -7,12 +7,16 @@
 
 # Sources
 /usr/src/linux*
+/usr/lib/klibc/
+/usr/lib/perl*/
 
 # Documentation
 /usr/share/man/**/*.*
+/usr/share/info/**
 /usr/share/doc/**
 /usr/share/gtk-doc/**
 /usr/share/gnome/help/**
+/usr/share/sgml/docbook/xsl-stylesheets/
 
-# Annoying messages during unmerge
-/etc/sgml/sgml-docbook.cat
+# Pruned directories
+/usr/share/claws-mail/themes/**

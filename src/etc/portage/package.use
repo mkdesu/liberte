@@ -2,6 +2,7 @@
 sys-apps/groff                  -X
 sys-process/psmisc              -X
 net-misc/openssh                -X
+dev-tcltk/expect                -X                   # FEATURES=test
 sys-devel/gcc                   -gtk
 media-fonts/terminus-font       -X -pcf
 app-text/hunspell               -ncurses
@@ -11,6 +12,7 @@ sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
 net-libs/webkit-gtk             -gstreamer
 gnome-extra/libgsf              -gtk
+dev-python/twisted              -gtk                 # FEATURES=test
 media-libs/jasper               -opengl
 app-emulation/qemu-kvm          sdl
 media-libs/libsdl               -opengl
@@ -32,6 +34,7 @@ media-libs/libsdl               -audio -joystick
 gnome-base/gvfs                 -http
 net-libs/neon                   -pkcs11
 app-editors/nano                -spell
+dev-python/twisted              -crypt               # FEATURES=test
 
 # Extra functionality
 sys-fs/udev                     extras               # pcmanfm
@@ -48,6 +51,7 @@ app-text/poppler                cairo
 app-office/abiword              plugins
 app-editors/gedit               python               # gedit-plugins
 app-arch/p7zip                  rar
+# app-portage/eix                 sqlite
 
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
 media-video/mplayer             -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2

@@ -29,6 +29,7 @@ gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
 if [ "$2" = copy ]; then
     sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
     rsync -aHAXS -x -i --delete-excluded          \
+        --include-from=${FROM}/rootfs.includes    \
         --exclude-from=${FROM}/rootfs-cp.excludes \
         ${LIVECD}/src/ ${LIVECD}/copy | head -n 20
 

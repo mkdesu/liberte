@@ -17,13 +17,19 @@ if which env-update >&/dev/null; then
                         -exec chown -h anon:anon {} \;
     fi
 
-    if [ -f /usr/bin/xcdroast ]; then
+    if [ -e /usr/bin/xcdroast ]; then
         find /usr/lib/xcdroast-*/bin/xcdrwrap ! -user root -exec chown root {} \;
         find /usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
     fi
 
-    if [ -f /var/lib/layman/make.conf ]; then
-        echo -e "\nsource /var/lib/layman/make.conf" >> /etc/make.conf
+    # if [ -e /usr/bin/eix-update ]; then
+    #    export FEATURES="metadata-transfer"
+    #    sed -i 's/^# MODULE //' /etc/portage/modules/sqlite
+    #    sed -i 's/^# SQLITE //' /etc/eixrc
+    # fi
+
+    if [ -e /var/lib/layman/make.conf ]; then
+        sed -i 's/^# LAYMAN //' /etc/make.conf
     fi
 fi
 
