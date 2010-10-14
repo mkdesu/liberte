@@ -136,8 +136,9 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     sinfo "Extracting portage to ${LIVECD}/src/usr"
     tar -xpSjf ${LIVECD}/mirror/portage/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
 
-    mkdir -m 2775 ${LIVECD}/src/usr/portage/distfiles
-    chown 250:250 ${LIVECD}/src/usr/portage/distfiles
+    uidgid=`grep '^portage:' ${LIVECD}/src/etc/passwd | cut -d: -f3,4`
+    mkdir -m 2775   ${LIVECD}/src/usr/portage/distfiles
+    chown ${uidgid} ${LIVECD}/src/usr/portage/distfiles
 else
     sinfo "Skipping overwrite of ${LIVECD}/src (use \"fresh\")"
 fi

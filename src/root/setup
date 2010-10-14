@@ -41,7 +41,7 @@ if [ ${PHASE} != src ]; then
 fi
 
 
-if [ "$1" != fresh  -a  -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
+if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     sinfo "Updating portage"
 
     gpg -q --homedir /etc/portage/gnupg --import /var/tmp/addons/keys/gentoo-*.asc
