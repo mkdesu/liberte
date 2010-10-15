@@ -1,0 +1,2 @@
+# -i [s]: check interval (low, but have -n standby in smartd.conf)
+SMARTD_OPTS="-i 300"

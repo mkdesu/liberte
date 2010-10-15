@@ -42,7 +42,7 @@ net-wireless/bluez-firmware
 # Disk utilities
 sys-apps/hdparm
 sys-apps/sdparm
-app-admin/ide-smart
+sys-apps/smartmontools
 virtual/eject
 app-misc/secure-delete
 app-arch/libarchive

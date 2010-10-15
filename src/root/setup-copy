@@ -231,7 +231,8 @@ depscan.sh
 
 
 sinfo "Saving current packages list in /tmp/packages-list"
-find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d | sed 's:^/var/db/pkg/::'| sort > /tmp/packages-list
+find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d \
+    | sed 's:^/var/db/pkg/::'| sort > /tmp/packages-list
 
 
 sinfo "Done."

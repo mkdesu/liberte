@@ -5,7 +5,10 @@ depend() {
     # gentoo=nox -> /etc/.noxdm
 	need xdm-setup
 
-    # NOTE: should be "use lvm", but since we are in baselayout-1,
+    # SMART detection needs active disks
+    after smartd
+
+    # NOTE: should be "need lvm", but since we are in baselayout-1,
     # just list dm-mod in modules.autoload, and keep this as a reminder
     after lvm
     need modules
@@ -109,6 +112,9 @@ EOF
             eend 1
         fi
     fi
+
+
+    # TODO: hdparm -y ?
 
 
     # Enable power management for wireless

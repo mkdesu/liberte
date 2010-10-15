@@ -109,6 +109,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
             emerge -qC --deselect=n =sys-devel/`basename ${oldgcc}`
         fi
     fi
+    env-update
     source /etc/profile
 
     emerge -q1 virtual/libc
@@ -231,7 +232,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl metalog iptables consolekit hdparm"
-defaultsvc="liberte acpid rngd alsasound aumix gpm bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
+defaultsvc="liberte acpid rngd alsasound aumix gpm smartd bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do

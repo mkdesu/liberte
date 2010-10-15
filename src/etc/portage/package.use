@@ -1,62 +1,63 @@
-# X/Gtk/Qt/Tk/Curses interface
+# X/Gtk/Qt/Tk/Curses/Image interface
 sys-apps/groff                  -X
 sys-process/psmisc              -X
 net-misc/openssh                -X
-dev-tcltk/expect                -X                   # FEATURES=test
-sys-devel/gcc                   -gtk
 media-fonts/terminus-font       -X -pcf
+sys-devel/gcc                   -gtk
+net-dialup/ppp                  -gtk                 # (ui by networkmanager)
+gnome-extra/libgsf              -gtk
 app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
 dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
-net-libs/webkit-gtk             -gstreamer
-gnome-extra/libgsf              -gtk
-dev-python/twisted              -gtk                 # FEATURES=test
+media-video/mplayer             -opengl
 media-libs/jasper               -opengl
-app-emulation/qemu-kvm          sdl
 media-libs/libsdl               -opengl
+net-libs/webkit-gtk             -gstreamer
+app-emulation/qemu-kvm          sdl
+sci-visualization/gnuplot       gd
 
 # Drivers
 # (vmware segfaults "Xorg -configure", fbdev conflicts with vesa)
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
-
-# Unnecessary functionality
+media-video/mplayer             -video_cards_mga -video_cards_s3virge -video_cards_tdfx
+sys-fs/udev                     extras               # pcmanfm
 sys-fs/ntfs3g                   -udev
 sys-fs/ntfsprogs                minimal -crypt
-sys-libs/ncurses                minimal
-media-libs/libsndfile           minimal
-sys-apps/iproute2               minimal
-gnome-extra/zenity              -compat
-mail-client/claws-mail          -ssl -gnutls -imap
 app-emulation/qemu-kvm          -bluetooth
-media-libs/libsdl               -audio -joystick
-gnome-base/gvfs                 -http
-net-libs/neon                   -pkcs11
-app-editors/nano                -spell
-dev-libs/libxslt                -crypt
-dev-python/twisted              -crypt               # FEATURES=test
 
-# Extra functionality
-sys-fs/udev                     extras               # pcmanfm
-media-libs/jpeg                 static-libs          # splashutils
+# Networking, including SSL/TLS
+mail-client/claws-mail          -ssl -gnutls -imap
 net-libs/libsoup                ssl                  # (gnutls, used by midori)
 net-misc/wget                   ssl                  # portage
-net-misc/curl                   ssl                  # (used by gnupg)
-net-libs/neon                   ssl                  # (used by audacious)
-net-wireless/wpa_supplicant     ssl
-media-libs/openjpeg             tools
-gnome-base/librsvg              tools
-sci-visualization/gnuplot       gd
-app-text/poppler                cairo
-app-office/abiword              plugins
-app-editors/gedit               python               # gedit-plugins
-app-arch/p7zip                  rar
-# app-portage/eix               sqlite
+net-misc/curl                   ssl  -gnutls -nss    # (used by gnupg)
+net-libs/neon                   ssl  -gnutls         # (used by audacious)
+net-wireless/wpa_supplicant     -ssl  gnutls         # (used by networkmanager)
+net-misc/networkmanager               gnutls -nss
+gnome-base/gvfs                 -http
 
+# Multimedia
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
 media-video/mplayer             -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
-media-video/mplayer             -opengl -video_cards_mga -video_cards_s3virge -video_cards_tdfx
+media-libs/libsdl               -audio -joystick
+
+# Unnecessary functionality
+sys-libs/ncurses                minimal
+media-libs/libsndfile           minimal
+gnome-extra/zenity              -compat
+app-editors/nano                -spell
+dev-libs/libxslt                -crypt
+
+# Extra functionality
+media-libs/jpeg                 static-libs          # splashutils
+media-libs/openjpeg             tools
+gnome-base/librsvg              tools                # (used by bin/gen-wallpaper)
+app-text/poppler                cairo
+app-arch/p7zip                  rar
+app-office/abiword              plugins
+app-editors/gedit               python               # gedit-plugins
+# app-portage/eix               sqlite
 
 # Internationalization
 app-i18n/scim-tables            linguas_*
@@ -66,5 +67,4 @@ sys-apps/man-pages              -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Quirks
-x11-libs/cairo                  -xcb
 dev-libs/libxml2                python               # TEMP (gnome-doc-utils bdep)
