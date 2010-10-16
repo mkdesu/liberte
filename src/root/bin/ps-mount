@@ -21,7 +21,7 @@ if [ "$1" = fork ]; then
     # Mount options
     supported=" ext2 vfat msdos ntfs iso9660 "
     luser=anon
-    lgroup=anon
+    lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
     opts_vfat=${opts_common},flush,iocharset=iso8859-1,utf8,showexec,uid=${luser},gid=${lgroup},umask=0137,dmask=067
     opts_ntfs=${opts_common},uid=${luser},gid=${lgroup},fmask=0137,dmask=067

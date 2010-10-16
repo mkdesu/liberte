@@ -161,13 +161,7 @@ FEATURES="${FEATURES} -sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>
 rm -r /usr/lib/portage/
 
 
-sinfo "Initializing a secondary PGP keyring"
-sudo -n -u anon touch     /home/anon/config/gnupg/liberte.gpg
-sudo -n -u anon chmod 600 /home/anon/config/gnupg/liberte.gpg
-sudo -n -u anon gpg -q --homedir /home/anon/config/gnupg \
-    --primary-keyring liberte.gpg --import /var/tmp/addons/keys/liberte-*.asc
-
-
+# Done here because cache may be recreated after "src" phase
 sinfo "Trimming icons cache"
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
     -exec gtk-update-icon-cache -q -f -i {} \;

@@ -14,7 +14,7 @@ if [ -z "$1"  -o  \( -n "$2"  -a  "$2" != fresh \) ]; then
 fi
 
 
-if [ `id -u` != 0 ]; then
+if [ `id -u` != 0  -o  `id -g` != 0 ]; then
     echo "Must be root"
     exit 1
 fi

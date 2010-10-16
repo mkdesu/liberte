@@ -29,10 +29,10 @@ app-emulation/qemu-kvm          -bluetooth
 
 # Networking, including SSL/TLS
 mail-client/claws-mail          -ssl -gnutls -imap
+net-misc/wget                   -ssl                 # portage, libqalculate(forex)
 net-libs/libsoup                ssl                  # (gnutls, used by midori)
-net-misc/wget                   ssl                  # portage
-net-misc/curl                   ssl  -gnutls -nss    # (used by gnupg)
-net-libs/neon                   ssl  -gnutls         # (used by audacious)
+net-misc/curl                   ssl  gnutls -nss     # (used by gnupg)
+net-libs/neon                   ssl  gnutls          # (used by audacious-plugins)
 net-wireless/wpa_supplicant     -ssl  gnutls         # (used by networkmanager)
 net-misc/networkmanager               gnutls -nss
 gnome-base/gvfs                 -http

@@ -1,8 +1,7 @@
 umask 022
 
 if which env-update >&/dev/null; then
-	env-update
-	source /etc/profile
+	env-update && source /etc/profile
 
     # see /root/.cpan/CPAN/MyConfig.pm (currently unused)
     export PERL5LIB=/var/tmp/cpan/lib
@@ -10,12 +9,6 @@ if which env-update >&/dev/null; then
     sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
     echo ">sys-kernel/hardened-sources-`cat ${HOME}/config/kversion`" \
         > /etc/portage/package.mask/kernel
-
-    if id -u anon 1>/dev/null 2>&1; then
-        find /home/anon \( -type f -o -type d -o -type l \) \
-                        \( ! -user anon -o ! -group anon \) \
-                        -exec chown -h anon:anon {} \;
-    fi
 
     if [ -e /usr/bin/xcdroast ]; then
         find /usr/lib/xcdroast-*/bin/xcdrwrap ! -user root -exec chown root {} \;

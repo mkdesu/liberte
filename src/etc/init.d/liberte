@@ -2,16 +2,14 @@
 
 
 depend() {
+    # depend on dm-mod module
+    need modules
+
     # gentoo=nox -> /etc/.noxdm
 	need xdm-setup
 
     # SMART detection needs active disks
     after smartd
-
-    # NOTE: should be "need lvm", but since we are in baselayout-1,
-    # just list dm-mod in modules.autoload, and keep this as a reminder
-    after lvm
-    need modules
 
     # use entropy for encrypted storage, if available
     after urandom rngd
@@ -57,7 +55,7 @@ eprompt() {
 
 # Shared variables
 luser=anon
-lgroup=anon
+lgroup=legion
 lmount=/home/${luser}/persist
 otfefile=/mnt/cdrom${OTFEFILE}
 
