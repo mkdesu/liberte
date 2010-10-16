@@ -1,3 +1,6 @@
+# System
+=sys-devel/gcc-4.4.4*
+
 # Firmware
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
@@ -17,6 +20,4 @@ media-fonts/khmer
 
 # Applications
 app-editors/gedit-plugins
-
-
 # www-plugins/swfdec-mozilla

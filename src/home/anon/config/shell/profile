@@ -61,6 +61,7 @@ if [ -z "${NO_STARTX}" ]; then
     fi
 
     while [ -z "${stopx}" -a -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; do
+        # assume [ -z "${XDG_SESSION_COOKIE}" ]
         ck-launch-session startx 1>${TMPDIR}/xorg.log 2>&1
         if post-logout; then
             stopx=1
