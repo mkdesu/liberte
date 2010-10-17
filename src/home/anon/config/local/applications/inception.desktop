@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Inception
+GenericName=Virtual Machine
+Comment=Run non-Torified embedded Liberté
+Exec=inception
+Terminal=false
+Type=Application
+Categories=Network;System
+Icon=preferences-desktop-keyboard-shortcuts

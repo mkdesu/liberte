@@ -6,7 +6,6 @@ if type -p env-update 1>/dev/null; then
     # see /root/.cpan/CPAN/MyConfig.pm (currently unused)
     export PERL5LIB=/var/tmp/cpan/lib
 
-    sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
     echo ">sys-kernel/hardened-sources-`cat ${HOME}/config/kversion`" \
         > /etc/portage/package.mask/kernel
 

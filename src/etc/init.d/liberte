@@ -45,10 +45,10 @@ splash_get_mode() {
 eprompt() {
     local stars=`echo "$@" | sed 's/./-/g'`
     echo
-    echo " * ${stars}"
-    echo " * $@"
-    echo " * Keyboard map: `awk -F= '/^KEYMAP=/ { print $2 }' /etc/conf.d/keymaps`"
-    echo " * ${stars}"
+    einfo "${stars}"
+    einfo "$@"
+    einfo "Keyboard map: `awk -F= '/^KEYMAP=/ { print toupper($2) }' /etc/conf.d/keymaps | tr -d '\042'`"
+    einfo "${stars}"
     echo
 }
 
@@ -183,7 +183,8 @@ EOF
                 done
 
                 if [ ${inittries} -ne 0 ]; then
-                    echo -e '\n * LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
+                    echo
+                    einfo 'LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
 
                     ebegin Backing up crypto header: ${otfefile}-hdr.bak
                     rm -f ${otfefile}-hdr.bak
@@ -192,6 +193,7 @@ EOF
 
                     eprompt Please re-enter the password for ${otfefile}
                     cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+                    echo
 
                     # LC_ALL enables UTF-8 label support
                     ebegin Formatting encrypted storage as NTFS: ${otfefile}
@@ -212,6 +214,7 @@ EOF
             if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
                 eerror Failed to attach encrypted storage: ${otfefile}
             fi
+            echo
         fi
         splash svc_input_end ${SVCNAME}
 

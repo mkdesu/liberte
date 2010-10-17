@@ -232,6 +232,10 @@ sinfo "Refreshing trusted CA certificates list"
 update-ca-certificates --fresh
 
 
+sinfo "Generating /etc/issue"
+sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
+
+
 sinfo "Patching init scripts"
 initpatches="genkernel checkroot rc inittab iptables hdparm"
 for p in ${initpatches}; do
