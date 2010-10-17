@@ -60,6 +60,8 @@ app-admin/sudo
 sys-apps/paxctl
 sys-fs/cryptsetup
 app-crypt/gnupg
+app-crypt/mcrypt
+app-crypt/steghide
 sys-apps/rng-tools
 app-emulation/qemu-kvm
 
