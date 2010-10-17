@@ -112,7 +112,18 @@ EOF
     fi
 
 
-    # TODO: hdparm -y ?
+    # Put ATA/SCSI drives into standby
+    # device listing is similar to non-devfs /etc/init.d/hdparm section
+    hdevs=`find /dev/disk/by-path -xtype b -exec readlink -e {} \;`
+    for dev in ${hdevs}; do
+        # ignore boot media (desirable if it is a disk)
+        if [ "${cddev#${dev}}" = "${cddev}" ]; then
+            if hdparm -y ${dev} 1>/dev/null 2>&1; then
+                ebegin Enabled standby mode: ${dev}
+                eend 0
+            fi
+        fi
+    done
 
 
     # Enable power management for wireless

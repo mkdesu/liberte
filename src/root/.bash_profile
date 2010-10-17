@@ -1,6 +1,6 @@
 umask 022
 
-if which env-update >&/dev/null; then
+if type -p env-update 1>/dev/null; then
 	env-update && source /etc/profile
 
     # see /root/.cpan/CPAN/MyConfig.pm (currently unused)
