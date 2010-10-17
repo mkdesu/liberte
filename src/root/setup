@@ -153,10 +153,16 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 else
     sinfo "Skipping full rebuild (use \"fresh\")"
     sinfo "Listing updates"
-    emerge -qupvDN --with-bdeps y world
 
-    echo -n "Press Enter to continue..."
-    read
+    updlist=`mktemp`
+    emerge -qupvDN --with-bdeps y --color y world | tee ${updlist}
+
+    if [ -s ${updlist} ]; then
+        echo -n "Press Enter to continue..."
+        read
+    fi
+
+    rm ${updlist}
 fi
 
 
@@ -227,7 +233,7 @@ update-ca-certificates --fresh
 
 
 sinfo "Patching init scripts"
-initpatches="genkernel checkroot rc inittab iptables hdparm tor"
+initpatches="genkernel checkroot rc inittab iptables hdparm"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done

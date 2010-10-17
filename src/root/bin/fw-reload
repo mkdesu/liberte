@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/bin/sh -e
+
+luser=anon
 
 # Default policies
 iptables -P INPUT   DROP
@@ -24,7 +26,9 @@ iptables -A LOGREJECT -j REJECT --reject-with icmp-admin-prohibited
 # Allow existing/related connections packets through (TCP + UDP-in + ICMP-in errors)
 iptables -A INPUT  -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+
 iptables -A INPUT  -p udp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+
 iptables -A INPUT  -p icmp --icmp-type destination-unreachable -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT  -p icmp --icmp-type time-exceeded           -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT  -p icmp --icmp-type source-quench           -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -39,13 +43,13 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 
 # Protect Tor hidden service and Privoxy ports from unintended access
 # (owner match doesn't work with the INPUT chain)
-iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor  -d 127.0.0.1 --dport 80   -j LOGREJECT
-iptables -A OUTPUT -p tcp -m owner ! --uid-owner anon -d 127.0.0.1 --dport 8118 -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor      -d 127.0.0.1 --dport   80 -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner ! --uid-owner ${luser} -d 127.0.0.1 --dport 8118 -j LOGREJECT
 
 # Tor access via SOCKS to selected users only
-iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner anon    --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
-iptables -A OUTPUT -p tcp -d 127.0.0.1 --dport 9050 -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
 # Pass other loopback packets through
 iptables -A INPUT  -i lo -j ACCEPT

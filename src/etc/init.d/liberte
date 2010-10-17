@@ -113,17 +113,19 @@ EOF
 
 
     # Put ATA/SCSI drives into standby
-    # device listing is similar to non-devfs /etc/init.d/hdparm section
-    hdevs=`find /dev/disk/by-path -xtype b -exec readlink -e {} \;`
-    for dev in ${hdevs}; do
-        # ignore boot media (desirable if it is a disk)
-        if [ "${cddev#${dev}}" = "${cddev}" ]; then
-            if hdparm -y ${dev} 1>/dev/null 2>&1; then
-                ebegin Enabled standby mode: ${dev}
-                eend 0
+    # /dev/disk/by-path should contain only physical devices
+    if [ -e /dev/disk/by-path ]; then
+        hdevs=`find /dev/disk/by-path -xtype b -exec readlink -e {} \;`
+        for dev in ${hdevs}; do
+            # ignore boot media (desirable if it is a disk)
+            if [ "${cddev#${dev}}" = "${cddev}" ]; then
+                if hdparm -y ${dev} 1>/dev/null 2>&1; then
+                    ebegin Enabled standby mode: ${dev}
+                    eend 0
+                fi
             fi
-        fi
-    done
+        done
+    fi
 
 
     # Enable power management for wireless
@@ -238,45 +240,17 @@ EOF
         fi
 
         ebegin Restoring persistent configuration: ${lmount}/settings
-        sudo -n -u ${luser} /bin/bsdtar -xpSf ${lmount}/settings/config.tar.xz -C /home/${luser}
+        sudo -n -u ${luser} /home/${luser}/bin/persistence restore ${lmount}/settings
         eend $?
     fi
 }
 
 stop() {
     # Save configuration (an incremental snapshot)
-    ebegin Saving configuration to ${lmount}/settings
-
-    # snapshot list in ${savelist}, archive in ${lmount}/settings/config.tar.xz.new
-    # rsync notice: symlinks, mode+acl+xattr
-    #       ignore: owner, mtime, devices+specials
-    #       assume: UTF-8 filenames (enabled by LC_ALL)
-    savelist=`mktemp` \
-        && LC_ALL=en_GB.UTF-8 rsync -rlpHAX -c -x -n --out-format='%i %n' \
-               --exclude-from=/home/${luser}/config/persist.excludes \
-               /home/${luser}/config /mnt/livecd/home/${luser}       \
-           | sed '/^[^>ch.]/d; s/^[^ ]* //' > ${savelist}            \
-        && bsdtar -cJf ${lmount}/settings/config.tar.xz.new          \
-                  -C /home/${luser} -n -T ${savelist}                \
-        && rm ${savelist}
-
-    # proceed only if the archive was successfully written to ${lmount}
-    if [ $? = 0 ]; then
-        # currently, does nothing
-        chown ${luser}:${lgroup} ${lmount}/settings/config.tar.xz.new
-        chmod 600                ${lmount}/settings/config.tar.xz.new
-
-        # store a backup of previous archive, if it exists,
-        # but don't overwrite the backup if unnecessary
-        if [ -e ${lmount}/settings/config.tar.xz ] && \
-                ! cmp -s ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz; then
-            mv ${lmount}/settings/config.tar.xz ${lmount}/settings/config.tar.xz.bak
-        fi
-        mv ${lmount}/settings/config.tar.xz.new ${lmount}/settings/config.tar.xz
-
+    if [ -e /mnt/livecd/home/${luser} ]; then
+        ebegin Saving configuration: ${lmount}/settings
+        sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/livecd
         eend $?
-    else
-        eend 1
     fi
 
 
