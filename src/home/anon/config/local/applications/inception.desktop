@@ -6,4 +6,4 @@ Exec=inception
 Terminal=false
 Type=Application
 Categories=Network;System
-Icon=preferences-desktop-keyboard-shortcuts
+Icon=network-error

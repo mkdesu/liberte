@@ -62,6 +62,7 @@ sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
 app-crypt/steghide
+app-crypt/ccid
 sys-apps/rng-tools
 app-emulation/qemu-kvm
 

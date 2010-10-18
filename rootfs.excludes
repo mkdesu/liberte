@@ -100,6 +100,9 @@
 /var/run/*.pid
 
 # Miscellaneous
+# (lastlog is not sparse on unionfs, wtmp has no growth limit)
+/var/log/lastlog
+/var/log/wtmp
 .keep*
 .empty_on_purpose
 /root/**

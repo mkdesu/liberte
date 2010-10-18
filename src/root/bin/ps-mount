@@ -127,10 +127,11 @@ if [ "$1" = fork ]; then
 
             # Changes weren't reflected in /mnt/media
             if [ ${count} != 100 ]; then
-                logger -p 4 -t auto.media "autofs reloading failed, restarting service"
-                flock -u ${lockfd}
+                logger -p 4 -t auto.media "autofs reloading failed, not restarting service"
                 # Deadlock if the lock is still held at this point
-                ${daemon} restart
+                # Race condition + infinite loop if lock is not held, when ACTION=change
+                # flock -u ${lockfd}
+                # ${daemon} restart
             fi
         fi
     }
