@@ -8,14 +8,15 @@ depend() {
     # gentoo=nox -> /etc/.noxdm
 	need xdm-setup
 
-    # SMART detection needs active disks
-    after smartd
+    # start after power management is enabled
+    after laptop_mode
 
     # use entropy for encrypted storage, if available
-    after urandom rngd
+    use urandom rngd
 
     # password entry is on console
-    after clock numlock gpm consolefont fbcondecor
+    after  clock numlock gpm consolefont
+    use    fbcondecor
     before xdm
 
     # Tor config (if any) must be extracted before running Tor
@@ -117,6 +118,11 @@ EOF
     if [ -e /dev/disk/by-path ]; then
         hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b -exec readlink -e {} \;`
         for dev in ${hdevs}; do
+            if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
+                ebegin Enabled acoustic settings: ${dev}
+                eend 0
+            fi
+
             # ignore boot media (desirable if it is a disk)
             if [ "${cddev#${dev}}" = "${cddev}" ]; then
                 if hdparm -y ${dev} 1>/dev/null 2>&1; then
@@ -126,16 +132,6 @@ EOF
             fi
         done
     fi
-
-
-    # Enable power management for wireless
-    # awk -F: '/eth.:|tr.:|ath.:|wlan.:/{print $1}' /proc/net/dev
-    wdevs=`iwconfig 2>/dev/null | grep -oE '^[^ ]+'`
-    for dev in ${wdevs}; do
-        ebegin Enabling wireless power management: ${dev}
-        iwconfig ${dev} power on
-        eend $?
-    done
 
 
     # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)

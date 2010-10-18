@@ -1,0 +1,10 @@
+--- /etc/init.d/smartd	2010-10-16 12:18:26.000000000 +0000
++++ /etc/init.d/smartd.new	2010-10-18 18:18:36.000000000 +0000
+@@ -6,6 +6,7 @@
+ depend() {
+     need localmount
+     after bootmisc
++    before laptop_mode
+ }
+ 
+ opts="${opts} reload"

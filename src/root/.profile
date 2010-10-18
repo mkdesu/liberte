@@ -6,7 +6,7 @@ export LANG=en_GB.UTF-8
 export TZ=Zulu
 
 if [ "${TERM}" = linux ]; then
-    setterm -blength 0 -blank 5 -powerdown 5
+    setterm -blength 0
     echo -ne "\033[?17;0;64c"
 
     TMOUT=120

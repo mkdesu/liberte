@@ -237,7 +237,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="genkernel checkroot rc inittab iptables hdparm"
+initpatches="genkernel checkroot rc inittab iptables smartd"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
@@ -245,8 +245,8 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 
 sinfo "Configuring start-up services"
-bootsvc="microcode_ctl metalog iptables consolekit hdparm"
-defaultsvc="liberte acpid rngd alsasound aumix gpm smartd bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
+bootsvc="microcode_ctl metalog iptables consolekit alsasound"
+defaultsvc="liberte acpid rngd laptop_mode aumix gpm smartd bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do

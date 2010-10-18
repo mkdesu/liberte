@@ -21,6 +21,7 @@ media-gfx/splashutils
 # (no fw for AR9170_USB in portage)
 sys-apps/microcode-ctl
 x11-drivers/radeon-ucode
+media-sound/alsa-firmware
 net-wireless/b43-firmware
 net-wireless/ipw2100-firmware
 net-wireless/ipw2200-firmware
@@ -83,6 +84,8 @@ net-misc/youtube-dl
 sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
+sys-power/powertop
+app-laptop/laptop-mode-tools
 # app-emulation/virt-what [hardened gcc 4.3.4]
 sys-apps/pciutils
 sys-fs/lsscsi

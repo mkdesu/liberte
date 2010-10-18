@@ -56,7 +56,7 @@ if [ -z "${NO_STARTX}" ]; then
     export NO_STARTX=1
 
     if [ "${TERM}" = linux ]; then
-        setterm -blength 0 -blank 5 -powerdown 5
+        setterm -blength 0
         # /usr/src/linux/Documentation/VGA-softcursor.txt
         echo -ne "\033[?17;0;64c"
     fi
