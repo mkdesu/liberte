@@ -175,7 +175,7 @@ EOF
                 splash svc_input_begin ${SVCNAME}
 
                 inittries=10
-                while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -h ${OTFEHASH} luksFormat ${loop}; do
+                while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -s ${OTFEKEYSIZE} -h ${OTFEHASH} luksFormat ${loop}; do
                     let inittries=inittries-1
                 done
 

@@ -18,6 +18,7 @@ export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
 export GNUPGHOME=${XDG_CONFIG_HOME}/gnupg
 export GST_REGISTRY=${XDG_CACHE_HOME}/gstreamer/registry.xml
 export INPUTRC=${XDG_CONFIG_HOME}/shell/inputrc
+export MCRYPTRC=${XDG_CONFIG_HOME}/misc/mcryptrc
 
 # X11 configuration dirs
 export XENVIRONMENT=${XDG_CONFIG_HOME}/x11/Xdefaults
@@ -38,7 +39,6 @@ export QT_IM_MODULE=scim-bridge
 export BROWSER=midori
 export LESS="-R -M --shift 16 -Swi -x4"
 export LESSHISTFILE=-
-export MCRYPT_ALGO=rijndael-256
 export GZIP=-9
 
 # Proxy settings

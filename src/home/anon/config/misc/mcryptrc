@@ -1,0 +1,5 @@
+openpgp
+openpgp-z 9
+algorithm rijndael-128
+hash sha1
+echo
