@@ -290,8 +290,8 @@ sudo -n -u anon gpg -q --homedir /home/anon/config/gnupg \
 
 
 sinfo "Installing wrappers"
-mv -n /sbin/dhcpcd{,.orig}
-ln -sf dhcpcd.wrapper /sbin/dhcpcd
+mv -n /sbin/dhcpcd{,.orig}   && ln -sf dhcpcd.wrapper   /sbin/dhcpcd
+mv -n /sbin/iwconfig{,.orig} && ln -sf iwconfig.wrapper /sbin/iwconfig
 
 
 sinfo "Compiling kernel"

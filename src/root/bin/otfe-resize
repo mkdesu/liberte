@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -pe
 
 # This script should be safe to run via sudo
 # (with env_reset and secure_path set)
