@@ -72,6 +72,6 @@ sinfo "Logs:"
 ${FIND} -name '*.log*' -o -type f \( -path '/var/run/*' -o -path '/var/log/*' \)
 
 sinfo "SUID/SGID:"
-${FIND} -type f -perm /u+s -printf '%M %u %g\t%p\n'
-${FIND} -type f -perm /g+s -printf '%M %u %g\t%p\n'
-${FIND} -type d -perm /a+s -printf '%M %u %g\t%p\n'
+${FIND} -type f -perm /u+s      -printf '%M %u %g\t%p\n'
+${FIND} -type f -perm /g+s,o+w  -printf '%M %u %g\t%p\n'
+${FIND} -type d -perm /a+st,o+w -printf '%M %u %g\t%p\n'

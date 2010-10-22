@@ -1,0 +1,38 @@
+# Distinguished name is directly supplied to ssl-req
+
+[ req ]
+distinguished_name  = req_empty
+
+[ req_empty ]
+
+
+# X.509 extensions
+# http://www.openssl.org/docs/apps/x509v3_config.html
+
+[ root ]
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+
+authorityInfoAccess = caIssuers;URI:http://dee.su/liberte
+
+basicConstraints    = critical, CA:true, pathlen:0
+keyUsage            = critical, keyCertSign, cRLSign
+
+
+[ verify ]
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+
+keyUsage            = critical, digitalSignature
+extendedKeyUsage    = critical, emailProtection
+
+
+[ encrypt ]
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+
+keyUsage         = critical, keyEncipherment
+extendedKeyUsage = critical, emailProtection

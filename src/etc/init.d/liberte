@@ -58,8 +58,8 @@ eprompt() {
 luser=anon
 lgroup=legion
 lmount=/home/${luser}/persist
+ltordir=/home/${luser}/config/tor/hidden_service
 otfefile=/mnt/cdrom${OTFEFILE}
-
 
 start() {
     # see the /root/bin/ps-mount script
@@ -90,9 +90,11 @@ start() {
 
 
     # Arm the poweroff watchdog
-    ebegin Arming power-off on removal: ${cddev}
-    /root/bin/poweroff-watchdog ${cddev} &
-    eend $?
+    if ! pgrep -u root -x udev-watchdog 1>/dev/null; then
+        ebegin Arming power-off on removal: ${cddev}
+        /root/bin/poweroff-watchdog ${cddev} &
+        eend $?
+    fi
 
 
     # Configure X server, unless "nox" is given to kernel (rely on xdm-setup)
@@ -148,6 +150,7 @@ EOF
     # Proceed with OTFE attachment only if remount-rw succeeded
     # (a read-only persist directory is more problematic than tmpfs)
     if [ ${remount} = 0 ]; then
+
         # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
         # device later, and for otfe-resize script to be able to mount it
         if ! grep -q "^/dev/mapper/${OTFEVOLUME} " /etc/fstab; then
@@ -181,7 +184,16 @@ EOF
 
                 if [ ${inittries} -ne 0 ]; then
                     echo
-                    einfo 'LUKS initialized, run "sudo otfe-resize" to resize encrypted storage'
+                    einfo 'OTFE initialized, run "sudo otfe-resize" to resize encrypted storage'
+
+
+                    # Here is a good place to notify the user about certificates generation
+                    echo
+                    einfo 'NOTE: After mounting the OTFE partition, communication certificates'
+                    einfo '      will be generated. It is a one-time operation that may take'
+                    einfo '      some time, typically ~40 mins on a modern computer'
+                    einfo '[key size is currently reduced, since this functionality is unused]'
+
 
                     eprompt Please re-enter the password for ${otfefile}
                     cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
@@ -222,35 +234,67 @@ EOF
             echo
         fi
 
+
         # Mount OTFE filesystem
         if [ -e /dev/mapper/${OTFEVOLUME} ]; then
+
             ebegin Mounting encrypted storage: ${lmount}
             mount ${lmount}
             eend $?
+            lmountok=$?
+
 
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
-            ebegin Verifying persistence directories
-            rsync -aO /mnt/livecd${lmount}/ ${lmount}
-            eend $?
+            if [ ${lmountok} = 0 ]; then
+                ebegin Verifying persistence directories
+                rsync -aO /mnt/livecd${lmount}/ ${lmount}
+                eend $?
+            fi
+
+
+            # Extract configuration archive, if present
+            if [ -e ${lmount}/settings/config.tar.xz ]; then
+                ebegin Restoring persistent configuration: ${lmount}/settings
+                sudo -n -u ${luser} /home/${luser}/bin/persistence restore ${lmount}/settings
+                eend $?
+            fi
+
+
+            # Create (small) Tor hidden service key + hostname, if they don't exist
+            if [ ! -e ${ltordir} ]; then
+                ebegin Initializing Tor hidden service directory
+                sudo -n -u ${luser} /home/${luser}/bin/gen-anon-hostname
+                eend $?
+            fi
+
+
+            # Propagate Tor hidden service files
+            if [ -e /var/lib/tor/hidden_service ]; then
+                ebegin Verifying existing Tor hidden service hostname
+                cmp -s ${ltordir}/hostname /var/lib/tor/hidden_service/hostname
+                eend $?
+            else
+                ebegin Propagating Tor hidden service directory
+                rsync -aHS --no-o --no-g --no-p --chmod=go= ${ltordir} /var/lib/tor \
+                    && chown -hR tor:tor /var/lib/tor/hidden_service
+                eend $?
+            fi
+
+
+            # Create (big) private key + communication certificates + username
+            if [ ${lmountok} = 0  -a  ! -e /home/${luser}/config/ssl/certs ]; then
+                ebegin Generating communication certificates
+                sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
+                eend $?
+            fi
+
         fi
+
     else
         ewarn Skipping OTFE persistence setup
     fi
-
-
-    # Extract configuration archive, if present
-    # This comes last, so that failure invalidates service start
-    if [ -e ${lmount}/settings/config.tar.xz ]; then
-        # Sanity check (Wicd shouldn't start before local)
-        if [ -d /home/${luser}/config/tor/hidden_service ]; then
-            ewarn Existing Tor configuration in ${lmount}
-        fi
-
-        ebegin Restoring persistent configuration: ${lmount}/settings
-        sudo -n -u ${luser} /home/${luser}/bin/persistence restore ${lmount}/settings
-        eend $?
-    fi
 }
+
 
 stop() {
     # Save configuration (an incremental snapshot)

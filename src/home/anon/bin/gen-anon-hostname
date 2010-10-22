@@ -1,0 +1,37 @@
+#!/bin/sh -e
+
+umask 077
+
+
+# This command is run via "sudo -u anon"
+# Available environment: HOME, USER
+
+# https://gitweb.torproject.org/tor.git/blob/HEAD:/doc/spec/tor-spec.txt
+# https://trac.torproject.org/projects/tor/wiki/TheOnionRouter/HiddenServiceNames
+
+tordir=${HOME}/config/tor/hidden_service
+base32=${HOME}/bin/hex2base32
+
+
+# Intentionally fail if dir already exists
+mkdir ${tordir}
+
+
+# Key generation can be lengthy, set some traps
+trap 'rm -f ${HOME}/.rnd' EXIT
+trap 'rm -r ${tordir}'    ERR INT QUIT TERM SEGV
+
+
+# Generate RSA-1024 with exponent 65537, as per spec
+# Use genrsa instead of genpkey, for result similarity
+openssl genrsa -f4 -out ${tordir}/private_key 1024 2>/dev/null
+
+
+# Tor hashes ASN.1 RSAPublicKey instead of SubjectPublicKeyInfo,
+# which contains RSAPublicKey at offset 22; it then converts the
+# first half of SHA-1 hash to Base32
+hex=`openssl pkey -in ${tordir}/private_key -pubout -outform der 2>/dev/null \
+         | tail -c +23 | sha1sum | head -c 20`
+b32=`${base32} ${hex}`
+
+echo ${b32}.onion > ${tordir}/hostname
