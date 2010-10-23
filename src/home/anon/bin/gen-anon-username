@@ -6,10 +6,10 @@ umask 077
 # This command can be run via "sudo -u anon"
 # Available environment: HOME, USER
 
-ssldir=${HOME}/config/ssl
+ssldir=${HOME}/persist/security/ssl
 base32=${HOME}/bin/hex2base32
 
-sslconf=${ssldir}/extensions.cnf
+sslconf=${HOME}/config/ssl/extensions.cnf
 certdir=${ssldir}/certs
 keysdir=${ssldir}/private
 
@@ -66,11 +66,11 @@ openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdir}/encrypt.pem \
 # Sanity checks
 checks=`
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose crlsign      \
-              -CAfile ${certdir}/ca.pem ${certdir}/ca.pem
+              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/ca.pem
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose smimesign    \
-              -CAfile ${certdir}/ca.pem ${certdir}/verify.pem
+              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/verify.pem
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose smimeencrypt \
-              -CAfile ${certdir}/ca.pem ${certdir}/encrypt.pem
+              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/encrypt.pem
 `
 
 test "${checks}" = "${certdir}/ca.pem: OK

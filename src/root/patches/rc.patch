@@ -39,7 +39,7 @@
  # started or stopped from the command line.
  
 -RC_VERBOSE="no"
-+RC_VERBOSE="yes"
++RC_VERBOSE="no"
  
  # RC_BOOTLOG will generate a log of the boot messages shown on the console.  
  # Useful for headless machines or debugging.  You need to emerge the 

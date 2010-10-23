@@ -58,14 +58,14 @@ eprompt() {
 luser=anon
 lgroup=legion
 lmount=/home/${luser}/persist
-ltordir=/home/${luser}/config/tor/hidden_service
+ltordir=${lmount}/security/tor/hidden_service
 otfefile=/mnt/cdrom${OTFEFILE}
 
 start() {
     # see the /root/bin/ps-mount script
     # these flags are mirrored in /root/bin/otfe-resize
-    # NOTE: dirs are group-accessible, files are group-readable
-    ntfsflags=noatime,noexec,nosuid,nodev,fmask=0137,dmask=067,uid=${luser},gid=${lgroup}
+    # (permissions: rwX------)
+    ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
     cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
@@ -190,8 +190,7 @@ EOF
                     # Here is a good place to notify the user about certificates generation
                     echo
                     einfo 'NOTE: After mounting the OTFE partition, communication certificates'
-                    einfo '      will be generated. It is a one-time operation that may take'
-                    einfo '      some time, typically ~40 mins on a modern computer'
+                    einfo 'will be generated. It is a one-time operation that may take some time.'
                     einfo '[key size is currently reduced, since this functionality is unused]'
 
 
@@ -246,8 +245,8 @@ EOF
 
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
             if [ ${lmountok} = 0 ]; then
-                ebegin Verifying persistence directories
-                rsync -aO /mnt/livecd${lmount}/ ${lmount}
+                ebegin Recreating persistence directories
+                cp -an /mnt/livecd${lmount} `dirname ${lmount}`
                 eend $?
             fi
 
@@ -282,7 +281,7 @@ EOF
 
 
             # Create (big) private key + communication certificates + username
-            if [ ${lmountok} = 0  -a  ! -e /home/${luser}/config/ssl/certs ]; then
+            if [ ${lmountok} = 0  -a  ! -e ${lmount}/security/ssl/certs ]; then
                 ebegin Generating communication certificates
                 sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
                 eend $?

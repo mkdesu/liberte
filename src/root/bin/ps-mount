@@ -19,7 +19,7 @@ if [ "$1" = fork ]; then
     daemonpid=/var/run/autofs.pid
     started=/var/lib/init.d/started/autofs
 
-    # Mount options
+    # Mount options (permissions: rw-r----- / rwx--x---)
     supported=" ext2 vfat msdos ntfs iso9660 "
     luser=anon
     lgroup=legion

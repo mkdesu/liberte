@@ -23,12 +23,6 @@
 /config/claws-mail/claws-mail-[0-9]*
 /config/claws-mail/tagsdb/
 
-# Backups
-/config/gnupg/random_seed
-/config/gnupg/*~
-/config/gnupg/*.bak
-/config/gnupg/*.lock
-
 # Logs
 /config/mc/history
 /config/audacious/log

@@ -9,7 +9,7 @@ umask 077
 # https://gitweb.torproject.org/tor.git/blob/HEAD:/doc/spec/tor-spec.txt
 # https://trac.torproject.org/projects/tor/wiki/TheOnionRouter/HiddenServiceNames
 
-tordir=${HOME}/config/tor/hidden_service
+tordir=${HOME}/persist/security/tor/hidden_service
 base32=${HOME}/bin/hex2base32
 
 

@@ -283,9 +283,9 @@ useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 
 
 sinfo "Initializing a secondary PGP keyring"
-sudo -n -u anon touch     /home/anon/config/gnupg/liberte.gpg
-sudo -n -u anon chmod 600 /home/anon/config/gnupg/liberte.gpg
-sudo -n -u anon gpg -q --homedir /home/anon/config/gnupg \
+sudo -n -u anon touch     /home/anon/persist/security/pgp/liberte.gpg
+sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/liberte.gpg
+sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp \
     --primary-keyring liberte.gpg --import /var/tmp/addons/keys/liberte-*.asc
 
 

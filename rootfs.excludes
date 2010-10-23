@@ -107,7 +107,7 @@
 .empty_on_purpose
 /root/**
 /boot/memtest86plus/memtest.*
-/home/anon/config/gnupg/*~
+/home/anon/persist/security/pgp/*~
 /etc/*-
 /etc/issue.logo
 /etc/skel/

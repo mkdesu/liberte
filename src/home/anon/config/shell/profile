@@ -1,6 +1,5 @@
-# Dirs:  rwx--x---
-# Files: rw-------
-umask 067
+# rwX------
+umask 077
 
 # Add ${HOME}/bin and *sbin dirs to PATH
 if [ -n "${PATH##*${HOME}/bin:*}" ]; then
@@ -15,7 +14,7 @@ export XDG_CACHE_HOME=${TMPDIR}/cache
 
 export ASPELL_CONF="per-conf ${XDG_CONFIG_HOME}/aspell/aspell.conf; home-dir ${XDG_CONFIG_HOME}/aspell"
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
-export GNUPGHOME=${XDG_CONFIG_HOME}/gnupg
+export GNUPGHOME=${HOME}/persist/security/pgp
 export GST_REGISTRY=${XDG_CACHE_HOME}/gstreamer/registry.xml
 export INPUTRC=${XDG_CONFIG_HOME}/shell/inputrc
 export MCRYPTRC=${XDG_CONFIG_HOME}/misc/mcryptrc
