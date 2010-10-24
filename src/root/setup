@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 hsversion=`cat ${HOME}/config/kversion`
-kversion=`echo ${hsversion} | sed s/-/-hardened-/`
+kversion=${hsversion/-/-hardened-}
 consolefont=ter-i16n.psf
 lzmamem=20MiB
 protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock /etc/._cfg????_eixrc"
@@ -14,7 +14,7 @@ sinfo() {
 spatch() {
     local pname=$1; shift
     local pcat=cat
-    if [ "`echo ${pname} | sed 's/.*\.//'`" = gz ]; then
+    if [ "${pname##*.}" = gz ]; then
         pcat=zcat
     fi
 
@@ -54,8 +54,6 @@ if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     gpg -q --homedir /etc/portage/gnupg --import /var/tmp/addons/keys/gentoo-*.asc
     eix-sync -qw -C -q
 fi
-eselect news read all
-eselect news purge
 
 
 if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
@@ -65,7 +63,12 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion}
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
-    cp ${HOME}/config/linux-${kversion}.config /usr/src/linux/.config
+    cp ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config
+
+
+    # Some news are delayed until first emerge
+    eselect news read all
+    eselect news purge
 
 
     sinfo "Downloading kernel patches"
@@ -157,6 +160,9 @@ else
     updlist=`mktemp`
     emerge -qupvDN --with-bdeps y --color y world | tee ${updlist}
 
+    eselect news read all
+    eselect news purge
+
     if [ -s ${updlist} ]; then
         echo -n "Press Enter to continue..."
         read
@@ -225,6 +231,10 @@ done
 sinfo "Updating PCI and USB lists"
 update-pciids -q
 update-usbids -q
+if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
+    sinfo "Do PCI/USB IDs lists use compressed format exclusively?"
+    exit 1
+fi
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
@@ -336,7 +346,7 @@ lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion}.config /usr/src/linux/.config || true
+diff ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config || true
 
 
 sinfo "Cleaning modules directory"
