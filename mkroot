@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 sinfo() {
-    echo -e "\033[1;33;41m$@\033[0m"
+    echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
 
 
@@ -52,7 +52,7 @@ fi
 # Extract stage3 + portage snapshot to fresh directory
 if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     # Download stage3 + portage snapshot
-    mkdir -p ${LIVECD}/mirror/{stage3,portage,keys}
+    mkdir -p ${LIVECD}/mirror/stage3 ${LIVECD}/mirror/portage ${LIVECD}/mirror/keys
     mkdir -p -m 700 ${LIVECD}/mirror/gnupg
 
     # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
@@ -63,24 +63,25 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
     # If a new stage3 is available, remove old mirrors
     if [ ! -e ${LIVECD}/mirror/stage3/${stage3file} ]; then
-        rm -f ${LIVECD}/mirror/stage3/stage3-i686-*.tar.bz2{,.CONTENTS{,.actual},.DIGESTS.asc}
+        rm -f ${LIVECD}/mirror/stage3/stage3-i686-*.tar.bz2*
     fi
 
 
     sinfo "Downloading ${stage3file}"
-    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}{.DIGESTS.asc,.CONTENTS,}
+    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
+        ${stage3base}/${stage3}.CONTENTS ${stage3base}/${stage3}
 
     sinfo "Downloading portage-latest.tar.bz2"
-    wget -N -nv -P ${LIVECD}/mirror/portage ${portage}{.gpgsig,}
+    wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
 
 
-    if which gpg 1>/dev/null 2>&1; then
+    if type gpg 1>/dev/null 2>&1; then
         # Don't rely on the HKP outbounding port being open
         sinfo "Fetching PGP public keys and verifying fingerprints"
         for key in ${gpg_keys}; do
             org=`echo ${key} | cut -d: -f1`
             fpr=`echo ${key} | cut -d: -f2`
-            keyid=`echo ${fpr} | sed 's/.*\(.\{8,8\}\)$/\1/'`
+            keyid=`echo -n ${fpr} | tail -c 8`
 
             if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
                 eval wget -nv -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
@@ -99,7 +100,8 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
             --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-            --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2{.gpgsig,}
+            --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2.gpgsig \
+                     ${LIVECD}/mirror/portage/portage-latest.tar.bz2
     else
         sinfo "GnuPG not found, skipping signatures verification"
     fi
@@ -113,7 +115,8 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     if tar --version | grep -q '(GNU tar)'; then
         sinfo "Verifying stage3 files list"
         LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
-        cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS{,.actual}
+        cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
+               ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
     else
         sinfo "GNU tar not found, skipping stage3 files list verification"
     fi

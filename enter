@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 sinfo() {
-    echo -e "\033[1;33;41m$@\033[0m"
+    echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
 
 
@@ -39,7 +39,9 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i --exclude={/root/,/home/anon/,/mnt/hidden/,/etc/{sudoers,.auto.lock},/etc/portage/gnupg/} -C ${SRC}/ ${LIVECD}
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i \
+        --exclude=/root/ --exclude=/home/anon/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
+        --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt

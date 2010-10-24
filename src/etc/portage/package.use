@@ -56,7 +56,6 @@ gnome-base/librsvg              tools                # (used by bin/gen-wallpape
 app-text/poppler                cairo
 app-arch/p7zip                  rar
 app-office/abiword              plugins
-app-editors/gedit               python               # gedit-plugins
 # app-portage/eix               sqlite
 
 # Internationalization

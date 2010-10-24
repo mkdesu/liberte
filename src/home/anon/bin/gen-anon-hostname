@@ -18,8 +18,8 @@ mkdir ${tordir}
 
 
 # Key generation can be lengthy, set some traps
-trap 'rm -f ${HOME}/.rnd' EXIT
-trap 'rm -r ${tordir}'    ERR INT QUIT TERM SEGV
+trap 'if [ $? != 0 ]; then rm -r ${tordir}; fi;  rm -f ${HOME}/.rnd' 0
+trap : INT QUIT TERM SEGV
 
 
 # Generate RSA-1024 with exponent 65537, as per spec

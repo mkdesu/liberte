@@ -25,8 +25,8 @@ mkdir ${certdir} ${keysdir}
 
 
 # Key generation can be lengthy, set some traps
-trap 'rm -f ${HOME}/.rnd'          EXIT
-trap 'rm -r ${certdir} ${keysdir}' ERR INT QUIT TERM SEGV
+trap 'if [ $? != 0 ]; then rm -r ${certdir} ${keysdir}; fi;  rm -f ${HOME}/.rnd' 0
+trap : INT QUIT TERM SEGV
 
 
 # Generate RSA key + X.509 self-signed root CA certificate

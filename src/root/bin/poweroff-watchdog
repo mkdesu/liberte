@@ -26,7 +26,7 @@ fi
 # Copy the executables to RAM
 # (the executables depend only on libc)
 ramdir=`mktemp -d --tmpdir=/dev/shm`
-cp --preserve=all /sbin/poweroff ${ramdir}
+cp -aH /sbin/poweroff ${ramdir}
 
 # Prevent possible access to locale files
 export LC_ALL=C

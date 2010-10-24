@@ -115,6 +115,7 @@
 /etc/sgml/
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
+/usr/sbin/libpng-*-update.sh
 /mnt/floppy/
 /mnt/cdrom/
 # (GeoIP is not used in Tor setup)

@@ -5,9 +5,6 @@
 			<stringvalue>changecase</stringvalue>
 		</li>
 		<li type="string">
-			<stringvalue>charmap</stringvalue>
-		</li>
-		<li type="string">
 			<stringvalue>docinfo</stringvalue>
 		</li>
 		<li type="string">
@@ -18,9 +15,6 @@
 		</li>
 		<li type="string">
 			<stringvalue>quickopen</stringvalue>
-		</li>
-		<li type="string">
-			<stringvalue>showtabbar</stringvalue>
 		</li>
 		<li type="string">
 			<stringvalue>sort</stringvalue>

@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 hsversion=`cat ${HOME}/config/kversion`
 kversion=`echo ${hsversion} | sed s/-/-hardened-/`

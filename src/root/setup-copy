@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -216,6 +216,7 @@ rm /etc/env.d/05gcc-i686-pc-linux-gnu
 rm -rf /etc/env.d/{binutils,gcc}
 
 rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,gcov}
+rm /sbin/fix_libtool_files.sh
 
 rm /usr/bin/{kernel,profile}-config
 rm /usr/share/eselect/modules/{binutils,kernel,news,profile}.eselect
@@ -228,6 +229,11 @@ sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /
 
 sinfo "Updating init scripts dependencies cache"
 depscan.sh
+
+
+sinfo "Setting dash as /bin/sh"
+ln -sf dash /bin/sh
+sed -i 's:^#!/bin/sh$:#!/bin/bash:' /lib/udev/move_tmp_persistent_rules.sh
 
 
 sinfo "Saving current packages list in /tmp/packages-list"

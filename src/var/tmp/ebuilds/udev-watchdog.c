@@ -46,7 +46,7 @@ static int print_device(struct udev_device *device, const char *f_action, const 
 {
 	struct timeval  tv;
 	struct timezone tz;
-    
+
     const  char *action  = udev_device_get_action(device);
     const  char *devpath = udev_device_get_devpath(device);
     size_t f_len, d_len;

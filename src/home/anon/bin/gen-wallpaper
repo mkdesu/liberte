@@ -1,17 +1,18 @@
-#!/bin/sh
+#!/bin/sh -e
 
 dir=${HOME}/config/images
 
-height=$(xwininfo -root | grep '^  Height:' | sed 's/^  Height: //')
+height=`xwininfo -root | sed -n 's/^  Height: //p'`
 wheight=${height}
 
 # Wait for the taskbar to come up
 while [ ${height} = ${wheight} ]; do
     sleep 1
     if xprop -root _NET_WORKAREA | grep -q =; then
-        wheight=$(xprop -root '=$3' _NET_WORKAREA | sed 's/.*=//')
+        wheight=`xprop -root '=$3' _NET_WORKAREA | cut -d= -f2`
     fi
 done
 
-size=$(qalc -t "$(xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)\n' _NET_WORKAREA | sed 's/.*=//')")
+calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
+size=`qalc -t "${calc}"`
 rsvg-convert -h ${size} -o ${dir}/liberte-logo-wallpaper.png ${dir}/liberte-logo-nofont.svg

@@ -19,7 +19,7 @@ You need the following installed.
     udev + sysfs  (Gentoo: sys-fs/udev)
 
 Run setup.sh as:
- 
+
     setup.sh /dev/XXX [nombr]
 
 If the optional <nombr> parameter is specified, and /dev/XXX
@@ -44,14 +44,14 @@ fi
 
 
 # Check for pre-4.x Syslinux (without the -v switch)
-if ! syslinux -v >& /dev/null; then
+if ! syslinux -v 1>/dev/null 2>&1; then
     echo "Unsupported Syslinux version detected"
     exit 1
 fi
 
 
 # Check for wrong Syslinux version (exact match required)
-havesysver=`syslinux -v |& cut -d' ' -f2`
+havesysver=`syslinux -v 2>&1 | cut -d' ' -f2`
 if [ "${havesysver}" != ${sysver} ]; then
     echo "Syslinux v${havesysver} detected, need v${sysver}"
     exit 1

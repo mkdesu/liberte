@@ -1,2 +1,3 @@
+# -q never: don't fail if no SMART-capable devices
 # -i [s]: check interval (low, but have -n standby in smartd.conf)
-SMARTD_OPTS="-i 300"
+SMARTD_OPTS="-q never -i 300"

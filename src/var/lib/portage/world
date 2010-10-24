@@ -55,7 +55,8 @@ sys-fs/ntfsprogs
 sys-fs/dosfstools
 net-fs/autofs
 
-# Security utilities
+# System / security utilities
+app-shells/dash
 app-admin/metalog
 app-admin/sudo
 sys-apps/paxctl
@@ -113,7 +114,7 @@ media-sound/aumix
 media-sound/audacious
 media-video/gnome-mplayer
 media-gfx/gpicview
-app-editors/gedit-plugins
+app-editors/gedit
 app-text/epdfview
 app-office/abiword
 app-office/gnumeric

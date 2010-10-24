@@ -83,8 +83,8 @@ start() {
     eend $?
 
 
-    # Limit console logging
-    ebegin Reducing console logging level
+    # Limit dmesg console logging
+    ebegin Reducing kernel console logging level
     dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
     eend $?
 
