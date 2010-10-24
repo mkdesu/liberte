@@ -40,7 +40,7 @@ pcmanfm -d --desktop &
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &
 scim -d &
-wicd-client &
+nm-applet &
 
 # Wait for WM exit
 wait ${WM_PID}

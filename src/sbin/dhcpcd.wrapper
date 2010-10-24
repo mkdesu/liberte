@@ -6,21 +6,13 @@
 # not easily customizable (no interface argument), and arguably MAC
 # address randomization is useful only for DHCP.
 
-# Another reason is that wicd doesn't properly support
-# (use_)dhcphostname in wired/wireless-settings.conf
+# NetworkManager calls
+# dhcpcd -B -K -L -c /usr/libexec/nm-dhcp-client.action eth0
+echo "$@" >> /tmp/dhcpcd-cmd
+exec /sbin/dhcpcd.orig "$@"
 
-# Wicd always calls "dhcpcd -k xxx", then "dhcpcd xxx (-h hostname)".
-if [ $# = 2 -a "$1" = "-k" ]; then
-    /sbin/dhcpcd.orig "$@"
-    ifconfig "$2" down
-
-    # Randomize MAC address only if it's a wireless interface
-    # (needs the deprecated WIRELESS_EXT_SYSFS in kernel)
-    if [ -e "/sys/class/net/$2/wireless" ]; then
-        macchanger -a "$2"
-    fi
-elif [ $# = 3 -a "$2" = "-h" ]; then
-    exec /sbin/dhcpcd.orig "$1"
-else
-    exec /sbin/dhcpcd.orig "$@"
-fi
+# Randomize MAC address only if it's a wireless interface
+# (needs the deprecated WIRELESS_EXT_SYSFS in kernel)
+# if [ -e "/sys/class/net/$2/wireless" ]; then
+#     macchanger -a "$2"
+# fi

@@ -35,30 +35,6 @@
 /usr/include/
 /usr/src/
 /usr/lib/**/include/
-/usr/lib/python*/config/
-/usr/lib/python*/distutils/
-/usr/lib/python*/pydoc*
-/usr/lib/python*/doctest.*
-/usr/lib/python*/unittest.*
-/usr/lib/python*/lib2to3/
-/usr/lib/python*/test/
-/usr/lib/python*/**/test/
-/usr/lib/python*/**/tests/
-/usr/lib/python*/**/src/
-/usr/lib/python*/**/docs/
-/usr/lib/python*/site-packages/pkg_resources.*
-/usr/lib/python*/site-packages/*.egg-info
-/usr/lib/python*/site-packages/setuptools/
-/usr/lib/python*/site-packages/**/setup.*
-/usr/lib/python*/site-packages/**/setupscons.*
-/usr/lib/python*/site-packages/gtk-*/codegen/
-/usr/lib/python*/site-packages/numpy/doc/
-/usr/lib/python*/site-packages/numpy/testing/
-/usr/lib/python*/site-packages/numpy/f2py/
-/usr/lib/python*/site-packages/numpy/distutils/
-/usr/lib/python*/site-packages/numpy/numarray/numpy/
-/usr/share/pygtk/
-/usr/share/pygobject/
 /usr/lib/icu/
 /usr/share/aclocal/
 /usr/share/baselayout/
@@ -73,9 +49,10 @@
 /usr/share/splashutils/
 /usr/share/glib-*/gettext/
 /usr/share/gtk-*/demo/
-/usr/lib/pygtk/*/*demo*
 
 # Static libraries and libtool files
+/lib/**.a
+/lib/**.la
 /usr/lib/**.a
 /usr/lib/**.la
 /usr/**/lib/**.a
@@ -134,47 +111,59 @@
 /sbin/ldconfig
 /sbin/sln
 
-# Perl and Python-related files
-# (unusable after ebuild patching, see setup-copy)
+# Perl and Python scripts
+# x11-wm/openbox: XDG autostart functionality
+/usr/lib/openbox/xdg-autostart
+# sys-apps/lm_sensors: sensors detection and config file helper
 /usr/sbin/sensors-detect
 /usr/bin/sensors-conf-convert
+# gnome-base/libglade: old versions ui upgrade
 /usr/bin/libglade-convert
-
-# Perl scripts
-# (media-gfx/splashutils: themes creation and conversion,
-#                         + cpio-using initramfs generator)
+# x11-libs/gtk+: glade -> xml conversion
+/usr/bin/gtk-builder-convert
+# media-gfx/splashutils: themes creation and conversion,
+# cpio-using initramfs generator
 /usr/bin/splash_resize
 /usr/bin/bootsplash2fbsplash
+/usr/bin/splashy2fbsplash.py
 /usr/sbin/splash_geninitramfs
-# (net-misc/ntp: servers chain tracer, ntpq loop wrapper)
+# net-misc/ntp: servers chain tracer, ntpq loop wrapper
 /usr/bin/ntptrace
 /usr/bin/ntp-wait
-# (dev-util/strace: nice strace output)
+# dev-util/strace: nice strace output
 /usr/bin/strace-graph
-# (app-text/aspell: old dictionaries import)
+# app-text/aspell: old dictionaries import
 /usr/bin/aspell-import
-# (dev-libs/openssl: optional functionality for update-ca-certificates,
-#                    helper for "openssl ca", improvement of CA.sh)
+# dev-libs/openssl: optional functionality for update-ca-certificates,
+# helper for "openssl ca", improvement of CA.sh
 /usr/bin/c_rehash
 /etc/ssl/misc/CA.pl
-# (media-libs/gd: raster fonts converter)
+# media-libs/gd: raster fonts converter
 /usr/bin/bdftogd
-# (sys-libs/glibc: malloc debugging)
+# sys-libs/glibc: malloc debugging
 /usr/bin/mtrace
-# (dev-libs/glib: C source code manipulation)
+# dev-libs/glib: C source code manipulation
 /usr/bin/glib-mkenums
-# (net-wireless/atmel-firmware: unnecessary script alternative)
+# net-wireless/atmel-firmware: unnecessary script alternative
 /usr/sbin/atmel_fwl.pl
-# (sys-apps/less: LESSCOLOR != 0 + obscure conditions)
+# sys-apps/less: LESSCOLOR != 0 + obscure conditions
 /usr/bin/code2color
-# (mail-client/claws-mail: external helper scripts)
+# mail-client/claws-mail: external helper scripts
 /usr/lib/claws-mail/tools/*.pl
+/usr/lib/claws-mail/tools/*.py
 /usr/lib/claws-mail/tools/tb2claws-mail
-# (app-misc/mc: extfs extension-specific handlers)
+# app-misc/mc: extfs extension-specific handlers
 /usr/share/mc/extfs/a
 /usr/share/mc/extfs/apt
 /usr/share/mc/extfs/deb*
 /usr/share/mc/extfs/dpkg
 /usr/share/mc/extfs/*fs
 /usr/share/mc/extfs/rpms
+/usr/share/mc/extfs/s3
 /usr/share/mc/extfs/uzip
+# dev-libs/libevent: marshaling code generator
+/usr/bin/event_rpcgen.py
+# x11-libs/gtksourceview: *.lang files development
+/usr/share/gtksourceview-*/language-specs/convert.py
+# gnome-base/librsvg: a script superseded by rsvg-convert
+/usr/bin/rsvg

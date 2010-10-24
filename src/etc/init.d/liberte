@@ -19,8 +19,8 @@ depend() {
     use    fbcondecor
     before xdm
 
-    # Tor config (if any) must be extracted before running Tor
-    before wicd tor
+    # Tor config (if any) must be initialized before running Tor
+    before NetworkManager wicd tor
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
     before autofs

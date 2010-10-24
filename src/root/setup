@@ -177,7 +177,7 @@ emerge -quDN --with-bdeps y world
 
 
 sinfo "Removing unnecessary packages"
-emerge -qc
+emerge -qc --deselect=n
 
 
 sinfo "Checking linking consistency"
@@ -256,7 +256,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl metalog iptables consolekit alsasound"
-defaultsvc="liberte acpid rngd laptop_mode aumix gpm smartd bluetooth pcscd nscd fbcondecor autofs wicd privoxy"
+defaultsvc="liberte acpid rngd laptop_mode aumix gpm smartd bluetooth pcscd nscd fbcondecor autofs NetworkManager privoxy"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do
@@ -274,7 +274,7 @@ depscan.sh
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
 # "wheel" group: necessary for su/sudo PAM authentication
-# "users" group: necessary for Wicd DBUS communication
+# "users" group: some apps require for DBUS communication
 # "audio" group: ALSA/OSS devices access
 # "video" group: V4L2 devices access (webcam - mplayer tv://)
 # "cdrom" group: raw CD devices access (cd playing + cd/dvd writing)

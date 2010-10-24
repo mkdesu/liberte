@@ -1,4 +1,4 @@
-# NOTE: this file is not used by wicd
+# NOTE: this file is not used by network managers
 # It is intended for direct network setup
 # (/etc/init.d/net.eth0 start)
 

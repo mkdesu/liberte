@@ -74,12 +74,12 @@ net-analyzer/macchanger
 sys-apps/ethtool
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
-net-misc/wicd
+net-misc/networkmanager
+gnome-extra/nm-applet
 net-misc/ntp
 net-misc/tor
 net-proxy/tsocks
 net-proxy/privoxy
-net-misc/youtube-dl
 
 # Peripheral utilities
 sys-apps/x86info
@@ -94,6 +94,7 @@ sys-apps/usbutils
 sys-apps/pcmciautils
 net-wireless/bluez
 dev-libs/opensc
+# sys-apps/usb_modeswitch [needs tcl]
 sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
