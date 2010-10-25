@@ -204,7 +204,7 @@ awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/
 
 
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/midori /usr/bin/mplayer
+paxctl -m /usr/bin/midori /usr/bin/mplayer /usr/bin/qemu-system-x86_64
 
 
 sinfo "Configuring fontconfig"

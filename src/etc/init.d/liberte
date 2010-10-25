@@ -102,6 +102,12 @@ start() {
         ebegin Configuring X server
         if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
             mv /root/xorg.conf.new /etc/X11/xorg.conf
+
+            # QEMU + 24bpp + Openbox: http://bugzilla.icculus.org/show_bug.cgi?id=4363
+            if egrep -q '^[[:space:]]*BoardName[[:space:]]+"GD 5446"$' /etc/X11/xorg.conf; then
+                sed -i 's/[[:space:]]*Identifier[[:space:]]\+"Screen0"$/&\n\tDefaultDepth 16/' /etc/X11/xorg.conf
+            fi
+
             cat >> /etc/X11/xorg.conf <<EOF
 Section "ServerFlags"
     Option "DontZap"      "true"
