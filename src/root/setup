@@ -271,6 +271,12 @@ done
 depscan.sh
 
 
+# (lastlog is not sparse on unionfs, wtmp has no growth limit)
+sinfo "Disabling lastlog and wtmp tracking"
+ln -sf /dev/null /var/log/lastlog
+rm -f  /var/log/wtmp
+
+
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
 # "wheel" group: necessary for su/sudo PAM authentication

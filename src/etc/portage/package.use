@@ -45,6 +45,7 @@ media-libs/libsdl               -audio -joystick
 # Unnecessary functionality
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
+dev-lang/tcl                    -threads
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt

@@ -57,6 +57,7 @@
 /usr/lib/**.la
 /usr/**/lib/**.a
 /usr/**/lib/**.la
+/usr/lib/tclConfig.sh
 
 # Pruned directories (see rootfs.includes)
 /usr/share/consolefonts/**
@@ -77,9 +78,6 @@
 /var/run/*.pid
 
 # Miscellaneous
-# (lastlog is not sparse on unionfs, wtmp has no growth limit)
-/var/log/lastlog
-/var/log/wtmp
 .keep*
 .empty_on_purpose
 /root/**

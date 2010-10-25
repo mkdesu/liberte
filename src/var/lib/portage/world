@@ -94,7 +94,7 @@ sys-apps/usbutils
 sys-apps/pcmciautils
 net-wireless/bluez
 dev-libs/opensc
-# sys-apps/usb_modeswitch [needs tcl]
+sys-apps/usb_modeswitch
 sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils

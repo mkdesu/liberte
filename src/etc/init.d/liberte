@@ -83,8 +83,9 @@ start() {
     eend $?
 
 
-    # Limit dmesg console logging
+    # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
     ebegin Reducing kernel console logging level
+    rm -f /var/log/wtmp
     dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
     eend $?
 
