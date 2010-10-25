@@ -8,7 +8,7 @@ DESCRIPTION="X.Org Syriac fonts"
 HOMEPAGE="http://xorg.freedesktop.org/"
 SRC_URI="http://xorg.freedesktop.org/releases/individual/font/${P}.tar.bz2"
 
-LICENSE="X11"
+LICENSE="MIT"
 SLOT="0"
 KEYWORDS="amd64 x86"
 
