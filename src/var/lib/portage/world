@@ -47,9 +47,13 @@ sys-apps/smartmontools
 virtual/eject
 app-misc/secure-delete
 app-arch/libarchive
+app-arch/pigz
+app-arch/pbzip2
 app-arch/zip
 app-arch/p7zip
 app-arch/unrar
+app-arch/arj
+app-arch/lha
 sys-fs/ntfs3g
 sys-fs/ntfsprogs
 sys-fs/dosfstools

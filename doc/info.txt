@@ -1,0 +1,83 @@
+Repositories
+============
+
+Stage3 and portage snapshots
+  + http://mirrors.kernel.org/gentoo
+  [mkroot]
+
+Webrsync and portage packages
+  + http://mirrors.kernel.org/gentoo
+  + http://distfiles.gentoo.org
+  [/etc/make.conf]
+
+Rsync
+  + disabled
+  [/etc/make.conf]
+
+
+
+SSL/TLS implementations
+=======================
+
+package                 supports                uses
+______________________________________________________
+
+xorg-server             ssl                     ssl
+libarchive              ssl                     ssl
+opensc                  ssl                     ssl
+
+tor                     ssl                     ssl
+aircrack-ng             ssl                     ssl
+
+networkmanager          gnutls, nss             gnutls
+wpa_supplicant          ssl, gnutls, libtom     gnutls
+
+libsoup(midori)         gnutls                  gnutls
+curl                    ssl, gnutls, nss        gnutls
+neon                    ssl, gnutls             gnutls
+
+
+libcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring
+
+
+
+Encryption
+==========
+
+LUKS
+  + AES-256 / XTS
+  + SHA-256 LUKS header hashing
+  + OTFE-compatible
+
+mcrypt
+  + AES-128 / CFB
+  + S2K-ISALTED-SHA1 password hashing
+  + OpenPGP-compatible
+
+shadow
+  + SHA-256 password hashing
+  + salted + 5000 rounds
+
+GnuPG
+  + AES-256 / CFB underlying symmetric cipher
+  + SHA-1   digest for DSA-1024, RSA-[1024..4096] signature keys
+  + SHA-256 digest for DSA-[2048..3072]           signature keys
+
+
+
+File permissions
+================
+
+Boot media
+  [root] rw-r--r-- / rwxr-xr-x
+
+Home directory
+  umask 077
+  [anon] rw------- / rwx------
+
+Persistence directory (cryptsetup)
+  [anon] rw------- / rwx------
+
+Automounted directories
+  [anon] rw-r----- / rwx--x--- [rw]
+  [anon] r--r----- / r-x--x--- [ro]
