@@ -14,3 +14,6 @@ app-emulation/virt-what
 x11-misc/xdg-user-dirs
 x11-misc/xvkbd
 media-fonts/khmer
+
+# Handling of "--"
+app-arch/pigz

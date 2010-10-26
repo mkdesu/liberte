@@ -229,6 +229,7 @@ done
 
 
 sinfo "Updating PCI and USB lists"
+sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
 update-pciids -q
 update-usbids -q
 if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
@@ -336,7 +337,7 @@ mkdir ${cpiodir}/cpio
     | (cd ${cpiodir}/cpio; cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1)
 mkdir -p ${cpiodir}/cpio/etc/splash
 cp -pr /etc/splash/liberty ${cpiodir}/cpio/etc/splash/
-zcat /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
+/bin/gzip -cd /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
 find ${cpiodir}/cpio -not -type d -o -name root -o -path '*/etc/splash/*' \
     | sed "s@^${cpiodir}/cpio/@@" \
     | (cd ${cpiodir}/cpio; cpio -oA -H newc -O ${cpiodir}/initramfs)

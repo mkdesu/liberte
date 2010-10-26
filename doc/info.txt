@@ -1,16 +1,16 @@
 Repositories
 ============
 
-Stage3 and portage snapshots
+stage3 and portage snapshots
   + http://mirrors.kernel.org/gentoo
   [mkroot]
 
-Webrsync and portage packages
+webrsync and portage packages
   + http://mirrors.kernel.org/gentoo
   + http://distfiles.gentoo.org
   [/etc/make.conf]
 
-Rsync
+rsync
   + disabled
   [/etc/make.conf]
 
@@ -81,3 +81,29 @@ Persistence directory (cryptsetup)
 Automounted directories
   [anon] rw-r----- / rwx--x--- [rw]
   [anon] r--r----- / r-x--x--- [ro]
+
+
+
+ACLs and extended attributes
+============================
+
+ACLS
+  + ACL changes propagate to tmpfs via UnionFS, but the inode must already
+    exist in tmpfs (apparently, a bug in UnionFS)
+  + ACL reads propagate to SquashFS, which supports xattrs (and likely
+    ACLs) since kernel 2.6.35
+
+Extended attributes
+  + xattrs are not supported by tmpfs
+  + xattr change requests propagate to the underlying (ro) SquashFS
+  + xattr reads propagate to SquashFS, which supports xattrs
+    since kernel 2.6.35
+
+configuration persistence
+  + ACLs are stored along regular permissions using bsdtar
+
+(auto)mounted directories
+  + NTFS: user.* xattrs correspond to NTFS streams
+  + ext2/3/4 removable media is mounted with ACLs and user.* xattrs
+
+SquashFS LZMA support is unavailable as of kernel 2.6.36.
