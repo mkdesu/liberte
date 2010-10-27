@@ -41,6 +41,11 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 
 # --- Loopback ---
 
+# NTP server modification permission to ntpd user only (or root in pre-DNS phase)
+iptables -A OUTPUT -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp  -j ACCEPT
+iptables -A OUTPUT -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp  -j ACCEPT
+iptables -A OUTPUT -p udp                           -d 127.0.0.1 --dport 9050 -j LOGREJECT
+
 # Protect Tor hidden service and Privoxy ports from unintended access
 # (owner match doesn't work with the INPUT chain)
 iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor      -d 127.0.0.1 --dport   80 -j LOGREJECT

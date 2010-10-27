@@ -1,0 +1,16 @@
+#!/bin/sh
+
+exec 1>/dev/null 2>&1
+
+iface=$1
+action=$2
+
+case ${action} in
+*up)
+        # NTP gracefully adds/removes interfaces
+        if [ ! -e /var/lib/init.d/started/ntpd ]; then
+            logger -p 6 -t nm.dispatch "Starting NTP service (${iface})"
+            /etc/init.d/ntpd start
+        fi
+        ;;
+esac

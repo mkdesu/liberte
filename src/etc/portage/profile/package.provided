@@ -1,2 +1,5 @@
-# No need for mail-mta/ssmtp (virtual/mta)
+# virtual/mta (sudo, gnupg)
 mail-mta/ssmtp-0
+
+# virtual/mailx (smartmontools)
+mail-client/mailx-0

@@ -1,5 +1,5 @@
-Repositories
-============
+Repositories and mirrors
+========================
 
 stage3 and portage snapshots
   + http://mirrors.kernel.org/gentoo
@@ -13,6 +13,14 @@ webrsync and portage packages
 rsync
   + disabled
   [/etc/make.conf]
+
+HKP(S)
+  + hkps://zimmermann.mayfirst.org
+  + [alt: x-hkp://pool.sks-keyservers.net]
+  + [alt: x-hkp://keys.gnupg.net]
+
+NTP
+  + [0-3].pool.ntp.org
 
 
 

@@ -20,6 +20,8 @@ depend() {
     before xdm
 
     # Tor config (if any) must be initialized before running Tor
+    # bluetooth needs to start before NetworkManager
+    after  bluetooth
     before NetworkManager wicd tor
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment

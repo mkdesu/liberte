@@ -1,18 +1,45 @@
 #!/bin/sh
 
 # The reason for this wrapper is that dhcpcd determines the HW address
-# *before* calling the hooks in /lib/dhcpcd/dhcpcd-hooks (although the
-# DHCP broadcast occurs later). On the other hand, Wicd's scripts are
-# not easily customizable (no interface argument), and arguably MAC
-# address randomization is useful only for DHCP.
+# *before* calling the hooks in /lib/dhcpcd/dhcpcd-hooks (or other supplied
+# hooks), although the DHCP broadcast occurs later.
+
+# Another reason is that Networkmanager doesn't supply pre-up hooks
+# because of the main developer's delusions of grandeur:
+# https://bugs.launchpad.net/ubuntu/+source/network-manager/+bug/336736
 
 # NetworkManager calls
 # dhcpcd -B -K -L -c /usr/libexec/nm-dhcp-client.action eth0
-echo "$@" >> /tmp/dhcpcd-cmd
-exec /sbin/dhcpcd.orig "$@"
+# (and just kills dhcpcd when connection is down)
+
+# Assume last argument is the interface
+eval iface=\$$#
+
+release=0
+for arg in $*; do
+    if [ "${arg}" = -k  -o  "${arg}" = --release ]; then
+        release=1
+        break
+    fi
+done
+
 
 # Randomize MAC address only if it's a wireless interface
 # (needs the deprecated WIRELESS_EXT_SYSFS in kernel)
-# if [ -e "/sys/class/net/$2/wireless" ]; then
-#     macchanger -a "$2"
-# fi
+if [ ${release} = 0  -a  -e /sys/class/net/"${iface}"/wireless ]; then
+    # Set random vendor MAC of the same kind
+    logger -p 6 -t dhcpcd.wrapper "Randomizing MAC address on ${iface}"
+
+    # macchanger needs non-busy interface
+    # NetworkManager is OK with carrier OFF/ON in <4s
+    ifconfig ${iface} down
+    macout=`macchanger -a ${iface} 2>&1`
+    ifconfig ${iface} up
+
+    if echo "${macout}" | grep -q ERROR:; then
+        logger -p 3 -t dhcpcd.wrapper "${macout}"
+    fi
+
+fi
+
+exec /sbin/dhcpcd.orig "$@"

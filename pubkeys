@@ -1,3 +1,7 @@
+# Liberté Linux (Release Signing Key) <liberte@dee.su>
+liberte:  6FDD D756 110C 1B07 249F  D07E 9B02 7FCD 81DE 1001
+
+
 # Gentoo Release Engineering: Release security & signing
 # http://www.gentoo.org/proj/en/releng/#doc_chap5
 
@@ -10,5 +14,12 @@ gentoo:   13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910
 # Gentoo Portage Snapshot Signing Key (Automated Signing Key)
 gentoo:   AE54 54F9 67B5 6AB0 9AE1  6064 0838 C26E 239C 75C4
 
-# Liberté Linux (Release Signing Key) <liberte@dee.su>
-liberte:  6FDD D756 110C 1B07 249F  D07E 9B02 7FCD 81DE 1001
+
+# HKPS CA certificate signatures
+# http://zimmermann.mayfirst.org/
+
+# Jamie McClelland <jamie@mayfirst.org> [expired]
+mayfirst: 4322 A68D 5010 CF2F 2218  8A17 9EAF 3762 76CC 057D
+
+# Daniel Kahn Gillmor <dkg@fifthhorseman.net>
+mayfirst: 0EE5 BE97 9282 D80B 9F75  40F1 CCD2 ED94 D217 39E9

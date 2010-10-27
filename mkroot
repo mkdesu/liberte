@@ -20,8 +20,11 @@ MIRROR=http://mirrors.kernel.org/gentoo
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
+# Don't rely on the HKP outbounding port being open
 gpg_wwwserver='http://wwwkeys.eu.pgp.net/pks/lookup?op=get&search=0x${fpr}'
 gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
+
+mfpl=https://support.mayfirst.org/raw-attachment/wiki/mfpl_certificate_authority/mfpl.crt
 
 
 # Copying and pruning
@@ -75,17 +78,22 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
 
 
-    if type gpg 1>/dev/null 2>&1; then
-        # Don't rely on the HKP outbounding port being open
-        sinfo "Fetching PGP public keys and verifying fingerprints"
-        for key in ${gpg_keys}; do
-            org=`echo ${key} | cut -d: -f1`
-            fpr=`echo ${key} | cut -d: -f2`
-            keyid=`echo -n ${fpr} | tail -c 8`
+    sinfo "Downloading HKPS CA certificate"
+    wget -N -nv -P ${LIVECD}/mirror/keys --no-check-certificate ${mfpl} \
+        ${mfpl}.jamie.asc ${mfpl}.dkg.asc
 
-            if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
-                eval wget -nv -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
-            fi
+
+    sinfo "Fetching PGP public keys and verifying fingerprints"
+    for key in ${gpg_keys}; do
+        org=`echo ${key} | cut -d: -f1`
+        fpr=`echo ${key} | cut -d: -f2`
+        keyid=`echo -n ${fpr} | tail -c 8`
+
+        if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
+            eval wget -nv -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
+        fi
+
+        if type gpg 1>/dev/null 2>&1; then
             gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
 
             fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint --with-colons 0x${fpr} | grep '^fpr:' | cut -d: -f 10`
@@ -93,17 +101,30 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
                 echo "Fingerprint mismatch: [${fpr}] != [${fpr2}]"
                 exit 1
             fi
-        done
+        else
+            sinfo "*** No GnuPG, skipping fingerprint verification: ${org}-${keyid}"
+        fi
+    done
 
 
+    if type gpg 1>/dev/null 2>&1; then
         sinfo "Verifying stage3 and portage PGP signatures"
         gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
             --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always        \
             --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2.gpgsig \
                      ${LIVECD}/mirror/portage/portage-latest.tar.bz2
+
+
+        sinfo "Verifying HKPS CA certificate"
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+            --verify ${LIVECD}/mirror/keys/mfpl.crt.jamie.asc        \
+                     ${LIVECD}/mirror/keys/mfpl.crt
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+            --verify ${LIVECD}/mirror/keys/mfpl.crt.dkg.asc          \
+                     ${LIVECD}/mirror/keys/mfpl.crt
     else
-        sinfo "GnuPG not found, skipping signatures verification"
+        sinfo "*** No GnuPG, skipping stage3, portage and HKPS CA certificate verification"
     fi
 
 
@@ -118,7 +139,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
                ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
     else
-        sinfo "GNU tar not found, skipping stage3 files list verification"
+        sinfo "*** No GNU tar, skipping stage3 files list verification"
     fi
 
 

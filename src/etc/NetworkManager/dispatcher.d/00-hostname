@@ -1,0 +1,10 @@
+#!/bin/sh
+
+iface=$1
+action=$2
+
+case ${action} in
+hostname)
+        logger -p 4 -t nm.dispatch "Hostname changed on ${iface}"
+        ;;
+esac

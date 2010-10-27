@@ -229,9 +229,13 @@ done
 
 
 sinfo "Updating PCI and USB lists"
+
 sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
 update-pciids -q
+
+rm -f /usr/share/misc/usb.ids.gz
 update-usbids -q
+
 if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     sinfo "Do PCI/USB IDs lists use compressed format exclusively?"
     exit 1
@@ -305,6 +309,8 @@ sudo -n -u anon touch     /home/anon/persist/security/pgp/liberte.gpg
 sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/liberte.gpg
 sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp \
     --primary-keyring liberte.gpg --import /var/tmp/addons/keys/liberte-*.asc
+sudo -n -u anon cp -p /var/tmp/addons/keys/mfpl.crt /home/anon/persist/security/pgp
+sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
 
 
 sinfo "Installing wrappers"

@@ -53,7 +53,9 @@ else
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/var/tmp/addons
 
     # rwX------
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go= -i --delete --exclude=/anon/persist/security/pgp/\*.gpg -C ${SRC}/home/anon ${LIVECD}/home
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go= -i --delete \
+        --exclude=/anon/persist/security/pgp/\*.gpg           \
+        --exclude=/anon/persist/security/pgp/\*.crt -C ${SRC}/home/anon ${LIVECD}/home
     find ${LIVECD}/home/anon \( ! -user 2101 -o ! -group 9000 \) -exec chown -h 2101:9000 {} \;
 fi
 environment="${environment} PHASE=${PHASE}"
