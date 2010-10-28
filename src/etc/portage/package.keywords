@@ -1,3 +1,6 @@
+# CVE-2010-3856
+=sys-libs/glibc-2.11.2-r2
+
 # Firmware
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter

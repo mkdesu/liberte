@@ -7,7 +7,7 @@ action=$2
 
 case ${action} in
 *up)
-        # NTP gracefully adds/removes interfaces
+        # ntpd gracefully adds/removes interfaces
         if [ ! -e /var/lib/init.d/started/ntpd ]; then
             logger -p 6 -t nm.dispatch "Starting NTP service (${iface})"
             /etc/init.d/ntpd start

@@ -22,6 +22,9 @@ HKP(S)
 NTP
   + [0-3].pool.ntp.org
 
+HTP
+  + {google,yahoo,msn,facebook}.com
+
 
 
 SSL/TLS implementations

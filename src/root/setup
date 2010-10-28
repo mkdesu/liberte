@@ -285,23 +285,34 @@ rm -f  /var/log/wtmp
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
-# "wheel" group: necessary for su/sudo PAM authentication
-# "users" group: some apps require for DBUS communication
-# "audio" group: ALSA/OSS devices access
-# "video" group: V4L2 devices access (webcam - mplayer tv://)
-# "cdrom" group: raw CD devices access (cd playing + cd/dvd writing)
-# "lp"    group: printing subsystem access (DBUS comm. with bluetoothd)
-# "games" group: prevent games complaining about not keeping scores
-# "kvm"   group: (TODO) let anon run qemu before a designated user is configured
+# "wheel"   group: necessary for su/sudo PAM authentication
+# "users"   group: some apps require for DBUS communication
+# "plugdev" group: changing NetworkManager settings via DBUS
+# "audio"   group: ALSA/OSS devices access
+# "video"   group: V4L2 devices access (webcam - mplayer tv://)
+# "cdrom"   group: raw CD devices access (cd playing + cd/dvd writing)
+# "lp"      group: printing subsystem access (DBUS comm. with bluetoothd)
+# "games"   group: prevent games complaining about not keeping scores
+# "kvm"     group: /dev/kvm access for qemu-kvm by non-firewalled user
 sinfo "Setting up users"
 sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
+
 grpck -r && grpconv
+
 echo root:liberte | chpasswd
+
 groupadd -f -r games
+groupadd -f -r plugdev
 groupadd -g 9000 legion || [ $? = 9 ]
+
 useradd -u 2101 -g legion -c "Anonymous" -d /home/anon anon || [ $? = 9 ]
-usermod -G wheel,users,audio,video,cdrom,lp,games,kvm anon
-useradd -c nscd -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
+usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
+
+useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
+useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
+
+useradd -c "non-firewalled" -d /dev/null -s /sbin/nologin -r nofw || [ $? = 9 ]
+usermod -G audio,kvm nofw
 
 
 sinfo "Initializing a secondary PGP keyring"

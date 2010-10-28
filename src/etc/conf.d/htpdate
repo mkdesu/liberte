@@ -1,0 +1,6 @@
+SERVERS="google.com msn.com yahoo.com facebook.com myspace.com"
+
+# minimal 5min interval (divided between servers)
+HTPDATE_OPTS="-D -s -4 -l -u htp:htp -m 300"
+
+# PROXY="-P <proxy>:<port>"

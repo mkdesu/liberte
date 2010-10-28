@@ -81,6 +81,7 @@ net-wireless/aircrack-ng
 net-misc/networkmanager
 gnome-extra/nm-applet
 net-misc/ntp
+net-misc/htpdate
 net-misc/tor
 net-proxy/tsocks
 net-proxy/privoxy
