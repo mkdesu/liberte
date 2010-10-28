@@ -154,14 +154,12 @@ EOF
         mount -o remount,rw /mnt/cdrom
         remount=$?
         eend ${remount}
+    # Same check is done in fw-reload
     elif grep -q '\<looptype=noloop\>' /proc/cmdline; then
         ebegin Disabling privacy-supporting services
         chmod a-x /etc/NetworkManager/dispatcher.d/*
         sed -i 's/^forward-socks.*\<localhost:9050\>/#&/' /etc/privoxy/config
         eend $?
-
-        rc-update delete iptables
-        /etc/init.d/iptables stop
     fi
 
 

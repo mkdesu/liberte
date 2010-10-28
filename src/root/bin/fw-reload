@@ -1,5 +1,11 @@
 #!/bin/sh -e
 
+if grep -q '\<looptype=noloop\>' /proc/cmdline; then
+    echo " * Skipping firewall setup"
+    exit
+fi
+
+
 luser=anon
 nofw=nofw
 
