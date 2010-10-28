@@ -193,7 +193,7 @@ x11-apps/xfd
 # Khmer OS:       Khmer script (Cambodia), Battambang/Bokor/Content/Fasthand/Freehand/Metal Chrieng/Muol/Siemreap/System
 # TibMachUni:     Tibetan, Dzongkha and Ladakhi scripts
 # LKLUG:          [Extra] Sinhala (Sri Lanka) script
-# [Mv:            [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas]
+# Mv:             [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas
 # [Cham:          www.ling.hawaii.edu/~uhdoc/champa/chamHI.ttf, incorrect codepoints]
 # Essays1743:     Nice decorative Latin font
 media-fonts/inconsolata
@@ -221,8 +221,7 @@ media-fonts/thaifonts-scalable
 media-fonts/khmer
 media-fonts/tibetan-machine-font
 media-fonts/ttf-sinhala-lklug
-# (MCST site unavailable)
-# media-fonts/mcst-dhivehi-fonts
+media-fonts/mcst-dhivehi-fonts
 media-fonts/essays1743
 
 # Internationalization
