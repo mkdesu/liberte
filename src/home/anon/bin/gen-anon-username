@@ -2,6 +2,8 @@
 
 umask 077
 
+# NOTE: PSS signatures support in certificates
+# is not yet released for OpenSSL
 
 # This command can be run via "sudo -u anon"
 # Available environment: HOME, USER
@@ -13,8 +15,7 @@ sslconf=${HOME}/config/ssl/extensions.cnf
 certdir=${ssldir}/certs
 keysdir=${ssldir}/private
 
-# rsabits=16384
-rsabits=4096
+rsabits=16384
 shabits=512
 reqsubj='/O=Liberté Linux/CN=Anonymous'
 crtdays=18300
