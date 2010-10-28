@@ -21,8 +21,9 @@ depend() {
 
     # Tor config (if any) must be initialized before running Tor
     # bluetooth needs to start before NetworkManager
+    # Privoxy config may be modified here
     after  bluetooth
-    before NetworkManager wicd tor
+    before NetworkManager wicd tor privoxy
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
     before autofs
@@ -153,6 +154,14 @@ EOF
         mount -o remount,rw /mnt/cdrom
         remount=$?
         eend ${remount}
+    elif grep -q '\<looptype=noloop\>' /proc/cmdline; then
+        ebegin Disabling privacy-supporting services
+        chmod a-x /etc/NetworkManager/dispatcher.d/*
+        sed -i 's/^forward-socks.*\<localhost:9050\>/#&/' /etc/privoxy/config
+        eend $?
+
+        rc-update delete iptables
+        /etc/init.d/iptables stop
     fi
 
 
