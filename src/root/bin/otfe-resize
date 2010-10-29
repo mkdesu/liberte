@@ -55,11 +55,11 @@ fi
 
 # Retrieve devices stack
 otfe=`cryptsetup status ${OTFEVOLUME} | head -n 1 | awk '{ print $1 }'`
-loop=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:space:]]*device:/ { print $2 }'`
+loop=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:blank:]]*device:/ { print $2 }'`
 file=`losetup "${loop}" | cut -d' ' -f3 | sed 's/^(//; s/)$//'`
 
-otfeoffset=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:space:]]*offset:.* sectors/ { print $2 }'`
-otfesize=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:space:]]*size:.* sectors/ { print $2 }'`
+otfeoffset=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:blank:]]*offset:.* sectors/ { print $2 }'`
+otfesize=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:blank:]]*size:.* sectors/ { print $2 }'`
 
 
 # Sanity checks

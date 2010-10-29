@@ -17,7 +17,7 @@ SRC=`dirname $0`/src
 
 version=`cat ${SRC}/../version`
 environment="VERSION=${version} LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
-for env in LANG TERM RSYNC_PROXY http_proxy ftp_proxy; do
+for env in LANG TERM RSYNC_PROXY http_proxy https_proxy ftp_proxy no_proxy; do
     if printenv ${env} 1>/dev/null; then
         environment="${environment} ${env}=`printenv ${env}`"
     fi

@@ -108,8 +108,8 @@ start() {
             mv /root/xorg.conf.new /etc/X11/xorg.conf
 
             # QEMU + 24bpp + Openbox: http://bugzilla.icculus.org/show_bug.cgi?id=4363
-            if egrep -q '^[[:space:]]*BoardName[[:space:]]+"GD 5446"$' /etc/X11/xorg.conf; then
-                sed -i 's/[[:space:]]*Identifier[[:space:]]\+"Screen0"$/&\n\tDefaultDepth 16/' /etc/X11/xorg.conf
+            if egrep -q '^[[:blank:]]*BoardName[[:blank:]]+"GD 5446"$' /etc/X11/xorg.conf; then
+                sed -i 's/[[:blank:]]*Identifier[[:blank:]]\+"Screen0"$/&\n\tDefaultDepth 16/' /etc/X11/xorg.conf
             fi
 
             cat >> /etc/X11/xorg.conf <<EOF

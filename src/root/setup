@@ -6,6 +6,9 @@ consolefont=ter-i16n.psf
 lzmamem=20MiB
 protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock /etc/._cfg????_eixrc"
 
+pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [[:blank:][:graph:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
+usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
+
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -196,7 +199,7 @@ sinfo "Compiling custom executables"
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
 # s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...
-lcrep=`awk '/^[[:space:]]*title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^[[:space:]]*title[[:space:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
+lcrep=`awk '/^[[:blank:]]*title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^[[:blank:]]*title[[:blank:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
 # "Spain" ca "__ca_ES@valencia" ca_ES.UTF-8@valencia (+ lcrep)
 awk '/UTF-8/ && !/^iw_IL/ { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a); printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); print $1 }' /usr/share/i18n/SUPPORTED | sed "${ccrep}${lcrep}" | LC_ALL=C sort | tr '\n' ' ' > /etc/locale.menu
 # "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"
@@ -240,6 +243,11 @@ if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     sinfo "Do PCI/USB IDs lists use compressed format exclusively?"
     exit 1
 fi
+
+
+sinfo "Verifying PCI and USB lists"
+LC_ALL=C awk --posix "! /${pciids_regexp}/                  { print; exit 1 }" /usr/share/misc/pci.ids
+LC_ALL=C awk --posix "! /${pciids_regexp}|${usbids_regexp}/ { print; exit 1 }" /usr/share/misc/usb.ids
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
