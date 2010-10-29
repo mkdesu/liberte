@@ -6,6 +6,7 @@ height=`xwininfo -root | sed -n 's/^  Height: //p'`
 wheight=${height}
 
 # Wait for the taskbar to come up
+# (long timeout for QEMU non-KVM runs)
 w=
 while [ ${#w} -lt 300  -a  ${height} = ${wheight} ]; do
     sleep 1

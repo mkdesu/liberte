@@ -235,6 +235,7 @@ app-i18n/scim-input-pad
 
 # X11 window management
 x11-wm/openbox
+x11-misc/wmctrl
 lxde-base/lxpanel
 lxde-base/lxshortcut
 lxde-base/lxtask

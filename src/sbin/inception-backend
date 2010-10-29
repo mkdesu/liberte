@@ -1,0 +1,51 @@
+#!/bin/sh -e
+
+# This command can be run via "sudo -u nofw"
+# In that case, it is recommended to restrict arguments
+
+# TODO: add "-device virtio-rng" once it's supported by QEMU
+
+title="UNSAFE Virtualized Liberté"
+mem=128M
+bootdir=/mnt/cdrom/liberte/boot
+
+cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
+
+params="looptype=noloop loop=/etc/hosts cdroot
+        cdroot_type=squashfs unionfs nopata nosata nousb
+        video=uvesafb:800x600-32,mtrr:3,ywrap quiet
+        splash=silent,theme:liberty console=tty1"
+
+export QEMU_AUDIO_DRV=alsa
+
+
+if [ -n "$1" ]; then
+    bootdir="$1"
+    shift
+fi
+
+if [ ! -d "${bootdir}" ]; then
+    echo "Error:  ${bootdir} not found (already virtualized?)" 1>&2
+    echo "Format: $0 [bootdir [extra kernel params ...]]"      1>&2
+    exit 1
+fi
+
+
+kvm=
+if [ ! -e /dev/kvm ]; then
+    kvm="-no-kvm -cpu qemu32"
+fi
+
+
+# not running "echo $$ / exec ...", so sudo process can exit
+# monitor (Ctrl-Alt-2) can be added with "-monitor vc"
+qemu-kvm ${kvm} -name "${title}" -m ${mem} -nodefaults \
+    -sdl -balloon virtio -vga cirrus                   \
+    -soundhw es1370 -net nic,model=virtio -net user    \
+    -kernel "${bootdir}/kernel-x86.zi"                 \
+    -initrd "${bootdir}/initrd-x86.lzm"                \
+    -drive file="${bootdir}/root-x86.sfs,${cdrom}"     \
+    -append "`echo ${params} $*`"                      \
+    </dev/null 1>/dev/null 2>&1  &  pid=$!
+
+echo ${pid}

@@ -1,49 +1,39 @@
 #!/bin/sh
 
-title="UNSAFE Virtualized Liberté"
-mem=192M
-bootdir=/mnt/cdrom/liberte/boot
-
-cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
-
-params="looptype=noloop loop=/etc/hosts cdroot
-        cdroot_type=squashfs unionfs nopata nosata nousb
-        video=uvesafb:800x600-32,mtrr:3,ywrap quiet
-        splash=silent,theme:liberty console=tty1"
-
-export QEMU_AUDIO_DRV=alsa
+nofw=nofw
 
 
-if [ -n "$1" ]; then
-    bootdir="$1"
-    shift
-fi
-
-if [ ! -d "${bootdir}" ]; then
-    echo "Error:  ${bootdir} not found (already virtualized?)"
-    echo "Format: $0 [bootdir] [extra kernel params]"
-    exit 1
-fi
-
-
-kvm=
 if [ ! -e /dev/kvm ]; then
-    vmflag=`grep '^flags\>' /proc/cpuinfo | egrep -o '\<(vmx|svm)\>' | uniq`
+    vmflag=`sed -n 's/^flags\>.*\<\(vmx\|svm\)\>.*$/\1/p' /proc/cpuinfo | head -n 1`
+
     if [ "${vmflag}" = vmx ]; then
         sudo modprobe kvm-intel
     elif [ "${vmflag}" = svm ]; then
         sudo modprobe kvm-amd
-    else
-        kvm="-no-kvm -cpu qemu32"
     fi
 fi
 
 
-# TODO: add "-device virtio-rng" once it's supported by QEMU
-exec qemu-kvm ${kvm} -name "${title}" -m ${mem}    \
-    -nodefaults -sdl -monitor vc -balloon virtio   \
-    -vga cirrus -soundhw es1370 -net nic,model=virtio -net user \
-    -kernel "${bootdir}/kernel-x86.zi"             \
-    -initrd "${bootdir}/initrd-x86.lzm"            \
-    -drive file="${bootdir}/root-x86.sfs,${cdrom}" \
-    -append "`echo ${params} $*`"
+xhost +si:localuser:${nofw}
+
+
+# DISPLAY is preserved by sudo
+pid=`unset XAUTHORITY; cd /tmp; sudo -n -u ${nofw} inception-backend`
+
+
+if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
+    w=
+    while [ ${#w} -lt 120 ]; do
+        sleep 1
+
+        wid=`wmctrl -lp | awk "\$3==${pid} { print \$1 }"`
+        if [ -n "${wid}" ]; then
+            break;
+        fi
+
+        w=${w}X
+    done
+fi
+
+
+xhost -si:localuser:${nofw}

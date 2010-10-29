@@ -16,4 +16,9 @@
 
 # User privilege specification (group prefix = %)
 root	ALL=(ALL) ALL
-anon	liberte = NOPASSWD: /sbin/shutdown -h now, /sbin/shutdown -r now, /sbin/modprobe kvm-intel, /sbin/modprobe kvm-amd, /sbin/otfe-resize
+
+anon	liberte = NOPASSWD: /sbin/shutdown -h now,    /sbin/shutdown -r now
+anon	liberte = NOPASSWD: /sbin/modprobe kvm-intel, /sbin/modprobe kvm-amd
+anon	liberte = NOPASSWD: /sbin/otfe-resize
+
+anon	liberte = (nofw) NOPASSWD: /sbin/inception-backend ""
