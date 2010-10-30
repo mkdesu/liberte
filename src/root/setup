@@ -192,9 +192,13 @@ rebuild_locales
 
 
 sinfo "Compiling custom executables"
-( . /etc/make.conf && \
-    gcc -o /usr/local/sbin/udev-watchdog /var/tmp/ebuilds/udev-watchdog.c ${CFLAGS} ${LDFLAGS} -ludev && \
-    strip -s /usr/local/sbin/udev-watchdog )
+gcc -o /usr/local/sbin/udev-watchdog /var/tmp/ebuilds/udev-watchdog.c \
+    `portageq envvar CFLAGS` `portageq envvar LDFLAGS` -ludev
+gcc -o /usr/local/bin/log-limit      /var/tmp/ebuilds/log-limit.c     \
+    `portageq envvar CFLAGS` `portageq envvar LDFLAGS`
+
+strip -s /usr/local/sbin/udev-watchdog
+strip -s /usr/local/bin/log-limit
 
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`

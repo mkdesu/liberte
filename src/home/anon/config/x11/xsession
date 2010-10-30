@@ -3,9 +3,6 @@
 # Import environment
 . ${HOME}/config/shell/profile
 
-# Redirect X11 clients output
-exec 1>${TMPDIR}/xsession.log 2>&1
-
 # Restrict X server access
 # xhost +si:localuser:${USER}
 xhost -
