@@ -280,6 +280,16 @@
         <command>lxterminal</command>
       </action>
     </keybind>
+    <keybind key="Print">
+      <action name="Execute">
+        <command>xsnapshot ~/persist/desktop -root</command>
+      </action>
+    </keybind>
+    <keybind key="A-Print">
+      <action name="Execute">
+        <command>xsnapshot ~/persist/desktop</command>
+      </action>
+    </keybind>
     <keybind key="XF86AudioRaiseVolume">
       <action name="Execute">
         <command>aumix -v+5</command>

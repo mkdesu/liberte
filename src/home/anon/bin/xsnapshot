@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+if [ ! -d "$1" ]; then
+    echo "Format: $0 <dir> [options ...]"
+    exit 1
+fi
+
+dir="$1"
+shift
+
+name=`date -u +%F-Z%H%M.%S`
+exec xwd -silent "$@" | gm convert -quality 100 -comment '' xwd:- png:"${dir}"/${name}.png

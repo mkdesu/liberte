@@ -69,7 +69,7 @@ shadow
   + SHA-256 password hashing
   + salted + 5000 rounds
 
-GnuPG
+GnuPG(SM)
   + AES-256 / CFB underlying symmetric cipher
   + SHA-1   digest for DSA-1024, RSA-[1024..4096] signature keys
   + SHA-256 digest for DSA-[2048..3072]           signature keys

@@ -120,6 +120,7 @@ media-sound/aumix
 media-sound/audacious
 media-video/gnome-mplayer
 media-gfx/gpicview
+media-gfx/graphicsmagick
 app-editors/gedit
 app-text/epdfview
 app-office/abiword
@@ -172,6 +173,7 @@ x11-apps/xkill
 # (utilities)
 x11-apps/xrefresh
 x11-apps/xsetroot
+x11-apps/xwd
 x11-apps/xlsfonts
 x11-apps/xfd
 

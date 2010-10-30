@@ -4,6 +4,9 @@
 /root/.bashrc
 /root/.inputrc
 
+# Include needed .la files for dynamic modules
+/usr/lib/GraphicsMagick**.la
+
 # Include fontconfig directory and its contents
 /var/cache/fontconfig/***
 

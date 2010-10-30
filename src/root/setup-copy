@@ -121,6 +121,13 @@ sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
 
 
+sinfo "Fixing GraphicsMagick .la files"
+rm /usr/lib/libGraphicsMagick*.la
+for mod in `find /usr/lib/GraphicsMagick* -name '*.so'`; do
+    echo dlname=\'${mod##*/}\' > ${mod%.so}.la
+done
+
+
 # Any problem will cause a fatal error
 sinfo "Checking linking consistency"
 revdep-rebuild -q -i

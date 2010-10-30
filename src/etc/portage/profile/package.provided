@@ -3,3 +3,6 @@ mail-mta/ssmtp-0
 
 # virtual/mailx (smartmontools)
 mail-client/mailx-0
+
+# very heavy and unneeded (graphicsmagick)
+app-text/ghostscript-gpl-0
