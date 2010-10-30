@@ -39,6 +39,7 @@ export QT_IM_MODULE=scim-bridge
 export BROWSER=midori
 export LESS="-R -M --shift 16 -Swi -x4"
 export LESSHISTFILE=-
+export PAPERSIZE=a4
 
 # Proxy settings
 # http://www.gnu.org/software/wget/manual/html_node/Proxies.html

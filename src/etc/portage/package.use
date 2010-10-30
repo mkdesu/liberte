@@ -3,8 +3,9 @@ sys-apps/groff                  -X
 sys-process/psmisc              -X
 net-misc/openssh                -X
 media-fonts/terminus-font       -X -pcf
+app-text/ghostscript-gpl        -X -gtk
 sys-devel/gcc                   -gtk
-net-dialup/ppp                  -gtk                 # (ui by networkmanager)
+net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
 app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
@@ -22,18 +23,18 @@ sci-visualization/gnuplot       gd
 # (vmware segfaults "Xorg -configure", fbdev conflicts with vesa)
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
 media-video/mplayer             -video_cards_mga -video_cards_s3virge -video_cards_tdfx
-sys-fs/udev                     extras               # pcmanfm
+sys-fs/udev                     extras
 sys-fs/ntfs3g                   -udev
 sys-fs/ntfsprogs                minimal -crypt
 app-emulation/qemu-kvm          -bluetooth
 
 # Networking, including SSL/TLS
 mail-client/claws-mail          -ssl -gnutls -imap
-net-misc/wget                   -ssl                 # portage, libqalculate(forex)
-net-libs/libsoup                ssl                  # (gnutls, used by midori)
-net-misc/curl                   ssl  gnutls -nss     # (used by gnupg)
-net-libs/neon                   ssl  gnutls          # (used by audacious-plugins)
-net-wireless/wpa_supplicant     -ssl  gnutls         # (used by networkmanager)
+net-misc/wget                   -ssl
+net-libs/libsoup                ssl
+net-misc/curl                   ssl  gnutls -nss
+net-libs/neon                   ssl  gnutls
+net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 gnome-base/gvfs                 -http
 
@@ -49,14 +50,18 @@ dev-lang/tcl                    -threads
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
+app-text/ghostscript-gpl        -djvu
 
 # Extra functionality
-media-libs/jpeg                 static-libs          # splashutils
+media-libs/jpeg                 static-libs
 media-libs/openjpeg             tools
-gnome-base/librsvg              tools                # (used by bin/gen-wallpaper)
+gnome-base/librsvg              tools
 app-text/poppler                cairo
 app-arch/p7zip                  rar
-app-office/abiword              plugins
+app-office/abiword              plugins gnome
+gnome-extra/gucharmap           gnome
+app-text/evince                 gnome
+gnome-base/gvfs                 gnome
 # app-portage/eix               sqlite
 
 # Internationalization
@@ -64,7 +69,9 @@ app-i18n/scim-tables            linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
 sys-apps/man-pages              -linguas_*
+app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Quirks
-dev-libs/libxml2                python               # TEMP (gnome-doc-utils bdep)
+# (gnome-doc-utils bdep)
+dev-libs/libxml2                python               # TEMP

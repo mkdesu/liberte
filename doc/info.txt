@@ -30,8 +30,8 @@ HTP
 SSL/TLS implementations
 =======================
 
-package                 supports                uses
-______________________________________________________
+package                 supports                uses            used by
+_______________________________________________________________________
 
 xorg-server             ssl                     ssl
 libarchive              ssl                     ssl
@@ -41,11 +41,12 @@ tor                     ssl                     ssl
 aircrack-ng             ssl                     ssl
 
 networkmanager          gnutls, nss             gnutls
-wpa_supplicant          ssl, gnutls, libtom     gnutls
+wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 
-libsoup(midori)         gnutls                  gnutls
-curl                    ssl, gnutls, nss        gnutls
-neon                    ssl, gnutls             gnutls
+libsoup                 gnutls                  gnutls          midori
+curl                    ssl, gnutls, nss        gnutls          gnupg
+neon                    ssl, gnutls             gnutls          audacious-plugins
+wget                    ssl                     -               portage, libqalculate(forex)
 
 
 libcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring

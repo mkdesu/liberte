@@ -3,6 +3,5 @@ gtk-recent-files-limit   = 0
 
 gtk-cursor-blink = 0
 
-# TODO: remove %s and %f
 # gtk-print-preview-command = "evince --unlink-tempfile --preview --print-settings %s %f"
-gtk-print-preview-command = "epdfview %f"
+# gtk-print-preview-command = "epdfview %f"

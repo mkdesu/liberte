@@ -18,13 +18,14 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 
 # equery requires gentoolkit, copy ebuilds early
 # NOTE: the below patches are intended for depclean
-# portage:     exclude python  RDEPEND
-# gentoolkit:  exclude perl    RDEPEND
-# lm_sensors:  exclude perl    RDEPEND
-# libglade:    exclude python  RDEPEND
-# gvfs:        exclude openssh RDEPEND
-# splashutils: exclude cpio    RDEPEND
-# midori:      exclude python  RDEPEND
+# portage:        exclude python  RDEPEND
+# gentoolkit:     exclude perl    RDEPEND
+# lm_sensors:     exclude perl    RDEPEND
+# libglade:       exclude python  RDEPEND
+# gvfs:           exclude openssh RDEPEND
+# splashutils:    exclude cpio    RDEPEND
+# graphicsmagick: exclude perl    RDEPEND
+# midori:         exclude python  RDEPEND
 sinfo "Patching copies of selected ebuilds"
 ebuilds="sys-apps/portage
          app-portage/gentoolkit
@@ -32,6 +33,7 @@ ebuilds="sys-apps/portage
          gnome-base/libglade
          gnome-base/gvfs
          media-gfx/splashutils
+         media-gfx/graphicsmagick
          www-client/midori"
 
 # /usr/portage is bind-mounted ro
@@ -58,6 +60,9 @@ sed -i s:net-misc/openssh:: ${ebuild_gvfs}
 
 # cpio is only needed for splash_geninitramfs
 sed -i s:app-arch/cpio:: ${ebuild_splashutils}
+
+# perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
+sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
 
 # Python is only needed during build
 # (don't bother with putting it in DEPEND)
@@ -120,6 +125,11 @@ rm -f /usr/lib/{?,}crt?.o
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
 
+if [ -e /usr/bin/perl ]; then
+    sinfo "Failed to discard Perl dependencies"
+    false
+fi
+
 
 sinfo "Fixing GraphicsMagick .la files"
 rm /usr/lib/libGraphicsMagick*.la
@@ -145,6 +155,11 @@ mv /var/db/pkg/dev-lang/python-* ${dbpython}/python
 
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
+
+if [ -e /usr/sbin/python-updater ]; then
+    sinfo "Failed to discard Python dependencies"
+    false
+fi
 
 
 # Unmerge packages that other package depend upon, but are not needed
@@ -175,8 +190,9 @@ rm -r ${dbpython}
 # Done here because cache may be recreated after "src" phase
 sinfo "Trimming icons cache"
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
-    -exec gtk-update-icon-cache -q -f -i {} \;
-gtk-update-icon-cache -q -f -i -t /usr/share/gconf-editor/icons/hicolor
+    -exec gtk-update-icon-cache -q -f -i    {} \;
+find /usr/share -mindepth 3 -maxdepth 3 -type d -name hicolor \
+    -exec gtk-update-icon-cache -q -f -i -t {} \;
 
 
 sinfo "Uncompressing selected files"

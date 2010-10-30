@@ -123,6 +123,7 @@ media-gfx/gpicview
 media-gfx/graphicsmagick
 app-editors/gedit
 app-text/epdfview
+app-text/evince
 app-office/abiword
 app-office/gnumeric
 mail-client/claws-mail-notification

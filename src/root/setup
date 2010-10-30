@@ -234,6 +234,8 @@ do
     fi
 done
 
+ln -sf ../dejavu /usr/share/fonts/default/ghostscript
+
 
 sinfo "Updating PCI and USB lists"
 
@@ -303,7 +305,7 @@ rm -f  /var/log/wtmp
 # "audio"   group: ALSA/OSS devices access
 # "video"   group: V4L2 devices access (webcam - mplayer tv://)
 # "cdrom"   group: raw CD devices access (cd playing + cd/dvd writing)
-# "lp"      group: printing subsystem access (DBUS comm. with bluetoothd)
+# "lp"      group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
 # "games"   group: prevent games complaining about not keeping scores
 # "kvm"     group: /dev/kvm access for qemu-kvm by non-firewalled user
 sinfo "Setting up users"
