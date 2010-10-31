@@ -157,7 +157,8 @@ EOF
     # Same check is done in fw-reload
     elif grep -q '\<looptype=noloop\>' /proc/cmdline; then
         ebegin Disabling privacy-supporting services
-        chmod a-x /etc/NetworkManager/dispatcher.d/*
+        rm -f /etc/NetworkManager/dispatcher.d/*
+        rm -f /home/${luser}/config/local/applications/inception.desktop
         sed -i 's/^forward-socks.*\<localhost:9050\>/#&/' /etc/privoxy/config
         eend $?
     fi

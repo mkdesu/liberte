@@ -1,16 +1,16 @@
 #!/bin/sh -e
 
-if grep -q '\<looptype=noloop\>' /proc/cmdline; then
-    echo " * Skipping firewall setup"
-    exit
-fi
-
-
 luser=anon
 nofw=nofw
 
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,8088,11523
+
+
+if grep -q '\<looptype=noloop\>' /proc/cmdline; then
+    echo " * Relaxing firewall setup in virtualized boot"
+    nofw=privoxy
+fi
 
 
 # Default policies
@@ -96,7 +96,6 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner tor  --syn -m multiport --dports 
 # DNS and HTTP(S) communication for non-firewalled user
 iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports domain,${hotspot} -j ACCEPT
-
 
 
 # Log all other packets at level 7

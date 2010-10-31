@@ -234,7 +234,11 @@ do
     fi
 done
 
-ln -sf ../dejavu /usr/share/fonts/default/ghostscript
+# Ghostscript has its urw-fonts dependency stripped
+if [ -e /usr/share/fonts/default ]; then
+    rm    /usr/share/fonts/default/ghostscript
+    rmdir /usr/share/fonts/default
+fi
 
 
 sinfo "Updating PCI and USB lists"
