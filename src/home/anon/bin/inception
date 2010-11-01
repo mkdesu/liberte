@@ -1,6 +1,7 @@
 #!/bin/sh
 
 nofw=nofw
+timeout=120
 
 
 if [ ! -e /dev/kvm ]; then
@@ -23,7 +24,7 @@ pid=`unset XAUTHORITY; cd /tmp; sudo -n -u ${nofw} inception-backend`
 
 if [ -n "${pid}" ] && kill -0 "${pid}" 2>/dev/null; then
     w=
-    while [ ${#w} -lt 120 ]; do
+    while [ ${#w} -lt ${timeout} ]; do
         sleep 1
 
         wid=`wmctrl -lp | awk "\$3==${pid} { print \$1 }"`

@@ -54,6 +54,7 @@ app-arch/p7zip
 app-arch/unrar
 app-arch/arj
 app-arch/lha
+sys-fs/inotify-tools
 sys-fs/ntfs3g
 sys-fs/ntfsprogs
 sys-fs/dosfstools
@@ -92,7 +93,7 @@ sys-apps/dmidecode
 sys-power/cpufrequtils
 sys-power/powertop
 app-laptop/laptop-mode-tools
-# app-emulation/virt-what [hardened gcc 4.3.4]
+# app-emulation/virt-what [hardened gcc]
 sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils
@@ -103,6 +104,7 @@ sys-apps/usb_modeswitch
 sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
+net-print/ink
 
 # Text utilities
 app-text/tree

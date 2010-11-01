@@ -3,6 +3,9 @@
 luser=anon
 nofw=nofw
 
+# ReachableAddresses ports in /etc/tor/torrc
+torports=80,443
+
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,8088,11523
 
@@ -51,20 +54,24 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 
 
 # --- Loopback ---
+# NOTE: owner match doesn't work with the INPUT chain
 
 # NTP server modification permission to ntpd user only (or root in pre-DNS phase)
 iptables -A OUTPUT -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp -j ACCEPT
 iptables -A OUTPUT -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
 iptables -A OUTPUT -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
 
-# Protect Tor hidden service and Privoxy ports from unintended access
-# (owner match doesn't work with the INPUT chain)
-iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor      -d 127.0.0.1 --dport   80 -j LOGREJECT
-iptables -A OUTPUT -p tcp -m owner ! --uid-owner ${luser} -d 127.0.0.1 --dport 8118 -j LOGREJECT
+# Hidden service server access only for Tor
+iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor -d 127.0.0.1 --dport 80 -j LOGREJECT
 
-# Tor access via SOCKS to selected users only
-iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+# Privoxy access only for main user and HTP
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 8118 -j LOGREJECT
+
+# Tor access via SOCKS only for main user and Privoxy
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
 iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
 # Pass other loopback packets through
@@ -75,30 +82,26 @@ iptables -A OUTPUT -o lo -j ACCEPT
 # --- External Communications ---
 
 # DHCP and NTP client communication
-iptables -A OUTPUT -p udp --sport bootpc --dport bootps -j ACCEPT
-iptables -A OUTPUT -p udp --sport ntp    --dport ntp    -j ACCEPT
+iptables -A OUTPUT -p udp                     --sport bootpc --dport bootps -j ACCEPT
+iptables -A OUTPUT -p udp                     --sport ntp    --dport ntp    -j ACCEPT
 
-# DNS use for Tor, NTP server, and HTP server
-# (uid-owner does not work for dns with nscd; ntpd resolves hostnames as root)
-iptables -A OUTPUT -p udp -m owner --uid-owner root       --dport domain -j ACCEPT
-iptables -A OUTPUT -p udp -m owner --uid-owner tor        --dport domain -j ACCEPT
-iptables -A OUTPUT -p udp -m owner --uid-owner htp        --dport domain -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner root --syn --dport domain -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner tor  --syn --dport domain -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner htp  --syn --dport domain -j ACCEPT
-
-# Let HTP connect to HTTP port for HEAD requests
-iptables -A OUTPUT -p tcp -m owner --uid-owner htp  --syn --dport http   -j ACCEPT
+# DNS use for Tor and NTP server
+# NOTE: uid-owner does not work for dns with nscd
+# NOTE: ntpd resolves hostnames as root
+iptables -A OUTPUT -p udp -m owner --uid-owner root          --dport domain -j ACCEPT
+iptables -A OUTPUT -p udp -m owner --uid-owner tor           --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn --dport domain -j ACCEPT
 
 # Let Tor initiate connections to its ReachableAddresses ports
-iptables -A OUTPUT -p tcp -m owner --uid-owner tor  --syn -m multiport --dports 80,443 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn -m multiport --dports ${torports} -j ACCEPT
 
 # DNS and HTTP(S) communication for non-firewalled user
 iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports domain,${hotspot} -j ACCEPT
 
 
-# Log all other packets at level 7
+# Log all other packets
 iptables -A INPUT   -j LOGDROP
 iptables -A FORWARD -j LOGDROP
 iptables -A OUTPUT  -j LOGREJECT

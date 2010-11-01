@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 dir=${HOME}/config/images
+timeout=300
 
 height=`xwininfo -root | sed -n 's/^  Height: //p'`
 wheight=${height}
@@ -8,7 +9,7 @@ wheight=${height}
 # Wait for the taskbar to come up
 # (long timeout for QEMU non-KVM runs)
 w=
-while [ ${#w} -lt 300  -a  ${height} = ${wheight} ]; do
+while [ ${#w} -lt ${timeout}  -a  ${height} = ${wheight} ]; do
     sleep 1
 
     if xprop -root _NET_WORKAREA | grep -q =; then
