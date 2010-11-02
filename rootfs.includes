@@ -6,8 +6,8 @@
 
 # Include needed .la files for dynamic modules
 # revdep-rebuild -p --library '.*libltdl\.so.*'
-/usr/lib/GraphicsMagick**.la
-/usr/lib/scim**/pinyin-imengine-setup.la
+/usr/lib/GraphicsMagick-[0-9]**.la
+/usr/lib/scim-[0-9]**/pinyin-imengine-setup.la
 
 # Include fontconfig directory and its contents
 /var/cache/fontconfig/***

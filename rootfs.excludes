@@ -7,11 +7,12 @@
 /usr/share/gtk-doc/
 /usr/share/gettext/
 /usr/share/nano/man-html/
-/usr/share/gnumeric/*/doc
+/usr/share/gnumeric/[0-9]*/doc
 # (no gnome-extra/yelp with "-gnome")
 /usr/share/omf/
-/usr/share/gnome*/
-/usr/share/control-center-*/
+/usr/share/gnome/
+/usr/share/gnome-control-center/
+/usr/share/control-center-[0-9]*/
 
 # Portage directories
 /usr/portage/
@@ -47,8 +48,8 @@
 /usr/share/ntp/
 /usr/share/readline/
 /usr/share/splashutils/
-/usr/share/glib-*/gettext/
-/usr/share/gtk-*/demo/
+/usr/share/glib-[0-9]*/gettext/
+/usr/share/gtk-[0-9]*/demo/
 
 # Static libraries and libtool files
 /lib/**.a

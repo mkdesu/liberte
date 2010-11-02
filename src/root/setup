@@ -343,7 +343,6 @@ sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
 
 
 sinfo "Installing wrappers"
-mv -n /sbin/dhcpcd{,.orig}   && ln -sf dhcpcd.wrapper   /sbin/dhcpcd
 mv -n /sbin/iwconfig{,.orig} && ln -sf iwconfig.wrapper /sbin/iwconfig
 
 

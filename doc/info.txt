@@ -77,6 +77,14 @@ GnuPG(SM)
 
 
 
+Password management
+===================
+
+GPG Agent:     used by GgnuPG (-> Pinentry), GPA
+GNOME Keyring: uses by nm-applet
+
+
+
 File permissions
 ================
 

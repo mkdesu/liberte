@@ -9,6 +9,7 @@ xhost -
 
 # X settings
 xrdb /dev/null
+xbacklight -set 100
 xset b off s 300 15 dpms 300 600 900
 xset r rate 250 50 m 3/2 0
 
@@ -17,6 +18,11 @@ xset r rate 250 50 m 3/2 0
 eval `dbus-launch --sh-syntax`
 #eval `ssh-agent -s`
 eval `gpg-agent -s --daemon`
+
+# assume [ -z "${GNOME_KEYRING_CONTROL}" ]
+set -a
+eval `gnome-keyring-daemon -sdc secrets`
+set +a
 
 # Check XDG_*_DIR directories according to
 # ${XDG_CONFIG_HOME}/user-dirs.dirs contents
@@ -43,6 +49,7 @@ nm-applet &
 wait ${WM_PID}
 
 # Kill daemons
+kill ${GNOME_KEYRING_PID}
 kill `echo ${GPG_AGENT_INFO} | cut -d: -f2`
 #eval `ssh-agent -s -k`
 kill ${DBUS_SESSION_BUS_PID}

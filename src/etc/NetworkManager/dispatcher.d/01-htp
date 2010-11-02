@@ -12,6 +12,11 @@ case ${action} in
         if [ ! -e /var/lib/init.d/started/htpdate ]; then
             logger -p 6 -t nm.dispatch "Starting HTP service (${iface})"
             /etc/init.d/htpdate start
+        # However, htpdate can be started when there is no connection to
+        # the sites; time difference might be too big for adjtime then
+        else
+            logger -p 6 -t nm.dispatch "Restarting HTP service (${iface})"
+            /etc/init.d/htpdate restart
         fi
         ;;
 esac
