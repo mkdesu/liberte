@@ -40,7 +40,7 @@ else
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i \
-        --exclude=/root/ --exclude=/home/anon/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
+        --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
         --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
@@ -57,6 +57,10 @@ else
         --exclude=/anon/persist/security/pgp/\*.gpg           \
         --exclude=/anon/persist/security/pgp/\*.crt -C ${SRC}/home/anon ${LIVECD}/home
     find ${LIVECD}/home/anon \( ! -user 2101 -o ! -group 9000 \) -exec chown -h 2101:9000 {} \;
+
+    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go= -i --delete-excluded \
+        -C ${SRC}/home/nofw ${LIVECD}/home
+    find ${LIVECD}/home/nofw \( ! -user 2102 -o ! -group 9001 \) -exec chown -h 2102:9001 {} \;
 fi
 environment="${environment} PHASE=${PHASE}"
 

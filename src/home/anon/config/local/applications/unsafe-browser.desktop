@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Unsafe Browser
+GenericName=Web Browser
+Comment=Run non-Torified browser for e.g., wireless hotspot registration
+Exec=unsafe-browser
+Terminal=false
+Type=Application
+Categories=GTK;Network;WebBrowser
+Icon=network-error

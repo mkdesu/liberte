@@ -71,7 +71,6 @@ app-crypt/mcrypt
 app-crypt/steghide
 app-crypt/ccid
 sys-apps/rng-tools
-app-emulation/qemu-kvm
 
 # Network utilities
 net-firewall/iptables

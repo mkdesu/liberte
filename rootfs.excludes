@@ -69,7 +69,6 @@
 /usr/share/fc-lang/
 /usr/share/mime/packages/
 /usr/share/claws-mail/themes/**
-/usr/share/qemu/**
 
 # Temporary directories
 /tmp/**

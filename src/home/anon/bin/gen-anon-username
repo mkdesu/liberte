@@ -20,13 +20,16 @@ shabits=512
 reqsubj='/O=Liberté Linux/CN=Anonymous'
 crtdays=18300
 
+# Rely on pam_mktemp
+export RANDFILE=/tmp/.private/${USER}/openssl.rnd
+
 
 # Intentionally fail if CA dir already exists
 mkdir ${certdir} ${keysdir}
 
 
 # Key generation can be lengthy, set some traps
-trap 'if [ $? != 0 ]; then rm -r ${certdir} ${keysdir}; fi;  rm -f ${HOME}/.rnd' 0
+trap 'if [ $? != 0 ]; then rm -r ${certdir} ${keysdir}; fi' 0
 trap : INT QUIT TERM SEGV
 
 

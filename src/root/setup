@@ -211,7 +211,7 @@ awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/
 
 
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/midori /usr/bin/mplayer /usr/bin/qemu-system-x86_64
+paxctl -m /usr/bin/midori /usr/bin/mplayer
 
 
 sinfo "Configuring fontconfig"
@@ -311,7 +311,6 @@ rm -f  /var/log/wtmp
 # "cdrom"   group: raw CD devices access (cd playing + cd/dvd writing)
 # "lp"      group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
 # "games"   group: prevent games complaining about not keeping scores
-# "kvm"     group: /dev/kvm access for qemu-kvm by non-firewalled user
 sinfo "Setting up users"
 sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
 
@@ -322,15 +321,15 @@ echo root:liberte | chpasswd
 groupadd -f -r games
 groupadd -f -r plugdev
 groupadd -g 9000 legion || [ $? = 9 ]
+groupadd -g 9001 nofw   || [ $? = 9 ]
 
-useradd -u 2101 -g legion -c "Anonymous" -d /home/anon anon || [ $? = 9 ]
+useradd -u 2101 -g legion -c "Anonymous"      -d /home/anon                  anon || [ $? = 9 ]
+useradd -u 2102 -g nofw   -c "Non-firewalled" -d /home/nofw -s /sbin/nologin nofw || [ $? = 9 ]
+
 usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
-
-useradd -c "non-firewalled" -d /dev/null -s /sbin/nologin -r nofw || [ $? = 9 ]
-usermod -G audio,kvm nofw
 
 
 sinfo "Initializing a secondary PGP keyring"

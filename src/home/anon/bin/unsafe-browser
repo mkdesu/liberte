@@ -1,0 +1,13 @@
+#!/bin/sh
+
+nofw=nofw
+
+
+xhost +si:localuser:${nofw}
+
+
+# DISPLAY is preserved by sudo
+sudo -n -u ${nofw} /mnt/livecd/home/${nofw}/bin/unsafe-browser
+
+
+xhost -si:localuser:${nofw}

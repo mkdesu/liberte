@@ -1,0 +1,45 @@
+#!/bin/sh -e
+
+umask 077
+
+
+# This command is run via "sudo -u anon"
+# Available environment: HOME, USER
+
+# Some sanity checks
+if [ "${HOME}" != /home/nofw ]; then
+    echo "This program should be run via sudo" 1>&2
+    exit 1
+fi
+
+refdir=/mnt/livecd${HOME}
+if [ ! -e ${refdir} ]; then
+    refdir=/mnt/cdrom${HOME}
+
+    # Note that /mnt/cdrom is not supporters by this script's callers
+    if [ ! -e ${refdir} ]; then
+        echo "Could not locate reference directory" 1>&2
+        exit 1
+    fi
+fi
+
+
+# Reinitialize home directory
+rsync -aHAXS -x --delete-excluded ${refdir}/ ${HOME}
+
+
+# Setup environment
+unset XAUTHORITY
+export XDG_CONFIG_HOME=${HOME}/config
+export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
+export XDG_CACHE_HOME=${XDG_CONFIG_HOME}/cache
+export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
+
+
+# Run Midori (which uses getpwent instead of ${HOME})
+set +e
+midori -c ${XDG_CONFIG_HOME}/midori
+
+
+# Reinitialize home directory
+rsync -aHAXS -x --delete-excluded ${refdir}/ ${HOME}

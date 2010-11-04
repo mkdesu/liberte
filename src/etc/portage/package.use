@@ -14,9 +14,7 @@ sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
 media-video/mplayer             -opengl
 media-libs/jasper               -opengl
-media-libs/libsdl               -opengl
 net-libs/webkit-gtk             -gstreamer
-app-emulation/qemu-kvm          sdl
 sci-visualization/gnuplot       gd
 
 # Drivers
@@ -26,7 +24,6 @@ media-video/mplayer             -video_cards_mga -video_cards_s3virge -video_car
 sys-fs/udev                     extras
 sys-fs/ntfs3g                   -udev
 sys-fs/ntfsprogs                minimal -crypt
-app-emulation/qemu-kvm          -bluetooth
 
 # Networking, including SSL/TLS
 mail-client/claws-mail          -ssl -gnutls -imap
@@ -41,7 +38,6 @@ gnome-base/gvfs                 -http
 # Multimedia
 # (mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode)
 media-video/mplayer             -speex -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
-media-libs/libsdl               -audio -joystick
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal
