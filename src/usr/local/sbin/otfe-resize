@@ -103,8 +103,15 @@ EOF
 fi
 
 
+# Check that the parameter is not too long
+if [ ${#size} -gt 12 ]; then
+    echo "Parameter is too long"
+    exit 1
+fi
+
+
 # Sanitize the parameter and discard the original
-size=`echo "$1" | tr -cd '[:digit:]' | cut -c -12`
+size=`echo "$1" | tr -cd '[[:digit:]]'`
 shift
 
 

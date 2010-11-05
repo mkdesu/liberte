@@ -54,7 +54,7 @@ eselect profile set ${hardened}
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     sinfo "Updating portage"
 
-    gpg -q --homedir /etc/portage/gnupg --import /var/tmp/addons/keys/gentoo-*.asc
+    gpg -q --homedir /etc/portage/gnupg --import /usr/local/addons/keys/gentoo-*.asc
     eix-sync -qw -C -q
 fi
 
@@ -192,9 +192,9 @@ rebuild_locales
 
 
 sinfo "Compiling custom executables"
-gcc -o /usr/local/sbin/udev-watchdog /var/tmp/ebuilds/udev-watchdog.c \
+gcc -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c \
     `portageq envvar CFLAGS` `portageq envvar LDFLAGS` -ludev
-gcc -o /usr/local/bin/log-limit      /var/tmp/ebuilds/log-limit.c     \
+gcc -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c     \
     `portageq envvar CFLAGS` `portageq envvar LDFLAGS`
 
 strip -s /usr/local/sbin/udev-watchdog
@@ -336,8 +336,8 @@ sinfo "Initializing a secondary PGP keyring"
 sudo -n -u anon touch     /home/anon/persist/security/pgp/liberte.gpg
 sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/liberte.gpg
 sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp \
-    --primary-keyring liberte.gpg --import /var/tmp/addons/keys/liberte-*.asc
-sudo -n -u anon cp -p /var/tmp/addons/keys/mfpl.crt /home/anon/persist/security/pgp
+    --primary-keyring liberte.gpg --import /usr/local/addons/keys/liberte-*.asc
+sudo -n -u anon cp -p /usr/local/addons/keys/mfpl.crt /home/anon/persist/security/pgp
 sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
 
 

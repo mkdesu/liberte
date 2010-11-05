@@ -1,0 +1,95 @@
+#!/bin/sh -e
+
+# This script should be safe to run via sudo
+# (with env_reset and secure_path set)
+
+
+if [ $# != 1  -a  $# != 2 ]; then
+    cat<<EOF
+Format: sudo mac-randomize all
+        sudo mac-randomize wireless
+        sudo mac-randomize <interface> XX:XX:XX:XX:XX:XX
+
+Changing a MAC address on an interface will reset all its connections.
+EOF
+    exit 1
+fi
+
+
+# Sanitize input, and extract parameters
+ifaces=`find /sys/class/net -xdev -mindepth 1 -maxdepth 1 ! -lname '*/virtual/*' -printf '%f\n'`
+mac=
+
+# ${ifaces} contains the (possibly empty) interfaces list
+# ${mac} contains the MAC address (${ifaces} has one interface then)
+if [ $# = 1 ]; then
+    if [ "$1" = wireless ]; then
+        # Rely on the deprecated WIRELESS_EXT_SYSFS in kernel
+        ifaces2=
+        for iface in ${ifaces}; do
+            if [ -e /sys/class/net/${iface}/wireless ]; then
+                ifaces2="${ifaces2}${iface} "
+            fi
+        done
+        ifaces="${ifaces2}"
+    elif [ "$1" != all ]; then
+        echo "Incorrect first parameter"
+        exit 1
+    fi
+else
+    selected=
+    for iface in ${ifaces}; do
+        if [ "$1" = ${iface} ]; then
+            selected=${iface}
+        fi
+    done
+
+    if [ -z "${selected}" ]; then
+        echo "No such interface"
+        exit 1
+    fi
+
+    ifaces=${selected}
+
+    if [ ${#2} != 17 ]; then
+        echo "Incorrect MAC address length"
+        exit 1
+    fi
+
+    mac=`echo "$2" | tr -cd '[[:xdigit:]:]' | tr '[a-f]' '[A-F]'`
+
+    if [ ${#2} != ${#mac} ] || \
+            ! echo "${mac}" | egrep -q '^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$'; then
+        echo "Incorrect MAC address format"
+        exit 1
+    fi
+fi
+
+
+# Change addresses
+if [ -n "${ifaces}" ]; then
+    wireless=0
+    for iface in ${ifaces}; do
+        if [ -e /sys/class/net/${iface}/wireless ]; then
+            wireless=1
+            echo "Wireless interface: ${iface}"
+        else
+            echo "Interface: ${iface}"
+        fi
+
+        ifconfig ${iface} down
+
+        if [ -z "${mac}" ]; then
+            macchanger -e ${iface}
+        else
+            macchanger -m ${mac} ${iface}
+        fi
+
+        ifconfig ${iface} up
+    done
+
+    if [ ${wireless} = 1 ] && pgrep -u root -x wpa_supplicant 1>/dev/null; then
+        echo "Killing wpa_supplicant"
+        pkill -u root -x wpa_supplicant
+    fi
+fi

@@ -16,6 +16,7 @@
 
 # Portage directories
 /usr/portage/
+/usr/local/portage/
 /var/db/pkg/
 /usr/lib/pkgconfig/
 /usr/share/pkgconfig/
@@ -35,6 +36,7 @@
 # Sources and development tools
 /usr/include/
 /usr/src/
+/usr/local/src/
 /usr/lib/**/include/
 /usr/lib/icu/
 /usr/share/aclocal/
@@ -76,6 +78,7 @@
 /var/cache/**
 /var/log/*.log
 /var/run/*.pid
+/usr/local/addons/
 
 # Miscellaneous
 .keep*

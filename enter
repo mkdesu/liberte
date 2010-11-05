@@ -39,28 +39,28 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i \
-        --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
-        --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
+    rsync -rltOHS --chmod=u=rwX,go=rX -i \
+          --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
+          --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
+    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    rsync -rltOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
+    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
 
-    rsync -aHS -O --no-o --no-g --chmod=ug=r,o=     -i ${SRC}/etc/sudoers    ${LIVECD}/etc
-    rsync -aHS -O --no-o --no-g --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock ${LIVECD}/etc
+    rsync -rltOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers    ${LIVECD}/etc
+    rsync -rltOHS --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock ${LIVECD}/etc
 
-    mkdir -p -m 755 ${LIVECD}/var/tmp/addons
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/var/tmp/addons
+    mkdir -p -m 755 ${LIVECD}/usr/local/addons
+    rsync -rltOHS --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
 
     # rwX------
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go= -i --delete \
-        --exclude=/anon/persist/security/pgp/\*.gpg           \
-        --exclude=/anon/persist/security/pgp/\*.crt -C ${SRC}/home/anon ${LIVECD}/home
-    find ${LIVECD}/home/anon \( ! -user 2101 -o ! -group 9000 \) -exec chown -h 2101:9000 {} \;
+    rsync -rltOHS --chmod=u=rwX,go= -i --delete \
+          --exclude=/anon/persist/security/pgp/\*.gpg --exclude=/anon/persist/security/pgp/\*.crt \
+          -C ${SRC}/home/anon ${LIVECD}/home
+    find ${LIVECD}/home/anon ! \( -user 2101 -group 9000 \) -exec chown -h 2101:9000 {} \;
 
-    rsync -aHS -O --no-o --no-g --chmod=u=rwX,go= -i --delete-excluded \
-        -C ${SRC}/home/nofw ${LIVECD}/home
-    find ${LIVECD}/home/nofw \( ! -user 2102 -o ! -group 9001 \) -exec chown -h 2102:9001 {} \;
+    rsync -rltOHS --chmod=u=rwX,go= -i --delete-excluded \
+          -C ${SRC}/home/nofw ${LIVECD}/home
+    find ${LIVECD}/home/nofw ! \( -user 2102 -group 9001 \) -exec chown -h 2102:9001 {} \;
 fi
 environment="${environment} PHASE=${PHASE}"
 

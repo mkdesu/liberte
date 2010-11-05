@@ -112,12 +112,6 @@ start() {
                 sed -i 's/[[:blank:]]*Identifier[[:blank:]]\+"Screen0"$/&\n\tDefaultDepth 16/' /etc/X11/xorg.conf
             fi
 
-            cat >> /etc/X11/xorg.conf <<EOF
-Section "ServerFlags"
-    Option "DontZap"      "true"
-    Option "DontVTSwitch" "false"
-EndSection
-EOF
             eend 0
         else
             eend 1
@@ -144,6 +138,12 @@ EOF
             fi
         done
     fi
+
+
+    # Randomize endings of wireless interfaces MAC addresses
+    ebegin Randomizing wireless MACs
+    mac-randomize wireless 1>/dev/null
+    eend $?
 
 
     # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)

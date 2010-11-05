@@ -17,7 +17,7 @@
 # User privilege specification (group prefix = %)
 root	ALL=(ALL) ALL
 
-anon	liberte = NOPASSWD: /sbin/shutdown -h now, /sbin/shutdown -r now
-anon	liberte = NOPASSWD: /sbin/otfe-resize
+anon	liberte = NOPASSWD: /sbin/shutdown -h now,       /sbin/shutdown -r now
+anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
 
 anon	liberte = (nofw) NOPASSWD: /mnt/livecd/home/nofw/bin/unsafe-browser ""

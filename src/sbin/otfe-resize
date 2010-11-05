@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-# This is a wrapper for a script that should only be run by root
-# (directly, or via sudo)
-exec /root/bin/otfe-resize "$@"

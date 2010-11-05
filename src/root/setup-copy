@@ -42,7 +42,7 @@ ebuilds="sys-apps/portage
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
-    rsync -a /usr/portage/${ebuild} /var/tmp/ebuilds/`dirname ${ebuild}`
+    rsync -a /usr/portage/${ebuild} /usr/local/portage/`dirname ${ebuild}`
     eval ebuild_`basename ${ebuild//-}`=`equery which ${ebuild}`
 done
 
