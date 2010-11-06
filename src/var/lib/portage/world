@@ -74,7 +74,6 @@ sys-apps/rng-tools
 
 # Network utilities
 net-firewall/iptables
-net-analyzer/macchanger
 sys-apps/ethtool
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng

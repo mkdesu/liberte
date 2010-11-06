@@ -10,12 +10,6 @@ torports=80,443
 hotspot=http,https,webcache,tproxy,3128,8088,11523
 
 
-if grep -q '\<looptype=noloop\>' /proc/cmdline; then
-    echo " * Relaxing firewall setup in virtualized boot"
-    nofw=privoxy
-fi
-
-
 # Default policies
 iptables -P INPUT   DROP
 iptables -P FORWARD DROP

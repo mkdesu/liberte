@@ -56,7 +56,7 @@ else
         exit 1
     fi
 
-    mac=`echo "$2" | tr -cd '[[:xdigit:]:]' | tr '[a-f]' '[A-F]'`
+    mac=`echo "$2" | tr -cd '[[:xdigit:]:]' | tr '[A-F]' '[a-f]'`
 
     if [ ${#2} != ${#mac} ] || \
             ! echo "${mac}" | egrep -q '^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$'; then
@@ -66,10 +66,23 @@ else
 fi
 
 
+# MAC getter via sysfs
+mac_get() {
+    local iface=$1
+
+    if [ "`cat /sys/class/net/${iface}/addr_len`" != 6 ]; then
+        false
+    else
+        cat /sys/class/net/${iface}/address
+    fi
+}
+
+
 # Change addresses
 if [ -n "${ifaces}" ]; then
     wireless=0
     for iface in ${ifaces}; do
+
         if [ -e /sys/class/net/${iface}/wireless ]; then
             wireless=1
             echo "Wireless interface: ${iface}"
@@ -77,14 +90,19 @@ if [ -n "${ifaces}" ]; then
             echo "Interface: ${iface}"
         fi
 
-        ifconfig ${iface} down
-
         if [ -z "${mac}" ]; then
-            macchanger -e ${iface}
+            newmac=`mac_get ${iface} | cut -d: -f1-3`:`RANDFILE=/dev/null openssl rand -hex 3 | sed 's/^\(..\)\(..\)\(..\)$/\1:\2:\3/'`
         else
-            macchanger -m ${mac} ${iface}
+            newmac=${mac}
         fi
 
+        if [ ${#newmac} != 17 ]; then
+            echo "Incorrect MAC address length (internal error)"
+            exit 1
+        fi
+
+        ifconfig ${iface} down
+        ifconfig ${iface} hw ether ${newmac}
         ifconfig ${iface} up
     done
 

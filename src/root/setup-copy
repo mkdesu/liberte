@@ -26,7 +26,6 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # gvfs:           exclude openssh RDEPEND
 # splashutils:    exclude cpio    RDEPEND
 # graphicsmagick: exclude perl    RDEPEND
-# midori:         exclude python  RDEPEND
 # mpg123:         exclude libtool RDEPEND
 sinfo "Patching copies of selected ebuilds"
 ebuilds="sys-apps/portage
@@ -37,7 +36,6 @@ ebuilds="sys-apps/portage
          gnome-base/gvfs
          media-gfx/splashutils
          media-gfx/graphicsmagick
-         www-client/midori
          media-sound/mpg123"
 
 # /usr/portage is bind-mounted ro
@@ -70,9 +68,6 @@ sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 
 # perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
-
-# Python is only needed during build
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_midori}
 
 # libltdl.* libraries are kept during libtool unmerge
 sed -i s:sys-devel/libtool:: ${ebuild_mpg123}
