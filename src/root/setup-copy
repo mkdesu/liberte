@@ -26,6 +26,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # gvfs:           exclude openssh RDEPEND
 # splashutils:    exclude cpio    RDEPEND
 # graphicsmagick: exclude perl    RDEPEND
+# eboard:         exclude perl    RDEPEND
 # mpg123:         exclude libtool RDEPEND
 sinfo "Patching copies of selected ebuilds"
 ebuilds="sys-apps/portage
@@ -36,6 +37,7 @@ ebuilds="sys-apps/portage
          gnome-base/gvfs
          media-gfx/splashutils
          media-gfx/graphicsmagick
+         games-board/eboard
          media-sound/mpg123"
 
 # /usr/portage is bind-mounted ro
@@ -68,6 +70,9 @@ sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 
 # perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
+
+# Perl is not needed at all
+sed -i s:dev-lang/perl:: ${ebuild_eboard}
 
 # libltdl.* libraries are kept during libtool unmerge
 sed -i s:sys-devel/libtool:: ${ebuild_mpg123}
@@ -135,8 +140,8 @@ if [ -e /usr/bin/perl ]; then
 fi
 
 
-sinfo "Fixing GraphicsMagick .la files"
-rm /usr/lib/libGraphicsMagick*.la
+sinfo "Fixing .la files"
+rm /usr/lib/libGraphicsMagick*.la /usr/lib/libsox.la
 for mod in `find /usr/lib/GraphicsMagick* -name '*.so'`; do
     echo dlname=\'${mod##*/}\' > ${mod%.so}.la
 done

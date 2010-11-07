@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec torify /usr/games/bin/eboard "$@"

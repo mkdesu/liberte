@@ -64,7 +64,10 @@ net-fs/autofs
 app-shells/dash
 app-admin/metalog
 app-admin/sudo
+app-misc/hatools
 sys-apps/paxctl
+app-misc/vlock
+x11-misc/alock
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
@@ -121,6 +124,7 @@ media-sound/audacious
 media-video/gnome-mplayer
 media-gfx/gpicview
 media-gfx/graphicsmagick
+media-sound/sox
 app-editors/gedit
 app-text/epdfview
 app-text/evince
@@ -136,6 +140,8 @@ www-client/midori
 
 # Games
 games-board/xmahjongg
+games-board/gnuchess
+games-board/eboard
 
 # X11 (a subset of xorg-x11 metapackage)
 x11-base/xorg-server
