@@ -19,5 +19,6 @@ root	ALL=(ALL) ALL
 
 anon	liberte = NOPASSWD: /sbin/shutdown -h now,       /sbin/shutdown -r now
 anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
+anon	liberte = NOPASSWD: /sbin/sysrq [01]
 
 anon	liberte = (nofw) NOPASSWD: /mnt/livecd/home/nofw/bin/unsafe-browser ""

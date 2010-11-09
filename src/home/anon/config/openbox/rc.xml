@@ -280,6 +280,16 @@
         <command>lxterminal</command>
       </action>
     </keybind>
+    <keybind key="W-l">
+      <action name="Execute">
+        <command>xlock</command>
+      </action>
+    </keybind>
+    <keybind key="W-s">
+      <action name="Execute">
+        <command>sync-notify</command>
+      </action>
+    </keybind>
     <keybind key="Print">
       <action name="Execute">
         <command>xsnapshot ~/persist/desktop -root</command>

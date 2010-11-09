@@ -184,7 +184,7 @@ emerge -qc --deselect=n
 
 
 sinfo "Checking linking consistency"
-revdep-rebuild -q -i
+revdep-rebuild -qi
 
 rm -f ${protected}
 etc-update

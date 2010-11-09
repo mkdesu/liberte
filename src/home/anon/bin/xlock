@@ -1,0 +1,85 @@
+#!/bin/sh -e
+
+lock=${TMPDIR}/xlock.lock
+
+if [ "$1" != lockmagic ]; then
+    if ! halockrun -tc ${lock}; then
+        echo "Another xlock instance is already running: ${lock} is busy"
+        exit 1
+    fi
+
+    exec halockrun -n ${lock} "$0" lockmagic "$@"
+fi
+shift
+
+
+logo=${HOME}/config/images/liberte-logo-wallpaper.png
+pass=${HOME}/persist/security/lock/passwd.sha256
+sysrq=/proc/sys/kernel/sysrq
+
+pinask='SETDESC Specify a new screen lock password
+SETPROMPT Password:
+GETPIN'
+pinver='SETDESC Verify the screen lock password
+SETPROMPT Password:
+GETPIN'
+
+getpin() {
+    local pin=
+    local vpin=x
+    local pinextra=
+
+    while [ "${pin}" != "${vpin}" ]; do
+        pin=`echo "${pinextra}${pinask}" | pinentry | sed -n '/^D /p; s/^ERR .*/E/p'`
+        if [ "${pin}" = E ]; then
+            return 1
+        fi
+
+        vpin=`echo "${pinver}" | pinentry | sed -n '/^D /p; s/^ERR .*/E/p'`
+        pinextra='SETERROR Verification failed
+'
+    done
+
+    echo "${pin}" | sed 's/^D //'
+}
+
+
+if [ ! -e ${logo} ]; then
+    echo "Lock image not found: ${logo}"
+    exit 1
+fi
+
+
+if [ ! -e ${pass} ]; then
+    # Failure exits the script
+    pin=`getpin`
+
+    if [ -z "${pin}" ]; then
+        zenity --warning --text='Alock does not support empty passwords.'
+        exit 1
+    fi
+
+    echo -n "${pin}" | sha256sum | cut -d' ' -f1 > ${pass}
+fi
+
+
+# Save current SysRq state, and disable SysRq keyboard sequences
+if [ -e ${sysrq} ]; then
+    sysrqsave=`cat ${sysrq}`
+    sudo -n sysrq 0
+fi
+
+
+gm display -font fixed -immutable -background black -bordercolor black \
+           -backdrop ${logo} & gmpid=$!
+
+alock -auth sha256:file=${pass} -cursor glyph:name=pencil
+
+# TERM causes a segfault and leaves a hanging process
+kill -9 ${gmpid}
+
+
+# Restore SysRq state
+if [ -e ${sysrq} ]; then
+    sudo -n sysrq ${sysrqsave}
+fi

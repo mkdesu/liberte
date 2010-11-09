@@ -5,6 +5,5 @@ sleep 1
 sync
 sleep 1
 
-exec zenity --info --text="Removable media can be disconnected now.
-
-Before disconnecting, make sure that any I/O activity on the device has stopped."
+exec notify-send -u low -i drive-removable-media 'Media synchronized' 'Removable media can be disconnected now.
+Before disconnecting, make sure that any I/O activity on the device has stopped.'

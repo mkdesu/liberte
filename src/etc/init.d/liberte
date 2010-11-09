@@ -73,6 +73,11 @@ start() {
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
     cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
 
+    xorg_extra='Section "ServerFlags"
+    Option "DontZap"      "true"
+    Option "DontVTSwitch" "true"
+EndSection'
+
 
     # Lock root account's password
     ebegin Disabling root password
@@ -105,6 +110,7 @@ start() {
     if [ ! -e /etc/.noxdm  -a  ! -e /etc/X11/xorg.conf ]; then
         ebegin Configuring X server
         if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
+            echo "${xorg_extra}" >> /root/xorg.conf.new
             mv /root/xorg.conf.new /etc/X11/xorg.conf
 
             # QEMU + 24bpp + Openbox: http://bugzilla.icculus.org/show_bug.cgi?id=4363

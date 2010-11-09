@@ -1,13 +1,15 @@
 #!/bin/sh -e
 
 dir=${HOME}/config/images
-timeout=300
+svg=${dir}/liberte-logo-nofont.svg
+png=${dir}/liberte-logo-wallpaper.png
+
+timeout=120
 
 height=`xwininfo -root | sed -n 's/^  Height: //p'`
 wheight=${height}
 
 # Wait for the taskbar to come up
-# (long timeout for QEMU non-KVM runs)
 w=
 while [ ${#w} -lt ${timeout}  -a  ${height} = ${wheight} ]; do
     sleep 1
@@ -19,7 +21,10 @@ while [ ${#w} -lt ${timeout}  -a  ${height} = ${wheight} ]; do
     w=${w}X
 done
 
-calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
-size=`qalc -t "${calc}"`
+if [ ! -e ${png} ]; then
+    calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
+    size=`qalc -t "${calc}"`
 
-exec rsvg-convert -h ${size} -o ${dir}/liberte-logo-wallpaper.png ${dir}/liberte-logo-nofont.svg
+    # Black background is needed for xlock (gm display +matte has no antialiasing)
+    exec rsvg-convert --background-color=black -h ${size} -o ${png} ${svg}
+fi

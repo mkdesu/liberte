@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Lock Screen
+GenericName=Screen Saver
+Comment=Lock X server screen using alock
+Exec=xlock
+Terminal=false
+Type=Application
+Categories=Utility;System;Security
+Icon=system-lock-screen.svg

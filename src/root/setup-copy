@@ -149,7 +149,7 @@ done
 
 # Any problem will cause a fatal error
 sinfo "Checking linking consistency"
-revdep-rebuild -q -i
+revdep-rebuild -qi
 
 
 # Unmerge portage utilities (revdep-rebuild is unavailable afterwards)

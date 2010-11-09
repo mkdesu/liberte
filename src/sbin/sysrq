@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+# This program can be safely run via sudo
+
+sysrq=/proc/sys/kernel/sysrq
+
+if [ ! -e ${sysrq} ]; then
+    echo "SysRq control file not found"
+    exit 1
+fi
+
+if [ $# != 1 -o \( "$1" != 0 -a "$1" != 1 \) ]; then
+    echo "Format: sudo sysrq 0|1"
+    exit 1
+fi
+
+echo "$1" > ${sysrq}

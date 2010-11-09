@@ -122,9 +122,11 @@ app-cdr/isomaster
 media-sound/aumix
 media-sound/audacious
 media-video/gnome-mplayer
+media-video/gpac
 media-gfx/gpicview
 media-gfx/graphicsmagick
 media-sound/sox
+media-sound/vorbis-tools
 app-editors/gedit
 app-text/epdfview
 app-text/evince
