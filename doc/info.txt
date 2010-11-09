@@ -89,7 +89,7 @@ File permissions
 ================
 
 Boot media
-  [root] rw-r--r-- / rwxr-xr-x
+  [anon] rw-r----- / rwx--x---
 
 Home directory
   umask 077

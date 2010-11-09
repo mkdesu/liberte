@@ -21,7 +21,7 @@ version=`cat ${SRC}/version`
 distname=liberte-${version}
 
 # see the /root/bin/ps-mount script
-vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,umask=0133,dmask=022
+vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=2101,gid=9000,umask=0137,dmask=067
 
 
 if type mksquashfs 1>/dev/null 2>&1; then

@@ -183,6 +183,14 @@ sinfo "Removing unnecessary packages"
 emerge -qc --deselect=n
 
 
+sinfo "Updating Perl modules"
+perl-cleaner --ph-clean --modules -- -q
+
+
+# sinfo "Updating Python modules"
+# python-updater -dmanual -- -q
+
+
 sinfo "Checking linking consistency"
 revdep-rebuild -qi
 

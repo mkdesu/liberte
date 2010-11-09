@@ -146,7 +146,9 @@ if [ "$1" = fork ]; then
                 eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
                 ;;
             ext3|ext4)
+                ID_FS_LABEL="${ID_FS_LABEL}-readonly"
                 type="ext2,${opts_ext2},ro"
+                fixlabel
                 ;;
             msdos)
                 type="vfat,${opts_vfat}"

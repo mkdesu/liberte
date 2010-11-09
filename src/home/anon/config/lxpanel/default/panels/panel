@@ -56,7 +56,7 @@ Plugin {
             id=/usr/share/applications/pcmanfm.desktop
         }
         Button {
-            id=/usr/share/applications/lxterminal.desktop
+            id=/usr/share/applications/sakura.desktop
         }
         Button {
             id=/usr/share/applications/qalculate-gtk.desktop

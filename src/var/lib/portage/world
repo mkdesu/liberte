@@ -112,6 +112,7 @@ app-text/tree
 
 # Applications
 lxde-base/lxterminal
+x11-terms/sakura
 x11-misc/parcellite
 x11-misc/xvkbd
 app-arch/xarchiver

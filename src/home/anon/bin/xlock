@@ -60,6 +60,7 @@ if [ ! -e ${pass} ]; then
     fi
 
     echo -n "${pin}" | sha256sum | cut -d' ' -f1 > ${pass}
+    unset pin
 fi
 
 
@@ -70,13 +71,24 @@ if [ -e ${sysrq} ]; then
 fi
 
 
+# Disable/buffer notifications until the screen is unlocked
+pkill -STOP -u ${USER} -x notification-da || true
+
+# Hide windows behind a full-screen logo on backdrop
 gm display -font fixed -immutable -background black -bordercolor black \
            -backdrop ${logo} & gmpid=$!
 
-alock -auth sha256:file=${pass} -cursor glyph:name=pencil
 
-# TERM causes a segfault and leaves a hanging process
-kill -9 ${gmpid}
+# Grab keyboard/mouse until the correct password is entered (blindly)
+alock -auth sha256:file=${pass} -cursor glyph:name=pencil
+set +e
+
+
+# A TERM signal causes a segfault and leaves a hanging process
+kill -KILL ${gmpid}
+
+# Re-enable notifications
+pkill -CONT -u ${USER} -x notification-da || true
 
 
 # Restore SysRq state

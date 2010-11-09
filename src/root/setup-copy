@@ -60,7 +60,7 @@ sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto}
 sed -i s:dev-lang/perl:: ${ebuild_lm_sensors}
 
 # Python is only needed by libglade-convert
-sed -i 's@>=dev-lang/python[[:alnum:].-]*@@' ${ebuild_libglade}
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade}
 
 # OpenSSH is only needed for ssh:// support
 sed -i s:net-misc/openssh:: ${ebuild_gvfs}
