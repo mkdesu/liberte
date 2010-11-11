@@ -160,6 +160,10 @@ EndSection'
         mount -o remount,rw /mnt/cdrom
         remount=$?
         eend ${remount}
+    elif grep -q '\<looptype=noloop\>' /proc/cmdline; then
+        ebegin Linking /mnt/cdrom to /mnt/livecd
+        rmdir /mnt/livecd && ln -s cdrom /mnt/livecd
+        eend $?
     fi
 
 
