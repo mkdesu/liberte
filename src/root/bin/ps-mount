@@ -20,7 +20,7 @@ if [ "$1" = fork ]; then
     started=/var/lib/init.d/started/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)
-    supported=" ext2 vfat msdos ntfs iso9660 "
+    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf "
     luser=anon
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
@@ -93,7 +93,7 @@ if [ "$1" = fork ]; then
     # Fixing volume label in case of collision
     fixlabel() {
         if [ -z "${autokeys/* ${ID_FS_LABEL} */}" ]; then
-            local suffix=1
+            local suffix=2
 
             while [ -z "${autokeys/* ${ID_FS_LABEL}-${suffix} */}" ]; do
                 let suffix=suffix+1

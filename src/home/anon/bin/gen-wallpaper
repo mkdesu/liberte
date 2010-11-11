@@ -12,7 +12,7 @@ wheight=${height}
 # Wait for the taskbar to come up
 w=
 while [ ${#w} -lt ${timeout}  -a  ${height} = ${wheight} ]; do
-    sleep 1
+    sleep 0.2
 
     if xprop -root _NET_WORKAREA | grep -q =; then
         wheight=`xprop -root '=$3' _NET_WORKAREA | cut -d= -f2`

@@ -75,14 +75,16 @@ GnuPG(SM)
   + SHA-1   digest for DSA-1024, RSA-[1024..4096] signature keys
   + SHA-256 digest for DSA-[2048..3072]           signature keys
 
+alock
+  + SHA-256 password hashing
 
 
 Password management
 ===================
 
-GPG Agent:     used by GgnuPG (-> Pinentry), GPA
-GNOME Keyring: uses by nm-applet
-
+GPG Agent:     used by GgnuPG, GPA [password entry: Pinentry]
+GNOME Keyring: used by nm-applet   [password entry: native]
+xlock:         custom script       [password entry: Pinentry]
 
 
 File permissions

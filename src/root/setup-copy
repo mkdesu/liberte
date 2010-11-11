@@ -204,6 +204,13 @@ find /usr/share -mindepth 3 -maxdepth 3 -type d -name hicolor \
     -exec gtk-update-icon-cache -q -f -i -t {} \;
 
 
+# http://www.freedesktop.org/wiki/Specifications/mime-actions-spec
+sinfo "Modifying MIME actions ordering preferences"
+sed -i 's/\<epdfview.desktop;evince.desktop;/evince.desktop;epdfview.desktop;/ ;
+        s/\<gnome-mplayer.desktop;audacious2.desktop;/audacious2.desktop;gnome-mplayer.desktop;/' \
+    /usr/share/applications/mimeinfo.cache
+
+
 sinfo "Uncompressing selected files"
 gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`
