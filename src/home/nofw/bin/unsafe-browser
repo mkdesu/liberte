@@ -8,7 +8,7 @@ umask 077
 
 # Some sanity checks
 if [ "${HOME}" != /home/nofw ]; then
-    echo "This program should be run via sudo" 1>&2
+    echo "This program should be run via sudo"
     exit 1
 fi
 
@@ -18,7 +18,7 @@ if [ ! -e ${refdir} ]; then
 
     # Note that /mnt/cdrom is not supporters by this script's callers
     if [ ! -e ${refdir} ]; then
-        echo "Could not locate reference directory" 1>&2
+        echo "Could not locate reference directory"
         exit 1
     fi
 fi

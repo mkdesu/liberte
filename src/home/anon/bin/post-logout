@@ -9,11 +9,11 @@ ret=0
 
 case "${choice}" in
 shutdown)
-    sudo shutdown -h now
+    sudo -n shutdown -h now
     sleep 5
     ;;
 reboot)
-    sudo shutdown -r now
+    sudo -n shutdown -r now
     sleep 5
     ;;
 login)
