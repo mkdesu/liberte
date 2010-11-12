@@ -27,10 +27,10 @@ sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
 mail-client/claws-mail          -ssl -gnutls -imap
-net-misc/wget                   -ssl
+net-misc/wget                   ssl
 net-libs/libsoup                ssl
-net-misc/curl                   ssl  gnutls -nss
-net-libs/neon                   ssl  gnutls
+net-misc/curl                   ssl   gnutls -nss
+net-libs/neon                   ssl   gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 gnome-base/gvfs                 -http

@@ -28,6 +28,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # graphicsmagick: exclude perl    RDEPEND
 # eboard:         exclude perl    RDEPEND
 # mpg123:         exclude libtool RDEPEND
+# libqalculate:   exclude gnuplot RDEPEND
 sinfo "Patching copies of selected ebuilds"
 ebuilds="sys-apps/portage
          app-portage/gentoolkit
@@ -38,7 +39,8 @@ ebuilds="sys-apps/portage
          media-gfx/splashutils
          media-gfx/graphicsmagick
          games-board/eboard
-         media-sound/mpg123"
+         media-sound/mpg123
+         sci-libs/libqalculate"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -76,6 +78,9 @@ sed -i s:dev-lang/perl:: ${ebuild_eboard}
 
 # libltdl.* libraries are kept during libtool unmerge
 sed -i s:sys-devel/libtool:: ${ebuild_mpg123}
+
+# Gnuplot is an overkill, and is superficially integrated
+sed -i 's:>=sci-visualization/gnuplot-[a-z0-9._-]\+::' ${ebuild_libqalculate}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild \$${ebuild} manifest

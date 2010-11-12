@@ -46,7 +46,7 @@ wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 libsoup                 gnutls                  gnutls          midori
 curl                    ssl, gnutls, nss        gnutls          gnupg
 neon                    ssl, gnutls             gnutls          audacious-plugins
-wget                    ssl                     -               portage, libqalculate(forex)
+wget                    ssl                     ssl             portage, libqalculate(forex)
 
 
 libcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring
