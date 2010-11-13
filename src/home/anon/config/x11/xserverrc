@@ -1,2 +1,2 @@
 #!/bin/sh -e
-exec /usr/bin/X -nolisten tcp -br "$@"
+exec nice -n -10 /usr/bin/X -nolisten tcp -br "$@"

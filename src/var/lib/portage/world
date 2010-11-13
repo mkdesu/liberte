@@ -123,7 +123,7 @@ app-cdr/isomaster
 media-sound/aumix
 media-sound/audacious
 media-video/gnome-mplayer
-media-video/gpac
+media-video/x264-encoder
 media-gfx/gpicview
 media-gfx/graphicsmagick
 media-sound/sox

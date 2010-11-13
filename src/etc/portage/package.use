@@ -38,7 +38,7 @@ gnome-base/gvfs                 -http
 # Multimedia
 # mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode
 media-video/mplayer             -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
-media-video/mplayer             encode x264 -faac -xvid -twolame -toolame
+media-video/mplayer             -encode -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
 media-video/gpac                -* aac mad ogg vorbis
 
