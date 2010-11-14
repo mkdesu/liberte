@@ -11,7 +11,7 @@ if type -p env-update 1>/dev/null; then
 
     if [ -e /usr/bin/xcdroast ]; then
         find /usr/lib/xcdroast-*/bin/xcdrwrap ! -user root -exec chown root {} \;
-        find /usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4711 -exec chmod 4711 {} \;
+        find /usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
     fi
 
     # if [ -e /usr/bin/eix-update ]; then
