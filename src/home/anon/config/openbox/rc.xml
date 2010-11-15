@@ -300,23 +300,37 @@
         <command>xsnapshot ~/persist/desktop</command>
       </action>
     </keybind>
+    <keybind key="XF86Mail">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Email</name>
+        </startupnotify>
+        <command>claws-mail</command>
+      </action>
+    </keybind>
+    <keybind key="XF86WWW">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Browser</name>
+        </startupnotify>
+        <command>midori</command>
+      </action>
+    </keybind>
     <keybind key="XF86AudioRaiseVolume">
       <action name="Execute">
-        <command>aumix -v+5</command>
+        <command>amixer sset -q Master 5%+</command>
       </action>
     </keybind>
     <keybind key="XF86AudioLowerVolume">
       <action name="Execute">
-        <command>aumix -v-5</command>
+        <command>amixer sset -q Master 5%-</command>
       </action>
     </keybind>
     <keybind key="XF86AudioMute">
       <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Aumix</name>
-        </startupnotify>
-        <command>aumix -I -v0</command>
+        <command>amixer sset -q Master toggle</command>
       </action>
     </keybind>
   </keyboard>

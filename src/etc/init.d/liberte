@@ -152,6 +152,27 @@ EndSection'
     eend $?
 
 
+    # Select preferred audio card based on the number of mixer controls
+    if [ -e /proc/asound ]; then
+        ebegin Selecting preferred audio card
+        acards=`sed -n 's/^[[:blank:]]*[[:digit:]]\+[[:blank:]]*\[\([^][:blank:]]\+\)[[:blank:]]*\].*$/\1/p' /proc/asound/cards`
+        bestcount=-1
+        for acard in ${acards}; do
+            acount=`amixer -c ${acard} controls | wc -l`
+            if [ ${acount} -gt ${bestcount} ]; then
+                bestcard=${acard}
+                bestcount=${acount}
+            fi
+        done
+        if [ ${bestcount} -gt -1 ]; then
+            sed -i "s/\<card .*\$/card ${bestcard}/" /etc/asound.conf
+        else
+            false
+        fi
+        eend $?
+    fi
+
+
     # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
     remount=1
     if [ ${cdtype} = vfat ]; then

@@ -120,7 +120,6 @@ app-misc/mc
 app-cdr/xcdroast
 # app-cdr/graveman
 app-cdr/isomaster
-media-sound/aumix
 media-sound/audacious
 media-video/gnome-mplayer
 media-video/x264-encoder

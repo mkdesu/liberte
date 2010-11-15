@@ -1,0 +1,39 @@
+2010-05-05
+  + 2010.0 inital release
+
+2010-11-15
+  + 2010.1 release
+
+  * Transitioned to SYSLINUX, radically simplified installation on all platforms
+  * Robust persistence using resizable encrypted virtual partition (OTFE)
+  * Tor start-up does not depend on in-the-clear correct time source access
+  * Tor hostname is now directly generated and propagated to Tor upon first boot
+  * Provisional communication certificates generation and username derivation
+  * GnuPG uses HKPS protocol (CA certificate verified during build)
+  * Added an unsafe browser that bypasses the firewall (for Wi-Fi registration)
+  * Added robust X server screen locking support
+
+  * Added a robust and reasonably fast start-to-finish build script
+  * Added universal verification of signatures during build (rsync is disabled)
+  * Hardened build is now based on the more reliable regular stage3 autobuilds
+  * Hardened GCC version with SSP and PIE support is now used to build packages
+  * Removed CDROM boot support
+  * Accepted licenses are explicitly specified during build
+
+  * Updated to kernel 2.6.32, kernel+initrd use LZMA
+  * Removed SquashFS LZMA support until it is available in mainline
+  * Added full ACL and extended attributes support
+  * AutoFS integration fixes and enhancements
+  * Added support for popular Ethernet and Wi-Fi drivers (including firmware)
+  * Removed the deprecated IDE support in favor of libata, added SMART monitor
+  * MAC address is correctly randomized (automatic for Wi-Fi only)
+  * Laptop Mode Tools are used for power management
+  * Replaced (unmaintained and Python-based) Wicd with NetworkManager 
+
+  * Stability, security, and hardware support improvements
+  * Space usage improvements
+  * Improved control of growing log files (no file grows indefinitely in tmpfs)
+  * Perl and Python are cleanly removed from the image
+
+  * Applications list improvements (Evince+Postscript/DejaVu, Eboard, ...)
+  * Provisional MP4[H.264+Ogg[Vorbis/Speex]] lightweight video encoding support

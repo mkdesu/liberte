@@ -1,8 +1,0 @@
-#!/bin/sh
-
-extra=
-if [ $# = 0 ]; then
-    extra="-I"
-fi
-
-exec /usr/bin/aumix -f ${XDG_CONFIG_HOME}/misc/aumixrc ${extra} "$@"
