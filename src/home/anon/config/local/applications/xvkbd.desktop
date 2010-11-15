@@ -5,5 +5,5 @@ Comment=Virtual keyboard for X window system
 Exec=xvkbd
 Terminal=false
 Type=Application
-Categories=Utility;Accessibility
+Categories=Utility;Accessibility;
 Icon=preferences-desktop-keyboard-shortcuts

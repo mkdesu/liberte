@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Alsa Mixer
+GenericName=Audio Mixer
+Comment=Console-based Alsa mixer
+Exec=alsamixer
+Terminal=true
+Type=Application
+Categories=ConsoleOnly;Mixer;AudioVideo;Audio;Settings;
+Icon=gnome-mixer

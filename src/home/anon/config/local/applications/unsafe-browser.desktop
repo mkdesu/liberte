@@ -5,5 +5,5 @@ Comment=Run non-Torified browser for e.g., wireless hotspot registration
 Exec=unsafe-browser
 Terminal=false
 Type=Application
-Categories=GTK;Network;WebBrowser
+Categories=GTK;Network;WebBrowser;
 Icon=network-error
