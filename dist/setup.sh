@@ -110,6 +110,13 @@ syslinux -i -d ${sysdir} "${dev}"
 
 # If necessary, install Syslinux-supplied MBR
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
+    # Check that GNU Parted is available
+    if ! type parted 1>/dev/null 2>&1; then
+        echo "GNU Parted not found, unable to install Syslinux MBR"
+        exit 1
+    fi
+
+
     # Get the parent device
     rdevpath=`dirname ${devpath}`
     rdev=`udevadm info -q property -p ${rdevpath} | grep '^DEVNAME=' | cut -d= -f2`
