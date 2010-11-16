@@ -247,5 +247,5 @@ else
     fi
 
     # Bash doesn't understand ${lockfd}<
-    (flock ${lockfd} && "$0" fork "$@") 20< ${lock} &
+    (flock ${lockfd}; "$0" fork "$@") 20< ${lock} &
 fi

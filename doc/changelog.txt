@@ -28,6 +28,7 @@
   * Removed the deprecated IDE support in favor of libata, added SMART monitor
   * MAC address is correctly randomized (automatic for Wi-Fi only)
   * Laptop Mode Tools are used for power management
+  * Most capable audio card is configured as default during boot
   * Replaced (unmaintained and Python-based) Wicd with NetworkManager 
 
   * Stability, security, and hardware support improvements

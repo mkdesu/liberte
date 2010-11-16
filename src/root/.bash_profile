@@ -1,7 +1,8 @@
 umask 022
 
 if type -p env-update 1>/dev/null; then
-	env-update && source /etc/profile
+    env-update
+    source /etc/profile
 
     # see /root/.cpan/CPAN/MyConfig.pm (currently unused)
     # export PERL5LIB=/var/tmp/cpan/lib

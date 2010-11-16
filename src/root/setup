@@ -115,7 +115,8 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
             emerge -qC --deselect=n =sys-devel/`basename ${oldgcc}`
         fi
     fi
-    env-update && source /etc/profile
+    env-update
+    source /etc/profile
 
     emerge -q1 virtual/libc
     rm -f ${protected}
@@ -322,7 +323,12 @@ rm -f  /var/log/wtmp
 sinfo "Setting up users"
 sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
 
-grpck -r && grpconv
+pwconv
+pwck -qr
+
+groupdel smmsp || [ $? = 6 ]
+grpck -r
+grpconv
 
 echo root:liberte | chpasswd
 
@@ -350,7 +356,8 @@ sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
 
 
 sinfo "Installing wrappers"
-mv -n /sbin/iwconfig{,.orig} && ln -sf iwconfig.wrapper /sbin/iwconfig
+mv -n /sbin/iwconfig{,.orig}
+ln -sf iwconfig.wrapper /sbin/iwconfig
 
 
 sinfo "Compiling kernel"

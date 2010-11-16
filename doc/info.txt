@@ -15,7 +15,8 @@ rsync
   [/etc/make.conf]
 
 HKP(S)
-  + hkps://zimmermann.mayfirst.org
+  + https://zimmermann.mayfirst.org/pks/lookup [mkroot]
+  + hkps://zimmermann.mayfirst.org             [anon]
   + [alt: x-hkp://pool.sks-keyservers.net]
   + [alt: x-hkp://keys.gnupg.net]
 

@@ -8,6 +8,7 @@ font="Sans"
 
 af-add=bs2b
 vf-add=screenshot
+zoom=yes
 
 tv=driver=v4l2
 
