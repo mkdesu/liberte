@@ -13,6 +13,7 @@ fi
 
 
 # Variables
+SRC=`dirname $0`
 LIVECD=$1/copy
 FIND="chroot ${LIVECD} find / -xdev"
 
@@ -79,3 +80,15 @@ sinfo "SUID/SGID:"
 ${FIND} -type f -perm /u+s      -printf '%M %u %g\t%p\n'
 ${FIND} -type f -perm /g+s,o+w  -printf '%M %u %g\t%p\n'
 ${FIND} -type d -perm /a+st,o+w -printf '%M %u %g\t%p\n'
+
+sinfo "Build environment:"
+if [ -e ${SRC}/conf/checkregexps ]; then
+    regexps=`cat ${SRC}/conf/checkregexps | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
+    chroot ${LIVECD}/../src grep   -iE "${regexps}" /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin
+    chroot ${LIVECD}        lzgrep -iE "${regexps}" /boot/initrd-x86.lzm
+    ${FIND} -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
+        ! -name 'libgucharmap.so.*' ! -name oui.txt \
+        | chroot ${LIVECD} xargs grep -liE "${regexps}"
+else
+    echo "checkregexp file not found, skipping"
+fi

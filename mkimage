@@ -17,7 +17,7 @@ SRC=`dirname $0`
 LIVECD=$1/copy
 USBROOT=$1/dist/liberte
 
-version=`cat ${SRC}/version`
+version=`cat ${SRC}/conf/version`
 distname=liberte-${version}
 
 # see the /root/bin/ps-mount script
@@ -56,7 +56,7 @@ sinfo "Creating SquashFS image"
 
 ${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs -noappend \
     -no-exports -no-progress \
-    -sort ${SRC}/rootfs.sort -e boot
+    -sort ${SRC}/conf/rootfs.sort -e boot
 chmod 644 ${USBROOT}/boot/root-x86.sfs
 
 

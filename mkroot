@@ -22,7 +22,7 @@ portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 
 # Don't rely on the HKP outbounding port being open
 gpg_wwwserver='https://zimmermann.mayfirst.org/pks/lookup?op=get&search=0x${fpr}'
-gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/pubkeys`
+gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/conf/pubkeys`
 
 mfpl=https://support.mayfirst.org/raw-attachment/wiki/mfpl_certificate_authority/mfpl.crt
 
@@ -30,19 +30,19 @@ mfpl=https://support.mayfirst.org/raw-attachment/wiki/mfpl_certificate_authority
 # Copying and pruning
 if [ "$2" = copy ]; then
     sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded          \
-        --include-from=${FROM}/rootfs.includes    \
-        --exclude-from=${FROM}/rootfs-cp.excludes \
+    rsync -aHAXS -x -i --delete-excluded               \
+        --include-from=${FROM}/conf/rootfs.includes    \
+        --exclude-from=${FROM}/conf/rootfs-cp.excludes \
         ${LIVECD}/src/ ${LIVECD}/copy | head -n 20
 
     sinfo "Done."
     exit
 elif [ "$2" = clean ]; then
     sinfo "Pruning ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded          \
-        --include-from=${FROM}/rootfs.includes    \
-        --exclude-from=${FROM}/rootfs.excludes    \
-        --exclude-from=${FROM}/rootfs-cp.excludes \
+    rsync -aHAXS -x -i --delete-excluded               \
+        --include-from=${FROM}/conf/rootfs.includes    \
+        --exclude-from=${FROM}/conf/rootfs.excludes    \
+        --exclude-from=${FROM}/conf/rootfs-cp.excludes \
         ${LIVECD}/copy/ ${LIVECD}/copy | head
 
     ${FROM}/check ${LIVECD}
