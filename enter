@@ -40,11 +40,17 @@ else
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
     rsync -rltOHS --chmod=u=rwX,go=rX -i \
-          --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ --exclude=/etc/sudoers \
+          --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ \
+          --exclude=/etc/privoxy/\* --exclude=/etc/sudoers \
           --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
     rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     rsync -rltOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
+
+    rsync -rltOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
+    if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then
+        chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter ${LIVECD}/etc/privoxy/{config,match-all.action}
+    fi
 
     rsync -rltOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers    ${LIVECD}/etc
     rsync -rltOHS --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock ${LIVECD}/etc
@@ -53,14 +59,17 @@ else
     rsync -rltOHS --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
 
     # rwX------
-    rsync -rltOHS --chmod=u=rwX,go= -i --delete \
+    rsync -rltOHS --chmod=u=rwX,go=   -i --delete \
           --exclude=/anon/persist/security/pgp/\*.gpg --exclude=/anon/persist/security/pgp/\*.crt \
           -C ${SRC}/home/anon ${LIVECD}/home
-    find ${LIVECD}/home/anon ! \( -user 2101 -group 9000 \) -exec chown -h 2101:9000 {} \;
+    chown -hR --from=0:0 2101:9000 ${LIVECD}/home/anon
 
-    rsync -rltOHS --chmod=u=rwX,go= -i --delete-excluded \
-          -C ${SRC}/home/nofw ${LIVECD}/home
-    find ${LIVECD}/home/nofw ! \( -user 2102 -group 9001 \) -exec chown -h 2102:9001 {} \;
+    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
+    chown -hR --from=0:0 2102:9001 ${LIVECD}/home/nofw
+
+    if [ -e ${LIVECD}/usr/bin/xcdroast ]; then
+        find ${LIVECD}/usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
+    fi
 fi
 environment="${environment} PHASE=${PHASE}"
 

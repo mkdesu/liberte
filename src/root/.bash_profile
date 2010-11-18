@@ -10,11 +10,6 @@ if type -p env-update 1>/dev/null; then
     echo ">sys-kernel/hardened-sources-`cat ${HOME}/config/kversion`" \
         > /etc/portage/package.mask/kernel
 
-    if [ -e /usr/bin/xcdroast ]; then
-        find /usr/lib/xcdroast-*/bin/xcdrwrap ! -user root -exec chown root {} \;
-        find /usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
-    fi
-
     # if [ -e /usr/bin/eix-update ]; then
     #    export FEATURES="metadata-transfer"
     #    sed -i 's/^# MODULE //' /etc/portage/modules/sqlite
