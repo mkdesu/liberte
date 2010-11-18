@@ -25,6 +25,6 @@ if [ ! -e ${png} ]; then
     calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
     size=`qalc -t "${calc}"`
 
-    # Black background is needed for xlock (gm display +matte has no antialiasing)
+    # Black background is needed for xlock (display +matte has no antialiasing)
     exec rsvg-convert --background-color=black -h ${size} -o ${png} ${svg}
 fi

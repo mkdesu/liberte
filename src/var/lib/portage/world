@@ -124,6 +124,8 @@ media-sound/audacious
 media-video/gnome-mplayer
 media-video/x264-encoder
 media-gfx/gpicview
+media-gfx/geeqie
+media-gfx/fbida
 media-gfx/graphicsmagick
 media-sound/sox
 media-sound/vorbis-tools

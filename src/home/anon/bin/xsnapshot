@@ -9,4 +9,4 @@ dir="$1"
 shift
 
 name=`date -u +%F-Z%H%M.%S`
-exec xwd -silent "$@" | gm convert -quality 100 -comment '' xwd:- png:"${dir}"/${name}.png
+exec xwd -silent "$@" | convert -quality 100 -comment '' xwd:- png:"${dir}"/${name}.png

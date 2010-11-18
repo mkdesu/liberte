@@ -87,8 +87,10 @@ if [ -e ${SRC}/conf/checkregexps ]; then
     chroot ${LIVECD}/../src grep   -iE "${regexps}" /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin
     chroot ${LIVECD}        lzgrep -iE "${regexps}" /boot/initrd-x86.lzm
     ${FIND} -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
-        ! -name 'libgucharmap.so.*' ! -name oui.txt \
-        | chroot ${LIVECD} xargs grep -liE "${regexps}"
+        ! -name 'libgucharmap.so.*' ! -name oui.txt -print0 \
+        | chroot ${LIVECD} xargs -0 grep -liE "${regexps}"
 else
     echo "checkregexp file not found, skipping"
 fi
+
+true

@@ -23,16 +23,17 @@
 /config/claws-mail/claws-mail-[0-9]*
 /config/claws-mail/tagsdb/
 
-# Logs
-/config/mc/history
-/config/audacious/log
-
-# Qalculate plots
-/config/qalculate/tmp/
-
 # Miscellaneous
 /config/mplayer/registry
 
+# Logs
+/config/mc/history
+/config/audacious/log
+/config/geeqie/history
+
 # Transient directories
+/config/qalculate/tmp/
 /config/local/webkit/
 /config/local/gvfs-metadata/
+/config/local/geeqie/metadata/
+/config/local/geeqie/trash/

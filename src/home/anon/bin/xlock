@@ -75,8 +75,8 @@ fi
 pkill -STOP -u ${USER} -x notification-da || true
 
 # Hide windows behind a full-screen logo on backdrop
-gm display -font fixed -immutable -background black -bordercolor black \
-           -backdrop ${logo} & gmpid=$!
+display -font fixed -immutable -background black -bordercolor black \
+        -backdrop ${logo} & gmpid=$!
 
 
 # Grab keyboard/mouse until the correct password is entered (blindly)
