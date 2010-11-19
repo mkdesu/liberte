@@ -71,7 +71,6 @@ playlist_manager_width=0
 playlist_manager_height=0
 output_path=/usr/lib/audacious/Output/alsa.so
 iface_path=/usr/lib/audacious/General/gtkui.so
-filesel_path=
 chardet_detector=
 chardet_fallback=
 cover_name_include=

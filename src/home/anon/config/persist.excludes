@@ -25,6 +25,7 @@
 
 # Miscellaneous
 /config/mplayer/registry
+/config/audacious/plugin-registry
 
 # Logs
 /config/mc/history
