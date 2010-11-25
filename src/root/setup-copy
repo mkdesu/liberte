@@ -256,9 +256,14 @@ ln -sf dash /bin/sh
 sed -i 's:^#!/bin/sh$:#!/bin/bash:' /lib/udev/move_tmp_persistent_rules.sh
 
 
-sinfo "Saving current packages list in /tmp/packages-list"
-find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d \
-    | sed 's:^/var/db/pkg/::'| sort > /tmp/packages-list
+# Spaces in entries are not handled, but it doesn't matter here
+sinfo "Saving current packages list in /tmp/packages"
+pakdir=/tmp/packages
+mkdir ${pakdir}
+for p in `find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d \
+          | sed 's:^/var/db/pkg/::'`; do
+    sed -n 's/^\(obj\|sym\) \([^ ]\+\).*$/\2/p' /var/db/pkg/${p}/CONTENTS > ${pakdir}/${p//\//=}
+done
 
 
 sinfo "Done."

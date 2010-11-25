@@ -47,6 +47,27 @@ elif [ "$2" = clean ]; then
 
     ${FROM}/check ${LIVECD}
 
+
+    sinfo "Creating pruned packages list"
+    for p in ${LIVECD}/copy/tmp/packages/*; do
+        found=0
+        for f in `cat "${p}"`; do
+            if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
+                found=1
+                break
+            fi
+        done
+
+        if [ ${found} = 0 ]; then
+            rm ${p}
+        fi
+    done
+
+    find ${LIVECD}/copy/tmp/packages -type f -printf '%f\n' | tr = / | sort \
+        > ${LIVECD}/copy/boot/packages.lst
+    chmod 644 ${LIVECD}/copy/boot/packages.lst
+
+
     sinfo "Done."
     exit
 fi

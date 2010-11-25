@@ -14,7 +14,8 @@ ECHO.
 GOTO end
 
 :baddir
-ECHO The directory "%~pd0" should be moved to the root of a removable disk.
+ECHO %~d0\liberte\setup.bat not found! The directory "%~pd0" should be the
+ECHO top-level "liberte" directory of a removable disk.
 
 :end
 ECHO.

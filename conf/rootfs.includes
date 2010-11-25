@@ -24,3 +24,6 @@
 /usr/share/claws-mail/themes/A_Ducks_Claw/***
 /usr/share/games/eboard/Kingdom.png
 /usr/share/games/eboard/Diagram.png
+
+# Packages list (excluded during image creation)
+/tmp/packages/***
