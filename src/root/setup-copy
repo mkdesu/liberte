@@ -201,6 +201,28 @@ rm -r /usr/lib/python*/
 rm -r ${dbpython}
 
 
+sinfo "Verifying HTP servers"
+htpservers=`sed -n 's/^SERVERS="\(.*\)"$/\1/p' /etc/conf.d/htpdate`
+htpdates=
+for htp in ${htpservers}; do
+    echo -ne "${htp}:\t"
+
+    # Will fail if the server doesn't provide a timestamp
+    htpdate=`curl -sI ${htp} | grep '^Date: ' | sed 's/^Date: //'`
+    echo "${htpdate}"
+
+    htpdates="${htpdates} "`date +%s -ud "${htpdate}"`
+done
+
+htpmin=`echo ${htpdates} | tr ' ' '\n' | sort -n | head -n 1`
+htpmax=`echo ${htpdates} | tr ' ' '\n' | sort -n | tail -n 1`
+
+if [ $[${htpmax} - ${htpmin}] -gt 60 ]; then
+    echo "HTP servers disagreement > 1min, fix /etc/conf.d/htpdate"
+    false
+fi
+
+
 # Done here because cache may be recreated after "src" phase
 sinfo "Trimming icons cache"
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \

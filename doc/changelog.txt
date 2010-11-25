@@ -1,5 +1,5 @@
-2010-05-05
-  + 2010.0 inital release
+20XX-XX-XX
+  + 2010.2 release
 
 2010-11-15
   + 2010.1 release
@@ -38,3 +38,6 @@
 
   * Applications list improvements (Evince+Postscript/DejaVu, Eboard, ...)
   * Provisional MP4[H.264+Ogg[Vorbis/Speex]] lightweight video encoding support
+
+2010-05-05
+  + 2010.0 inital release
