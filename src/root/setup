@@ -416,7 +416,8 @@ mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86.zi
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initrd-x86.lzm
 
 mkdir -p /boot/syslinux
-cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32} /boot/syslinux/
+cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,mbr.bin} /boot/syslinux/
+cp -p /usr/bin/syslinux /boot/syslinux/syslinux-x86
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
 rm -f /boot/syslinux/${consolefont}
 gunzip /boot/syslinux/${consolefont}.gz

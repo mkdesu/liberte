@@ -1,6 +1,8 @@
 20XX-XX-XX
   + 2010.2 release
 
+  * Removed SYSLINUX dependency during Linux install
+
 2010-11-15
   + 2010.1 release
 

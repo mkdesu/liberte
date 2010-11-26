@@ -2,9 +2,10 @@
 
 # Required Syslinux version
 sysver=4.02
+sysbin=syslinux
 sysmbr=/usr/share/syslinux/mbr.bin
 
-# Directory for ldlinux.sys
+# Directory for ldlinux.sys and bundled syslinux binary
 sysdir=/liberte/boot/syslinux
 
 
@@ -15,8 +16,11 @@ This script installs SYSLINUX on a device with Liberté Linux.
 You need the following installed.
 
     Syslinux ${sysver} (Gentoo: sys-boot/syslinux)
+        [bundled 32-bit version will be used if unavailable]
     GNU Parted    (Gentoo: sys-apps/parted)
+        [only needed if the master boot record must be changed]
     udev + sysfs  (Gentoo: sys-fs/udev)
+        [available on most modern Linux distributions]
 
 Run setup.sh as:
 
@@ -44,17 +48,20 @@ fi
 
 
 # Check for pre-4.x Syslinux (without the -v switch)
-if ! syslinux -v 1>/dev/null 2>&1; then
-    echo "Unsupported Syslinux version detected"
-    exit 1
-fi
-
-
-# Check for wrong Syslinux version (exact match required)
-havesysver=`syslinux -v 2>&1 | cut -d' ' -f2`
-if [ "${havesysver}" != ${sysver} ]; then
-    echo "Syslinux v${havesysver} detected, need v${sysver}"
-    exit 1
+sysok=1
+if ! ${sysbin} -v 1>/dev/null 2>&1; then
+    echo "Syslinux v4+ not found"
+    sysok=0
+elif [ ! -e ${sysmbr} ]; then
+    echo "${sysmbr} not found"
+    sysok=0
+else
+    # Check for wrong Syslinux version (exact match required)
+    havesysver=`${sysbin} -v 2>&1 | cut -d' ' -f2`
+    if [ "${havesysver}" != ${sysver} ]; then
+        echo "Syslinux v${havesysver} detected, need v${sysver}"
+        sysok=0
+    fi
 fi
 
 
@@ -89,23 +96,35 @@ fi
 # Check for installation directory
 mntdir=`mktemp -d`
 mount -r -t vfat -o noatime,nosuid,nodev,noexec "${dev}" ${mntdir}
-if [ -d ${mntdir}${sysdir} ]; then
+if [ -e ${mntdir}${sysdir}/syslinux-x86  -a  -e ${mntdir}${sysdir}/mbr.bin ]; then
     hassysdir=1
 else
     hassysdir=0
 fi
+
+# Copy bundled syslinux binary if system versions are wrong
+if [ ${hassysdir} = 1  -a  ${sysok} = 0 ]; then
+    systmpdir=`mktemp -d`
+
+    cp ${mntdir}${sysdir}/syslinux-x86 ${mntdir}${sysdir}/mbr.bin ${systmpdir}
+    sysbin=${systmpdir}/syslinux-x86;  chmod 755 ${sysbin}
+    sysmbr=${systmpdir}/mbr.bin;       chmod 644 ${sysmbr}
+
+    echo "Using bundled Syslinux binary and MBR"
+fi
+
 umount ${mntdir}
 rmdir  ${mntdir}
 
 if [ ${hassysdir} = 0 ]; then
-    echo "Directory ${sysdir} not found on ${dev}"
+    echo "Directory ${sysdir} not found or incorrect on ${dev}"
     exit 1
 fi
 
 
 # Install SYSLINUX
 echo "*** Installing SYSLINUX on ${dev} ***"
-syslinux -i -d ${sysdir} "${dev}"
+${sysbin} -i -d ${sysdir} "${dev}"
 
 
 # If necessary, install Syslinux-supplied MBR
@@ -167,11 +186,13 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)
     echo "*** Installing bootloader to the MBR of ${rdev} ***"
-    if [ ! -e ${sysmbr} ]; then
-        echo "${sysmbr} not found"
-        exit 1
-    fi
     cat ${sysmbr} > ${rdev}
+fi
+
+
+# Erase temporary directories
+if [ ${sysok} = 0 ]; then
+    rm -r ${systmpdir}
 fi
 
 
