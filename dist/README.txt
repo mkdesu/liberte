@@ -19,3 +19,5 @@ NOTE: The USB stick needs to be formatted as FAT/FAT32.
 Older computers might be able to boot only FAT(16)-formatted
 USB keys - the corresponding BIOS boot option is typically
 "USB RMD-FDD".
+
+Visit http://dee.su/liberte for further information.
