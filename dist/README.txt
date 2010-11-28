@@ -14,3 +14,8 @@ In order to boot from a USB stick, enable booting
 from USB drive in your computer BIOS, and give it
 precedence over regular hard disk boot. Or, you can
 enable the Multiboot menu in BIOS.
+
+NOTE: The USB stick needs to be formatted as FAT/FAT32.
+Older computers might be able to boot only FAT(16)-formatted
+USB keys - the corresponding BIOS boot option is typically
+"USB RMD-FDD".
