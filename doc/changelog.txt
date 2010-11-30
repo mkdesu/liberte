@@ -3,6 +3,9 @@
 
   * Removed SYSLINUX dependency during Linux install
 
+  * MP4[H.264+MP3] webcam video encoding
+
+
 2010-11-15
   + 2010.1 release
 

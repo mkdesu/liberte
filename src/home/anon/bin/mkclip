@@ -1,0 +1,96 @@
+#!/bin/sh -e
+
+if [ $# = 0 ]  ||  ! echo "$1" | grep -q '\.mp4$'; then
+    echo "Format: $0 <outfile.mp4> [fps]"
+    exit 1
+fi
+
+
+# Variables
+result="$1"
+fps=${2:-7.5}
+
+tmpdir=$(mktemp -d --tmpdir=$(dirname "${out}") mkclip.XXXXX)
+fifodir=$(mktemp -d)
+
+
+# Create FIFOs (need fs support, space not required)
+mkfifo ${fifodir}/video.y4m ${fifodir}/audio.wav
+
+
+# Launch encoders, note PIDs for waiting
+x264 --quiet --preset fast -o "${tmpdir}"/video.h264 \
+     ${fifodir}/video.y4m 2>/dev/null & vencpid=$!
+
+lame -S --strictly-enforce-ISO ${fifodir}/audio.wav \
+    "${tmpdir}"/audio.mp3 & aencpid=$!
+
+
+# Launch streams, note PIDs for killing
+mplayer -really-quiet -noconfig all -fps "${fps}"      \
+        -input nodefault-bindings:conf=/dev/null       \
+        -vf harddup -tv fps="${fps}" tv://             \
+        -vo yuv4mpeg:file=${fifodir}/video.y4m & vstrpid=$!
+
+arecord -qN -f U8 -r 8000 -c 1 - \
+        > ${fifodir}/audio.wav & astrpid=$!
+
+
+# Kill streams on user input, then wait for encoders
+echo "Press [Enter] when done..."
+read
+
+if ! kill -INT ${vstrpid} 2>/dev/null; then
+    vstrpid=err
+fi
+
+if ! kill -INT ${astrpid} 2>/dev/null; then
+    astrpid=err
+fi
+
+if [ ${vstrpid} = err ]; then
+    echo "Video stream source died, killing video encoder"
+    kill ${vencpid} 2>/dev/null || true
+fi
+
+if [ ${astrpid} = err ]; then
+    echo "Audio stream source died, killing audio encoder"
+    kill ${aencpid} 2>/dev/null || true
+fi
+
+wait ${vencpid} || true
+wait ${aencpid} || true
+
+
+# Remove FIFOs
+rm    ${fifodir}/video.y4m ${fifodir}/audio.wav
+rmdir ${fifodir}
+
+
+# If there was a streaming error, delete any 0-size files
+if [ ${vstrpid} = err  -o  ${astrpid} = err ]; then
+    if [ ! -s "${tmpdir}"/video.h264 ]; then
+        rm -f "${tmpdir}"/video.h264
+    fi
+
+    if [ ! -s "${tmpdir}"/audio.mp3 ]; then
+        rm -f "${tmpdir}"/audio.mp3
+    fi
+
+    rmdir --ignore-fail-on-non-empty "${tmpdir}"
+    exit 1
+fi
+
+
+# Copy encoded streams to MP4 container
+lang=$(echo ${LANG} | sed 's/[_.].*//')
+
+MP4Box -quiet -tmp "${tmpdir}"               \
+    -new "${result}" -no-iod                 \
+    -add "${tmpdir}"/video.h264:fps="${fps}" \
+    -add "${tmpdir}"/audio.mp3:lang="${lang:-und}"
+
+
+# Remove encoded streams
+rm    "${tmpdir}"/video.h264 "${tmpdir}"/audio.mp3
+rmdir "${tmpdir}"
