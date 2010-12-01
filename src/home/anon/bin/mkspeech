@@ -1,0 +1,70 @@
+#!/bin/sh -e
+
+if [ $# = 0 ]  ||  ! echo "$1" | grep -q '\.spx$'; then
+    echo "Format: $0 <outfile.spx>"
+    exit 1
+fi
+
+
+# Variables
+result="$1"
+fifodir=$(mktemp -d)
+
+
+# Set some traps
+trap 'if [ $? != 0 ]; then kill ${astrpid} ${aencpid} 2>/dev/null || true; rm -rf ${fifodir}; fi' 0
+trap : INT QUIT TERM SEGV
+
+
+# Create FIFOs (need fs support, space not required)
+mkfifo ${fifodir}/audio.pcm
+
+
+# Launch encoder, note PID for waiting
+speexenc -n --rate 8000 --8bit --vbr --dtx --denoise \
+         --comp 4 --quality 8 \
+         ${fifodir}/audio.pcm "${result}" & aencpid=$!
+
+
+# Launch stream, note PID for killing
+arecord -qN -t raw -f U8 -r 8000 -c 1 - \
+        > ${fifodir}/audio.pcm & astrpid=$!
+kill -STOP ${astrpid}
+
+
+# Signal streamers to start on user input
+echo "Press [Enter] to start..."
+read
+
+kill -CONT ${astrpid}
+
+
+# Kill streams on user input, then wait for encoders
+echo "Encoding, press [Enter] when done..."
+read
+
+if ! kill -INT ${astrpid} 2>/dev/null; then
+    astrpid=err
+fi
+
+if [ ${astrpid} = err ]; then
+    echo "Audio stream source died, killing audio encoder"
+    kill ${aencpid} 2>/dev/null || true
+fi
+
+wait ${aencpid} || true
+
+
+# Remove FIFO
+rm    ${fifodir}/audio.pcm
+rmdir ${fifodir}
+
+
+# If there was a streaming error, delete any 0-size files
+if [ ${astrpid} = err ]; then
+    if [ ! -s "${result}" ]; then
+        rm -f "${result}"
+    fi
+
+    exit 1
+fi

@@ -3,7 +3,8 @@
 
   * Removed SYSLINUX dependency during Linux install
 
-  * MP4[H.264+MP3] webcam video encoding
+  * Easy MP4[H.264+MP3] webcam video encoding
+  * Easy Speex audio encoding
 
 
 2010-11-15

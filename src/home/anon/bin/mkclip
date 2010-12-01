@@ -9,39 +9,59 @@ fi
 # Variables
 result="$1"
 fps=${2:-7.5}
+audelay=1
 
 tmpdir=$(mktemp -d --tmpdir=$(dirname "${out}") mkclip.XXXXX)
 fifodir=$(mktemp -d)
 
 
+# Set some traps
+trap 'if [ $? != 0 ]; then kill ${vstrpid} ${astrpid} ${vencpid} ${aencpid} 2>/dev/null || true; rm -rf ${fifodir}; fi' 0
+trap : INT QUIT TERM SEGV
+
+
 # Create FIFOs (need fs support, space not required)
-mkfifo ${fifodir}/video.y4m ${fifodir}/audio.wav
+mkfifo ${fifodir}/video.y4m ${fifodir}/audio.wav ${fifodir}/mplayer_ctl
 
 
 # Launch encoders, note PIDs for waiting
-x264 --quiet --preset fast -o "${tmpdir}"/video.h264 \
-     ${fifodir}/video.y4m 2>/dev/null & vencpid=$!
+x264 --quiet --no-progress --preset fast \
+     -o "${tmpdir}"/video.264 ${fifodir}/video.y4m & vencpid=$!
 
 lame -S --strictly-enforce-ISO ${fifodir}/audio.wav \
     "${tmpdir}"/audio.mp3 & aencpid=$!
 
 
 # Launch streams, note PIDs for killing
-mplayer -really-quiet -noconfig all -fps "${fps}"      \
-        -input nodefault-bindings:conf=/dev/null       \
-        -vf harddup -tv fps="${fps}" tv://             \
+# (mplayer sometimes dies with -really-quiet)
+mplayer -really-quiet -noconfig all -fps "${fps}" -slave \
+        -input nodefault-bindings:conf=/dev/null:file=${fifodir}/mplayer_ctl \
+        -vf harddup -tv fps="${fps}" tv://               \
         -vo yuv4mpeg:file=${fifodir}/video.y4m & vstrpid=$!
+echo pausing get_property pause > ${fifodir}/mplayer_ctl
 
 arecord -qN -f U8 -r 8000 -c 1 - \
         > ${fifodir}/audio.wav & astrpid=$!
+kill -STOP ${astrpid}
+
+
+# Signal streamers to start on user input
+echo "Press [Enter] to start..."
+read
+
+kill -CONT ${astrpid}
+sleep ${audelay}
+echo pause > ${fifodir}/mplayer_ctl
 
 
 # Kill streams on user input, then wait for encoders
-echo "Press [Enter] when done..."
+echo "Encoding, press [Enter] when done..."
 read
 
-if ! kill -INT ${vstrpid} 2>/dev/null; then
+if ! kill -0 ${vstrpid} 2>/dev/null; then
     vstrpid=err
+else
+    echo stop > ${fifodir}/mplayer_ctl
 fi
 
 if ! kill -INT ${astrpid} 2>/dev/null; then
@@ -63,14 +83,14 @@ wait ${aencpid} || true
 
 
 # Remove FIFOs
-rm    ${fifodir}/video.y4m ${fifodir}/audio.wav
+rm    ${fifodir}/video.y4m ${fifodir}/audio.wav ${fifodir}/mplayer_ctl
 rmdir ${fifodir}
 
 
 # If there was a streaming error, delete any 0-size files
 if [ ${vstrpid} = err  -o  ${astrpid} = err ]; then
-    if [ ! -s "${tmpdir}"/video.h264 ]; then
-        rm -f "${tmpdir}"/video.h264
+    if [ ! -s "${tmpdir}"/video.264 ]; then
+        rm -f "${tmpdir}"/video.264
     fi
 
     if [ ! -s "${tmpdir}"/audio.mp3 ]; then
@@ -87,10 +107,10 @@ lang=$(echo ${LANG} | sed 's/[_.].*//')
 
 MP4Box -quiet -tmp "${tmpdir}"               \
     -new "${result}" -no-iod                 \
-    -add "${tmpdir}"/video.h264:fps="${fps}" \
+    -add "${tmpdir}"/video.264:fps="${fps}" \
     -add "${tmpdir}"/audio.mp3:lang="${lang:-und}"
 
 
 # Remove encoded streams
-rm    "${tmpdir}"/video.h264 "${tmpdir}"/audio.mp3
+rm    "${tmpdir}"/video.264 "${tmpdir}"/audio.mp3
 rmdir "${tmpdir}"
