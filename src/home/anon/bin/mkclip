@@ -21,15 +21,16 @@ trap : INT QUIT TERM SEGV
 
 
 # Create FIFOs (need fs support, space not required)
-mkfifo ${fifodir}/video.y4m ${fifodir}/audio.wav ${fifodir}/mplayer_ctl
+mkfifo ${fifodir}/video.y4m ${fifodir}/audio.pcm ${fifodir}/mplayer_ctl
 
 
 # Launch encoders, note PIDs for waiting
 x264 --quiet --no-progress --preset fast \
      -o "${tmpdir}"/video.264 ${fifodir}/video.y4m & vencpid=$!
 
-lame -S --strictly-enforce-ISO ${fifodir}/audio.wav \
-    "${tmpdir}"/audio.mp3 & aencpid=$!
+lame -S --strictly-enforce-ISO --preset phon+ \
+    -r -s 16 --bitwidth 16 -m m 2>/dev/null \
+    ${fifodir}/audio.pcm "${tmpdir}"/audio.mp3 & aencpid=$!
 
 
 # Launch streams, note PIDs for killing
@@ -40,8 +41,8 @@ mplayer -really-quiet -noconfig all -fps "${fps}" -slave \
         -vo yuv4mpeg:file=${fifodir}/video.y4m & vstrpid=$!
 echo pausing get_property pause > ${fifodir}/mplayer_ctl
 
-arecord -qN -f U8 -r 8000 -c 1 - \
-        > ${fifodir}/audio.wav & astrpid=$!
+arecord -qN -t raw -f S16_LE -r 16000 -c 1 - \
+        > ${fifodir}/audio.pcm & astrpid=$!
 kill -STOP ${astrpid}
 
 
@@ -83,7 +84,7 @@ wait ${aencpid} || true
 
 
 # Remove FIFOs
-rm    ${fifodir}/video.y4m ${fifodir}/audio.wav ${fifodir}/mplayer_ctl
+rm    ${fifodir}/video.y4m ${fifodir}/audio.pcm ${fifodir}/mplayer_ctl
 rmdir ${fifodir}
 
 

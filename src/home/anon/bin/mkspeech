@@ -21,13 +21,13 @@ mkfifo ${fifodir}/audio.pcm
 
 
 # Launch encoder, note PID for waiting
-speexenc -n --rate 8000 --8bit --vbr --dtx --denoise \
+speexenc -w --rate 16000 --16bit --vbr --dtx \
          --comp 4 --quality 8 \
          ${fifodir}/audio.pcm "${result}" & aencpid=$!
 
 
 # Launch stream, note PID for killing
-arecord -qN -t raw -f U8 -r 8000 -c 1 - \
+arecord -qN -t raw -f S16_LE -r 16000 -c 1 - \
         > ${fifodir}/audio.pcm & astrpid=$!
 kill -STOP ${astrpid}
 

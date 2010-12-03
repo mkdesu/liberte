@@ -1,0 +1,159 @@
+#!/bin/sh -e
+
+# Encryption, decryption and verification of messages and message receipts
+
+# Variables
+cmd="$1"
+ssldir="$2"
+msgdir="$3"
+
+sigalg=sha512
+encalg=aes256
+
+base32=hex2base32
+
+
+# Command-line parameters
+if [ \( "${cmd}" != send -a "${cmd}" != recv -a "${cmd}" != ack \) \
+     -o  ! -d "${ssldir}"  -o  ! -d "${msgdir}" ]; then
+    echo "Format: $0 send|recv|ack <ssldir> <msgdir>"
+    exit 1
+fi
+
+
+# Verifying the ca/verify/encrypt certificates triple
+# * parses and extracts the first certificate from each file
+# * verifies the certificates chain (important only for encrypt.pem)
+# * generates username from ca.pem
+verify_certs() {
+    local cvedir="$1" name count fingerprint
+
+    for name in ca verify encrypt; do
+        openssl x509 -in  "${cvedir}"/${name}.pem \
+                     -out "${cvedir}"/${name}.norm.pem
+
+        # Sanity check - OpenSSL should output exactly 1 certificate
+        count=`sed -n '/^-----BEGIN /p' "${cvedir}"/${name}.norm.pem | wc -l`
+        [ "${count}" = 1 ]
+    done
+
+    openssl verify -x509_strict -policy_check -purpose crlsign -check_ss_sig \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/ca.norm.pem \
+        >  "${cvedir}"/certs.vfy 2>&1
+    openssl verify -x509_strict -policy_check -purpose smimesign \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/verify.norm.pem \
+        >> "${cvedir}"/certs.vfy 2>&1
+    openssl verify -x509_strict -policy_check -purpose smimeencrypt \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/encrypt.norm.pem \
+        >> "${cvedir}"/certs.vfy 2>&1
+
+    cat > "${cvedir}"/certs.cmp <<EOF
+${cvedir}/ca.norm.pem: OK
+${cvedir}/verify.norm.pem: OK
+${cvedir}/encrypt.norm.pem: OK
+EOF
+
+    if ! cmp -s "${cvedir}"/certs.vfy "${cvedir}"/certs.cmp; then
+        echo "Certificates chain verification failed"
+        return 1
+    fi
+
+    rm -- "${cvedir}"/certs.cmp "${cvedir}"/certs.vfy
+
+    fingerprint=`openssl x509 -in "${cvedir}"/ca.norm.pem -outform der | sha1sum | head -c 40`
+    ${base32} "${fingerprint}" > "${cvedir}"/username
+}
+
+
+# Public certificates and private keys in PEM format
+# ${certdir}/ca.pem      : X.509 self-signed root CA certificate
+# ${certdir}/verify.pem  : X.509 signature verification certificate (issued by root CA)
+# ${certdir}/encrypt.pem : X.509 encryption certificate             (issued by root CA)
+# ${keysdir}/sign.pem    : private signature key
+# ${keysdir}/decrypt.pem : private decryption key (may be the same as signature key)
+certdir="${ssldir}"/certs
+keysdir="${ssldir}"/private
+
+# <send>
+#     in:  ${msgdir}/message, ${msgdir}/{ca,encrypt}.pem
+#     out: ${msgdir}/message.sig, ${msgdir}/message.out
+#
+# <recv>
+#     in:  ${msgdir}/message, ${msgdir}/{ca,verify,encrypt}.pem
+#     out: ${msgdir}/message.in, ${msgdir}/receipt.{sig,out}
+#
+# <ack> (expected <send>'s directory with veirfied certificates)
+#     in:  ${msgdir}/receipt, ${msgdir}/message.sig, ${msgdir}/{ca,verify}.pem
+#     out: ${msgdir}/receipt.sig
+
+case "$1" in
+send)
+    verify_certs "${msgdir}"
+
+    # NOTE: -noattr is partially ignored
+    openssl cms -sign -noattr -binary -md ${sigalg} -nodetach \
+                -receipt_request_all -receipt_request_to auto \
+                -outform der -nocerts                 \
+                -signer   "${certdir}"/verify.pem     \
+                -inkey    "${keysdir}"/sign.pem       \
+                -in       "${msgdir}"/message         \
+                -out      "${msgdir}"/message.sig
+
+    openssl cms -encrypt -binary -${encalg} -outform pem \
+                -in       "${msgdir}"/message.sig \
+                -out      "${msgdir}"/message.out \
+                          "${msgdir}"/encrypt.norm.pem
+    ;;
+
+
+recv)
+    verify_certs "${msgdir}"
+
+    openssl cms -decrypt -inform pem \
+                -recip    "${certdir}"/encrypt.pem \
+                -inkey    "${keysdir}"/decrypt.pem \
+                -in       "${msgdir}"/message      \
+                -out      "${msgdir}"/message.sig
+
+    openssl cms -verify -inform der \
+                -x509_strict -policy_check -purpose smimesign -check_ss_sig \
+                -CAfile   "${msgdir}"/ca.norm.pem -CApath /dev/null \
+                -certfile "${msgdir}"/verify.norm.pem \
+                -in       "${msgdir}"/message.sig     \
+                -out      "${msgdir}"/message.in
+
+    # NOTE: -md (and partially, -noattr) are ignored
+    openssl cms -sign_receipt -noattr -md ${sigalg} -nodetach \
+                -inform der -outform der -nocerts     \
+                -signer   "${certdir}"/verify.pem     \
+                -inkey    "${keysdir}"/sign.pem       \
+                -in       "${msgdir}"/message.sig     \
+                -out      "${msgdir}"/receipt.sig
+
+    openssl cms -encrypt -binary -${encalg} -outform pem \
+                -in       "${msgdir}"/receipt.sig \
+                -out      "${msgdir}"/receipt.out \
+                          "${msgdir}"/encrypt.norm.pem
+    ;;
+
+
+ack)
+    openssl cms -decrypt -inform pem \
+                -recip    "${certdir}"/encrypt.pem \
+                -inkey    "${keysdir}"/decrypt.pem \
+                -in       "${msgdir}"/receipt      \
+                -out      "${msgdir}"/receipt.sig
+
+    openssl cms -x509_strict -policy_check -purpose smimesign -check_ss_sig \
+                -inform der -rctform der \
+                -CAfile         "${msgdir}"/ca.norm.pem -CApath /dev/null \
+                -certfile       "${msgdir}"/verify.norm.pem \
+                -verify_receipt "${msgdir}"/receipt.sig     \
+                -in             "${msgdir}"/message.sig
+    ;;
+
+
+*)
+    exit 1
+    ;;
+esac

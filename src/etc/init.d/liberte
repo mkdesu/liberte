@@ -232,7 +232,6 @@ EndSection'
                     echo
                     einfo 'NOTE: After mounting the OTFE partition, communication certificates'
                     einfo 'will be generated. It is a one-time operation that may take some time.'
-                    einfo '[currently disabled, since this functionality is unused]'
 
 
                     eprompt Please re-enter the password for ${otfefile}
@@ -322,11 +321,12 @@ EndSection'
 
 
             # Create (big) private key + communication certificates + username
-            # if [ ${lmountok} = 0  -a  ! -e ${lmount}/security/ssl/certs ]; then
-            #     ebegin Generating communication certificates
-            #     sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
-            #     eend $?
-            # fi
+            if [ ${lmountok} = 0  -a  ! -e ${lmount}/security/ssl/certs ]; then
+                ebegin Generating communication certificates
+                einfo 'It is a one-time operation - please do not interrupt'
+                sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
+                eend $?
+            fi
 
         fi
 

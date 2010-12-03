@@ -1,0 +1,56 @@
+S/MIME v3.1 messages exchange
+=============================
+
+Send:
+  + Message (with receipt request) is signed with [private sign.pem]
+  + Signed message is encrypted with recipient's [X.509 encrypt.pem]
+
+Receive:
+  + Message is decrypted with [private decrypt.pem]
+  + Decrypted message is verified against sender's [X.509 verify.pem]
+  + Receipt is signed with [private sign.pem]
+  + Signed receipt is encrypted with sender's [X.509 encrypt.pem]
+
+Acknowledge:
+  + Receipt is decrypted with sender's [private decrypt.pem]
+  + Decrypted receipt is verified against sender's [X.509 verify.pem]
+    and the original signed message
+
+
+Protocol:
+  + <shost,rhost>/cable/certs/{ca,verify,encrypt}.pem are always accessible
+  + <shost>/cable/queue/<msgid> is accessible until receipt verified
+  + <rhost>/cable/queue/<msgid>.rcp is accessible until receipt verification acked
+  + communication is stateless
+
+  [sender fetches <rhost>/cable/certs/{ca,encrypt,verify}.pem]
+  [... sender prepares the signed/encrypted message with receipt request ...]
+  [sender publishes (<shost>)/cable/queue/<msgid>]
+
+  -> MSG <suser> <shost> <msgid>        (<suser>@<shost> is sender's address)
+                                        (msgid = 12 lowercase alnum chars)
+  [recipient fetches <shost>/cable/queue/<msgid>]
+  [recipient fetches <shost>/cable/certs/{ca,encrypt,verify}.pem]
+  [... recipient verifies message and prepares the signed/encrypted receipt ...]
+  [recipient publishes (<rhost>)/cable/queue/<msgid>.rcp]
+
+  <- RCP <msgid>
+
+  [sender fetches <rhost>/cable/queue/<msgid>.rcp]
+  [... sender verifies the receipt ...]
+  [sender removes /cable/queue/<msgid>]
+
+  -> ACK <msgid>
+
+  [recipient removes /cable/queue/<msgid>.rcp]
+
+
+Other possible commands:
+
+  <- REJ <msgid>              (message rejected: <msgid> in use, crypto failure, ...)
+
+  [sender removes /cable/queue/<msgid>]
+
+  -> RJR <msgid>              (receipt rejected: crypto failure, ...)
+
+  [recipient removes /cable/queue/<msgid>.rcp]
