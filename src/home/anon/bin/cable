@@ -38,13 +38,13 @@ verify_certs() {
     done
 
     openssl verify -x509_strict -policy_check -purpose crlsign -check_ss_sig \
-        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/ca.norm.pem \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem "${cvedir}"/ca.norm.pem \
         >  "${cvedir}"/certs.vfy 2>&1
     openssl verify -x509_strict -policy_check -purpose smimesign \
-        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/verify.norm.pem \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem "${cvedir}"/verify.norm.pem \
         >> "${cvedir}"/certs.vfy 2>&1
     openssl verify -x509_strict -policy_check -purpose smimeencrypt \
-        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem - "${cvedir}"/encrypt.norm.pem \
+        -CApath /dev/null -CAfile "${cvedir}"/ca.norm.pem "${cvedir}"/encrypt.norm.pem \
         >> "${cvedir}"/certs.vfy 2>&1
 
     cat > "${cvedir}"/certs.cmp <<EOF
