@@ -39,32 +39,41 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    rsync -rltOHS --chmod=u=rwX,go=rX -i \
-          --exclude=/root/ --exclude=/home/anon/ --exclude=/home/nofw/ --exclude=/mnt/hidden/ \
-          --exclude=/etc/privoxy/\* --exclude=/etc/sudoers \
-          --exclude=/etc/.auto.lock --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
-    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
-    rsync -rltOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
-    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
+    rsync -rlptOHS --chmod=u=rwX,go=rX -i \
+          --exclude=/root/            \
+          --exclude=/home/anon/       \
+          --exclude=/home/nofw/       \
+          --exclude=/mnt/hidden/      \
+          --exclude=/var/lib/portage/ \
+          --exclude=/etc/privoxy/\*   \
+          --exclude=/etc/sudoers      \
+          --exclude=/etc/sysctl.conf  \
+          --exclude=/etc/.auto.lock   \
+          --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
+    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
+    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
+    rsync -rlptOHS --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
 
-    rsync -rltOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
+    rsync -rlptOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
     if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then
         chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter ${LIVECD}/etc/privoxy/{config,match-all.action}
     fi
 
-    rsync -rltOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers    ${LIVECD}/etc
-    rsync -rltOHS --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock ${LIVECD}/etc
+    rsync -rlptOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
+    rsync -rlptOHS --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf ${LIVECD}/etc
+    rsync -rlptOHS --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock  ${LIVECD}/etc
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons
-    rsync -rltOHS --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
+    rsync -rlptOHS --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
 
     # rwX------
-    rsync -rltOHS --chmod=u=rwX,go=   -i --delete \
+    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete \
           --exclude=/anon/persist/security/pgp/\*.gpg --exclude=/anon/persist/security/pgp/\*.crt \
           -C ${SRC}/home/anon ${LIVECD}/home
     chown -hR --from=0:0 2101:9000 ${LIVECD}/home/anon
 
-    rsync -rltOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
+    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
     chown -hR --from=0:0 2102:9001 ${LIVECD}/home/nofw
 
     if [ -e ${LIVECD}/usr/bin/xcdroast ]; then
