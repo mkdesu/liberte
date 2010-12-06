@@ -2,47 +2,52 @@ S/MIME v3.1 messages exchange
 =============================
 
 Send:
-  + Message (with receipt request) is signed with [private sign.pem]
-  + Signed message is encrypted with recipient's [X.509 encrypt.pem]
+  + [message]     <- <input>
+  + [message]     -> signed    with sender's    [private sign.pem]    -> [message.sig]
+  + [message.sig] -> encrypted with recipient's [X.509   encrypt.pem] -> [message.out]
+  + [message.out] -> <send>
 
 Receive:
-  + Message is decrypted with [private decrypt.pem]
-  + Decrypted message is verified against sender's [X.509 verify.pem]
-  + Receipt is signed with [private sign.pem]
-  + Signed receipt is encrypted with sender's [X.509 encrypt.pem]
+  + [message.out] <- <receive>
+  + [message.out] -> decrypted with recipient's [private decrypt.pem] -> [message.sig]
+  + [message.sig] -> verified  wrt  sender's    [X.509   verify.pem]  -> [message]
+  +               -> r-signed  with recipient's [private sign.pem]    -> [receipt.sig]
+  + [receipt.sig] -> encrypted with sender's    [X.509   encrypt.pem] -> [receipt.out]
+  + [receipt.out] -> <send>
 
 Acknowledge:
-  + Receipt is decrypted with sender's [private decrypt.pem]
-  + Decrypted receipt is verified against sender's [X.509 verify.pem]
-    and the original signed message
+  + [receipt.out] <- <receive>
+  + [receipt.out] -> decrypted with sender's    [private decrypt.pem] -> [receipt.sig]
+  + [receipt.sig] -> verified  wrt  recipient's [X.509   verify.pem]  +  [message.sig]
+  + (ack)         -> <send>
 
 
 Protocol:
-  + <shost,rhost>/cable/certs/{ca,verify,encrypt}.pem are always accessible
+  + <shost,rhost>/cable/certs/<suser,ruser>/{ca,verify,encrypt}.pem are always accessible
   + <shost>/cable/queue/<msgid> is accessible until receipt verified
-  + <rhost>/cable/queue/<msgid>.rcp is accessible until receipt verification acked
+  + <rhost>/cable/rqueue/<msgid> is accessible until receipt verification acked
   + communication is stateless
 
-  [sender fetches <rhost>/cable/certs/{ca,encrypt,verify}.pem]
+  [sender fetches <rhost>/cable/certs/<ruser>/{ca,encrypt,verify}.pem]
   [... sender prepares the signed/encrypted message with receipt request ...]
   [sender publishes (<shost>)/cable/queue/<msgid>]
 
-  -> MSG <suser> <shost> <msgid>        (<suser>@<shost> is sender's address)
-                                        (msgid = 12 lowercase alnum chars)
+  -> MSG <shost> <suser> <msgid>        (msgid = 12 random lowercase alnum chars)
+
   [recipient fetches <shost>/cable/queue/<msgid>]
-  [recipient fetches <shost>/cable/certs/{ca,encrypt,verify}.pem]
+  [recipient fetches <shost>/cable/certs/<suser>/{ca,encrypt,verify}.pem]
   [... recipient verifies message and prepares the signed/encrypted receipt ...]
-  [recipient publishes (<rhost>)/cable/queue/<msgid>.rcp]
+  [recipient publishes (<rhost>)/cable/rqueue/<msgid>]
 
   <- RCP <msgid>
 
-  [sender fetches <rhost>/cable/queue/<msgid>.rcp]
+  [sender fetches <rhost>/cable/rqueue/<msgid>]
   [... sender verifies the receipt ...]
   [sender removes /cable/queue/<msgid>]
 
   -> ACK <msgid>
 
-  [recipient removes /cable/queue/<msgid>.rcp]
+  [recipient removes /cable/rqueue/<msgid>]
 
 
 Other possible commands:
@@ -53,4 +58,4 @@ Other possible commands:
 
   -> RJR <msgid>              (receipt rejected: crypto failure, ...)
 
-  [recipient removes /cable/queue/<msgid>.rcp]
+  [recipient removes /cable/rqueue/<msgid>]

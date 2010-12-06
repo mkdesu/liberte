@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
 # Encryption, decryption and verification of messages and message receipts
+# NOTE: the "-e" switch above is important (script failure on error)!
 
 # Variables
 cmd="$1"
@@ -24,7 +25,7 @@ fi
 # Verifying the ca/verify/encrypt certificates triple
 # * parses and extracts the first certificate from each file
 # * verifies the certificates chain (important only for encrypt.pem)
-# * generates username from ca.pem
+# * generates username from ca.pem and checks it against the given one
 verify_certs() {
     local cvedir="$1" name count fingerprint
 
@@ -33,7 +34,7 @@ verify_certs() {
                      -out "${cvedir}"/${name}.norm.pem
 
         # Sanity check - OpenSSL should output exactly 1 certificate
-        count=`sed -n '/^-----BEGIN /p' "${cvedir}"/${name}.norm.pem | wc -l`
+        count=`sed -n '/^-----BEGIN /p' -- "${cvedir}"/${name}.norm.pem | wc -l`
         [ "${count}" = 1 ]
     done
 
@@ -53,15 +54,23 @@ ${cvedir}/verify.norm.pem: OK
 ${cvedir}/encrypt.norm.pem: OK
 EOF
 
-    if ! cmp -s "${cvedir}"/certs.vfy "${cvedir}"/certs.cmp; then
+    if ! cmp -s -- "${cvedir}"/certs.vfy "${cvedir}"/certs.cmp; then
         echo "Certificates chain verification failed"
         return 1
     fi
 
     rm -- "${cvedir}"/certs.cmp "${cvedir}"/certs.vfy
 
+
     fingerprint=`openssl x509 -in "${cvedir}"/ca.norm.pem -outform der | sha1sum | head -c 40`
-    ${base32} "${fingerprint}" > "${cvedir}"/username
+    ${base32} "${fingerprint}" > "${cvedir}"/username.cmp
+
+    if ! cmp -s -- "${cvedir}"/username "${cvedir}"/username.cmp; then
+        echo "Username verification failed"
+        return 1
+    fi
+
+    rm -- "${cvedir}"/username.cmp
 }
 
 
@@ -74,20 +83,43 @@ EOF
 certdir="${ssldir}"/certs
 keysdir="${ssldir}"/private
 
+
+# Input and output files are in ${msgdir}
+#
+# in: ${cmd}.rdy (indicates ready input + {ca,verify,encrypt}.pem)
+#
 # <send>
-#     in:  ${msgdir}/message, ${msgdir}/{ca,encrypt}.pem
-#     out: ${msgdir}/message.sig, ${msgdir}/message.out
+#     in:  message, username
+#     out: message.sig, message.out
+#
+# ---> message.out
 #
 # <recv>
-#     in:  ${msgdir}/message, ${msgdir}/{ca,verify,encrypt}.pem
-#     out: ${msgdir}/message.in, ${msgdir}/receipt.{sig,out}
+#     in:  message.out, username
+#     out: message{,.sig}, receipt.{sig,out}
 #
-# <ack> (expected <send>'s directory with veirfied certificates)
-#     in:  ${msgdir}/receipt, ${msgdir}/message.sig, ${msgdir}/{ca,verify}.pem
-#     out: ${msgdir}/receipt.sig
+# <--- receipt.out
+#
+# <ack> (expects <send>'s directory)
+#     in:  receipt.out, message.sig
+#     out: receipt.sig
+#
+# out: ${cmd}.ok (+ ack.rdy for <send>)
 
-case "$1" in
+rm -f -- "${msgdir}"/${cmd}.ok
+
+if [ ! -e "${msgdir}"/${cmd}.rdy ]; then
+    echo "${msgdir} is not ready for <${cmd}>"
+    exit 1
+fi
+
+
+case ${cmd} in
 send)
+    rm -f -- "${msgdir}"/message.sig "${msgdir}"/message.out \
+             "${msgdir}"/receipt.sig "${msgdir}"/receipt.out \
+             "${msgdir}"/ack.rdy     "${msgdir}"/ack.ok
+
     verify_certs "${msgdir}"
 
     # NOTE: -noattr is partially ignored
@@ -107,12 +139,15 @@ send)
 
 
 recv)
+    rm -f -- "${msgdir}"/message.sig "${msgdir}"/message    \
+             "${msgdir}"/receipt.sig "${msgdir}"/receipt.out
+
     verify_certs "${msgdir}"
 
     openssl cms -decrypt -inform pem \
                 -recip    "${certdir}"/encrypt.pem \
                 -inkey    "${keysdir}"/decrypt.pem \
-                -in       "${msgdir}"/message      \
+                -in       "${msgdir}"/message.out  \
                 -out      "${msgdir}"/message.sig
 
     openssl cms -verify -inform der \
@@ -120,7 +155,7 @@ recv)
                 -CAfile   "${msgdir}"/ca.norm.pem -CApath /dev/null \
                 -certfile "${msgdir}"/verify.norm.pem \
                 -in       "${msgdir}"/message.sig     \
-                -out      "${msgdir}"/message.in
+                -out      "${msgdir}"/message
 
     # NOTE: -md (and partially, -noattr) are ignored
     openssl cms -sign_receipt -noattr -md ${sigalg} -nodetach \
@@ -138,10 +173,12 @@ recv)
 
 
 ack)
+    rm -f -- "${msgdir}"/receipt.sig
+
     openssl cms -decrypt -inform pem \
                 -recip    "${certdir}"/encrypt.pem \
                 -inkey    "${keysdir}"/decrypt.pem \
-                -in       "${msgdir}"/receipt      \
+                -in       "${msgdir}"/receipt.out  \
                 -out      "${msgdir}"/receipt.sig
 
     openssl cms -x509_strict -policy_check -purpose smimesign -check_ss_sig \
@@ -154,6 +191,9 @@ ack)
 
 
 *)
+    echo "Internal error"
     exit 1
     ;;
 esac
+
+touch -- "${msgdir}"/${cmd}.ok
