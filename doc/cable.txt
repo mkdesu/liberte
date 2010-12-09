@@ -1,13 +1,16 @@
-S/MIME v3.1 messages exchange
-=============================
+CMS messages exchange
+=====================
 
-Send:
+Authentication and encryption
+-----------------------------
+
+<send>
   + [message]     <- <input>
   + [message]     -> signed    with sender's    [private sign.pem]    -> [message.sig]
   + [message.sig] -> encrypted with recipient's [X.509   encrypt.pem] -> [message.out]
   + [message.out] -> <send>
 
-Receive:
+<recv>
   + [message.out] <- <receive>
   + [message.out] -> decrypted with recipient's [private decrypt.pem] -> [message.sig]
   + [message.sig] -> verified  wrt  sender's    [X.509   verify.pem]  -> [message]
@@ -15,47 +18,112 @@ Receive:
   + [receipt.sig] -> encrypted with sender's    [X.509   encrypt.pem] -> [receipt.out]
   + [receipt.out] -> <send>
 
-Acknowledge:
+<ack>
   + [receipt.out] <- <receive>
   + [receipt.out] -> decrypted with sender's    [private decrypt.pem] -> [receipt.sig]
   + [receipt.sig] -> verified  wrt  recipient's [X.509   verify.pem]  +  [message.sig]
-  + (ack)         -> <send>
+  + [hash(receipt.sig)] -> <send>
 
 
-Protocol:
-  + <shost,rhost>/cable/certs/<suser,ruser>/{ca,verify,encrypt}.pem are always accessible
-  + <shost>/cable/queue/<msgid> is accessible until receipt verified
-  + <rhost>/cable/rqueue/<msgid> is accessible until receipt verification acked
-  + communication is stateless
+Protocol
+--------
+  + each loop type is mutually exclusive for a given <msgid>
+  + <hostname>/cable/                              public directory w/o list permission
+                  /certs/<username>/               public X.509 certificates
+                  /queue/<msgid>                   outgoing message <msgid>
+                  /rqueue/<msgid>                  outgoing receipt <msgid>
+  + /cable-local/                                  private directory on same filesystem
+                  /queue/<msgid>/                  outgoing message <msgid> work dir
+                  /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
+  + [MUA]         reads from MUA directory, writes to /cable-local/queue
+  + [service]     writes to /cable-local/{queue,rqueue}
+  + [fetch  loop] fetches from network, writes to /cable-local/{queue,rqueue}
+  + [crypto loop] writes to /cable-local/{queue,rqueue}, MUA directory
+  + [comm   loop] sends to network, writes to /{cable,cable-local}/{queue,rqueue}
 
-  [sender fetches <rhost>/cable/certs/<ruser>/{ca,encrypt,verify}.pem]
-  [... sender prepares the signed/encrypted message with receipt request ...]
-  [sender publishes (<shost>)/cable/queue/<msgid>]
+<send>
+  [MUA]
+  + generate random 160-bit (40 hex digits) <msgid>
+  + prepare /cable-local/queue/<msgid>/{message,username,hostname}
+  + create  /cable-local/queue/<msgid>/send.req
 
-  -> MSG <shost> <suser> <msgid>        (msgid = 12 random lowercase alnum chars)
+  [fetch loop]
+  + check   /cable-local/queue/<msgid>/send.req
+  + fetch   <hostname>/cable/certs/<username>/{ca,encrypt,verify}.pem
+  + rename  /cable-local/queue/<msgid>/send.req -> send.rdy
 
-  [recipient fetches <shost>/cable/queue/<msgid>]
-  [recipient fetches <shost>/cable/certs/<suser>/{ca,encrypt,verify}.pem]
-  [... recipient verifies message and prepares the signed/encrypted receipt ...]
-  [recipient publishes (<rhost>)/cable/rqueue/<msgid>]
+  [crypto loop]
+  + check   /cable-local/queue/<msgid>/send.rdy
+  + prepare /cable-local/queue/<msgid>/message.out
+  + rename  /cable-local/queue/<msgid>/send.rdy -> send.ok  (success)
+  +                                             -> send.req (fail)
 
-  <- RCP <msgid>
-
-  [sender fetches <rhost>/cable/rqueue/<msgid>]
-  [... sender verifies the receipt ...]
-  [sender removes /cable/queue/<msgid>]
-
-  -> ACK <msgid>
-
-  [recipient removes /cable/rqueue/<msgid>]
+  [comm loop]
+  + check   /cable-local/queue/<msgid>/send.ok
+  + checkno /cable-local/queue/<msgid>/ack.ok
+  + move    /cable-local/queue/<msgid>/message.out (if exists) -> /cable/queue/<msgid>
+  + send    "MSG <shostname> <susername> <msgid>" to <hostname>
 
 
-Other possible commands:
+<recv>
+  [service]
+  + upon    "MSG <hostname> <username> <msgid>"
+  + prepare /cable-local/rqueue/<msgid>/{username,hostname}
+  + create  /cable-local/rqueue/<msgid>/recv.req
 
-  <- REJ <msgid>              (message rejected: <msgid> in use, crypto failure, ...)
+  [fetch loop]
+  + check   /cable-local/rqueue/<msgid>/recv.req
+  + checkno /cable-local/rqueue/<msgid>/recv.{rdy,ok}
+  + fetch   <hostname>/cable/queue/<msgid> -> (message.out)
+  + fetch   <hostname>/cable/certs/<username>/{ca,encrypt,verify}.pem
+  + rename  /cable-local/rqueue/<msgid>/recv.req -> recv.rdy
 
-  [sender removes /cable/queue/<msgid>]
+  [crypto loop]
+  + check   /cable-local/rqueue/<msgid>/recv.rdy
+  + prepare /cable-local/rqueue/<msgid>/receipt.out
+  + create  <mua message> <- (message)
+  + rename  /cable-local/rqueue/<msgid>/recv.rdy -> recv.ok  (success)
+  +                                              -> recv.req (fail)
 
-  -> RJR <msgid>              (receipt rejected: crypto failure, ...)
+  [comm loop]
+  + check   /cable-local/rqueue/<msgid>/recv.ok
+  + move    /cable-local/rqueue/<msgid>/receipt.out (if exists) -> /cable/rqueue/<msgid>
+  + send    "RCP <msgid>" to <hostname>
 
-  [recipient removes /cable/rqueue/<msgid>]
+
+<ack>
+  [service]
+  + upon    "RCP <msgid>"
+  + create  /cable-local/queue/<msgid>/ack.req
+
+  [fetch loop]
+  + check   /cable-local/queue/<msgid>/ack.req
+  + checkno /cable-local/queue/<msgid>/ack.{rdy,ok}
+  + fetch   <hostname>/cable/rqueue/<msgid> -> (receipt.out)
+  + rename  /cable-local/queue/<msgid>/ack.req -> ack.rdy
+
+  [crypto loop]
+  + check   /cable-local/queue/<msgid>/ack.rdy
+  + create  <mua acknowledge>
+  + rename  /cable-local/queue/<msgid>/ack.rdy -> ack.ok  (success)
+  +                                            -> ack.req (fail)
+
+  [comm loop]
+  + check   /cable-local/queue/<msgid>/ack.ok
+  + remove  /cable/queue/<msgid>                   (if exists)
+  + read    /cable-local/queue/<msgid>/receipt.ack (128 hex digits)
+  + send    "ACK <msgid> <ackhash>" to <hostname>  (wait for OK)
+  + remove  /cable-local/queue/<msgid>/            (if exists)
+
+
+<fin>
+  [service]
+  + upon    "ACK <msgid> <ackhash>"
+  + check   /cable-local/rqueue/<msgid>/recv.ok    (if <msgid> exists)
+  + compare /cable-local/rqueue/<msgid>/receipt.ack <-> <ackhash>
+  + remove  /cable-local/rqueue/<msgid>/           (if exists)
+  + return  OK
+
+  [comm loop]
+  + checkno /cable-local/rqueue/<msgid>/
+  + remove  /cable/rqueue/<msgid>                  (if exists)

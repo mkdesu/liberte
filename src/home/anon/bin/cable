@@ -96,15 +96,15 @@ keysdir="${ssldir}"/private
 #
 # <recv>
 #     in:  message.out, username
-#     out: message{,.sig}, receipt.{sig,out}
+#     out: message{,.sig}, receipt.{sig,ack,out}
 #
 # <--- receipt.out
 #
 # <ack> (expects <send>'s directory)
 #     in:  receipt.out, message.sig
-#     out: receipt.sig
+#     out: receipt.{sig,ack}
 #
-# out: ${cmd}.ok (+ ack.rdy for <send>)
+# out: ${cmd}.ok
 
 rm -f -- "${msgdir}"/${cmd}.ok
 
@@ -117,7 +117,7 @@ fi
 case ${cmd} in
 send)
     rm -f -- "${msgdir}"/message.sig "${msgdir}"/message.out \
-             "${msgdir}"/receipt.sig "${msgdir}"/receipt.out \
+             "${msgdir}"/receipt.sig "${msgdir}"/receipt.ack "${msgdir}"/receipt.out \
              "${msgdir}"/ack.rdy     "${msgdir}"/ack.ok
 
     verify_certs "${msgdir}"
@@ -140,7 +140,7 @@ send)
 
 recv)
     rm -f -- "${msgdir}"/message.sig "${msgdir}"/message    \
-             "${msgdir}"/receipt.sig "${msgdir}"/receipt.out
+             "${msgdir}"/receipt.sig "${msgdir}"/receipt.ack "${msgdir}"/receipt.out
 
     verify_certs "${msgdir}"
 
@@ -169,11 +169,14 @@ recv)
                 -in       "${msgdir}"/receipt.sig \
                 -out      "${msgdir}"/receipt.out \
                           "${msgdir}"/encrypt.norm.pem
+
+    ${sigalg}sum -- "${msgdir}"/receipt.sig | sed 's/[[:blank:]].*//' \
+                 >  "${msgdir}"/receipt.ack
     ;;
 
 
 ack)
-    rm -f -- "${msgdir}"/receipt.sig
+    rm -f -- "${msgdir}"/receipt.sig "${msgdir}"/receipt.ack
 
     openssl cms -decrypt -inform pem \
                 -recip    "${certdir}"/encrypt.pem \
@@ -187,6 +190,9 @@ ack)
                 -certfile       "${msgdir}"/verify.norm.pem \
                 -verify_receipt "${msgdir}"/receipt.sig     \
                 -in             "${msgdir}"/message.sig
+
+    ${sigalg}sum -- "${msgdir}"/receipt.sig | sed 's/[[:blank:]].*//' \
+                 >  "${msgdir}"/receipt.ack
     ;;
 
 
@@ -196,4 +202,4 @@ ack)
     ;;
 esac
 
-touch -- "${msgdir}"/${cmd}.ok
+mv -- "${msgdir}"/${cmd}.rdy "${msgdir}"/${cmd}.ok

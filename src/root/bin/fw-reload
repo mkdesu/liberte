@@ -7,7 +7,7 @@ nofw=nofw
 torports=80,443
 
 # Ports used by HotSpot registration pages
-hotspot=http,https,webcache,tproxy,3128,8088,11523
+hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
 
 # Default policies
