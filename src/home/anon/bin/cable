@@ -86,8 +86,6 @@ keysdir="${ssldir}"/private
 
 # Input and output files are in ${msgdir}
 #
-# in: ${cmd}.rdy (indicates ready input + {ca,verify,encrypt}.pem)
-#
 # <send>
 #     in:  message, username
 #     out: message.sig, message.out
@@ -103,22 +101,11 @@ keysdir="${ssldir}"/private
 # <ack> (expects <send>'s directory)
 #     in:  receipt.out, message.sig
 #     out: receipt.{sig,ack}
-#
-# out: ${cmd}.ok
-
-rm -f -- "${msgdir}"/${cmd}.ok
-
-if [ ! -e "${msgdir}"/${cmd}.rdy ]; then
-    echo "${msgdir} is not ready for <${cmd}>"
-    exit 1
-fi
-
 
 case ${cmd} in
 send)
     rm -f -- "${msgdir}"/message.sig "${msgdir}"/message.out \
-             "${msgdir}"/receipt.sig "${msgdir}"/receipt.ack "${msgdir}"/receipt.out \
-             "${msgdir}"/ack.rdy     "${msgdir}"/ack.ok
+             "${msgdir}"/receipt.sig "${msgdir}"/receipt.ack "${msgdir}"/receipt.out
 
     verify_certs "${msgdir}"
 
@@ -201,5 +188,3 @@ ack)
     exit 1
     ;;
 esac
-
-mv -- "${msgdir}"/${cmd}.rdy "${msgdir}"/${cmd}.ok
