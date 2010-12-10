@@ -4,6 +4,7 @@
 sysver=4.03
 sysbin=syslinux
 sysmbr=/usr/share/syslinux/mbr.bin
+sysmbr2=/usr/lib/syslinux/mbr.bin
 
 # Directory for ldlinux.sys and bundled syslinux binary
 sysdir=/liberte/boot/syslinux
@@ -52,8 +53,8 @@ sysok=1
 if ! ${sysbin} -v 1>/dev/null 2>&1; then
     echo "Syslinux v4+ not found"
     sysok=0
-elif [ ! -e ${sysmbr} ]; then
-    echo "${sysmbr} not found"
+elif [ ! -e ${sysmbr}  -a  ! -e ${sysmbr2} ]; then
+    echo "${sysmbr} or ${sysmbr2} not found"
     sysok=0
 else
     # Check for wrong Syslinux version (exact match required)
@@ -61,6 +62,8 @@ else
     if [ "${havesysver}" != ${sysver} ]; then
         echo "Syslinux v${havesysver} detected, need v${sysver}"
         sysok=0
+    elif [ -e ${sysmbr2} ]; then
+        sysmbr=${sysmbr2}
     fi
 fi
 
