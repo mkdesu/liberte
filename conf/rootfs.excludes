@@ -90,6 +90,7 @@
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
 /etc/*-
+/etc/resolv.conf
 /etc/issue.logo
 /etc/skel/
 /etc/locale.gen

@@ -57,7 +57,8 @@ else
 
     rsync -rlptOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
     if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then
-        chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter ${LIVECD}/etc/privoxy/{config,match-all.action}
+        chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter \
+            ${LIVECD}/etc/privoxy/config ${LIVECD}/etc/privoxy/match-all.action
     fi
 
     rsync -rlptOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
@@ -75,6 +76,10 @@ else
 
     rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
     chown -hR --from=0:0 2102:9001 ${LIVECD}/home/nofw
+
+    if [ -e /etc/resolv.conf ]; then
+        rsync -rlptOHS --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
+    fi
 
     if [ -e ${LIVECD}/usr/bin/xcdroast ]; then
         find ${LIVECD}/usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
