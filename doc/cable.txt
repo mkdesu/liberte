@@ -27,12 +27,15 @@ Authentication and encryption
 
 Protocol
 --------
-  + each loop type is mutually exclusive for a given <msgid>
-  + all code block are restartable (e.g., after crash)
-  + messages are never lost if filesystem is transactional
+  + username is explicitly verified against root CA fingerprint
+  + hostname is implicitly verified when fetching files
   + resistant against MITM injections (except MSG substitution with same <msgid>)
   + resistant against temporary MITM resources substitution
   + vulnerable to DoS (e.g., many MSG requests)
+
+  + each loop type is mutually exclusive for a given <msgid>
+  + all code block are restartable (e.g., after crash)
+  + messages are never lost if filesystem is transactional
 
   + <hostname>/cable/                              public directory w/o list permission
                   /certs/<username>/               public X.509 certificates
@@ -70,7 +73,7 @@ Protocol
   [comm loop]
   + check   /cable-local/queue/<msgid>/send.ok
   + checkno /cable-local/queue/<msgid>/ack.ok
-  + move    /cable-local/queue/<msgid>/message.out (if exists) -> /cable/queue/<msgid>
+  + copy    /cable-local/queue/<msgid>/message.out -> /cable/queue/<msgid> (if not exists)
   + send    "MSG <shostname> <susername> <msgid>" to <hostname>
 
 
@@ -96,7 +99,7 @@ Protocol
 
   [comm loop]
   + check   /cable-local/rqueue/<msgid>/recv.ok
-  + move    /cable-local/rqueue/<msgid>/receipt.out (if exists) -> /cable/rqueue/<msgid>
+  + copy    /cable-local/rqueue/<msgid>/receipt.out -> /cable/rqueue/<msgid> (if not exists)
   + send    "RCP <msgid>" to <hostname>
 
 

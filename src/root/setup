@@ -288,7 +288,8 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl metalog iptables consolekit alsasound"
-defaultsvc="liberte acpid rngd laptop_mode gpm smartd bluetooth pcscd nscd fbcondecor autofs NetworkManager privoxy"
+defaultsvc="liberte acpid rngd laptop_mode gpm smartd bluetooth
+            pcscd nscd fbcondecor autofs NetworkManager privoxy nginx"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do
@@ -344,6 +345,8 @@ usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
+
+chown nginx:nginx /var/log/nginx /var/tmp/nginx{,/client,/fastcgi}
 
 
 sinfo "Initializing a secondary PGP keyring"

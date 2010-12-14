@@ -47,6 +47,7 @@ media-video/gpac                -* aac mad ogg vorbis
 # Unnecessary functionality
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
+sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
@@ -64,6 +65,7 @@ gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
 gnome-base/gvfs                 gnome
 media-gfx/graphicsmagick        imagemagick
+www-servers/nginx               aio
 # app-portage/eix               sqlite
 
 # Internationalization

@@ -20,10 +20,10 @@ depend() {
     before xdm
 
     # Tor config (if any) must be initialized before running Tor
+    # nginx www directory is initialized here
     # bluetooth needs to start before NetworkManager
-    # Privoxy config may be modified here
     after  bluetooth
-    before NetworkManager wicd tor privoxy
+    before NetworkManager tor nginx
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
     before autofs
@@ -62,6 +62,7 @@ luser=anon
 lgroup=legion
 lmount=/home/${luser}/persist
 ltordir=${lmount}/security/tor/hidden_service
+certsdir=${lmount}/security/ssl/certs
 otfefile=/mnt/cdrom${OTFEFILE}
 
 start() {
@@ -314,17 +315,37 @@ EndSection'
                 eend $?
             else
                 ebegin Propagating Tor hidden service directory
-                rsync -aHS --no-o --no-g --no-p --chmod=go= ${ltordir} /var/lib/tor \
+                rsync -rlptHS --safe-links --chmod=u=rwX,go= ${ltordir} /var/lib/tor \
                     && chown -hR tor:tor /var/lib/tor/hidden_service
                 eend $?
             fi
 
 
             # Create (big) private key + communication certificates + username
-            if [ ${lmountok} = 0  -a  ! -e ${lmount}/security/ssl/certs ]; then
+            if [ ${lmountok} = 0  -a  ! -e ${certsdir} ]; then
                 ebegin Generating communication certificates
                 einfo 'It is a one-time operation - please do not interrupt'
                 sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
+                eend $?
+            fi
+
+
+            # Initialize public cables directory
+            if [ -e ${certsdir}/username  -a  ! -e /var/www/cable ]; then
+                ebegin Initializing cables directory
+
+                username=`cat ${certsdir}/username`
+                mkdir -m 711 /var/www/cable
+                mkdir -m 710 /var/www/cable/certs /var/www/cable/certs/"${username}"
+
+                rsync -lptHS --safe-links --chmod=u=rw,g=r,o= \
+                    ${certsdir}/*.pem /var/www/cable/certs/"${username}"
+                chown -hR root:nginx /var/www/cable/certs
+
+                # NOTE: POSIX ACLs don't work in UnionFS without ACL support in all layers
+                mkdir -m 3310           /var/www/cable/queue /var/www/cable/rqueue
+                chown -h ${luser}:nginx /var/www/cable/queue /var/www/cable/rqueue
+
                 eend $?
             fi
 

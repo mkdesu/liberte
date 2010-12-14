@@ -87,6 +87,8 @@ net-misc/htpdate
 net-misc/tor
 net-proxy/tsocks
 net-proxy/privoxy
+www-servers/nginx
+www-servers/spawn-fcgi
 
 # Peripheral utilities
 sys-apps/x86info
