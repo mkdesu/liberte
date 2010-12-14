@@ -35,7 +35,8 @@ else
     LIVECD=$1/${PHASE}
     shift
 
-    # NOTE: non-pruned files: /, /etc/portage/gnupg, /home/anon/persist/security/pgp/*.gpg
+    # NOTE: non-pruned files: /, /etc/portage/gnupg, /etc/privoxy, /var/lib/portage
+    #                         /home/anon/persist/security/pgp/*.gpg
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
@@ -45,15 +46,29 @@ else
           --exclude=/home/nofw/       \
           --exclude=/mnt/hidden/      \
           --exclude=/var/lib/portage/ \
+          --exclude=/var/www/         \
           --exclude=/etc/privoxy/\*   \
           --exclude=/etc/sudoers      \
           --exclude=/etc/sysctl.conf  \
           --exclude=/etc/.auto.lock   \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
+
     rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
     rsync -rlptOHS --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
+
+    rsync -rlptOHS --chmod=u=rwX,go=X    -i --delete \
+          --exclude=/www/cable/\*/ -C ${SRC}/var/www ${LIVECD}/var
+    rsync -rlptOHS --chmod=u=wX,g=sX,o=t -i --delete-excluded -C ${SRC}/var/www/cable/* ${LIVECD}/var/www/cable
+    chown -h --from=0 2101 ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
+    if [ -e ${LIVECD}/tmp/nginx-ref ]; then
+        chown -h --from=0:0 --reference=${LIVECD}/tmp/nginx-ref \
+              ${LIVECD}/var/log/nginx ${LIVECD}/var/tmp/nginx   \
+              ${LIVECD}/var/tmp/nginx/client ${LIVECD}/var/tmp/nginx/fastcgi
+        chgrp -h            --reference=${LIVECD}/tmp/nginx-ref \
+              ${LIVECD}/var/www/cable/certs ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
+    fi
 
     rsync -rlptOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
     if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then

@@ -346,7 +346,8 @@ usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 
-chown nginx:nginx /var/log/nginx /var/tmp/nginx{,/client,/fastcgi}
+touch             /tmp/nginx-ref
+chown nginx:nginx /tmp/nginx-ref
 
 
 sinfo "Initializing a secondary PGP keyring"

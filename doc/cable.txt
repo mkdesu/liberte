@@ -31,112 +31,114 @@ Protocol
   + hostname is implicitly verified when fetching files
   + resistant against MITM injections (except MSG substitution with same <msgid>)
   + resistant against temporary MITM resources substitution
-  + vulnerable to DoS (e.g., many MSG requests)
+
+  + resistant against fingerprinting if username is unknown
+  + vulnerable to DoS (e.g., many MSG requests) if username is known
 
   + each loop type is mutually exclusive for a given <msgid>
   + all code block are restartable (e.g., after crash)
   + messages are never lost if filesystem is transactional
 
-  + <hostname>/cable/                              public directory w/o list permission
-                  /certs/<username>/               public X.509 certificates
+  + <hostname>/<username>/                         public directory w/o list permission
+                  /certs/                          public X.509 certificates
                   /queue/<msgid>                   outgoing message <msgid>
                   /rqueue/<msgid>                  outgoing receipt <msgid>
-  + /cable-local/                                  private directory on same filesystem
+  + /cables/                                       private directory
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
 
-  + [MUA]         reads from MUA directory, writes to /cable-local/queue
-  + [service]     writes to /cable-local/{queue,rqueue}
-  + [fetch  loop] fetches from network, writes to /cable-local/{queue,rqueue}
-  + [crypto loop] writes to /cable-local/{queue,rqueue}, MUA directory
-  + [comm   loop] sends to network, writes to /{cable,cable-local}/{queue,rqueue}
+  + [MUA]         reads from MUA directory, writes to /cables/queue
+  + [service]     writes to /cables/{queue,rqueue}
+  + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
+  + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory
+  + [comm   loop] sends to network, writes to /{<username>,cables}/{queue,rqueue}
 
 
 <send>
   [MUA]
   + generate random 160-bit (40 hex digits) <msgid>
-  + prepare /cable-local/queue/<msgid>/{message,username,hostname}
-  + create  /cable-local/queue/<msgid>/send.req
+  + prepare /cables/queue/<msgid>/{message,username,hostname}
+  + create  /cables/queue/<msgid>/send.req
   + return  OK
 
   [fetch loop]
-  + check   /cable-local/queue/<msgid>/send.req
-  + fetch   <hostname>/cable/certs/<username>/*  -> /cable-local/queue/<msgid>/
-  + rename  /cable-local/queue/<msgid>/send.req  -> send.rdy
+  + check   /cables/queue/<msgid>/send.req
+  + fetch   <hostname>/<username>/certs/*          -> /cables/queue/<msgid>/
+  + rename  /cables/queue/<msgid>/send.req         -> send.rdy
 
   [crypto loop]
-  + check   /cable-local/queue/<msgid>/send.rdy
-  + prepare /cable-local/queue/<msgid>/message.out
-  + rename  /cable-local/queue/<msgid>/send.rdy  -> send.ok  (success)
-  +                                              -> send.req (fail)
+  + check   /cables/queue/<msgid>/send.rdy
+  + prepare /cables/queue/<msgid>/message.out
+  + rename  /cables/queue/<msgid>/send.rdy         -> send.ok  (success)
+  +                                                -> send.req (fail)
 
   [comm loop]
-  + check   /cable-local/queue/<msgid>/send.ok
-  + checkno /cable-local/queue/<msgid>/ack.ok
-  + copy    /cable-local/queue/<msgid>/message.out -> /cable/queue/<msgid> (if not exists)
+  + check   /cables/queue/<msgid>/send.ok
+  + checkno /cables/queue/<msgid>/ack.ok
+  + copy    /cables/queue/<msgid>/message.out -> //<susername>/queue/<msgid> (if not exists)
   + send    "MSG <shostname> <susername> <msgid>" to <hostname>
 
 
 <recv>
   [service]
   + upon    "MSG <hostname> <username> <msgid>"
-  + prepare /cable-local/rqueue/<msgid>/{username,hostname}
-  + create  /cable-local/rqueue/<msgid>/recv.req
+  + prepare /cables/rqueue/<msgid>/{username,hostname}
+  + create  /cables/rqueue/<msgid>/recv.req
 
   [fetch loop]
-  + check   /cable-local/rqueue/<msgid>/recv.req
-  + checkno /cable-local/rqueue/<msgid>/recv.{rdy,ok}
-  + fetch   <hostname>/cable/queue/<msgid>       -> /cable-local/rqueue/<msgid>/
-  + fetch   <hostname>/cable/certs/<username>/*  -> /cable-local/rqueue/<msgid>/
-  + rename  /cable-local/rqueue/<msgid>/recv.req -> recv.rdy
+  + check   /cables/rqueue/<msgid>/recv.req
+  + checkno /cables/rqueue/<msgid>/recv.{rdy,ok}
+  + fetch   <hostname>/<username>/queue/<msgid>    -> /cables/rqueue/<msgid>/
+  + fetch   <hostname>/<username>/certs/*          -> /cables/rqueue/<msgid>/
+  + rename  /cables/rqueue/<msgid>/recv.req        -> recv.rdy
 
   [crypto loop]
-  + check   /cable-local/rqueue/<msgid>/recv.rdy
-  + prepare /cable-local/rqueue/<msgid>/{message,receipt.{ack,out}}
-  + create  <mua message>                        <- /cable-local/rqueue/<msgid>/message
-  + rename  /cable-local/rqueue/<msgid>/recv.rdy -> recv.ok  (success)
-  +                                              -> recv.req (fail)
+  + check   /cables/rqueue/<msgid>/recv.rdy
+  + prepare /cables/rqueue/<msgid>/{message,receipt.{ack,out}}
+  + create  <mua message>                          <- /cables/rqueue/<msgid>/message
+  + rename  /cables/rqueue/<msgid>/recv.rdy        -> recv.ok  (success)
+  +                                                -> recv.req (fail)
 
   [comm loop]
-  + check   /cable-local/rqueue/<msgid>/recv.ok
-  + copy    /cable-local/rqueue/<msgid>/receipt.out -> /cable/rqueue/<msgid> (if not exists)
+  + check   /cables/rqueue/<msgid>/recv.ok
+  + copy    /cables/rqueue/<msgid>/receipt.out -> //<rusername>/rqueue/<msgid> (if not exists)
   + send    "RCP <msgid>" to <hostname>
 
 
 <ack>
   [service]
   + upon    "RCP <msgid>"
-  + create  /cable-local/queue/<msgid>/ack.req
+  + create  /cables/queue/<msgid>/ack.req
 
   [fetch loop]
-  + check   /cable-local/queue/<msgid>/ack.req
-  + checkno /cable-local/queue/<msgid>/ack.{rdy,ok}
-  + fetch   <hostname>/cable/rqueue/<msgid>      -> /cable-local/queue/<msgid>/receipt.out
-  + rename  /cable-local/queue/<msgid>/ack.req   -> ack.rdy
+  + check   /cables/queue/<msgid>/ack.req
+  + checkno /cables/queue/<msgid>/ack.{rdy,ok}
+  + fetch   <hostname>/<username>/rqueue/<msgid>   -> /cables/queue/<msgid>/receipt.out
+  + rename  /cables/queue/<msgid>/ack.req          -> ack.rdy
 
   [crypto loop]
-  + check   /cable-local/queue/<msgid>/ack.rdy
-  + prepare /cable-local/queue/<msgid>/receipt.ack
+  + check   /cables/queue/<msgid>/ack.rdy
+  + prepare /cables/queue/<msgid>/receipt.ack
   + create  <mua acknowledge>
-  + rename  /cable-local/queue/<msgid>/ack.rdy   -> ack.ok  (success)
-  +                                              -> ack.req (fail)
+  + rename  /cables/queue/<msgid>/ack.rdy          -> ack.ok  (success)
+  +                                                -> ack.req (fail)
 
   [comm loop]
-  + check   /cable-local/queue/<msgid>/ack.ok
-  + remove  /cable/queue/<msgid>                    (if exists)
-  + read    /cable-local/queue/<msgid>/receipt.ack  (128 hex digits)
+  + check   /cables/queue/<msgid>/ack.ok
+  + remove  //<susername>/queue/<msgid>             (if exists)
+  + read    /cables/queue/<msgid>/receipt.ack       (128 hex digits)
   + send    "ACK <msgid> <ackhash>" to <hostname>   (wait for OK)
-  + remove  /cable-local/queue/<msgid>/             (if exists, atomic)
+  + remove  /cables/queue/<msgid>/                  (if exists, atomic)
 
 
 <fin>
   [service]
   + upon    "ACK <msgid> <ackhash>"
-  + check   /cable-local/rqueue/<msgid>/recv.ok     (if <msgid>/ exists)
-  + compare /cable-local/rqueue/<msgid>/receipt.ack <-> <ackhash>
-  + remove  /cable-local/rqueue/<msgid>/            (if exists, atomic)
+  + check   /cables/rqueue/<msgid>/recv.ok          (if <msgid>/ exists)
+  + compare /cables/rqueue/<msgid>/receipt.ack      <-> <ackhash>
+  + remove  /cables/rqueue/<msgid>/                 (if exists, atomic)
   + return  OK
 
   [comm loop]
-  + checkno /cable-local/rqueue/<msgid>/
-  + remove  /cable/rqueue/<msgid>                   (if exists)
+  + checkno /cables/rqueue/<msgid>/
+  + remove  //<rusername>/rqueue/<msgid>            (if exists)

@@ -331,21 +331,10 @@ EndSection'
 
 
             # Initialize public cables directory
-            if [ -e ${certsdir}/username  -a  ! -e /var/www/cable ]; then
+            if [ -e ${certsdir}/username  -a  -e /var/www/cable ]; then
                 ebegin Initializing cables directory
-
-                username=`cat ${certsdir}/username`
-                mkdir -m 711 /var/www/cable
-                mkdir -m 710 /var/www/cable/certs /var/www/cable/certs/"${username}"
-
-                rsync -lptHS --safe-links --chmod=u=rw,g=r,o= \
-                    ${certsdir}/*.pem /var/www/cable/certs/"${username}"
-                chown -hR root:nginx /var/www/cable/certs
-
-                # NOTE: POSIX ACLs don't work in UnionFS without ACL support in all layers
-                mkdir -m 3310           /var/www/cable/queue /var/www/cable/rqueue
-                chown -h ${luser}:nginx /var/www/cable/queue /var/www/cable/rqueue
-
+                rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem /var/www/cable/certs \
+                    && mv -T /var/www/cable /var/www/`cat ${certsdir}/username`
                 eend $?
             fi
 
