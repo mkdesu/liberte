@@ -21,8 +21,9 @@ depend() {
 
     # Tor config (if any) must be initialized before running Tor
     # nginx www directory is initialized here
-    # bluetooth needs to start before NetworkManager
-    after  bluetooth
+    # bluetooth  needs to start before NetworkManager
+    # spawn-fcgi needs to start before nginx
+    after  bluetooth spawn-fcgi.cable
     before NetworkManager tor nginx
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
@@ -333,8 +334,10 @@ EndSection'
             # Initialize public cables directory
             if [ -e ${certsdir}/username  -a  -e /var/www/cable ]; then
                 ebegin Initializing cables directory
+                username=`cat ${certsdir}/username | tr -cd '[:alnum:]'`
                 rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem /var/www/cable/certs \
-                    && mv -T /var/www/cable /var/www/`cat ${certsdir}/username`
+                    && mv -T /var/www/cable /var/www/"${username}" \
+                    && sed -i "s/CABLE/${username}/" /etc/nginx/nginx.conf
                 eend $?
             fi
 

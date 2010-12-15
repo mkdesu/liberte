@@ -1,0 +1,21 @@
+# The filename is suffixed with -1, -2, ... for each child process
+FCGI_SOCKET=/var/run/fastcgi.sock
+
+# 0.0.0.0 binds to all addresses
+# Child processes use consecutive ports
+FCGI_ADDRESS=127.0.0.1
+FCGI_PORT=
+
+FCGI_PROGRAM=/usr/sbin/fcgiwrap
+FCGI_CHILDREN=1
+
+FCGI_CHROOT=
+FCGI_CHDIR=
+
+FCGI_USER=anon
+FCGI_GROUP=legion
+
+FCGI_EXTRA_OPTIONS="-U nginx -G nginx -M 0600"
+
+# Additional environment variables
+ALLOWED_ENV="PATH"

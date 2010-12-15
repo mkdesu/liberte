@@ -89,6 +89,7 @@ net-proxy/tsocks
 net-proxy/privoxy
 www-servers/nginx
 www-servers/spawn-fcgi
+www-misc/fcgiwrap
 
 # Peripheral utilities
 sys-apps/x86info
