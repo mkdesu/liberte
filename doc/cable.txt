@@ -43,6 +43,7 @@ Protocol
                   /certs/                          public X.509 certificates
                   /queue/<msgid>                   outgoing message <msgid>
                   /rqueue/<msgid>                  outgoing receipt <msgid>
+                  /request/...                     service interface
   + /cables/                                       private directory
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
@@ -76,12 +77,12 @@ Protocol
   + check   /cables/queue/<msgid>/send.ok
   + checkno /cables/queue/<msgid>/ack.ok
   + copy    /cables/queue/<msgid>/message.out -> //<susername>/queue/<msgid> (if not exists)
-  + send    "MSG <shostname> <susername> <msgid>" to <hostname>
+  + request <hostname>/<username>/request/msg/<msgid>/<shostname>/<susername>
 
 
 <recv>
   [service]
-  + upon    "MSG <hostname> <username> <msgid>"
+  + upon    msg/<msgid>/<shostname>/<susername>
   + prepare /cables/rqueue/<msgid>/{username,hostname}
   + create  /cables/rqueue/<msgid>/recv.req
 
@@ -102,12 +103,12 @@ Protocol
   [comm loop]
   + check   /cables/rqueue/<msgid>/recv.ok
   + copy    /cables/rqueue/<msgid>/receipt.out -> //<rusername>/rqueue/<msgid> (if not exists)
-  + send    "RCP <msgid>" to <hostname>
+  + request <hostname>/<username>/request/rcp/<msgid>
 
 
 <ack>
   [service]
-  + upon    "RCP <msgid>"
+  + upon    rcp/<msgid>
   + create  /cables/queue/<msgid>/ack.req
 
   [fetch loop]
@@ -127,16 +128,16 @@ Protocol
   + check   /cables/queue/<msgid>/ack.ok
   + remove  //<susername>/queue/<msgid>             (if exists)
   + read    /cables/queue/<msgid>/receipt.ack       (128 hex digits)
-  + send    "ACK <msgid> <ackhash>" to <hostname>   (wait for OK)
+  + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait for OK)
   + remove  /cables/queue/<msgid>/                  (if exists, atomic)
 
 
 <fin>
   [service]
-  + upon    "ACK <msgid> <ackhash>"
+  + upon    ack/<msgid>/<ackhash>
   + check   /cables/rqueue/<msgid>/recv.ok          (if <msgid>/ exists)
   + compare /cables/rqueue/<msgid>/receipt.ack      <-> <ackhash>
-  + remove  /cables/rqueue/<msgid>/                 (if exists, atomic)
+  + remove  /cables/rqueue/<msgid>/                 (if receipt.ack exists and compares, atomic)
   + return  OK
 
   [comm loop]

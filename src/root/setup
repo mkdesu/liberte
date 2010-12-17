@@ -201,13 +201,16 @@ rebuild_locales
 
 
 sinfo "Compiling custom executables"
-gcc -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c \
-    `portageq envvar CFLAGS` `portageq envvar LDFLAGS` -ludev
-gcc -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c     \
-    `portageq envvar CFLAGS` `portageq envvar LDFLAGS`
+cflags=`portageq envvar CFLAGS`\ `portageq envvar LDFLAGS`
+gcc ${cflags} -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c -ludev
+gcc ${cflags} -o /usr/local/bin/hex2base32     /usr/local/src/hex2base32.c
+gcc ${cflags} -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c
+gcc ${cflags} -o /usr/local/bin/cable-request  /usr/local/src/cable-request.c
 
-strip -s /usr/local/sbin/udev-watchdog
-strip -s /usr/local/bin/log-limit
+strip -s /usr/local/sbin/udev-watchdog \
+         /usr/local/bin/hex2base32     \
+         /usr/local/bin/log-limit      \
+         /usr/local/bin/cable-request
 
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`

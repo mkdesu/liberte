@@ -10,7 +10,7 @@ umask 077
 # https://trac.torproject.org/projects/tor/wiki/TheOnionRouter/HiddenServiceNames
 
 tordir=${HOME}/persist/security/tor/hidden_service
-base32=${HOME}/bin/hex2base32
+base32=hex2base32
 
 # Rely on pam_mktemp
 export RANDFILE=/tmp/.private/${USER}/openssl.rnd

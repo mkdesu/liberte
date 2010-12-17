@@ -9,7 +9,7 @@ umask 077
 # Available environment: HOME, USER
 
 ssldir=${HOME}/persist/security/ssl
-base32=${HOME}/bin/hex2base32
+base32=hex2base32
 
 sslconf=${HOME}/config/ssl/extensions.cnf
 certdir=${ssldir}/certs

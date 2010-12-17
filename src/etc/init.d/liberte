@@ -334,10 +334,11 @@ EndSection'
             # Initialize public cables directory
             if [ -e ${certsdir}/username  -a  -e /var/www/cable ]; then
                 ebegin Initializing cables directory
-                username=`cat ${certsdir}/username | tr -cd '[:alnum:]'`
+                username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
                 rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem /var/www/cable/certs \
-                    && mv -T /var/www/cable /var/www/"${username}" \
-                    && sed -i "s/CABLE/${username}/" /etc/nginx/nginx.conf
+                    && mv -T /var/www/cable /var/www/"${username}"              \
+                    && sed -i "s/CABLE/${username}/"      /etc/nginx/nginx.conf \
+                    && sed -i 's/127\.0\.0\.2/127.0.0.1/' /etc/nginx/nginx.conf
                 eend $?
             fi
 
