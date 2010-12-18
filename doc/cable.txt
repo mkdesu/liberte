@@ -82,7 +82,7 @@ Protocol
 
 <recv>
   [service]
-  + upon    msg/<msgid>/<shostname>/<susername>
+  + upon    msg/<msgid>/<hostname>/<username>
   + prepare /cables/rqueue/<msgid>/{username,hostname}
   + create  /cables/rqueue/<msgid>/recv.req
 
@@ -126,20 +126,21 @@ Protocol
 
   [comm loop]
   + check   /cables/queue/<msgid>/ack.ok
-  + remove  //<susername>/queue/<msgid>             (if exists)
-  + read    /cables/queue/<msgid>/receipt.ack       (128 hex digits)
-  + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait for OK)
-  + remove  /cables/queue/<msgid>/                  (if exists, atomic)
+  + remove  //<susername>/queue/<msgid>            (if exists)
+  + read    /cables/queue/<msgid>/receipt.ack      (128 hex digits)
+  + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait)
+  + remove  /cables/queue/<msgid>/                 (if exists, atomic)
+  (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
 
 
 <fin>
   [service]
   + upon    ack/<msgid>/<ackhash>
-  + check   /cables/rqueue/<msgid>/recv.ok          (if <msgid>/ exists)
-  + compare /cables/rqueue/<msgid>/receipt.ack      <-> <ackhash>
-  + remove  /cables/rqueue/<msgid>/                 (if receipt.ack exists and compares, atomic)
-  + return  OK
+  + check   /cables/rqueue/<msgid>/recv.ok
+  + compare /cables/rqueue/<msgid>/receipt.ack    <-> <ackhash>
+  + rename  /cables/rqueue/<msgid>                 -> <msgid>.trash
 
   [comm loop]
-  + checkno /cables/rqueue/<msgid>/
-  + remove  //<rusername>/rqueue/<msgid>            (if exists)
+  + check   /cables/rqueue/<msgid>.trash/
+  + remove  //<rusername>/rqueue/<msgid>           (if exists)
+  + remove  /cables/rqueue/<msgid>.trash/
