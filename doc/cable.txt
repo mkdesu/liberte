@@ -29,15 +29,16 @@ Protocol
 --------
   + username is explicitly verified against root CA fingerprint
   + hostname is implicitly verified when fetching files
-  + resistant against MITM injections (except MSG substitution with same <msgid>)
+  + resistant against MITM injections (except first MSG substitution with same <msgid>)
   + resistant against temporary MITM resources substitution
+  + resistant to request replay attacks intended to cause large number of disk writes
 
   + resistant against fingerprinting if username is unknown
   + vulnerable to DoS (e.g., many MSG requests) if username is known
 
   + each loop type is mutually exclusive for a given <msgid>
   + all code block are restartable (e.g., after crash)
-  + messages are never lost if filesystem is transactional
+  + messages and receipts are never lost if filesystem is transactional
 
   + <hostname>/<username>/                         public directory w/o list permission
                   /certs/                          public X.509 certificates
@@ -60,7 +61,6 @@ Protocol
   + generate random 160-bit (40 hex digits) <msgid>
   + prepare /cables/queue/<msgid>/{message,username,hostname}
   + create  /cables/queue/<msgid>/send.req
-  + return  OK
 
   [fetch loop]
   + check   /cables/queue/<msgid>/send.req
@@ -83,8 +83,11 @@ Protocol
 <recv>
   [service]
   + upon    msg/<msgid>/<hostname>/<username>
-  + prepare /cables/rqueue/<msgid>/{username,hostname}
-  + create  /cables/rqueue/<msgid>/recv.req
+  + checkno /cables/rqueue/<msgid>
+  + create  /cables/rqueue/<msgid>.new/            (ok if exists)
+  + write   /cables/rqueue/<msgid>.new/{username,hostname}
+  + create  /cables/rqueue/<msgid>.new/recv.req    (ok if exists)
+  + rename  /cables/rqueue/<msgid>.new             -> <msgid>
 
   [fetch loop]
   + check   /cables/rqueue/<msgid>/recv.req
@@ -109,7 +112,8 @@ Protocol
 <ack>
   [service]
   + upon    rcp/<msgid>
-  + create  /cables/queue/<msgid>/ack.req
+  + check   /cables/queue/<msgid>/send.ok
+  + create  /cables/queue/<msgid>/ack.req          (ok if exists)
 
   [fetch loop]
   + check   /cables/queue/<msgid>/ack.req
@@ -129,7 +133,8 @@ Protocol
   + remove  //<susername>/queue/<msgid>            (if exists)
   + read    /cables/queue/<msgid>/receipt.ack      (128 hex digits)
   + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait)
-  + remove  /cables/queue/<msgid>/                 (if exists, atomic)
+  + rename  /cables/queue/<msgid>                  -> <msgid>.trash
+  + remove  /cables/queue/<msgid>.trash/           (+ gc before start)
   (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
 
 

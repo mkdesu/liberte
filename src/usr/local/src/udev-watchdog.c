@@ -17,6 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 1
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+#endif
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,15 +52,14 @@ static void sig_handler(int signum)
 static int print_device(struct udev_device *device, const char *f_action, const char *f_devsuffix)
 {
 	struct timeval  tv;
-	struct timezone tz;
 
     const  char *action  = udev_device_get_action(device);
     const  char *devpath = udev_device_get_devpath(device);
     size_t f_len, d_len;
 
-	gettimeofday(&tv, &tz);
-	printf("%llu.%06u %s %s\n",
-	       (unsigned long long) tv.tv_sec, (unsigned int) tv.tv_usec,
+	gettimeofday(&tv, NULL);
+	printf("%lu.%06u %s %s\n",
+	       (unsigned long) tv.tv_sec, (unsigned int) tv.tv_usec,
 	       action, devpath);
 
     if (! strcmp(f_action, action)) {
@@ -71,12 +77,7 @@ int main(int argc, char *argv[])
 {
 	int rc = 0;
 
-	struct udev *udev = udev_new();
-    if (udev == NULL)
-        goto out2;
-
-    if (argc != 2)
-        goto out2;
+	struct udev *udev;
 
 	struct sigaction act;
 	sigset_t mask;
@@ -86,7 +87,15 @@ int main(int argc, char *argv[])
 	const char *filter_subsys    = "block";
 	/* const char *filter_devtype   = "partition"; */
     const char *filter_action    = "remove";
-    const char *filter_devsuffix = argv[1];
+    const char *filter_devsuffix;
+
+	udev = udev_new();
+	if (udev == NULL)
+		goto out2;
+
+	if (argc != 2)
+		goto out2;
+	filter_devsuffix = argv[1];
 
 	/* set signal handlers */
 	memset(&act, 0x00, sizeof(struct sigaction));
@@ -127,7 +136,7 @@ int main(int argc, char *argv[])
 				 &readfds, NULL, NULL, NULL);
 		if (fdcount < 0) {
 			if (errno != EINTR)
-				fprintf(stderr, "error receiving uevent message: %m\n");
+				fprintf(stderr, "error receiving uevent message: %s\n", strerror(errno));
 			continue;
 		}
 

@@ -201,7 +201,7 @@ rebuild_locales
 
 
 sinfo "Compiling custom executables"
-cflags=`portageq envvar CFLAGS`\ `portageq envvar LDFLAGS`
+cflags="-ansi -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
 gcc ${cflags} -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c -ludev
 gcc ${cflags} -o /usr/local/bin/hex2base32     /usr/local/src/hex2base32.c
 gcc ${cflags} -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c

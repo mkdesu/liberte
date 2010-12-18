@@ -7,6 +7,8 @@
 #include <string.h>
 #include <locale.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -109,7 +111,8 @@ static void write_line(const char *path, const char *s) {
 
 
 static void create_file(const char *path) {
-    write_line(path, NULL);
+    if(access(path, F_OK))
+        write_line(path, NULL);
 }
 
 
@@ -136,34 +139,48 @@ static void read_line(const char *path, char *s, int sz) {
 
 
 static void check_file(const char *path) {
-    read_line(path, NULL, 0);
+    if(access(path, F_OK))
+        retstatus(ERROR);
 }
 
 
 static void handle_msg(const char *msgid, const char *hostname, const char *username) {
-    char path[MAX_PATH_LENGTH+1];
+    char path[MAX_PATH_LENGTH+1], npath[MAX_PATH_LENGTH+4+1];
     int  baselen;
 
     /* base: .../cables/rqueue/<msgid> */
     strcpy(path, rq_pfx);
     strcat(path, msgid);
-    baselen = strlen(path);
 
-    /* atomically create directory */
-    if (mkdir(path, 0700))
+    /* checkno /cables/rqueue/<msgid> */
+    if (!access(path, F_OK))
+        retstatus(ERROR);
+
+    /* temp base: .../cables/rqueue/<msgid>.new */
+    strcpy(npath, path);
+    strcat(npath, ".new");
+    baselen = strlen(npath);
+
+    /* create directory (ok if exists) */
+    if (mkdir(npath, 0700) && errno != EEXIST)
         retstatus(ERROR);
 
     /* write hostname */
-    strcpy(path + baselen, "/hostname");
-    write_line(path, hostname);
+    strcpy(npath + baselen, "/hostname");
+    write_line(npath, hostname);
 
     /* write username */
-    strcpy(path + baselen, "/username");
-    write_line(path, username);
+    strcpy(npath + baselen, "/username");
+    write_line(npath, username);
 
     /* create recv.req */
-    strcpy(path + baselen, "/recv.req");
-    create_file(path);
+    strcpy(npath + baselen, "/recv.req");
+    create_file(npath);
+
+    /* rename .../cables/rqueue/<msgid>.new -> <msgid> */
+    npath[baselen] = '\0';
+    if (rename(npath, path))
+        retstatus(ERROR);
 }
 
 
@@ -175,6 +192,10 @@ static void handle_rcp(const char *msgid) {
     strcpy(path, q_pfx);
     strcat(path, msgid);
     baselen = strlen(path);
+
+    /* check send.ok */
+    strcpy(path + baselen, "/send.ok");
+    check_file(path);
 
     /* create ack.req */
     strcpy(path + baselen, "/ack.req");
@@ -204,7 +225,7 @@ static void handle_ack(const char *msgid, const char *ackhash) {
     if (strcmp(ackhash, recack))
         retstatus(ERROR);
 
-    /* rename .../cables/rqueue/<msgid>/ */
+    /* rename .../cables/rqueue/<msgid> -> <msgid>.trash */
     path[baselen] = '\0';
     strcpy(trpath, path);
     strcat(trpath, ".trash");
