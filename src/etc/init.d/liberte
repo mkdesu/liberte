@@ -5,9 +5,6 @@ depend() {
     # depend on dm-mod module
     need modules
 
-    # gentoo=nox -> /etc/.noxdm
-	need xdm-setup
-
     # start after power management is enabled
     after laptop_mode
 
@@ -109,7 +106,7 @@ EndSection'
 
 
     # Configure X server, unless "nox" is given to kernel (rely on xdm-setup)
-    if [ ! -e /etc/.noxdm  -a  ! -e /etc/X11/xorg.conf ]; then
+    if ! get_bootparam "nox" && [ ! -e /etc/X11/xorg.conf ]; then
         ebegin Configuring X server
         if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
             echo "${xorg_extra}" >> /root/xorg.conf.new

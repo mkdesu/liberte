@@ -90,6 +90,7 @@ net-proxy/privoxy
 www-servers/nginx
 www-servers/spawn-fcgi
 www-misc/fcgiwrap
+mail-filter/procmail
 
 # Peripheral utilities
 sys-apps/x86info

@@ -253,6 +253,12 @@ if [ -e /usr/share/fonts/default ]; then
 fi
 
 
+sinfo "Configuring Mesa"
+for mfam in `eselect mesa list | sed -n 's/^\([^[:blank:]]\+\).*/\1/p'`; do
+    eselect mesa set ${mfam} classic
+done
+
+
 sinfo "Updating PCI and USB lists"
 
 sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids

@@ -52,6 +52,7 @@
 /usr/share/splashutils/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
+/usr/bin/glsl_compiler
 
 # Static libraries and libtool files
 /lib/**.a

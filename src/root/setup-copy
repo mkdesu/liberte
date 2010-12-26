@@ -29,6 +29,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # eboard:         exclude perl    RDEPEND
 # mpg123:         exclude libtool RDEPEND
 # libqalculate:   exclude gnuplot RDEPEND
+# mesa:           replace libxml2[python] with libxml2 in RDEPEND
 sinfo "Patching copies of selected ebuilds"
 ebuilds="sys-apps/portage
          app-portage/gentoolkit
@@ -41,7 +42,8 @@ ebuilds="sys-apps/portage
          games-board/eboard
          media-sound/mpg123
          dev-libs/opensc
-         sci-libs/libqalculate"
+         sci-libs/libqalculate
+         media-libs/mesa"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -60,6 +62,9 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade}
+
+# Python support in libxml2 is only needed in development tools
+sed -i 's:\(dev-libs/libxml2\)\[python\]:\1:' ${ebuild_mesa}
 
 # OpenSSH is only needed for ssh:// support
 sed -i s:net-misc/openssh:: ${ebuild_gvfs}

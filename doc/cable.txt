@@ -149,3 +149,18 @@ Protocol
   + check   /cables/rqueue/<msgid>.trash/
   + remove  //<rusername>/rqueue/<msgid>           (if exists)
   + remove  /cables/rqueue/<msgid>.trash/
+
+
+Message format
+--------------
+
+<send>
+  + extract all To:, Cc:, Bcc: addresses
+  + check that all hosts are recognized (e.g., *.onion)
+  + remove Bcc: and all X-*: headers
+  + reformat Date: as UTC
+
+
+<recv>
+  + replace From: header with the actual address
+  + add X-Received-Date: header

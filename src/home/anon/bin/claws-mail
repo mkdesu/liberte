@@ -1,3 +1,16 @@
-#!/bin/sh
+#!/bin/sh -e
 
-exec /usr/bin/claws-mail --alternate-config-dir ${XDG_CONFIG_HOME}/claws-mail 2>/dev/null "$@"
+confdir=${XDG_CONFIG_HOME}/claws-mail
+
+username=${SECURITY_HOME}/ssl/certs/username
+hostname=${SECURITY_HOME}/tor/hidden_service/hostname
+
+if [ -e ${username} -a -e ${hostname} ]; then
+    address=`cat ${username}`@`cat ${hostname}`
+
+    if ! grep -q "^address=${address}\$" ${confdir}/accountrc; then
+        sed -i "s/^\(address=\).*/\1${address}/" ${confdir}/accountrc
+    fi
+fi
+
+exec /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"

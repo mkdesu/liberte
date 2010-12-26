@@ -11,10 +11,11 @@ fi
 export XDG_CONFIG_HOME=${HOME}/config
 export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
 export XDG_CACHE_HOME=${TMPDIR}/cache
+export SECURITY_HOME=${HOME}/persist/security
 
 export ASPELL_CONF="per-conf ${XDG_CONFIG_HOME}/aspell/aspell.conf; home-dir ${XDG_CONFIG_HOME}/aspell"
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
-export GNUPGHOME=${HOME}/persist/security/pgp
+export GNUPGHOME=${SECURITY_HOME}/pgp
 export GST_REGISTRY=${XDG_CACHE_HOME}/gstreamer/registry.xml
 export INPUTRC=${XDG_CONFIG_HOME}/shell/inputrc
 export MCRYPTRC=${XDG_CONFIG_HOME}/misc/mcryptrc

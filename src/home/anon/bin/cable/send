@@ -1,5 +1,63 @@
-#!/bin/sh
+#!/bin/sh -e
 
-# TODO
+umask 077
+export LC_ALL=C
 
-cat >> ${TMPDIR}/sent-mail
+
+# Creates ${queuedir}/<msgid>{username,hostname,message,send.req}
+queuedir=${HOME}/persist/cables/queue
+
+msgidbytes=20
+emailregex='^[a-z2-7]{32}@[a-z2-7]{16}\.onion$'
+
+# Temporary directory on same filesystem
+tmpdir=`mktemp -d --tmpdir=${queuedir}`
+
+trap 'rm -r ${tmpdir}' 0
+trap : INT QUIT TERM SEGV
+
+
+# Remove X-*: and Date: (which may be non-UTC) headers
+formail -f -I X- -I Date: > ${tmpdir}/message
+
+
+# Extract bare x@y addresses
+addresses=`formail -c -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
+    | tr , '\n'                                                 \
+    | sed 's/^.*<\([^>]*\)>/\1/'                                \
+    | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
+
+
+# Check address validity to prevent mistaken information leaks
+for addr in ${addresses}; do
+    if ! echo "x ${addr}" | sed 's/^x //' | egrep -q "${emailregex}"; then
+        echo "Unsupported address: ${addr}" 1>&2
+        exit 1
+    fi
+done
+
+
+# Remove Bcc: header and add a UTC Date:
+date=`date -uR`
+formail -f -I Bcc: -a "Date: ${date}" < ${tmpdir}/message > ${tmpdir}/message.new
+rm ${tmpdir}/message
+
+
+# Create actual <msgid> directories, one per addressee
+for addr in ${addresses}; do
+    # generate <msgid> and create as subdirectory
+    msgid=`openssl rand -hex ${msgidbytes}`
+    mkdir ${tmpdir}/${msgid}
+
+    # extract username and hostname from address, and generate respective files
+    echo ${addr} | sed 's/@.*//' > ${tmpdir}/${msgid}/username
+    echo ${addr} | sed 's/.*@//' > ${tmpdir}/${msgid}/hostname
+
+    # copy the sanitized message (assume the file will not be modified later)
+    ln ${tmpdir}/message.new ${tmpdir}/${msgid}/message
+
+    # atomically move directory to queue dir, and create send.req indicator
+    # (works even if the move is not atomic)
+    mv -T ${tmpdir}/${msgid} ${queuedir}/${msgid}
+    touch ${queuedir}/${msgid}/send.req
+done
