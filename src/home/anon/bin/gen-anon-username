@@ -42,6 +42,7 @@ openssl req -batch -new -utf8 -subj "${reqsubj}" \
 
 # Save 32-character Base32 username (root CA SHA-1 hash)
 fingerprint=`openssl x509 -in ${certdir}/ca.pem -outform der | sha1sum | head -c 40`
+[ ${#fingerprint} = 40 ]
 ${base32} ${fingerprint} > ${certdir}/username
 
 

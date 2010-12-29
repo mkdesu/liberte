@@ -3,6 +3,8 @@
 # This script should be safe to run via sudo
 # (with env_reset and secure_path set)
 
+export LC_ALL=C
+
 
 if [ $# != 1  -a  $# != 2 ]; then
     cat<<EOF
@@ -23,7 +25,7 @@ mac=
 # ${ifaces} contains the (possibly empty) interfaces list
 # ${mac} contains the MAC address (${ifaces} has one interface then)
 if [ $# = 1 ]; then
-    if [ "$1" = wireless ]; then
+    if [ X"$1" = Xwireless ]; then
         # Rely on the deprecated WIRELESS_EXT_SYSFS in kernel
         ifaces2=
         for iface in ${ifaces}; do
@@ -32,14 +34,14 @@ if [ $# = 1 ]; then
             fi
         done
         ifaces="${ifaces2}"
-    elif [ "$1" != all ]; then
+    elif [ X"$1" != Xall ]; then
         echo "Incorrect first parameter"
         exit 1
     fi
 else
     selected=
     for iface in ${ifaces}; do
-        if [ "$1" = ${iface} ]; then
+        if [ X"$1" = X${iface} ]; then
             selected=${iface}
         fi
     done
@@ -56,7 +58,7 @@ else
         exit 1
     fi
 
-    mac=`echo "$2" | tr -cd '[[:xdigit:]:]' | tr '[A-F]' '[a-f]'`
+    mac=`echo x "$2" | tr -cd '[[:xdigit:]:]' | tr '[A-F]' '[a-f]'`
 
     if [ ${#2} != ${#mac} ] || \
             ! echo "${mac}" | egrep -q '^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$'; then

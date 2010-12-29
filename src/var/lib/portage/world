@@ -166,6 +166,7 @@ x11-misc/xcalib
 x11-apps/xgamma
 
 # (session)
+x11-apps/xinit
 x11-apps/xauth
 x11-apps/xhost
 x11-apps/sessreg

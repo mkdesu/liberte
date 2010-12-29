@@ -35,6 +35,7 @@ openssl genrsa -f4 -out ${tordir}/private_key 1024 2>/dev/null
 # first half of SHA-1 hash to Base32
 hex=`openssl pkey -in ${tordir}/private_key -pubout -outform der 2>/dev/null \
          | tail -c +23 | sha1sum | head -c 20`
+[ ${#hex} = 20 ]
 b32=`${base32} ${hex}`
 
 echo ${b32}.onion > ${tordir}/hostname

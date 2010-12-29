@@ -52,7 +52,6 @@
 /usr/share/splashutils/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
-/usr/bin/glsl_compiler
 
 # Static libraries and libtool files
 /lib/**.a
@@ -141,9 +140,10 @@
 # app-text/aspell: old dictionaries import
 /usr/bin/aspell-import
 # dev-libs/openssl: optional functionality for update-ca-certificates,
-# helper for "openssl ca", improvement of CA.sh
+# helper for "openssl ca", improvement of CA.sh; an alternative to ssl-ts
 /usr/bin/c_rehash
 /etc/ssl/misc/CA.pl
+/etc/ssl/misc/tsget
 # media-libs/gd: raster fonts converter
 /usr/bin/bdftogd
 # sys-libs/glibc: malloc debugging
@@ -173,3 +173,8 @@
 /usr/share/gtksourceview-*/language-specs/convert.py
 # gnome-base/librsvg: a script superseded by rsvg-convert
 /usr/bin/rsvg
+# app-text/ghostscript-gpl: MS-produced postscript patcher
+/usr/bin/fixmswrd.pl
+
+# Individual unnecessary files
+/usr/bin/glsl_compiler

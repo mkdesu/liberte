@@ -36,7 +36,7 @@ if [ "${op}" = save ]; then
     savelist=`mktemp`
     LC_ALL=en_GB.UTF-8 rsync -rlpHAX -c -x -n --out-format='%i %n' \
             --exclude-from=${HOME}/config/persist.excludes \
-            ${HOME}/config "${livecd}"${HOME}                \
+            ${HOME}/config "${livecd}"${HOME}              \
         | sed '/^[^>ch.]/d; s/^[^ ]* //' > ${savelist}
     bsdtar -cJf "${settings}".new -C ${HOME} -n -T ${savelist}
     rm ${savelist}

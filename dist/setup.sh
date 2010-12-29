@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # Required Syslinux version
-sysver=4.03
+sysver=SYSVER
 sysbin=syslinux
 sysmbr=/usr/share/syslinux/mbr.bin
 sysmbr2=/usr/lib/syslinux/mbr.bin

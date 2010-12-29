@@ -17,12 +17,25 @@ sinfo() {
 spatch() {
     local pname=$1; shift
     local pcat=cat
+    local revok=
+
     if [ "${pname##*.}" = gz ]; then
         pcat=zcat
     fi
 
-    # sed causes $?==0
-    ${pcat} ${pname} | patch -Ns -r /tmp/patch-rejects "$@" | sed '/patch-rejects/d'
+    revres=0
+    ${pcat} ${pname} | patch --dry-run -R -Ns -r /tmp/patch-rejects "$@" 1>/dev/null || revres=$?
+
+    if ${pcat} ${pname} | patch -Ns -r /tmp/patch-rejects "$@" 1>/dev/null; then
+        echo "Successfully applied patch: ${pname}"
+    else
+        if [ ${revres} != 0 ]; then
+            echo "Failed to apply patch: ${pname}"
+            return 1
+        else
+            echo "Patch already applied: ${pname}"
+        fi
+    fi
     rm -f /tmp/patch-rejects
 }
 
@@ -84,8 +97,9 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     spatch ${HOME}/patches/kernel-info.patch -p0
     sed -i 's/lzma -9/lzma/' /usr/src/linux/scripts/Makefile.lib
 
-    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.31.2.patch     -d /usr/src/linux -p1
-    spatch /usr/local/portage/distfiles/unionfs-2.5.7_for_2.6.32.25.diff.gz -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.36-rc8.patch    -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/unionfs-2.5.7_for_2.6.36.diff.gz     -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/kernel-squashfs-lzma.patch'?rev=1.7' -d /usr/src/linux -p1
     # http://www.mail-archive.com/unionfs@mail.fsl.cs.sunysb.edu/msg03114.html
     spatch ${HOME}/patches/unionfs-unlink.patch -d /usr/src/linux -p4
 
@@ -430,6 +444,7 @@ mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86.zi
 mv /boot/initramfs-genkernel-x86-${kversion} /boot/initrd-x86.lzm
 
 mkdir -p /boot/syslinux
+syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,mbr.bin} /boot/syslinux/
 cp -p /usr/bin/syslinux /boot/syslinux/syslinux-x86
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/

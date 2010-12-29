@@ -3,6 +3,8 @@
 # This script should be safe to run via sudo
 # (with env_reset and secure_path set)
 
+export LC_ALL=C
+
 
 # Get OTFEVOLUME (everything else is deduced)
 source /etc/conf.d/liberte
@@ -90,7 +92,7 @@ fi
 
 
 # Provide information if requested
-if [ "$1" = info ]; then
+if [ X"$1" = Xinfo ]; then
     cat <<EOF
 OTFE LVM identifier:    ${OTFEVOLUME}
 OTFE logical device:    ${otfe}
@@ -111,7 +113,7 @@ fi
 
 
 # Sanitize the parameter and discard the original
-size=`echo "$1" | tr -cd '[[:digit:]]'`
+size=`echo x "$1" | tr -cd '[[:digit:]]'`
 shift
 
 

@@ -109,6 +109,9 @@ else
 fi
 environment="${environment} PHASE=${PHASE}"
 
+setarch=`which setarch`
+chroot=`which chroot`
+
 
 sinfo "Mounting system directories"
 for dir in proc sys dev dev/pts dev/shm; do
@@ -129,7 +132,7 @@ echo "${environment}" | tr ' ' '\n' | sed 's/^/    /'
 
 sinfo "Launching chrooted shell in ${LIVECD}"
 retval=0
-env -i ${environment} setarch i686 chroot ${LIVECD} /bin/bash -l "$@" || retval=$?
+env -i ${environment} "${setarch}" i686 "${chroot}" ${LIVECD} /bin/bash -l "$@" || retval=$?
 if [ ${retval} != 0 ]; then
     sinfo "Failed."
 fi

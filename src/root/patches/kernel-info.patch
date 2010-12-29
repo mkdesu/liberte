@@ -1,24 +1,20 @@
---- /usr/src/linux/scripts/mkcompile_h	2010-08-18 16:33:33.000000000 +0000
-+++ /usr/src/linux/scripts/mkcompile_h.new	2010-09-06 20:52:35.000000000 +0000
-@@ -65,19 +65,9 @@
+--- /usr/src/linux/scripts/mkcompile_h	2010-12-26 23:28:56.000000000 +0000
++++ /usr/src/linux/scripts/mkcompile_h.new	2010-12-27 00:01:03.000000000 +0000
+@@ -65,7 +65,7 @@
  
    echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
    echo \#define LINUX_COMPILE_BY \"`whoami`\"
 -  echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
 +  echo \#define LINUX_COMPILE_HOST \"liberte\"
  
--  if [ -x /bin/dnsdomainname ]; then
--    domain=`dnsdomainname 2> /dev/null`
--  elif [ -x /bin/domainname ]; then
--    domain=`domainname 2> /dev/null`
--  fi
--
--  if [ -n "$domain" ]; then
--    echo \#define LINUX_COMPILE_DOMAIN \"`echo $domain | $UTS_TRUNCATE`\"
--  else
--    echo \#define LINUX_COMPILE_DOMAIN
--  fi
-+  echo \#define LINUX_COMPILE_DOMAIN
+   domain=`dnsdomainname 2> /dev/null`
+   if [ -z "$domain" ]; then
+@@ -73,7 +73,7 @@
+   fi
  
-   echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
- ) > .tmpcompile
+   if [ -n "$domain" ]; then
+-    echo \#define LINUX_COMPILE_DOMAIN \"`echo $domain | $UTS_TRUNCATE`\"
++    echo \#define LINUX_COMPILE_DOMAIN
+   else
+     echo \#define LINUX_COMPILE_DOMAIN
+   fi
