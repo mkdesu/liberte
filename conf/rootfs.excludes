@@ -178,3 +178,4 @@
 
 # Individual unnecessary files
 /usr/bin/glsl_compiler
+/usr/bin/gs

@@ -4,7 +4,7 @@ sys-process/psmisc              -X
 net-misc/openssh                -X
 media-gfx/fbida                 -X
 media-fonts/terminus-font       -X -pcf
-app-text/ghostscript-gpl        -X -gtk
+app-text/ghostscript-gpl        -X
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
