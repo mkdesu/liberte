@@ -159,8 +159,10 @@ Message format
   + check that all hosts are recognized (e.g., *.onion)
   + remove Bcc: and all X-*: headers
   + reformat Date: as UTC
+  + compress with gzip
 
 
 <recv>
+  + uncompress with classic (single-threaded) gzip
   + replace From: header with the actual address
   + add X-Received-Date: header

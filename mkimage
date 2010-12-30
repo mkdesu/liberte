@@ -42,7 +42,7 @@ fi
 
 sinfo "Copying USB /boot"
 mkdir -p -m 755 ${USBROOT}
-rsync -aHAXS -i --delete-excluded \
+rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
     ${LIVECD}/boot ${USBROOT}
 sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/syslinux/syslinux.cfg
 
