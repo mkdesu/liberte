@@ -6,7 +6,7 @@ net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 net-wireless/iwl5150-ucode
 net-wireless/iwl6000-ucode
-net-wireless/iwl6050-ucode-9*
+net-wireless/iwl6050-ucode
 net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
