@@ -45,6 +45,11 @@ elif [ "$2" = clean ]; then
         --exclude-from=${FROM}/conf/rootfs-cp.excludes \
         ${LIVECD}/copy/ ${LIVECD}/copy | head
 
+
+    sinfo "Removing unnecessary SUID bits"
+    chmod a-s `sed -n "s:^/:${LIVECD}/copy&:p" ${FROM}/conf/rootfs.nosuid`
+
+
     ${FROM}/check ${LIVECD}
 
 

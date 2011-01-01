@@ -263,6 +263,11 @@ rm /usr/bin/python{,-wrapper}
 rm /usr/share/eselect/modules/{binutils,kernel,news,profile,python}.eselect
 
 
+sinfo "Tighting up SUID permissions"
+chgrp cdrom   /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
+chmod u+s,o-x /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
+
+
 sinfo "Updating ld cache"
 eselect env update 2>/dev/null
 sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
