@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <group name="Options">
+    <option name="DownloadDirectory" value="~/persist/documents"/>
+    <option name="ProxyHost" value="localhost"/>
+    <option name="ProxyPort" value="8118"/>
+    <option name="Timeout" value="120"/>
+    <option name="UseProxy" value="true"/>
+  </group>
+</config>

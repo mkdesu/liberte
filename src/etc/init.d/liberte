@@ -90,6 +90,16 @@ EndSection'
     eend $?
 
 
+    if [ ! -e /sys/fs/cgroup/user ]; then
+        ebegin Setting up control groups
+        echo /root/bin/cgroup-release > /sys/fs/cgroup/release_agent
+        echo 1                        > /sys/fs/cgroup/notify_on_release
+        mkdir -m 3770 /sys/fs/cgroup/user
+        chgrp users   /sys/fs/cgroup/user
+        eend $?
+    fi
+
+
     # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
     ebegin Reducing kernel console logging level
     rm -f /var/log/wtmp
@@ -105,7 +115,7 @@ EndSection'
     fi
 
 
-    # Configure X server, unless "nox" is given to kernel (rely on xdm-setup)
+    # Configure X server, unless "nox" is given to kernel
     if ! get_bootparam "nox" && [ ! -e /etc/X11/xorg.conf ]; then
         ebegin Configuring X server
         if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then

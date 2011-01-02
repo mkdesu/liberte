@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <group name="InfoDialog">
+    <option name="SelectedTab" value="Common"/>
+  </group>
+  <group name="OpenFileDialog">
+    <option name="Directory" value="/home/anon/persist/documents"/>
+  </group>
+  <group name="Options">
+    <option name="Height" value="550"/>
+    <option name="Width" value="750"/>
+    <option name="XPosition" value="0"/>
+    <option name="YPosition" value="0"/>
+  </group>
+  <group name="OptionsDialog">
+    <option name="Height" value="369"/>
+    <option name="SelectedTab" value="Library"/>
+    <option name="Width" value="549"/>
+  </group>
+  <group name="Style">
+    <option name="Base:fontFamily" value="DejaVu Serif"/>
+    <option name="Base:fontSize" value="12"/>
+  </group>
+  <group name="ToggleButtonGroup">
+    <option name="booksOrder" value="byAuthor"/>
+  </group>
+</config>

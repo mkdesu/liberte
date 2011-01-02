@@ -10,12 +10,12 @@ net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
 app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
+net-im/pidgin                   -ncurses
 dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline -pdf
 dev-db/sqlite                   -readline
 media-video/mplayer             -opengl
 media-libs/jasper               -opengl
-net-libs/webkit-gtk             -gstreamer
 sci-visualization/gnuplot       gd
 
 # Drivers
@@ -36,6 +36,8 @@ net-misc/curl                   ssl   gnutls -nss
 net-libs/neon                   ssl   gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
+net-irc/xchat                   ssl
+net-im/pidgin                         gnutls
 gnome-base/gvfs                 -http
 
 # Multimedia

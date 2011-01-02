@@ -145,6 +145,10 @@ mail-client/claws-mail-archive
 app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/midori
+app-text/fbreader
+net-irc/xchat
+x11-plugins/pidgin-otr
+x11-plugins/pidgin-libnotify
 
 # Games
 games-board/xmahjongg

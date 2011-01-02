@@ -45,12 +45,15 @@ networkmanager          gnutls, nss             gnutls
 wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 
 libsoup                 gnutls                  gnutls          midori
-curl                    ssl, gnutls, nss        gnutls          gnupg
+curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader
 neon                    ssl, gnutls             gnutls          audacious-plugins
 wget                    ssl                     ssl             portage, libqalculate(forex)
 
+xchat                   ssl                     ssl
+pidgin                  gnutls, nss             gnutls
 
-libcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring
+
+libgcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring, libotr(pidgin-otr)
 
 
 
@@ -113,14 +116,12 @@ ACLs and extended attributes
 ACLS
   + ACL changes propagate to tmpfs via UnionFS, but the inode must already
     exist in tmpfs (apparently, a bug in UnionFS)
-  + ACL reads propagate to SquashFS, which supports xattrs (and likely
-    ACLs) since kernel 2.6.35
+  + ACL reads propagate to SquashFS, which supports xattrs and ACLs
 
 Extended attributes
   + xattrs are not supported by tmpfs
   + xattr change requests propagate to the underlying (ro) SquashFS
   + xattr reads propagate to SquashFS, which supports xattrs
-    since kernel 2.6.35
 
 configuration persistence
   + ACLs are stored along regular permissions using bsdtar
@@ -129,4 +130,4 @@ configuration persistence
   + NTFS: user.* xattrs correspond to NTFS streams
   + ext2/3/4 removable media is mounted with ACLs and user.* xattrs
 
-SquashFS LZMA support is unavailable as of kernel 2.6.36.
+SquashFS LZMA support is available as a patch (PLD Linux) as of kernel 2.6.36.

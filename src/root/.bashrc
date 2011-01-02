@@ -8,3 +8,5 @@ alias -- -="less"
 alias g="grep"
 alias du="du -ks"
 alias ..="cd .."
+
+alias okroot="unset TMOUT; usermod -U root"

@@ -26,6 +26,7 @@
 # Miscellaneous
 /config/mplayer/registry
 /config/audacious/plugin-registry
+/config/fbreader/*.db
 
 # Logs
 /config/mc/history
