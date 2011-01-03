@@ -2,7 +2,7 @@
 <config>
   <group name="Options">
     <option name="DownloadDirectory" value="~/persist/documents"/>
-    <option name="ProxyHost" value="localhost"/>
+    <option name="ProxyHost" value="127.0.0.1"/>
     <option name="ProxyPort" value="8118"/>
     <option name="Timeout" value="120"/>
     <option name="UseProxy" value="true"/>

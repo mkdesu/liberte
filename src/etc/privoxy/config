@@ -15,10 +15,10 @@ enforce-blocks  0
 
 buffer-limit    4096
 
-forward-socks5  /                       localhost:9050  .
-forward-socks5  check.torproject.org    localhost:9050  .
-forward-socks5  torcheck.xenobite.eu    localhost:9050  .
-forward-socks5  .onion                  localhost:9050  .
+forward-socks5  /                       127.0.0.1:9050  .
+forward-socks5  check.torproject.org    127.0.0.1:9050  .
+forward-socks5  torcheck.xenobite.eu    127.0.0.1:9050  .
+forward-socks5  .onion                  127.0.0.1:9050  .
 
 forward         127.0.0.1/              .
 forward         localhost/              .

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
   <group name="Browser">
-    <option name="command" value="midori %1 &amp;"/>
+    <option name="command" value="xdg-open %1 &amp;"/>
   </group>
 </config>

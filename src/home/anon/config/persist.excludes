@@ -32,6 +32,7 @@
 /config/mc/history
 /config/audacious/log
 /config/geeqie/history
+/config/xchat/scrollback/
 
 # Transient directories
 /config/qalculate/tmp/
