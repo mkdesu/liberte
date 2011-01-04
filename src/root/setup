@@ -137,6 +137,9 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
 
     sinfo "Removing unnecessary packages"
+    python2=`eselect python list | awk '{ print $2 }' | grep '^python2\.'`
+    eselect python set ${python2}
+
     emerge -qC --deselect=n "=dev-lang/python-3*"
 
 
