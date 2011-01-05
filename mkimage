@@ -55,10 +55,12 @@ sed -i "s/SYSVER/${sysver}/" ${USBROOT}/setup.sh
 
 
 # Using default block size of 128KiB
+# Multi-threaded execution often causes deadlock after image creation
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs -noappend \
-    -no-exports -no-progress -no-xattrs -comp lzma \
+${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs \
+    -noappend -processors 1                          \
+    -no-exports -no-progress -no-xattrs -comp lzma   \
     -sort ${SRC}/conf/rootfs.sort -e boot tmp/packages
 chmod 644 ${USBROOT}/boot/root-x86.sfs
 

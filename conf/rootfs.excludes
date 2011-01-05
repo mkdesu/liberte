@@ -175,6 +175,9 @@
 /usr/bin/rsvg
 # app-text/ghostscript-gpl: MS-produced postscript patcher
 /usr/bin/fixmswrd.pl
+# net-im/pidgin: non-separated dbus-python dependency
+/usr/bin/purple-remote
+/usr/bin/purple-url-handler
 
 # Individual unnecessary files
 /usr/bin/glsl_compiler

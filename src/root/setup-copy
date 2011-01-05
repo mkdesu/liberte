@@ -23,6 +23,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # lm_sensors:     exclude perl    RDEPEND
 # xcb-proto:      exclude python  RDEPEND
 # libglade:       exclude python  RDEPEND
+# pidgin:         exclude python  RDEPEND (dbus-python)
 # gvfs:           exclude openssh RDEPEND
 # splashutils:    exclude cpio    RDEPEND
 # graphicsmagick: exclude perl    RDEPEND
@@ -36,6 +37,7 @@ ebuilds="sys-apps/portage
          sys-apps/lm_sensors
          x11-proto/xcb-proto
          gnome-base/libglade
+         net-im/pidgin
          gnome-base/gvfs
          media-gfx/splashutils
          media-gfx/graphicsmagick
@@ -62,6 +64,9 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade}
+
+# Python is needed by dbus-python, which is a non-separated dependency in ebuild
+sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
 
 # Python support in libxml2 is only needed in development tools
 sed -i 's:\(dev-libs/libxml2\)\[python\]:\1:' ${ebuild_mesa}
