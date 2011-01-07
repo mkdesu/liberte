@@ -313,9 +313,10 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 
 sinfo "Configuring start-up services"
-bootsvc="microcode_ctl metalog iptables consolekit alsasound"
+bootsvc="microcode_ctl irqbalance metalog iptables consolekit
+         alsasound fbcondecor"
 defaultsvc="liberte acpid rngd laptop_mode gpm smartd bluetooth
-            nscd fbcondecor autofs NetworkManager privoxy
+            nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable"
 delsvc="rmnologin netmount local"
 
@@ -392,7 +393,7 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 
 
 sinfo "Compiling kernel"
-genkflags="--splash=liberte --no-keymap --oldconfig --no-save-config --loglevel=0"
+genkflags="--no-splash --no-keymap --oldconfig --no-save-config --loglevel=0"
 sed -i 's/^DISKLABEL="yes"/DISKLABEL="no"/' /etc/genkernel.conf
 
 # Use MODULES_ISCSI for virtio, so as not to modify initrd.defaults
@@ -407,17 +408,17 @@ sed -i 's/^MODULES_\(DMRAID\|EVMS\|LVM\|MDADM\|NET\|FS\|FIREWIRE\)=/#\0/' \
 genkernel ${genkflags} all
 
 
-sinfo "Adding uvesafb support to initrd"
+sinfo "Extending and recompressing initrd"
 cpiodir=`mktemp -d`
 mkdir ${cpiodir}/cpio
 
 # Also add the alternative splash theme (genkernel can copy only one)
 /usr/src/linux/usr/gen_init_cpio /usr/share/v86d/initramfs \
     | (cd ${cpiodir}/cpio; cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1)
-mkdir -p ${cpiodir}/cpio/etc/splash
-cp -pr /etc/splash/liberty ${cpiodir}/cpio/etc/splash/
+
 /bin/gzip -cd /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
-find ${cpiodir}/cpio -not -type d -o -name root -o -path '*/etc/splash/*' \
+
+find ${cpiodir}/cpio ! -type d -o -name root \
     | sed "s@^${cpiodir}/cpio/@@" \
     | (cd ${cpiodir}/cpio; cpio -oA -H newc -O ${cpiodir}/initramfs)
 

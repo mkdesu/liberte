@@ -1,7 +1,7 @@
 # Silent mode messages
 SPLASH_BOOT_MESSAGE="Booting Liberté Linux (\$progress%)"
 SPLASH_REBOOT_MESSAGE="Rebooting Liberté Linux (\$progress%)"
-SPLASH_SHUTDOWN_MESSAGE="Shutting Liberté Linux down (\$progress%)"
+SPLASH_SHUTDOWN_MESSAGE="Shutting down Liberté Linux (\$progress%)"
 
 # Drop to verbose mode on initscript errors
 SPLASH_VERBOSE_ON_ERRORS="yes"

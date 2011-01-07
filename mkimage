@@ -49,7 +49,7 @@ sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/sysli
 
 sinfo "Copying USB add-ons"
 rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
-    --delete-excluded -C -f "P /boot/" \
+    --delete-excluded -C -f "P /boot/"             \
     ${SRC}/dist/ ${USBROOT}
 sed -i "s/SYSVER/${sysver}/" ${USBROOT}/setup.sh
 
@@ -58,9 +58,8 @@ sed -i "s/SYSVER/${sysver}/" ${USBROOT}/setup.sh
 # Multi-threaded execution often causes deadlock after image creation
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs \
-    -noappend -processors 1                          \
-    -no-exports -no-progress -no-xattrs -comp lzma   \
+${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs         \
+    -noappend -no-exports -no-progress -no-xattrs -comp lzma \
     -sort ${SRC}/conf/rootfs.sort -e boot tmp/packages
 chmod 644 ${USBROOT}/boot/root-x86.sfs
 

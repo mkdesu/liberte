@@ -93,6 +93,7 @@ www-misc/fcgiwrap
 mail-filter/procmail
 
 # Peripheral utilities
+sys-apps/irqbalance
 sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
