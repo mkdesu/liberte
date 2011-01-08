@@ -50,6 +50,7 @@ media-video/gpac                -* aac mad ogg vorbis
 # Unnecessary functionality
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
+sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 gnome-extra/zenity              -compat
@@ -58,6 +59,7 @@ dev-libs/libxslt                -crypt
 app-text/ghostscript-gpl        -djvu
 
 # Extra functionality
+sys-apps/busybox                static savedconfig
 media-libs/jpeg                 static-libs
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
@@ -76,6 +78,7 @@ app-i18n/scim-tables            linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
 sys-apps/man-pages              -linguas_*
+sys-apps/groff                  -linguas_*
 app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 

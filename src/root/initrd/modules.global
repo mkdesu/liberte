@@ -1,0 +1,5 @@
+# User may want to boot from a PATA/SATA hard disk
+ata
+
+# This includes CDROM support
+scsi

@@ -1,0 +1,145 @@
+#!/bin/busybox ash
+
+. /etc/initrd.defaults
+. /etc/initrd.scripts
+. /etc/modules.forced
+
+
+splash() {
+    return 0
+}
+
+[ -e /etc/initrd.splash ] && . /etc/initrd.splash
+
+
+# Clean input/output
+exec >${CONSOLE} <${CONSOLE} 2>&1
+
+
+# Mount virtual filesystems
+mount -t proc  proc  /proc
+mount -t sysfs sysfs /sys
+
+
+quiet_kmsg
+
+
+CMDLINE=`cat /proc/cmdline`
+for x in ${CMDLINE}; do
+    case "${x}" in
+        cdroot\=*)
+            CDROOT_DEV=`parse_opt "${x}"`
+        ;;
+        cdroot_type\=*)
+            CDROOT_TYPE=`parse_opt "${x}"`
+        ;;
+        cdroot_flags\=*)
+            CDROOT_FLAGS=`parse_opt "${x}"`
+        ;;
+        loop\=*)
+            LOOP=`parse_opt "${x}"`
+        ;;
+        looptype\=*)
+            LOOPTYPE=`parse_opt "${x}"`
+        ;;
+        debug)
+            DEBUG='yes'
+        ;;
+    esac
+done
+
+
+splash 'init'
+
+
+# Setup hotplugging
+echo '/bin/busybox mdev' > /proc/sys/kernel/hotplug
+
+
+good_msg 'Loading modules'
+oldmods=
+newmods=" ${FORCE_LOAD} "
+while [ "${oldmods}" != "${newmods}" ]; do
+    for modalias in ${newmods}; do
+        if ! echo "${oldmods}" | grep -q " ${modalias} "; then
+            modprobe -q ${modalias} 2>/dev/null
+        fi
+    done
+
+    oldmods="${newmods}"
+    newmods=' '$(cat $(find /sys/devices -name modalias) | sort -u | tr '\n' ' ')
+done
+
+
+# Start device manager
+good_msg 'Activating mdev'
+mdev -s
+
+
+mkdir -p "${NEW_ROOT}"
+CHROOT="${NEW_ROOT}"
+
+
+# Run debug shell if requested
+rundebugshell
+
+
+good_msg "Making tmpfs for ${NEW_ROOT}"
+mount -n -t tmpfs tmpfs "${NEW_ROOT}"
+
+for i in mnt mnt/cdrom mnt/livecd; do
+    mkdir -m 755 -p "${NEW_ROOT}"/${i}
+done
+chmod 755 ${NEW_ROOT}
+
+
+bootstrapCD
+
+
+# Setup the loopback mounts
+if [ "${LOOPTYPE}" = 'squashfs' ]; then
+    good_msg 'Mounting squashfs filesystem'
+    mount -t squashfs -o loop,ro "${NEW_ROOT}/mnt/cdrom/${LOOPEXT}${LOOP}" "${NEW_ROOT}/mnt/livecd"
+    test_success 'Mount filesystem'
+    FS_LOCATION='mnt/livecd'
+elif [ "${LOOPTYPE}" = 'noloop' ]; then
+    FS_LOCATION='mnt/cdrom'
+fi
+
+
+setup_unionfs ${NEW_ROOT} ${NEW_ROOT}/${FS_LOCATION}
+CHROOT=/union
+
+
+# Let init scripts know that we booted from CD
+export CDBOOT=1
+
+
+verbose_kmsg
+
+
+echo -ne "${GOOD}>>${NORMAL}${BOLD} Booting (initramfs)${NORMAL}"
+if [ ! -e "${CHROOT}/dev/console" ] || [ ! -e "${CHROOT}/dev/null" ]; then
+    echo -ne "${BAD}>>${NORMAL}${BOLD} ERROR: your real /dev is missing files required to boot (console and null)${NORMAL}"
+elif [ -e /etc/initrd.splash -a ! -e "${CHROOT}/dev/tty1" ]; then
+    echo -ne "${BAD}>>${NORMAL}${BOLD} ERROR: your real /dev is missing tty1, which is required for splash${NORMAL}"
+fi
+
+
+cd "${CHROOT}"
+echo -ne "${BOLD}.${NORMAL}"
+umount /sys  || echo '*: Failed to unmount the ramdisk /sys!'
+umount /proc || echo '*: Failed to unmount the ramdisk /proc!'
+echo -e "${BOLD}.${NORMAL}"
+
+exec switch_root -c /dev/console "${CHROOT}" /sbin/init
+
+
+# If we get here, something bad has happened
+splash 'verbose'
+
+
+echo 'A fatal error has probably occured since /sbin/init did not'
+echo 'boot correctly. Trying to open a shell...'
+echo
+exec sh

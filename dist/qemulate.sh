@@ -8,8 +8,7 @@ bootdir=`dirname $0`/boot
 
 cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
 
-params="looptype=noloop loop=/etc/hosts cdroot
-        cdroot_type=squashfs unionfs nopata nosata nousb
+params="looptype=noloop cdroot_type=squashfs
         video=uvesafb:800x600-32,mtrr:3,ywrap quiet
         splash=silent,theme:liberty console=tty1"
 

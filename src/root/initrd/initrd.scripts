@@ -1,0 +1,186 @@
+#!/bin/ash
+
+parse_opt() {
+    case "$1" in
+        *\=*)
+            echo "$1" | cut -d= -f2-
+        ;;
+    esac
+}
+
+
+findmediamount() {
+    # $1 = mount dir name / media name
+    # $2 = recognition file
+    # $3 = variable to have the device path
+    # $4 = directory before /mnt, like NEW_ROOT
+    # args remaining are possible devices
+
+    local media=$1 recon=$2 vrbl=$3
+    local mntdir="${4}/mnt/${media}"
+    shift 4
+
+    good_msg "Looking for the ${media}"
+
+    local devices="$*" tested=""
+
+    while true; do
+        for x in ${devices}; do
+            # Check for a block device to mount
+            if [ -b "${x}" ] && ! echo "${tested}" | grep -q " ${x} "; then
+                tested="${tested} ${x} "
+                skip=0
+                bsn=`basename "${x}"`
+
+                # Skip if disk has at least one partition
+                for part in `ls /sys/block/${bsn}/${bsn}[0-9]* 2>/dev/null`; do
+                    skip=1
+                    break;
+                done
+                if [ ${skip} = 1 ]; then
+                    continue
+                fi
+
+                good_msg "Attempting to mount media:- ${x}"
+
+                mount -r -t ${CDROOT_TYPE} -o ${CDROOT_FLAGS:-noatime} ${x} ${mntdir} >/dev/null 2>&1
+                if [ "$?" = 0 ]; then
+                    # Check for the media
+                    if [ -e "${mntdir}/${recon}" ]; then
+                        # set REAL_ROOT (or whatever ${vrbl} is)
+                        eval ${vrbl}'='"${x}"
+                        good_msg "Media found on ${x}"
+                        break 2
+                    else
+                        umount ${mntdir}
+                    fi
+                fi
+            fi
+        done
+
+        # We don't have "udevadm settle" with mdev, so just loop
+        warn_msg "Searching for more devices ..."
+        sdelay; devices=`devicelist`
+    done
+
+    eval local result='$'${vrbl}
+
+    [ -n "${result}" ] || bad_msg "Media not found"
+}
+
+devicelist(){
+    # CDROM DEVICES
+    local DEVICES="/dev/cdroms/* /dev/ide/cd/* /dev/sr*"
+
+    # USB Keychain/Storage
+    DEVICES="$DEVICES /dev/sd*"
+
+    # IDE devices
+    DEVICES="$DEVICES /dev/hd*"
+
+    # USB using the USB Block Driver
+    DEVICES="$DEVICES /dev/ubd* /dev/ubd/*"
+
+    # iSeries devices
+    DEVICES="$DEVICES /dev/iseries/vcd*"
+
+    # virtio devices
+    DEVICES="$DEVICES /dev/vd*"
+
+    echo ${DEVICES}
+}
+
+bootstrapCD() {
+    local DEVICES=`devicelist`
+    # The device was specified on the command line, so there's no need to scan
+    # a bunch of extra devices
+    [ -n "${CDROOT_DEV}" ] && DEVICES="${CDROOT_DEV}"
+
+    findmediamount "cdrom" "${SUBDIR}/${LOOP}" "REAL_ROOT" "${NEW_ROOT}" ${DEVICES}
+}
+
+
+run_shell() {
+    ash
+}
+
+test_success() {
+    retcode=$?
+    # If last command failed send error message and fall back to a shell
+    if [ "$retcode" != '0' ]; then
+        error_string="$1"
+        error_string="${error_string:-run command}"
+        bad_msg "Failed to $1; failing back to the shell..."
+        run_shell
+    fi
+}
+
+
+# msg functions arguments
+# $1 string
+# $2 hide flag
+
+good_msg() {
+    msg_string=$1
+    msg_string="${msg_string:-...}"
+    [ "$2" != 1 ] && echo -e "${GOOD}>>${NORMAL}${BOLD} ${msg_string} ${NORMAL}"
+}
+
+bad_msg() {
+    msg_string=$1
+    msg_string="${msg_string:-...}"
+    if [ "$2" != 1 ]; then
+        splash 'verbose' > /dev/null &
+        echo -e "${BAD}!!${NORMAL}${BOLD} ${msg_string} ${NORMAL}"
+    fi
+}
+
+warn_msg() {
+    msg_string=$1
+    msg_string="${msg_string:-...}"
+    [ "$2" != 1 ] && echo -e "${WARN}**${NORMAL}${BOLD} ${msg_string} ${NORMAL}"
+}
+
+
+sdelay() {
+    sleep 1
+}
+
+
+quiet_kmsg() {
+    # if QUIET is set make the kernel less chatty
+    [ -n "$QUIET" ] && echo '0' > /proc/sys/kernel/printk
+}
+
+verbose_kmsg() {
+    # if QUIET is set make the kernel less chatty
+    [ -n "$QUIET" ] && echo '6' > /proc/sys/kernel/printk
+}
+
+
+rundebugshell() {
+    if [ -n "$DEBUG" ]; then
+        good_msg 'Starting debug shell as requested by "debug" option.'
+        good_msg 'Type "exit" to continue with normal bootup.'
+        ash
+    fi
+}
+
+
+setup_unionfs() {
+    local rw_dir=$1
+    local ro_dir=$2
+
+    # Directory used for rw changes in union mount filesystem
+    UNION=/union
+    mkdir -p ${UNION}
+
+    good_msg "Creating union mount"
+    mount -t unionfs -o dirs=${rw_dir}=rw:${ro_dir}=ro unionfs ${UNION}
+    test_success 'create union mount'
+
+    for mnt in $(cut -d' ' -f2 /proc/mounts | grep "^${rw_dir}/" | sed "s@^${rw_dir}@@"); do
+        mount --move ${rw_dir}${mnt} ${UNION}${mnt}
+    done
+    mount --move ${rw_dir} ${UNION}/mnt/hidden${rw_dir}
+}

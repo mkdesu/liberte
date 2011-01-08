@@ -1,0 +1,2 @@
+# Modules to force-load during initramfs stage
+FORCE_LOAD='vfat nls_cp437 nls_iso8859-1 nls_utf8 loop squashfs unionfs'

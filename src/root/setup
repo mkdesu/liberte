@@ -62,6 +62,7 @@ fi
 sinfo "Setting a hardened profile"
 hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/'`
 eselect profile set ${hardened}
+rm -f /etc/portage/savedconfig/sys-apps/busybox-*
 
 
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
@@ -305,7 +306,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="genkernel checkroot rc inittab iptables smartd"
+initpatches="checkroot rc inittab iptables smartd"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
@@ -393,37 +394,48 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 
 
 sinfo "Compiling kernel"
-genkflags="--no-splash --no-keymap --oldconfig --no-save-config --loglevel=0"
-sed -i 's/^DISKLABEL="yes"/DISKLABEL="no"/' /etc/genkernel.conf
-
-# Use MODULES_ISCSI for virtio, so as not to modify initrd.defaults
 export KBUILD_BUILD_VERSION=0
-export AMODULES_FS="vfat fat nls_utf8 nls_cp437 nls_iso8859-1 loop squashfs unionfs"
-export AMODULES_PCMCIA="mmc_core mmc_block"
-export AMODULES_ISCSI="virtio_blk virtio virtio_pci virtio_ring"
-#export AMODULES_FIREWIRE="firewire-ohci firewire-sbp2"
-sed -i 's/^MODULES_\(DMRAID\|EVMS\|LVM\|MDADM\|NET\|FS\|FIREWIRE\)=/#\0/' \
-    /usr/share/genkernel/arch/x86/modules_load
-
-genkernel ${genkflags} all
+genkernel --oldconfig --no-save-config --loglevel=0 kernel
+rm /lib/modules/*/{build,source}
 
 
-sinfo "Extending and recompressing initrd"
+sinfo "Creating initramfs image"
+modules=`sed -n 's/^FORCE_LOAD=//p' ${HOME}/initrd/modules.forced | tr -d \'\"`
+extmods=`sed -n '/^[^#]/p' ${HOME}/initrd/modules.extra`
+globmods=
+for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
+    globmods="${globmods} "`find /lib/modules/${kversion}/kernel/drivers/${globmod} \
+        -name '*.ko' -printf '%f\n' | sed 's/\.ko$//'`
+done
+
 cpiodir=`mktemp -d`
-mkdir ${cpiodir}/cpio
 
-# Also add the alternative splash theme (genkernel can copy only one)
-/usr/src/linux/usr/gen_init_cpio /usr/share/v86d/initramfs \
-    | (cd ${cpiodir}/cpio; cpio -im --sparse --no-absolute-filenames -f dev/console dev/tty1)
+mkdir -p ${cpiodir}/lib/modules
+rsync -a --include='**/' --exclude='*' --delete-excluded \
+    /lib/modules/${kversion} ${cpiodir}/lib/modules
 
-/bin/gzip -cd /boot/initramfs-genkernel-x86-${kversion} > ${cpiodir}/initramfs
+for mod in ${modules} ${extmods} ${globmods}; do
+    grep /${mod}.ko: /lib/modules/${kversion}/modules.dep \
+        | tr -d : | tr ' ' '\n' >> ${cpiodir}/modules.extra
+done
 
-find ${cpiodir}/cpio ! -type d -o -name root \
-    | sed "s@^${cpiodir}/cpio/@@" \
-    | (cd ${cpiodir}/cpio; cpio -oA -H newc -O ${cpiodir}/initramfs)
+for mod in `sort -u ${cpiodir}/modules.extra`; do
+    cp -p ${mod} ${cpiodir}`dirname ${mod}`
+done
+
+rmdir --ignore-fail-on-non-empty `find ${cpiodir} -depth -type d`
+depmod -b ${cpiodir} -e -F /usr/src/linux/System.map ${kversion}
+
+cp ${HOME}/initrd/initramfs ${cpiodir}
+find ${cpiodir} -mindepth 3 -type d \
+    -printf 'dir  /%P    0755 0 0\n' >> ${cpiodir}/initramfs
+find ${cpiodir} -mindepth 3 -type f \
+    -printf 'file /%P %p 0644 0 0\n' >> ${cpiodir}/initramfs
 
 # "lzma -e" is not supported by the kernel (likely because lc bits > 3)
-lzma -c ${cpiodir}/initramfs > /boot/initramfs-genkernel-x86-${kversion}
+/usr/src/linux/usr/gen_init_cpio ${cpiodir}/initramfs \
+    | lzma -c > /boot/initramfs-genkernel-x86-${kversion}
+
 rm -r ${cpiodir}
 
 
@@ -435,10 +447,6 @@ lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 
 sinfo "Kernel config differences:"
 diff ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config || true
-
-
-sinfo "Cleaning modules directory"
-rm /lib/modules/*/{build,source}
 
 
 sinfo "Generating SYSLINUX configuration"
