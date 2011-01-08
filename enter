@@ -44,7 +44,6 @@ else
           --exclude=/root/            \
           --exclude=/home/anon/       \
           --exclude=/home/nofw/       \
-          --exclude=/mnt/hidden/      \
           --exclude=/var/lib/portage/ \
           --exclude=/etc/nginx/       \
           --exclude=/var/www/         \
@@ -56,7 +55,6 @@ else
 
     rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
-    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/hidden        ${LIVECD}/mnt
     rsync -rlptOHS --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
 

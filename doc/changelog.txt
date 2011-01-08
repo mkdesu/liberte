@@ -4,6 +4,7 @@
   * Removed SYSLINUX dependency during Linux install
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
+  * Custom initramfs with real coldplugging of modules
   * Control groups assist process scheduling
   * Xorg server 1.9
   * Easy MP4[H.264+MP3] webcam video encoding

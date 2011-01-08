@@ -1,0 +1,72 @@
+#!/bin/ash
+
+parse_opt() {
+    case "$1" in
+        *\=*)
+            echo "$1" | cut -d= -f2-
+        ;;
+    esac
+}
+
+
+devicelist(){
+    # CDROM DEVICES
+    local DEVICES="/dev/cdroms/* /dev/ide/cd/* /dev/sr*"
+
+    # USB Keychain/Storage
+    DEVICES="$DEVICES /dev/sd*"
+
+    # IDE devices
+    DEVICES="$DEVICES /dev/hd*"
+
+    # USB using the USB Block Driver
+    DEVICES="$DEVICES /dev/ubd* /dev/ubd/*"
+
+    # iSeries devices
+    DEVICES="$DEVICES /dev/iseries/vcd*"
+
+    # virtio devices
+    DEVICES="$DEVICES /dev/vd*"
+
+    echo ${DEVICES}
+}
+
+
+test_success() {
+    if [ $? != 0 ]; then
+        bad_msg "Failed to ${1:-run command}; failing back to the shell..."
+        ash
+    fi
+}
+
+
+good_msg() {
+    echo -e "${GOOD}>>${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+}
+
+bad_msg() {
+    splash verbose
+    echo -e "${BAD}!!${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+}
+
+warn_msg() {
+    echo -e "${WARN}**${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+}
+
+
+quiet_kmsg() {
+    echo 0 > /proc/sys/kernel/printk
+}
+
+verbose_kmsg() {
+    echo 6 > /proc/sys/kernel/printk
+}
+
+
+rundebugshell() {
+    if [ -n "${DEBUG}" ]; then
+        good_msg 'Starting debug shell as requested by "debug" option.'
+        good_msg 'Type "exit" to continue with normal bootup.'
+        ash
+    fi
+}

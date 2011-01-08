@@ -69,6 +69,7 @@ start() {
     # (permissions: rwX------)
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
+    # Empty if there is no loop (direct mount on /mnt/livecd)
     cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
     cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
 
@@ -86,7 +87,7 @@ EndSection'
 
     # genkernel's init leaves /etc/mtab somewhat messed
     ebegin Updating mtab
-    egrep -v ' (rootfs|autofs|/mnt/hidden/newroot) ' /proc/mounts > /etc/mtab
+    egrep -v ' (rootfs|autofs|/mnt/hidden/rwroot) ' /proc/mounts > /etc/mtab
     eend $?
 
 
@@ -108,7 +109,7 @@ EndSection'
 
 
     # Arm the poweroff watchdog
-    if ! pgrep -u root -x udev-watchdog 1>/dev/null; then
+    if [ -n "${cddev}" ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
         ebegin Arming power-off on removal: ${cddev}
         /root/bin/poweroff-watchdog ${cddev} &
         eend $?
@@ -184,16 +185,12 @@ EndSection'
 
     # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
     remount=1
-    if [ ${cdtype} = vfat  -o  ${cdtype} = ext2 ]; then
+    if [ "${cdtype}" = vfat  -o  "${cdtype}" = ext2 ]; then
         # Remount media root read-write (assuming vfat)
         ebegin Remounting /mnt/cdrom read-write
         mount -o remount,rw /mnt/cdrom
         remount=$?
         eend ${remount}
-    elif grep -q '\<looptype=noloop\>' /proc/cmdline; then
-        ebegin Linking /mnt/cdrom to /mnt/livecd
-        rmdir /mnt/livecd && ln -s cdrom /mnt/livecd
-        eend $?
     fi
 
 
@@ -381,7 +378,9 @@ stop() {
 
     # Remount media root read-only
     # (apparently, does not conflict with write cache)
-    ebegin Remounting /mnt/cdrom read-only
-    mount -o remount,ro /mnt/cdrom
-    eend $?
+    if grep -q ' /mnt/cdrom ' /proc/mounts; then
+        ebegin Remounting /mnt/cdrom read-only
+        mount -o remount,ro /mnt/cdrom
+        eend $?
+    fi
 }

@@ -409,21 +409,15 @@ for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
 done
 
 cpiodir=`mktemp -d`
-
-mkdir -p ${cpiodir}/lib/modules
-rsync -a --include='**/' --exclude='*' --delete-excluded \
-    /lib/modules/${kversion} ${cpiodir}/lib/modules
-
 for mod in ${modules} ${extmods} ${globmods}; do
     grep /${mod}.ko: /lib/modules/${kversion}/modules.dep \
         | tr -d : | tr ' ' '\n' >> ${cpiodir}/modules.extra
 done
 
 for mod in `sort -u ${cpiodir}/modules.extra`; do
+    mkdir -p     ${cpiodir}`dirname ${mod}`
     cp -p ${mod} ${cpiodir}`dirname ${mod}`
 done
-
-rmdir --ignore-fail-on-non-empty `find ${cpiodir} -depth -type d`
 depmod -b ${cpiodir} -e -F /usr/src/linux/System.map ${kversion}
 
 cp ${HOME}/initrd/initramfs ${cpiodir}
@@ -447,6 +441,12 @@ lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
 
 sinfo "Kernel config differences:"
 diff ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config || true
+
+
+if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then
+    sinfo "BusyBox config differences:"
+    diff /etc/portage/savedconfig/sys-apps/busybox{,-*}
+fi
 
 
 sinfo "Generating SYSLINUX configuration"

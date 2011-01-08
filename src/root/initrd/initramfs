@@ -9,8 +9,7 @@ nod  /dev/mem     0600 0 0  c 1 1
 # Init scripts
 dir  /etc         0755 0 0
 file /init                /root/initrd/init            0755 0 0
-file /etc/initrd.defaults /root/initrd/initrd.defaults 0644 0 0
-file /etc/initrd.scripts  /root/initrd/initrd.scripts  0644 0 0
+file /etc/init.scripts    /root/initrd/init.scripts    0644 0 0
 file /etc/modules.forced  /root/initrd/modules.forced  0644 0 0
 
 # Busybox
