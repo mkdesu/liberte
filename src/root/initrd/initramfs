@@ -28,6 +28,7 @@ file  etc/mdev.conf       /root/initrd/mdev.conf       0644 0 0
 slink bin/mdev            busybox                      0777 0 0
 
 # v86d
+dir   root        0700 0 0
 dir   sbin        0755 0 0
 file  sbin/v86d           /sbin/v86d                   0755 0 0
 

@@ -69,9 +69,14 @@ start() {
     # (permissions: rwX------)
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
-    # Empty if there is no loop (direct mount on /mnt/live)
-    cddev=`grep ' /mnt/boot ' /proc/mounts | cut -d' ' -f1`
-    cdtype=`grep ' /mnt/boot ' /proc/mounts | cut -d' ' -f3`
+    # No mountpoint if there is no loop (direct mount on /mnt/live)
+    if mountpoint -q /mnt/boot; then
+        cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d /mnt/boot))
+        cdtype=$(udevadm info -q property -p ${cddevpath} | sed -n 's/^ID_FS_TYPE=//p')
+    else
+        cddevpath=none
+        cdtype=none
+    fi
 
     xorg_extra='Section "ServerFlags"
     Option "DontZap"      "true"
@@ -109,9 +114,9 @@ EndSection'
 
 
     # Arm the poweroff watchdog
-    if [ -n "${cddev}" ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
-        ebegin Arming power-off on removal: ${cddev}
-        /root/bin/poweroff-watchdog ${cddev} &
+    if [ ${cddevpath} != none ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
+        ebegin Arming power-off on boot media removal
+        /root/bin/poweroff-watchdog ${cddevpath} &
         eend $?
     fi
 
@@ -138,15 +143,18 @@ EndSection'
     # Put ATA/SCSI drives into standby
     # /dev/disk/by-path should contain only physical devices
     if [ -e /dev/disk/by-path ]; then
-        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b -exec readlink -e {} \;`
-        for dev in ${hdevs}; do
+        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b  \
+                                      -exec udevadm info -q path -n {} \;`
+        for devpath in ${hdevs}; do
+            dev=/dev/`udevadm info -q name -p ${devpath}`
+
             if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
                 ebegin Enabled acoustic settings: ${dev}
                 eend 0
             fi
 
             # ignore boot media (desirable if it is a disk)
-            if [ "${cddev#${dev}}" = "${cddev}" ]; then
+            if [ ${cddevpath#${devpath}} = ${cddevpath} ]; then
                 if hdparm -y ${dev} 1>/dev/null 2>&1; then
                     ebegin Enabled standby mode: ${dev}
                     eend 0
@@ -184,7 +192,7 @@ EndSection'
 
 
     remount=1
-    if [ "${cdtype}" = vfat  -o  "${cdtype}" = ext2 ]; then
+    if [ ${cdtype} = vfat  -o  ${cdtype} = ext2 ]; then
         # Remount media root read-write (assuming vfat)
         ebegin Remounting /mnt/boot read-write
         mount -o remount,rw /mnt/boot
@@ -363,7 +371,7 @@ stop() {
 
 
     # Unmount the persistent fs
-    if grep -q " ${lmount} " /proc/mounts; then
+    if mountpoint -q ${lmount}; then
         ebegin Unmounting ${lmount}
         umount -l ${lmount}
         eend $?
@@ -377,7 +385,7 @@ stop() {
 
     # Remount media root read-only
     # (apparently, does not conflict with write cache)
-    if grep -q ' /mnt/boot ' /proc/mounts; then
+    if mountpoint -q /mnt/boot; then
         ebegin Remounting /mnt/boot read-only
         mount -o remount,ro /mnt/boot
         eend $?

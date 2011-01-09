@@ -11,15 +11,10 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-if [ ! -b "$1" ]; then
-    echo "$1 is not a block device"
-    exit 1
-fi
-
-devpath=`udevadm info -q path -n "$1"`
-devtype=`udevadm info -q property -p "${devpath}" | grep '^DEVTYPE=' | cut -d= -f2`
+devpath="$1"
+devtype=`udevadm info -q property -p "${devpath}" | sed -n 's/^DEVTYPE=//p'`
 if [ "${devtype}" != disk  -a  "${devtype}" != partition ]; then
-    echo "$1 is not a block disk/partition"
+    echo "$1 is not a devpath for disk/partition"
     exit 1
 fi
 

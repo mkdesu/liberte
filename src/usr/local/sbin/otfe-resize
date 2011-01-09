@@ -17,7 +17,7 @@ lmount=/home/${luser}/persist
 umount_fs() {
     # Unmount the filesystem if it's mounted
     unmount=0
-    if grep -q " ${lmount} " /proc/mounts; then
+    if mountpoint -q ${lmount}; then
         echo "Unmounting ${lmount}"
         umount ${lmount}
         unmount=1

@@ -396,6 +396,7 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 sinfo "Compiling kernel"
 export KBUILD_BUILD_VERSION=0
 genkernel --oldconfig --no-save-config --loglevel=0 kernel
+mv /boot/kernel-genkernel-x86-${kversion} /boot/kernel-x86.zi
 rm /lib/modules/*/{build,source}
 
 
@@ -428,7 +429,7 @@ find ${cpiodir} -mindepth 3 -type f \
 
 # "lzma -e" is not supported by the kernel (likely because lc bits > 3)
 /usr/src/linux/usr/gen_init_cpio ${cpiodir}/initramfs \
-    | lzma -c > /boot/initramfs-genkernel-x86-${kversion}
+    | lzma -c > /boot/initrd-x86.lzm
 
 rm -r ${cpiodir}
 
@@ -436,7 +437,7 @@ rm -r ${cpiodir}
 sinfo "Verifying LZMA decompression memory requirements"
 kernlzma=/usr/src/linux/arch/x86/boot/compressed/vmlinux.bin.lzma
 head -c $[`du -b ${kernlzma} | cut -f1` - 4] ${kernlzma} | lzma -t -M ${lzmamem}
-lzma -t -M ${lzmamem} /boot/initramfs-genkernel-x86-${kversion}
+lzma -t -M ${lzmamem} /boot/initrd-x86.lzm
 
 
 sinfo "Kernel config differences:"
@@ -451,9 +452,6 @@ fi
 
 sinfo "Generating SYSLINUX configuration"
 rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
-
-mv /boot/kernel-genkernel-x86-${kversion}    /boot/kernel-x86.zi
-mv /boot/initramfs-genkernel-x86-${kversion} /boot/initrd-x86.lzm
 
 mkdir -p /boot/syslinux
 syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
