@@ -61,7 +61,7 @@ lgroup=legion
 lmount=/home/${luser}/persist
 ltordir=${lmount}/security/tor/hidden_service
 certsdir=${lmount}/security/ssl/certs
-otfefile=/mnt/cdrom${OTFEFILE}
+otfefile=/mnt/boot${OTFEFILE}
 
 start() {
     # see the /root/bin/ps-mount script
@@ -69,9 +69,9 @@ start() {
     # (permissions: rwX------)
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
-    # Empty if there is no loop (direct mount on /mnt/livecd)
-    cddev=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f1`
-    cdtype=`grep ' /mnt/cdrom ' /proc/mounts | cut -d' ' -f3`
+    # Empty if there is no loop (direct mount on /mnt/live)
+    cddev=`grep ' /mnt/boot ' /proc/mounts | cut -d' ' -f1`
+    cdtype=`grep ' /mnt/boot ' /proc/mounts | cut -d' ' -f3`
 
     xorg_extra='Section "ServerFlags"
     Option "DontZap"      "true"
@@ -183,12 +183,11 @@ EndSection'
     fi
 
 
-    # In QEMU, /mnt/cdrom takes the role of /mnt/livecd (looptype=noloop)
     remount=1
     if [ "${cdtype}" = vfat  -o  "${cdtype}" = ext2 ]; then
         # Remount media root read-write (assuming vfat)
-        ebegin Remounting /mnt/cdrom read-write
-        mount -o remount,rw /mnt/cdrom
+        ebegin Remounting /mnt/boot read-write
+        mount -o remount,rw /mnt/boot
         remount=$?
         eend ${remount}
     fi
@@ -207,7 +206,7 @@ EndSection'
         # Initialize LUKS image mapping (create if it doesn't exist)
         if [ ! -e ${otfefile} ]; then
             # FAT free space is precise, but df rounds up - ignore this issue
-            freespace=`df -P -B 1M /mnt/cdrom | awk '/\// { print $4 }'`
+            freespace=`df -P -B 1M /mnt/boot | awk '/\// { print $4 }'`
             otfesize=$[ ${freespace} * ${OTFESIZE%/*} / ${OTFESIZE#*/} ]
 
             # 3 MiB is the minimum possible size (rounded up to MiB)
@@ -292,7 +291,7 @@ EndSection'
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
             if [ ${lmountok} = 0 ]; then
                 ebegin Recreating persistence directories
-                cp -an /mnt/livecd${lmount} `dirname ${lmount}`
+                cp -an /mnt/live${lmount} `dirname ${lmount}`
                 eend $?
             fi
 
@@ -356,9 +355,9 @@ EndSection'
 
 stop() {
     # Save configuration (an incremental snapshot)
-    if [ -e /mnt/livecd/home/${luser} ]; then
+    if [ -e /mnt/live/home/${luser} ]; then
         ebegin Saving configuration: ${lmount}/settings
-        sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/livecd
+        sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/live
         eend $?
     fi
 
@@ -378,9 +377,9 @@ stop() {
 
     # Remount media root read-only
     # (apparently, does not conflict with write cache)
-    if grep -q ' /mnt/cdrom ' /proc/mounts; then
-        ebegin Remounting /mnt/cdrom read-only
-        mount -o remount,ro /mnt/cdrom
+    if grep -q ' /mnt/boot ' /proc/mounts; then
+        ebegin Remounting /mnt/boot read-only
+        mount -o remount,ro /mnt/boot
         eend $?
     fi
 }

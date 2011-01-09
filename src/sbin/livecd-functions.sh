@@ -7,10 +7,10 @@ livecd_read_commandline() {
 
     # Additions to /etc/init.d/halt.sh:
     #   /dev/shm           - tmpfs
-    #   /mnt/cdrom         - ro on boot, must be ro before halt.sh
-    #   /mnt/livecd        - ro squashfs
+    #   /mnt/boot          - ro on boot, must be ro before halt.sh
+    #   /mnt/live          - ro squashfs
     #   /mnt/hidden/rwroot - tmpfs
-    export RC_NO_UMOUNTS='^(/|/dev|/dev/pts|/dev/shm|/lib/rcscripts/init.d|/proc|/proc/.*|/sys|/mnt/cdrom|/mnt/livecd|/mnt/hidden/rwroot)$'
+    export RC_NO_UMOUNTS='^(/|/dev|/dev/pts|/dev/shm|/lib/rcscripts/init.d|/proc|/proc/.*|/sys|/mnt/boot|/mnt/live|/mnt/hidden/rwroot)$'
 }
 
 livecd_fix_inittab() {

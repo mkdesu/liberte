@@ -16,8 +16,8 @@ file  etc/modules.forced  /root/initrd/modules.forced  0644 0 0
 dir   union                    0755 0 0
 dir   rwroot                   0755 0 0
 dir   rwroot/mnt               0755 0 0
-dir   rwroot/mnt/cdrom         0755 0 0
-dir   rwroot/mnt/livecd        0755 0 0
+dir   rwroot/mnt/boot          0755 0 0
+dir   rwroot/mnt/live          0755 0 0
 dir   rwroot/mnt/hidden        0700 0 0
 dir   rwroot/mnt/hidden/rwroot 0755 0 0
 

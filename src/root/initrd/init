@@ -11,7 +11,7 @@ BOLD="\033[1m"
 GOOD="\033[32;1m"
 
 RWROOT=/rwroot
-ROROOT=${RWROOT}/mnt/cdrom
+ROROOT=${RWROOT}/mnt/boot
 UNION=/union
 
 . /etc/init.scripts
@@ -149,12 +149,12 @@ findmediamount || test_success "find media to mount"
 if [ -n "${LOOP}" ]; then
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
-    mount -r -t squashfs ${ROROOT}/"${LOOP}" ${RWROOT}/mnt/livecd
+    mount -r -t squashfs ${ROROOT}/"${LOOP}" ${RWROOT}/mnt/live
     test_success 'mount compressed filesystem'
 else
-    mount -o move ${ROROOT} ${RWROOT}/mnt/livecd
+    mount -o move ${ROROOT} ${RWROOT}/mnt/live
 fi
-ROROOT=${RWROOT}/mnt/livecd
+ROROOT=${RWROOT}/mnt/live
 
 
 good_msg "Creating union mount"
@@ -187,6 +187,7 @@ umount /proc || bad_msg 'Failed to unmount /proc'
 
 
 cd ${UNION}
+echo > /proc/sys/kernel/hotplug
 exec switch_root -c /dev/console ${UNION} /sbin/init
 
 

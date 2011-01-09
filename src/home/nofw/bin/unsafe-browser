@@ -12,15 +12,10 @@ if [ "${HOME}" != /home/nofw ]; then
     exit 1
 fi
 
-refdir=/mnt/livecd${HOME}
+refdir=/mnt/live${HOME}
 if [ ! -e ${refdir} ]; then
-    refdir=/mnt/cdrom${HOME}
-
-    # Note that /mnt/cdrom is not supporters by this script's callers
-    if [ ! -e ${refdir} ]; then
-        echo "Could not locate reference directory"
-        exit 1
-    fi
+    echo "Could not locate reference directory"
+    exit 1
 fi
 
 

@@ -9,25 +9,8 @@ parse_opt() {
 }
 
 
-devicelist(){
-    # CDROM DEVICES
-    local DEVICES="/dev/cdroms/* /dev/ide/cd/* /dev/sr*"
-
-    # USB Keychain/Storage
-    DEVICES="$DEVICES /dev/sd*"
-
-    # IDE devices
-    DEVICES="$DEVICES /dev/hd*"
-
-    # USB using the USB Block Driver
-    DEVICES="$DEVICES /dev/ubd* /dev/ubd/*"
-
-    # iSeries devices
-    DEVICES="$DEVICES /dev/iseries/vcd*"
-
-    # virtio devices
-    DEVICES="$DEVICES /dev/vd*"
-
+devicelist() {
+    local DEVICES="/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*"
     echo ${DEVICES}
 }
 
