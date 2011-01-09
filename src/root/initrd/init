@@ -182,12 +182,12 @@ elif [ -e /etc/init.splash    -a  ! -e ${UNION}/dev/tty1 ]; then
 fi
 
 
+echo > /proc/sys/kernel/hotplug
 umount /sys  || bad_msg 'Failed to unmount /sys'
 umount /proc || bad_msg 'Failed to unmount /proc'
 
 
 cd ${UNION}
-echo > /proc/sys/kernel/hotplug
 exec switch_root -c /dev/console ${UNION} /sbin/init
 
 
