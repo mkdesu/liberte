@@ -26,17 +26,12 @@ exec >${CONSOLE} <${CONSOLE} 2>&1
 
 
 # Mount virtual filesystems
-mkdir -p ${RWROOT} ${UNION}
-
 mount -t proc  proc  /proc
 mount -t sysfs sysfs /sys
-mount -t tmpfs tmpfs ${RWROOT}
 
-for mnt in /mnt /mnt/cdrom /mnt/livecd /mnt/hidden${RWROOT}; do
-    mkdir -m 755 -p ${RWROOT}${mnt}
-done
-chmod 755 ${RWROOT}
-chmod 700 ${RWROOT}/mnt/hidden
+mount -t tmpfs -o mode=755 tmpfs ${UNION}
+cp    -a ${RWROOT}/mnt ${UNION}
+mount -o move ${UNION} ${RWROOT}
 
 
 quiet_kmsg
@@ -74,7 +69,7 @@ splash init
 good_msg 'Loading modules'
 
 # Setup hotplugging before starting coldplugging
-echo /sbin/mdev > /proc/sys/kernel/hotplug
+echo /bin/mdev > /proc/sys/kernel/hotplug
 
 oldmods=
 newmods=" ${FORCE_LOAD} "

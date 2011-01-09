@@ -422,9 +422,9 @@ depmod -b ${cpiodir} -e -F /usr/src/linux/System.map ${kversion}
 
 cp ${HOME}/initrd/initramfs ${cpiodir}
 find ${cpiodir} -mindepth 3 -type d \
-    -printf 'dir  /%P    0755 0 0\n' >> ${cpiodir}/initramfs
+    -printf 'dir  %P    0755 0 0\n' >> ${cpiodir}/initramfs
 find ${cpiodir} -mindepth 3 -type f \
-    -printf 'file /%P %p 0644 0 0\n' >> ${cpiodir}/initramfs
+    -printf 'file %P %p 0644 0 0\n' >> ${cpiodir}/initramfs
 
 # "lzma -e" is not supported by the kernel (likely because lc bits > 3)
 /usr/src/linux/usr/gen_init_cpio ${cpiodir}/initramfs \
