@@ -74,7 +74,7 @@ splash init
 good_msg 'Loading modules'
 
 # Setup hotplugging before starting coldplugging
-echo '/bin/busybox mdev' > /proc/sys/kernel/hotplug
+echo /sbin/mdev > /proc/sys/kernel/hotplug
 
 oldmods=
 newmods=" ${FORCE_LOAD} "
