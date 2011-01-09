@@ -48,7 +48,6 @@ fi
 # Check whether current time is in (conservative) range
 curdate=`date -u +'%F %T'`
 vendcons=`date -ud "${vstart} -0230" +'%F %T'`
-vmid=`date -ud "${vstart} -0130" +'%F %T'`
 
 order="${vstart}
 ${curdate}
