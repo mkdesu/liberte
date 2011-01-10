@@ -154,7 +154,7 @@ EndSection'
             fi
 
             # ignore boot media (desirable if it is a disk)
-            if [ ${cddevpath#${devpath}} = ${cddevpath} ]; then
+            if [ "${cddevpath#${devpath}}" = ${cddevpath} ]; then
                 if hdparm -y ${dev} 1>/dev/null 2>&1; then
                     ebegin Enabled standby mode: ${dev}
                     eend 0
