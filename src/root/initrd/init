@@ -129,9 +129,10 @@ while true; do
                         break 2
                     else
                         umount ${BOOT}
-                        waitmsg=1
                     fi
                 fi
+
+                waitmsg=1
             fi
         fi
     done

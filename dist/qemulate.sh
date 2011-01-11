@@ -8,7 +8,7 @@ bootdir=`dirname $0`/boot
 
 cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
 
-params="cdroot_type=squashfs video=uvesafb:800x600-32,mtrr:3,ywrap
+params="cdroot_type=squashfs video=uvesafb:800x600-32
         quiet splash=silent,theme:liberty console=tty1"
 
 export QEMU_AUDIO_DRV=alsa
