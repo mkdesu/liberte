@@ -1,4 +1,10 @@
-#!/bin/ash
+# ANSI codes for message functions
+NORMAL="\033[0m"
+WARN="\033[33;1m"
+BAD="\033[31;1m"
+BOLD="\033[1m"
+GOOD="\033[32;1m"
+
 
 parse_opt() {
     case "$1" in
@@ -7,21 +13,6 @@ parse_opt() {
         ;;
     esac
 }
-
-
-devicelist() {
-    local DEVICES="/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*"
-    echo ${DEVICES}
-}
-
-
-test_success() {
-    if [ $? != 0 ]; then
-        bad_msg "Failed to ${1:-run command}; failing back to the shell..."
-        ash
-    fi
-}
-
 
 good_msg() {
     echo -e "${GOOD}>>${NORMAL}${BOLD} ${1:-...}${NORMAL}"
@@ -46,6 +37,13 @@ verbose_kmsg() {
 }
 
 
+test_success() {
+    if [ $? != 0 ]; then
+        bad_msg "Failed to ${1:-run command}; failing back to the shell..."
+        ash
+    fi
+}
+
 rundebugshell() {
     if [ -n "${DEBUG}" ]; then
         good_msg 'Starting debug shell as requested by "debug" option.'
@@ -53,3 +51,7 @@ rundebugshell() {
         ash
     fi
 }
+
+
+# Default implementation in absence of init.splash
+splash() { return 0; }

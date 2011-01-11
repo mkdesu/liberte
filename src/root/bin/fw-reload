@@ -9,6 +9,9 @@ torports=80,443
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
+# LED blinking delay
+leddelay=500
+
 
 # Default policies
 iptables -P INPUT   DROP
@@ -21,11 +24,16 @@ iptables -X
 
 # Define custom chains
 iptables -N LOGDROP
+iptables -N LOGREJECT
+
+
+# --- Packet dropping ---
 # iptables -A LOGDROP -j LOG      --log-prefix "fw-drop: " --log-level debug --log-uid
+iptables -A LOGDROP -j LED      --led-trigger-id drop    --led-delay ${leddelay}
 iptables -A LOGDROP -j DROP
 
-iptables -N LOGREJECT
 iptables -A LOGREJECT -j LOG    --log-prefix "fw-deny: " --log-level debug --log-uid
+iptables -A LOGREJECT -j LED    --led-trigger-id drop    --led-delay ${leddelay}
 iptables -A LOGREJECT -j REJECT --reject-with icmp-admin-prohibited
 
 

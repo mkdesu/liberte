@@ -7,7 +7,8 @@ nod   dev/tty1    0600 0 0  c 4 1
 nod   dev/mem     0600 0 0  c 1 1
 
 # Init scripts
-dir   etc         0755 0 0
+dir   etc            0755 0 0
+dir   etc/modprobe.d 0755 0 0
 file  init                /root/initrd/init            0755 0 0
 file  etc/init.scripts    /root/initrd/init.scripts    0644 0 0
 file  etc/modules.forced  /root/initrd/modules.forced  0644 0 0
@@ -15,6 +16,7 @@ file  etc/modules.forced  /root/initrd/modules.forced  0644 0 0
 # Init scripts support
 dir   union                    0755 0 0
 dir   rwroot                   0755 0 0
+dir   rwroot/etc               0755 0 0
 dir   rwroot/mnt               0755 0 0
 dir   rwroot/mnt/boot          0755 0 0
 dir   rwroot/mnt/live          0755 0 0

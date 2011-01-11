@@ -128,7 +128,7 @@ if [ "$1" = fork ]; then
 
             # Changes weren't reflected in /mnt/media
             if [ ${count} != 100 ]; then
-                logger -p 4 -t auto.media "autofs reloading failed, not restarting service"
+                logger -p 4 -t auto.media "autofs reloading failed, restarting service"
 
                 # Deadlock if the lock is still held at this point
                 # Rather unreliable otherwise, but better than nothing

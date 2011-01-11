@@ -17,3 +17,6 @@ mmc_block
 # PCMCIA-attached storage
 yenta_socket
 pcmcia
+
+# VESA framebuffer
+uvesafb
