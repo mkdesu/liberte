@@ -133,7 +133,7 @@ if [ "$1" = fork ]; then
                 # Deadlock if the lock is still held at this point
                 # Rather unreliable otherwise, but better than nothing
                 flock -u ${lockfd}
-                ${daemon} restart
+                ${daemon} restart --quiet
             fi
         fi
     }

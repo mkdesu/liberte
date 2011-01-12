@@ -11,12 +11,12 @@ case ${action} in
         # hostnames every time it sends a HEAD request
         if [ ! -e /var/lib/init.d/started/htpdate ]; then
             logger -p 6 -t nm.dispatch "Starting HTP service (${iface})"
-            /etc/init.d/htpdate start
+            /etc/init.d/htpdate start --quiet
         # However, htpdate can be started when there is no connection to
         # the sites; time difference might be too big for adjtime then
         else
             logger -p 6 -t nm.dispatch "Restarting HTP service (${iface})"
-            /etc/init.d/htpdate restart
+            /etc/init.d/htpdate restart --quiet
         fi
         ;;
 esac
