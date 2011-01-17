@@ -31,3 +31,4 @@ SafeSocks 1
 #   if we're trying to encourage more clients to turn on relay functionality
 #   too (whether as bridge relays or as normal relays), then we need to
 #   understand this threat better and learn how to mitigate it.
+ClientOnly         1

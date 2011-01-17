@@ -10,5 +10,7 @@ choice=`zenity --list --height=220 --window-icon=question --title="Logout" \
 
 if [ -n "${choice}" ]; then
     echo ${choice} > ${TMPDIR}/logout-choice
-    kill ${WM_PID}
+
+    # kill ${WM_PID}
+    openbox --exit
 fi

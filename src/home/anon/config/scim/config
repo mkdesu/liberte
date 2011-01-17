@@ -1,6 +1,8 @@
 /DefaultIMEngineFactory/en_GB = IMEngine-M17N-en-ispell
 /FrontEnd/ChangeFactoryGlobally = false
+/FrontEnd/IMOpenedByDefault = false
 /FrontEnd/OnTheSpot = true
+/FrontEnd/SharedInputMethod = true
 /FrontEnd/Socket/ConfigReadOnly = false
 /FrontEnd/Socket/MaxClients = 512
 /FrontEnd/X11/BrokenWchar = true
@@ -18,6 +20,8 @@
 /Helper/InputPad/RepeatFrequency = 15
 /Helper/InputPad/ShowPreview = true
 /Hotkeys/FrontEnd/NextFactory = Control+Alt+Down,Shift+Control+KeyRelease+Shift_L,Shift+Control+KeyRelease+Shift_R
+/Hotkeys/FrontEnd/Off = 
+/Hotkeys/FrontEnd/On = 
 /Hotkeys/FrontEnd/PreviousFactory = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
 /Hotkeys/FrontEnd/ShowFactoryMenu = Control+Alt+Right
 /Hotkeys/FrontEnd/Trigger = Control+space

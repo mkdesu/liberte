@@ -8,7 +8,7 @@
 # Browsing
 /config/midori/running
 /config/midori/tabtrash.xbel
-/config/midori/history.db
+/config/midori/history.db*
 
 # Mail
 /config/claws-mail/menurc
@@ -23,6 +23,11 @@
 /config/claws-mail/claws-mail-[0-9]*
 /config/claws-mail/tagsdb/
 
+# Instant messaging
+# /config/purple/xmpp-caps.xml
+# /config/purple/logs/
+/config/xchat/scrollback/
+
 # Miscellaneous
 /config/mplayer/registry
 /config/audacious/plugin-registry
@@ -32,7 +37,6 @@
 /config/mc/history
 /config/audacious/log
 /config/geeqie/history
-/config/xchat/scrollback/
 
 # Transient directories
 /config/qalculate/tmp/

@@ -122,7 +122,7 @@ EndSection'
 
 
     # Configure X server, unless "nox" is given to kernel
-    if ! get_bootparam "nox" && [ ! -e /etc/X11/xorg.conf ]; then
+    if ! get_bootparam 'nox' && [ ! -e /etc/X11/xorg.conf ]; then
         ebegin Configuring X server
         if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
             echo "${xorg_extra}" >> /root/xorg.conf.new
@@ -292,8 +292,8 @@ EndSection'
 
             ebegin Mounting encrypted storage: ${lmount}
             mount ${lmount}
-            eend $?
             lmountok=$?
+            eend ${lmountok}
 
 
             # Recreate persist subdirs (for xdg-user-dir and claws-mail)
@@ -305,7 +305,9 @@ EndSection'
 
 
             # Extract configuration archive, if present
-            if [ -e ${lmount}/settings/config.tar.xz ]; then
+            if get_bootparam 'nosettings'; then
+                ewarn Skipping persistent configuration extraction
+            elif [ -e ${lmount}/settings/config.tar.xz ]; then
                 ebegin Restoring persistent configuration: ${lmount}/settings
                 sudo -n -u ${luser} /home/${luser}/bin/persistence restore ${lmount}/settings
                 eend $?
@@ -362,24 +364,29 @@ EndSection'
 
 
 stop() {
-    # Save configuration (an incremental snapshot)
-    if [ -e /mnt/live/home/${luser} ]; then
-        ebegin Saving configuration: ${lmount}/settings
-        sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/live
-        eend $?
-    fi
-
-
     # Unmount the persistent fs
     if mountpoint -q ${lmount}; then
+
+        # Save configuration (an incremental snapshot)
+        if get_bootparam 'nosettings'; then
+            ewarn Skipping persistent configuration saving
+        else
+            ebegin Saving configuration: ${lmount}/settings
+            sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/live
+            eend $?
+        fi
+
+
         ebegin Unmounting ${lmount}
         umount -l ${lmount}
         eend $?
+
 
         ebegin Detaching encrypted storage
         cryptsetup luksClose ${OTFEVOLUME}
         losetup -d `losetup -j ${otfefile} | cut -d: -f1`
         eend $?
+
     fi
 
 

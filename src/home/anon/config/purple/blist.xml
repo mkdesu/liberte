@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<purple version='1.0'>
+	<blist>
+		<group name='People'>
+			<setting name='collapsed' type='bool'>1</setting>
+			<setting name='show_offline' type='bool'>1</setting>
+		</group>
+		<group name='Chats'>
+			<setting name='collapsed' type='bool'>1</setting>
+		</group>
+	</blist>
+	<privacy/>
+</purple>

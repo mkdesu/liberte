@@ -13,6 +13,7 @@ location-entry-search=http://www.google.com/search?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
 enable-plugins=false
+enable-html5-database=true
 accept-cookies=MIDORI_ACCEPT_COOKIES_SESSION
 maximum-cookie-age=3
 maximum-history-age=1

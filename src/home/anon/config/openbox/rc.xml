@@ -290,6 +290,11 @@
         <command>sync-notify</command>
       </action>
     </keybind>
+    <keybind key="W-Escape">
+      <action name="Execute">
+        <command>xlogout</command>
+      </action>
+    </keybind>
     <keybind key="Print">
       <action name="Execute">
         <command>xsnapshot ~/persist/desktop -root</command>
