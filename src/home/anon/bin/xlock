@@ -40,7 +40,7 @@ getpin() {
 '
     done
 
-    echo "${pin}" | sed 's/^D //'
+    echo "${pin}"
 }
 
 
@@ -59,7 +59,7 @@ if [ ! -e ${pass} ]; then
         exit 1
     fi
 
-    echo -n "${pin}" | sha256sum | cut -d' ' -f1 > ${pass}
+    echo -n "${pin}" | sed 's/^D //' | sha256sum | cut -d' ' -f1 > ${pass}
     unset pin
 fi
 

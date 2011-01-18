@@ -2,9 +2,11 @@
   + 2011.1 release
 
   * Removed SYSLINUX dependency during Linux install
+  * Custom fast initramfs without modules probing
+  * Separated KMS-dependent and VESA-dependent boots
+  * Added option for booting without applying user setting
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
-  * Custom fast initramfs without modules probing
   * Control groups assist process scheduling
   * Xorg server 1.9
   * Easy MP4[H.264+MP3] webcam video encoding

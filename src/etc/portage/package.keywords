@@ -1,4 +1,5 @@
 # Applications
+=www-client/midori-0.2.9-r1
 =www-misc/fcgiwrap-1.0.3*
 =app-text/fbreader-0.12.10*
 =dev-libs/liblinebreak-1.2*
