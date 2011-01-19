@@ -10,6 +10,7 @@ app-portage/eix                   # TEMP
 
 
 # LiveCD tools
+sys-apps/kexec-tools
 sys-apps/memtest86+
 net-dialup/mingetty
 
@@ -61,6 +62,7 @@ sys-fs/dosfstools
 net-fs/autofs
 
 # System / security utilities
+sys-apps/gradm
 app-shells/dash
 app-admin/metalog
 app-admin/sudo

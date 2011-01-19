@@ -1,0 +1,8 @@
+BOOTPART=/mnt/boot
+KNAME=liberte/boot/kernel-x86.zi
+INITRD=${BOOTPART}/liberte/boot/initrd-x86.lzm
+
+ROOTPART=none
+KPARAM="quiet memwipe"
+
+LOAD_DURING_SHUTDOWN=yes

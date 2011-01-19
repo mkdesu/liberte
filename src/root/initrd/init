@@ -1,5 +1,32 @@
 #!/bin/busybox ash
 
+# Handle kexec reboot / shutdown
+mount -t proc proc /proc
+
+if grep -q '\<memwipe\>' /proc/cmdline; then
+    grep -q '\<halt\>' /proc/cmdline || reboot=1
+    clear
+
+    # Free as much RAM as possible
+    umount /proc
+    rm -r /etc /rwroot /sbin/v86d /lib
+
+    echo Wiping RAM
+    /sbin/memwipe
+    sleep 3
+    
+    if [ -n "${reboot}" ]; then
+        echo Rebooting ...
+        exec reboot -nf
+    else
+        echo Powering off ...
+        exec poweroff -nf
+    fi
+
+    exit 1
+fi
+
+
 # Default variables
 export PATH="/sbin:/bin"
 
@@ -18,7 +45,6 @@ exec </dev/console >/dev/console 2>&1
 
 
 # Mount virtual filesystems
-mount -t proc  proc  /proc
 mount -t sysfs sysfs /sys
 
 mount -t tmpfs -o mode=755 tmpfs ${UNION}

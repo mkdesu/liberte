@@ -1,0 +1,18 @@
+--- /etc/init.d/kexec	2011-01-18 22:32:15.000000000 +0000
++++ /etc/init.d/kexec.new	2011-01-19 02:12:27.000000000 +0000
+@@ -83,11 +83,15 @@
+ 	[ "${LOAD_DURING_SHUTDOWN:-yes}" != "yes" ] && return 0
+ 
+ 	ebegin "Configuring kexec"
++	if [ "`/sbin/runlevel|/bin/cut -c 3`" = "0" ]; then
++		KPARAM="${KPARAM} halt"
++	else
+ 	if [ "`/sbin/runlevel|/bin/cut -c 3`" != "6" ]; then
+ 		einfo "Not rebooting, so disabling"
+ 		kexec -u
+ 		return 0
+ 	fi
++	fi
+ 
+ 	load_image
+ 	eend $?

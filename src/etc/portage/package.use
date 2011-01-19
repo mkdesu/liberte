@@ -50,6 +50,7 @@ media-video/gpac                -* aac mad ogg vorbis
 # Unnecessary functionality
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
+sys-apps/kexec-tools            -zlib -lzma
 sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads

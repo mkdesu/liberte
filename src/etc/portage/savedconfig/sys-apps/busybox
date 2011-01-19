@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.17.4
-# Sat Jan  8 15:16:33 2011
+# Tue Jan 18 16:58:47 2011
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -418,7 +418,7 @@ CONFIG_FEATURE_KILL_DELAY=0
 # CONFIG_FEATURE_EXTRA_QUIET is not set
 # CONFIG_FEATURE_INIT_COREDUMPS is not set
 # CONFIG_FEATURE_INITRD is not set
-# CONFIG_HALT is not set
+CONFIG_HALT=y
 # CONFIG_FEATURE_CALL_TELINIT is not set
 CONFIG_TELINIT_PATH=""
 # CONFIG_MESG is not set

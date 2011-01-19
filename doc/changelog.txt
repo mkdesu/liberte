@@ -5,6 +5,7 @@
   * Custom fast initramfs without modules probing
   * Separated KMS-dependent and VESA-dependent boots
   * Added option for booting without applying user setting
+  * More RAM is wiped with KEXEC-based reboot/shutdown
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
   * Control groups assist process scheduling
