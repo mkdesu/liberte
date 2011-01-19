@@ -4,8 +4,9 @@
   * Removed SYSLINUX dependency during Linux install
   * Custom fast initramfs without modules probing
   * Separated KMS-dependent and VESA-dependent boots
-  * Added option for booting without applying user setting
+  * Added option for booting without applying user settings
   * More RAM is wiped with KEXEC-based reboot/shutdown
+  * RAM is also wiped before poweroff on boot media removal
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
   * Control groups assist process scheduling

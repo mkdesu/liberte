@@ -220,15 +220,19 @@ rebuild_locales
 
 sinfo "Compiling custom executables"
 cflags="-ansi -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
-gcc ${cflags} -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c -ludev
-gcc ${cflags} -o /usr/local/bin/hex2base32     /usr/local/src/hex2base32.c
-gcc ${cflags} -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c
-gcc ${cflags} -o /usr/local/bin/cable-request  /usr/local/src/cable-request.c
+gcc  ${cflags} -o /usr/local/sbin/udev-watchdog /usr/local/src/udev-watchdog.c -ludev
+gcc  ${cflags} -o /usr/local/bin/hex2base32     /usr/local/src/hex2base32.c
+gcc  ${cflags} -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c
+gcc  ${cflags} -o /usr/local/bin/cable-request  /usr/local/src/cable-request.c
+
+cflags="-Wall `portageq envvar CFLAGS`"
+klcc ${cflags} -o /usr/local/sbin/memwipe       /usr/local/src/memwipe.c
 
 strip -s /usr/local/sbin/udev-watchdog \
          /usr/local/bin/hex2base32     \
          /usr/local/bin/log-limit      \
-         /usr/local/bin/cable-request
+         /usr/local/bin/cable-request  \
+         /usr/local/sbin/memwipe
 
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
@@ -421,13 +425,7 @@ for mod in `sort -u ${cpiodir}/modules.extra`; do
 done
 depmod -b ${cpiodir} -e -F /usr/src/linux/System.map ${kversion}
 
-cflags="-Wall `portageq envvar CFLAGS`"
-klcc ${cflags} -o ${cpiodir}/memwipe ${HOME}/initrd/memwipe.c
-strip          -s ${cpiodir}/memwipe
-
 cp ${HOME}/initrd/initramfs ${cpiodir}
-echo "file sbin/memwipe ${cpiodir}/memwipe 0755 0 0" >> ${cpiodir}/initramfs
-
 find ${cpiodir} -mindepth 3 -type d \
     -printf 'dir  %P    0755 0 0\n' >> ${cpiodir}/initramfs
 find ${cpiodir} -mindepth 3 -type f \

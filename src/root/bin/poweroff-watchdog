@@ -21,7 +21,7 @@ fi
 # Copy the executables to RAM
 # (the executables depend only on libc)
 ramdir=`mktemp -d --tmpdir=/dev/shm`
-cp -aH /sbin/poweroff ${ramdir}
+cp -aH /usr/local/sbin/memwipe ${ramdir}
 
 # Prevent possible access to locale files
 export LC_ALL=C
@@ -30,9 +30,4 @@ exec </dev/null 1>/dev/null 2>&1
 
 # Power off only if the watchdog exited cleanly,
 # detecting the removal of the device.
-if udev-watchdog "${devpath}"; then
-
-    # Immediate halt without fs sync (which hopefully prevents device access)
-    # Expected to be cached: /etc/ld.so.preload (negative), /etc/ld.so.cache, /lib/libc.so.6
-    exec ${ramdir}/poweroff -n -f
-fi
+udev-watchdog "${devpath}" && exec ${ramdir}/memwipe halt
