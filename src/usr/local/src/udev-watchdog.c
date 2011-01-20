@@ -37,8 +37,10 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/select.h>
+#include <sys/reboot.h>
 #include <linux/types.h>
 #include <linux/netlink.h>
+#include <linux/reboot.h>
 #include <libudev.h>
 
 static volatile sig_atomic_t udev_exit;
@@ -89,13 +91,18 @@ int main(int argc, char *argv[])
     const char *filter_action    = "remove";
     const char *filter_devsuffix;
 
+    int kexec = 0;
+
 	udev = udev_new();
 	if (udev == NULL)
 		goto out2;
 
-	if (argc != 2)
+	if (argc != 2 && argc != 3)
 		goto out2;
 	filter_devsuffix = argv[1];
+
+    if (argc == 3 && !strcmp(argv[2], "kexec"))
+        kexec = 1;
 
 	/* set signal handlers */
 	memset(&act, 0x00, sizeof(struct sigaction));
@@ -161,6 +168,13 @@ out2:
 
     if (udev_exit == 2)
         rc = 1;
+
+    if (rc == 0 && kexec) {
+        reboot(LINUX_REBOOT_CMD_KEXEC);
+
+        fprintf(stderr, "error: failed to reboot via kexec: %s\n", strerror(errno));
+        rc = 1;
+    }
 
 	return rc;
 }

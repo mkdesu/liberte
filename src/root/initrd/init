@@ -1,7 +1,5 @@
 #!/bin/busybox ash
 
-export PATH="/sbin:/bin"
-
 # Handle kexec reboot / shutdown
 for x in $*; do
     case "${x}" in
@@ -12,13 +10,15 @@ done
 
 if [ -n "${MEMWIPE}" ]; then
     clear
+    echo Wiping RAM
 
     # Free as much RAM as possible
     rm -r /etc /rwroot /sbin/v86d /lib
+    sysctl -w vm.overcommit_memory=2 vm.overcommit_ratio=125 vm.drop_caches=3 >/dev/null
 
-    echo Wiping RAM
-    memwipe
-    sleep 3
+    # Wipe memory
+    /sbin/memwipe
+    sleep 0.25
     
     if [ -z "${HALT}" ]; then
         echo Rebooting ...
@@ -33,6 +33,8 @@ fi
 
 
 # Default variables
+export PATH="/sbin:/bin"
+
 UNION=/union
 RWROOT=/rwroot
 BOOT=${RWROOT}/mnt/boot

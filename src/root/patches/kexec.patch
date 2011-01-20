@@ -1,7 +1,19 @@
---- /etc/init.d/kexec	2011-01-18 22:32:15.000000000 +0000
-+++ /etc/init.d/kexec.new	2011-01-19 02:12:27.000000000 +0000
-@@ -83,11 +83,15 @@
- 	[ "${LOAD_DURING_SHUTDOWN:-yes}" != "yes" ] && return 0
+--- /etc/init.d/kexec	2011-01-19 21:48:58.000000000 +0000
++++ /etc/init.d/kexec.new	2011-01-19 21:58:12.000000000 +0000
+@@ -74,20 +74,26 @@
+ start() {
+ 	[ "${LOAD_DURING_SHUTDOWN:-yes}" = "yes" ] && return 0
+ 
++	KPARAM="${KPARAM} halt"
++
+ 	ebegin "Configuring kexec"
+ 	load_image
+ 	eend 0
+ }
+ 
+ stop() {
+-	[ "${LOAD_DURING_SHUTDOWN:-yes}" != "yes" ] && return 0
++	[ "${LOAD_DURING_SHUTDOWN:-yes}" = "no" ] && return 0
  
  	ebegin "Configuring kexec"
 +	if [ "`/sbin/runlevel|/bin/cut -c 3`" = "0" ]; then

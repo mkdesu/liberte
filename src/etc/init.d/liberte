@@ -2,11 +2,11 @@
 
 
 depend() {
-    # depend on dm-mod module
-    need modules
-
     # start after power management is enabled
     after laptop_mode
+
+    # power-off watchdog needs kexec
+    use kexec
 
     # use entropy for encrypted storage, if available
     use urandom rngd

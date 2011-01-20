@@ -5,4 +5,4 @@ INITRD=${BOOTPART}/liberte/boot/initrd-x86.lzm
 ROOTPART=none
 KPARAM="quiet memwipe"
 
-LOAD_DURING_SHUTDOWN=yes
+LOAD_DURING_SHUTDOWN=both

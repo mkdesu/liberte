@@ -1,39 +1,64 @@
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <sys/reboot.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+#define BLOCK  4096
+#define PATT_A 0x55
+#define PATT_B 0xAA
 
 
-int main(int argc, char **argv) {
-    int halt = 0;
-
-    /* Single "halt" argument causes post-wipe poweroff*/
-    if (argc >= 2 && !strcmp(argv[1], "halt"))
-        halt = 1;
+extern char etext;                          /* first addr past text        segment */
+extern char edata;                          /* first addr past init   data segment */
+extern char end;                            /* first addr past uninit data segment */
 
 
-    /* Wipe RAM */
-    printf("Test\n");
+static void unlimit(int resource, const char *name) {
+    struct rlimit rlim;
+    rlim.rlim_cur = RLIM_INFINITY;
+    rlim.rlim_max = RLIM_INFINITY;
+
+    /*
+    if (setrlimit(resource, &rlim))
+        fprintf(stderr, "Removing limits failed: %s\n", name);
+    */
+}
 
 
-    /* Power off if requested */
-    if (halt) {
-        printf("Powering off ...\n");
+static void wipe() {
+    void *brkstart, *brkend;
 
+    /* Doesn't work with klibc, but defaults are fine */
+    unlimit(RLIMIT_AS,      "as");          /* brk */
+    unlimit(RLIMIT_DATA,    "data");        /* brk: init data / uninit data / heap */
+    unlimit(RLIMIT_STACK,   "stack");       /* stack / command line / env vars */
+    unlimit(RLIMIT_MEMLOCK, "memlock");     /* mlock */
 
-        /* From sysvinit: halt.c */
-        kill(1, SIGTSTP);
+    brkstart = sbrk(0);
+    brkend   = brkstart;
 
-
-        /* Attempt to power off, then to halt */
-        reboot(RB_POWER_OFF);
-        reboot(RB_HALT_SYSTEM);
-
-
-        fprintf(stderr, "Poweroff failed.\n");
-        return 1;
+    /* Allocate as much memory as possible */
+    while (!brk(brkend + BLOCK)) {
+        memset(brkend, PATT_A, BLOCK);
+        brkend += BLOCK;
     }
+
+    /* Flip all bits twice */
+    memset(brkstart, PATT_B, brkend - brkstart);
+    memset(brkstart, PATT_A, brkend - brkstart);
+
+    /* Release allocated memory */
+    if (brk(brkstart))
+        fprintf(stderr, "Unable to release allocated memory\n");
+
+    printf("Wiped %ld MiB of RAM\n", (long) ((brkend - brkstart) / (1024*1024)));
+}
+
+
+int main() {
+    /* Wipe RAM */
+    wipe();
 
     return 0;
 }
