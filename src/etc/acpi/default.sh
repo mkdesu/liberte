@@ -18,6 +18,8 @@ case "${group}" in
                 # Shutdown only if SysRq wasn't disabled (e.g., via xlock)
                 if [ "`cat /proc/sys/kernel/sysrq 2>/dev/null`" = 1 ]; then
                     /sbin/shutdown -h now
+                else
+                    logger -p 4 -t acpi.default -- "Ignoring event: $@"
                 fi
                 ;;
 

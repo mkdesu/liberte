@@ -10,6 +10,9 @@ if [ "${TERM}" = linux ]; then
     echo -ne "\033[?17;0;64c"
 
     TMOUT=120
+
+    echo 'Type "okroot" to enable root account (password: liberte).'
+    echo 'This login session will time out after 2 minutes.'
 fi
 
 . ${HOME}/.bashrc
