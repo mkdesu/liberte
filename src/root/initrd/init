@@ -1,7 +1,7 @@
 #!/bin/busybox ash
 
 # Handle kexec reboot / shutdown
-# [quiet] memwipe [halt] [comm=X] (X = VM overcommit %)
+# [quiet] memwipe [halt]
 for x in $*; do
     case "${x}" in
         memwipe) MEMWIPE=1 ;;
@@ -11,13 +11,13 @@ done
 
 if [ -n "${MEMWIPE}" ]; then
     clear
-    echo Wiping RAM
+    echo 'Wiping RAM (expecting out-of-memory kills)'
 
     # Free as much RAM as possible
     rm -r /etc /rwroot /sbin/v86d /lib
 
     mount -t proc proc /proc
-    sysctl -w vm.overcommit_memory=2 vm.overcommit_ratio=${comm:-100} vm.drop_caches=3 >/dev/null
+    sysctl -w kernel.printk=0 vm.overcommit_memory=1 vm.drop_caches=3 >/dev/null
     umount /proc
 
     # Wipe memory
