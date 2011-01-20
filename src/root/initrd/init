@@ -22,7 +22,7 @@ if [ -n "${MEMWIPE}" ]; then
 
     # Wipe memory
     /sbin/memwipe
-    sleep 0.25
+    sleep 0.5
     
     if [ -z "${HALT}" ]; then
         echo Rebooting ...

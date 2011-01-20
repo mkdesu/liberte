@@ -44,6 +44,8 @@ static void wipe(int pass, int fillbyte) {
     wipesize     = 0;
     brkstartsave = brkstart;
 
+    /* brk(brkend + BLOCK); printf("%#x\n", *((int*)brkend)); */
+
     /* Incrementally allocate as much memory as possible */
     while (!brk(brkend + BLOCK)) {
         memset(brkend, fillbyte, BLOCK);
@@ -71,10 +73,12 @@ int main() {
     pid_t pid;
     int   status, pass, fillbyte;
 
+    /* Flip bits 0 -> 1 and 1 -> 0 in checkerboard pattern */
     for (pass = 0;  pass < 3;  ++pass) {
         fillbyte = (pass % 2) ? PATT_A : PATT_B;
-        
-        /* Suspends parent, all memory is common */
+
+        /* Suspends parent, all memory and resources are common,
+           everything is common - even the sky, even Allah! (c) */
         pid = vfork();
 
         /* printf("PID = %d, clone PID = %d\n", getpid(), pid); */
@@ -96,6 +100,7 @@ int main() {
             else {
                 if (WIFSIGNALED(status)) {
                     /* Release allocated memory if it wasn't freed after OOM kill */
+                    /* Note: PAX_MEMORY_SANITIZE does not come into effect here   */
                     if (brk((void*) brkstartsave))
                         fprintf(stderr, "Failed to release assumed-unfreed memory\n");
 
