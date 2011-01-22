@@ -21,4 +21,4 @@ anon	liberte = NOPASSWD: /sbin/shutdown -h now,       /sbin/shutdown -r now
 anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
 anon	liberte = NOPASSWD: /usr/local/sbin/sysrq [01]
 
-anon	liberte = (nofw) NOPASSWD: /mnt/live/home/nofw/bin/unsafe-browser ""
+anon	liberte = (nofw) NOPASSWD: /usr/local/sbin/unsafe-browser ""

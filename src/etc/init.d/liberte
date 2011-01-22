@@ -90,7 +90,6 @@ EndSection'
     eend $?
 
 
-    # genkernel's init leaves /etc/mtab somewhat messed
     ebegin Updating mtab
     egrep -v ' (rootfs|autofs|/mnt/hidden/rwroot) ' /proc/mounts > /etc/mtab
     eend $?

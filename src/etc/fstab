@@ -1,12 +1,12 @@
 # The / entry prevents /etc/init.d/checkroot's "mount -f /" complaint
-# (the /etc/mtab entry is overwritten in /etc/conf.d/local.start anyway)
-unionfs  /               unionfs  defaults  0 0
+# (the /etc/mtab entry is overwritten in /etc/init.d/liberte anyway)
+unionfs  /               unionfs  defaults                 0 0
 
 # Used by poweroff watchdog
-tmpfs    /dev/shm        tmpfs    defaults  0 0
+tmpfs    /dev/shm        tmpfs    nosuid,nodev             0 0
 
 # Control groups (mount just the cpu subsystem)
-cgroup   /sys/fs/cgroup  cgroup   cpu       0 0
+cgroup   /sys/fs/cgroup  cgroup   cpu,nosuid,nodev,noexec  0 0
 
 # /proc, /sys, /dev, and /dev/pts are mounted by /sbin/rc
 # see RC_USE_FSTAB in /etc/conf.d/rc

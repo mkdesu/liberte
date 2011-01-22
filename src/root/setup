@@ -355,7 +355,7 @@ rm -f  /var/log/wtmp
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
-# "wheel"   group: necessary for su/sudo PAM authentication
+# "wheel"   group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
 # "users"   group: some apps require for DBUS communication
 # "plugdev" group: changing NetworkManager settings via DBUS
 # "audio"   group: ALSA/OSS devices access
@@ -485,8 +485,7 @@ fi
 
 
 sinfo "Generating SYSLINUX configuration"
-rm -f /boot/boot /boot/System.map-genkernel-x86-${kversion}
-
+rm    -f /boot/boot
 mkdir -p /boot/syslinux
 syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,mbr.bin} /boot/syslinux/

@@ -1,2 +1,4 @@
 #!/bin/sh -e
-exec nice -n -10 /usr/bin/X -nolisten tcp -br "$@"
+
+# nice -n -10 doesnt' work with xinit (since run by user)
+exec /usr/bin/X -nolisten tcp -br "$@"

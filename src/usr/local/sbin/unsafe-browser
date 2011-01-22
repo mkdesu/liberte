@@ -3,7 +3,7 @@
 umask 077
 
 
-# This command is run via "sudo -u anon"
+# This command is run via "sudo -u nofw"
 # Available environment: HOME, USER
 
 # Some sanity checks
