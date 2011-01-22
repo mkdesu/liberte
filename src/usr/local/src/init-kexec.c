@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     char  *empty[] = { 0 };
 
 
-    /* Clear screen if the temrinal supports it */
+    /* Clear screen if the terminal supports it */
     printf(ANSI_CLS);
     fflush(stdout);
 
@@ -178,6 +178,7 @@ int main(int argc, char **argv) {
     else {
         reboot(LINUX_REBOOT_CMD_RESTART);
     }
-    
+
+
     return 0;
 }

@@ -78,7 +78,7 @@ static void wipe(int pass, int fillbyte) {
 
     /* Release allocated memory */
     if (brk(brkstart))
-        fprintf(stderr, "Unable to release allocated memory\n");
+        fprintf(stderr, "Failed to release allocated memory\n");
 }
 
 
