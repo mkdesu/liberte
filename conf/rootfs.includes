@@ -1,5 +1,4 @@
 # Include root's essential directories
-/root/bin/***
 /root/.profile
 /root/.bashrc
 /root/.inputrc

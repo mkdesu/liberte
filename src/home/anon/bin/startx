@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+cklaunch=ck-launch-session
+loglimit=8192
+
+if [ -n "${XDG_SESSION_COOKIE}" ]; then
+    cklaunch=
+fi
+
+exec ${cklaunch} /usr/bin/startx ${XDG_CONFIG_HOME}/x11/xsession  --   \
+                                 ${XDG_CONFIG_HOME}/x11/xserverrc 2>&1 \
+         | log-limit ${TMPDIR}/xsession.log ${loglimit}

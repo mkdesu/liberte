@@ -64,8 +64,8 @@ certsdir=${lmount}/security/ssl/certs
 otfefile=/mnt/boot${OTFEFILE}
 
 start() {
-    # see the /root/bin/ps-mount script
-    # these flags are mirrored in /root/bin/otfe-resize
+    # see the /usr/local/sbin/ps-mount script
+    # these flags are mirrored in /usr/local/sbin/otfe-resize
     # (permissions: rwX------)
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
@@ -97,8 +97,8 @@ EndSection'
 
     if [ ! -e /sys/fs/cgroup/user ]; then
         ebegin Setting up control groups
-        echo /root/bin/cgroup-release > /sys/fs/cgroup/release_agent
-        echo 1                        > /sys/fs/cgroup/notify_on_release
+        echo /usr/local/sbin/cgroup-release > /sys/fs/cgroup/release_agent
+        echo 1                              > /sys/fs/cgroup/notify_on_release
         mkdir -m 3770 /sys/fs/cgroup/user
         chgrp users   /sys/fs/cgroup/user
         eend $?
@@ -115,7 +115,7 @@ EndSection'
     # Arm the poweroff watchdog
     if [ ${cddevpath} != none ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
         ebegin Arming power-off on boot media removal
-        /root/bin/poweroff-watchdog ${cddevpath} &
+        poweroff-watchdog ${cddevpath} &
         eend $?
     fi
 

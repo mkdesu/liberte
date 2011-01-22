@@ -22,7 +22,7 @@ distname=liberte-${version}
 sysver=`cat ${LIVECD}/boot/syslinux/version`
 mksqver=4.1
 
-# see the /root/bin/ps-mount script
+# see the /usr/local/sbin/ps-mount script
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=2101,gid=9000,umask=0137,dmask=067
 
 

@@ -8,7 +8,7 @@
  	ebegin "Loading ${iptables_name} state and starting firewall"
 +	if [ -f ${iptables_save} ] ; then
  	${iptables_bin}-restore ${SAVE_RESTORE_OPTIONS} < "${iptables_save}"
-+	else /root/bin/fw-reload; fi
++	else fw-reload; fi
  	eend $?
  }
  
