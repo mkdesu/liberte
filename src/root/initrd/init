@@ -1,41 +1,5 @@
 #!/bin/busybox ash
 
-# Handle kexec reboot / shutdown
-# [quiet] memwipe [halt]
-for x in $*; do
-    case "${x}" in
-        memwipe) MEMWIPE=1 ;;
-        halt)    HALT=1    ;;
-    esac
-done
-
-if [ -n "${MEMWIPE}" ]; then
-    clear
-    echo 'Wiping RAM (expecting out-of-memory kills)'
-
-    # Free as much RAM as possible
-    rm -r /etc /rwroot /sbin/v86d /lib
-
-    mount -t proc proc /proc
-    sysctl -w kernel.printk=0 vm.overcommit_memory=1 vm.drop_caches=3 >/dev/null
-    umount /proc
-
-    # Wipe memory
-    /sbin/memwipe
-    sleep 0.5
-    
-    if [ -z "${HALT}" ]; then
-        echo Rebooting ...
-        exec reboot -nf
-    else
-        echo Powering off ...
-        exec poweroff -nf
-    fi
-
-    exit 1
-fi
-
-
 # Default variables
 export PATH="/sbin:/bin"
 

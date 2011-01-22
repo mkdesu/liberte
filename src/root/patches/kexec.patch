@@ -4,7 +4,7 @@
  start() {
  	[ "${LOAD_DURING_SHUTDOWN:-yes}" = "yes" ] && return 0
  
-+	KPARAM="${KPARAM} halt"
++	KPARAM="${KPARAM} halt alert"
 +
  	ebegin "Configuring kexec"
  	load_image

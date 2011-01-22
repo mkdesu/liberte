@@ -1,6 +1,7 @@
+#include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/types.h>
@@ -15,6 +16,18 @@
 
 static volatile void*     brkstartsave;
 static volatile ptrdiff_t wipesize;
+
+
+static void cocoon() {
+    struct sigaction sa;
+    sa.sa_handler  = SIG_IGN;
+    sa.sa_flags    = 0;
+    sa.sa_restorer = 0;
+    sigfillset(&sa.sa_mask);
+
+    if (sigaction(SIGTSTP, &sa, 0))
+        fprintf(stderr, "Failed to ignore SIGTSTP\n");
+}
 
 
 static void unlimit(int resource, const char *name) {
@@ -73,6 +86,11 @@ int main() {
     pid_t pid;
     int   status, pass, fillbyte;
 
+
+    /* Ignore some signals */
+    cocoon();
+
+
     /* Flip bits 0 -> 1 and 1 -> 0 in checkerboard pattern */
     for (pass = 0;  pass < 3;  ++pass) {
         fillbyte = (pass % 2) ? PATT_A : PATT_B;
@@ -89,7 +107,7 @@ int main() {
         /* In child thread */
         else if (pid == 0) {
             wipe(pass, fillbyte);
-            _exit(pass);
+            _exit(0);
         }
 
         /* Continuing in parent thread */

@@ -80,12 +80,16 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion}
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
-    cp ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config
+
+    spatch ${HOME}/patches/kernel-info.patch -p0
+    sed -i 's/lzma -9/lzma/' /usr/src/linux/scripts/Makefile.lib
 
 
-    # Some news are delayed until first emerge
-    eselect news read all
-    eselect news purge
+    sinfo "Cloning kernel to ${kversion}-kexec"
+    rsync -aHAXS /usr/src/linux-${kversion}/ /usr/src/linux-kexec
+
+    cp ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config
+    cp ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config
 
 
     sinfo "Downloading kernel patches"
@@ -95,9 +99,6 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
 
     sinfo "Applying kernel patches"
-    spatch ${HOME}/patches/kernel-info.patch -p0
-    sed -i 's/lzma -9/lzma/' /usr/src/linux/scripts/Makefile.lib
-
     spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.36-rc8.patch    -d /usr/src/linux -p1
     spatch /usr/local/portage/distfiles/unionfs-2.5.7_for_2.6.36.diff.gz     -d /usr/src/linux -p1
     spatch /usr/local/portage/distfiles/kernel-squashfs-lzma.patch'?rev=1.7' -d /usr/src/linux -p1
@@ -108,6 +109,11 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     # Filter locales before remerging libc
     sinfo "Filtering locales"
     grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
+
+
+    # Some news are delayed until first emerge
+    eselect news read all
+    eselect news purge
 
 
     sinfo "Recompiling toolchain"
@@ -226,13 +232,16 @@ gcc  ${cflags} -o /usr/local/bin/log-limit      /usr/local/src/log-limit.c
 gcc  ${cflags} -o /usr/local/bin/cable-request  /usr/local/src/cable-request.c
 
 cflags="-Wall `portageq envvar CFLAGS`"
-klcc ${cflags} -o /usr/local/sbin/memwipe       /usr/local/src/memwipe.c
+mkdir -p /usr/local/addons/initrd
+klcc ${cflags} -o /usr/local/addons/initrd/memwipe    /usr/local/src/memwipe.c
+klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.c
 
-strip -s /usr/local/sbin/udev-watchdog \
-         /usr/local/bin/hex2base32     \
-         /usr/local/bin/log-limit      \
-         /usr/local/bin/cable-request  \
-         /usr/local/sbin/memwipe
+strip -s /usr/local/sbin/udev-watchdog    \
+         /usr/local/bin/hex2base32        \
+         /usr/local/bin/log-limit         \
+         /usr/local/bin/cable-request     \
+         /usr/local/addons/initrd/memwipe \
+         /usr/local/addons/initrd/init-kexec
 
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
@@ -398,10 +407,18 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 
 
 sinfo "Compiling kernel"
+makeopts=`portageq envvar MAKEOPTS`
 export KBUILD_BUILD_VERSION=0
-genkernel --oldconfig --no-save-config --loglevel=0 kernel
-mv /boot/kernel-genkernel-x86-${kversion} /boot/kernel-x86.zi
+
+make -s ${makeopts} -C /usr/src/linux 2>/dev/null
+make -s ${makeopts} -C /usr/src/linux modules_install
 rm /lib/modules/*/{build,source}
+cp -a /usr/src/linux/arch/x86/boot/bzImage /boot/kernel-x86.zi
+
+
+sinfo "Compiling kexec kernel"
+make -s ${makeopts} -C /usr/src/linux-kexec 2>/dev/null
+cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec.zi
 
 
 sinfo "Creating initramfs image"
@@ -438,14 +455,27 @@ find ${cpiodir} -mindepth 3 -type f \
 rm -r ${cpiodir}
 
 
+sinfo "Creating kexec initramfs image"
+/usr/src/linux-kexec/usr/gen_init_cpio ${HOME}/initrd/initramfs-kexec \
+    | lzma -c > /usr/local/boot/initrd-kexec.lzm
+
+
 sinfo "Verifying LZMA decompression memory requirements"
-kernlzma=/usr/src/linux/arch/x86/boot/compressed/vmlinux.bin.lzma
-head -c $[`du -b ${kernlzma} | cut -f1` - 4] ${kernlzma} | lzma -t -M ${lzmamem}
+kernlzma=arch/x86/boot/compressed/vmlinux.bin.lzma
+
+head -c -4 /usr/src/linux/${kernlzma}       | lzma -t -M ${lzmamem}
 lzma -t -M ${lzmamem} /boot/initrd-x86.lzm
+
+head -c -4 /usr/src/linux-kexec/${kernlzma} | lzma -t -M ${lzmamem}
+lzma -t -M ${lzmamem} /usr/local/boot/initrd-kexec.lzm
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}.config /usr/src/linux/.config || true
+diff ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config                   || true
+
+
+sinfo "Kexec kernel config differences:"
+diff ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config || true
 
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then

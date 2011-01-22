@@ -1,8 +1,8 @@
-BOOTPART=/mnt/boot
-KNAME=liberte/boot/kernel-x86.zi
-INITRD=${BOOTPART}/liberte/boot/initrd-x86.lzm
+BOOTPART=/
+KNAME=usr/local/boot/kernel-kexec.zi
+INITRD=/usr/local/boot/initrd-kexec.lzm
 
 ROOTPART=none
-KPARAM="quiet memwipe"
+KPARAM="quiet"
 
 LOAD_DURING_SHUTDOWN=both
