@@ -47,6 +47,7 @@ wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 libsoup                 gnutls                  gnutls          midori
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader
 neon                    ssl, gnutls             gnutls          audacious-plugins
+rtmpdump                ssl, gnutls, polarssl   gnutls          mplayer
 wget                    ssl                     ssl             portage, libqalculate(forex)
 
 xchat                   ssl                     ssl

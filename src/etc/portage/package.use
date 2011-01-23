@@ -22,7 +22,7 @@ sci-visualization/gnuplot       gd
 # (vmware segfaults "Xorg -configure", fbdev conflicts with vesa)
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
 media-libs/mesa                 -gallium -video_cards_vmware
-media-video/mplayer             -video_cards_mga -video_cards_s3virge -video_cards_tdfx
+media-video/mplayer             -video_cards_*
 sys-fs/udev                     extras
 sys-fs/ntfs3g                   -udev
 sys-fs/ntfsprogs                minimal -crypt
@@ -34,6 +34,7 @@ net-misc/wget                   ssl
 net-libs/libsoup                ssl
 net-misc/curl                   ssl   gnutls -nss
 net-libs/neon                   ssl   gnutls
+media-video/rtmpdump            ssl   gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 net-irc/xchat                   ssl
@@ -41,8 +42,9 @@ net-im/pidgin                         gnutls
 gnome-base/gvfs                 -http
 
 # Multimedia
-# mplayer: faac, x264, xvid and twolame/toolame are activated only for +encode
-media-video/mplayer             -rar cpudetection custom-cpuopts 3dnow mmx sse sse2
+# mplayer: faac, x264, xvid, twolame/toolame and (partly) mp3 are activated only for +encode
+media-video/mplayer             cpudetection custom-cpuopts 3dnow 3dnowext mmx mmxext sse sse2
+media-video/mplayer             mpg123 -mp3 libmpeg2 rtmp -rar
 media-video/mplayer             -encode -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
 media-video/gpac                -* aac mad ogg vorbis
@@ -54,6 +56,7 @@ sys-apps/kexec-tools            -zlib -lzma
 sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
+x11-libs/libfm                  -udev
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
