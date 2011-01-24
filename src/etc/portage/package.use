@@ -65,6 +65,7 @@ app-text/ghostscript-gpl        -djvu
 # Extra functionality
 sys-apps/busybox                static savedconfig
 media-libs/jpeg                 static-libs
+media-libs/libpng               static-libs
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 app-text/poppler                cairo

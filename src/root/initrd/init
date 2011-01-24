@@ -104,6 +104,10 @@ while true; do
     if [ ${waitmsg} = 1 ]; then
         warn_msg 'Waiting for the media ...'
         waitmsg=0
+
+        # Incorrect USB hubs? (VMWare)
+        modprobe -q sd_mod      2>/dev/null
+        modprobe -q usb-storage 2>/dev/null
     fi
 
     if [ -n "${CDROOT_DEV}" ]; then
