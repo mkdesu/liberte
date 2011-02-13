@@ -8,7 +8,6 @@
 # Sources
 /usr/src/linux*
 /usr/lib/klibc/
-/usr/lib/perl*/
 
 # Documentation
 /usr/share/man/**/*.*
@@ -20,3 +19,7 @@
 
 # Pruned directories
 /usr/share/claws-mail/themes/**
+
+# Executables requiring development libraries
+/usr/bin/cairo-trace
+/usr/lib/cairo/libcairo-trace.*

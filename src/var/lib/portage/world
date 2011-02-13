@@ -99,6 +99,7 @@ sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
 sys-power/powertop
+sys-process/latencytop
 app-laptop/laptop-mode-tools
 # app-emulation/virt-what [hardened gcc]
 sys-apps/pciutils

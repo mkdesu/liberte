@@ -38,6 +38,7 @@
 /usr/src/
 /usr/local/src/
 /usr/lib/**/include/
+/usr/lib/perl*/
 /usr/lib/icu/
 /usr/share/aclocal/
 /usr/share/baselayout/

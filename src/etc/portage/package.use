@@ -21,6 +21,7 @@ sci-visualization/gnuplot       gd
 # Drivers
 # (vmware segfaults "Xorg -configure", fbdev conflicts with vesa)
 x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
+x11-libs/libdrm                 -video_cards_vmware
 media-libs/mesa                 -gallium -video_cards_vmware
 media-video/mplayer             -video_cards_*
 sys-fs/udev                     extras
