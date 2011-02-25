@@ -23,6 +23,8 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # lm_sensors:     exclude perl    RDEPEND
 # xcb-proto:      exclude python  RDEPEND
 # libglade:       exclude python  RDEPEND
+# gtk+:           exclude python  RDEPEND
+# gucharmap:      exclude python  RDEPEND
 # pidgin:         exclude python  RDEPEND (dbus-python)
 # gvfs:           exclude openssh RDEPEND
 # splashutils:    exclude cpio    RDEPEND
@@ -37,6 +39,8 @@ ebuilds="sys-apps/portage
          sys-apps/lm_sensors
          x11-proto/xcb-proto
          gnome-base/libglade
+         x11-libs/gtk+
+         gnome-extra/gucharmap
          net-im/pidgin
          gnome-base/gvfs
          media-gfx/splashutils
@@ -50,7 +54,7 @@ ebuilds="sys-apps/portage
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
     rsync -a /usr/portage/${ebuild} /usr/local/portage/`dirname ${ebuild}`
-    eval ebuild_`basename ${ebuild//-}`=`equery which ${ebuild}`
+    eval ebuild_`basename ${ebuild//[-+]}`=`equery which ${ebuild}`
 done
 
 # Make portage think it doesn't need Python
@@ -63,7 +67,9 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade}
+# Python is not needed at all by gtk+ and gucharmap
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
+                                         ${ebuild_gtk} ${ebuild_gucharmap}
 
 # Python is needed by dbus-python, which is a non-separated dependency in ebuild
 sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}

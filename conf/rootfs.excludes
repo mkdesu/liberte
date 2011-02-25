@@ -181,5 +181,6 @@
 /usr/bin/purple-url-handler
 
 # Individual unnecessary files
+/usr/bin/gdk*pixbuf*source
 /usr/bin/glsl_compiler
 /usr/bin/gs
