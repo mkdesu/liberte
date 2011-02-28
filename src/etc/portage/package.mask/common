@@ -1,5 +1,2 @@
 # Python 3
 >=dev-lang/python-3
-
-# Temporary ebuild problem fix
-=dev-libs/link-grammar-4.7.2
