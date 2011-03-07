@@ -148,7 +148,7 @@ mail-client/claws-mail-archive
 app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/midori
-app-text/fbreader
+# app-text/fbreader (EAPI 4)
 net-irc/xchat
 x11-plugins/pidgin-otr
 x11-plugins/pidgin-libnotify
