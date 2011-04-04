@@ -1,0 +1,93 @@
+diff --git a/fs/unionfs/commonfops.c b/fs/unionfs/commonfops.c
+index 51ea65e..0f6cba3 100644
+--- a/fs/unionfs/commonfops.c
++++ b/fs/unionfs/commonfops.c
+@@ -312,7 +312,7 @@ static int __unionfs_file_revalidate(struct file *file, struct dentry *dentry,
+ 	 * someone has copied up this file from underneath us, we also need
+ 	 * to refresh things.
+ 	 */
+-	if (d_deleted(dentry) ||
++	if ((d_deleted(dentry) && dbstart(dentry) >= fbstart(file)) ||
+ 	    (sbgen <= fgen &&
+ 	     dbstart(dentry) == fbstart(file) &&
+ 	     unionfs_lower_file(file)))
+@@ -506,8 +506,11 @@ static int __open_file(struct inode *inode, struct file *file,
+ 			for (bindex = bstart - 1; bindex >= 0; bindex--) {
+ 				err = copyup_file(parent->d_inode, file,
+ 						  bstart, bindex, size);
+-				if (!err)
++				if (!err) {
++					/* only one regular file open */
++					fbend(file) = fbstart(file);
+ 					break;
++				}
+ 			}
+ 			return err;
+ 		} else {
+diff --git a/fs/unionfs/inode.c b/fs/unionfs/inode.c
+index cc994bd..1905a32 100644
+--- a/fs/unionfs/inode.c
++++ b/fs/unionfs/inode.c
+@@ -933,7 +933,12 @@ static int unionfs_setattr(struct dentry *dentry, struct iattr *ia)
+ 		err = -EINVAL;
+ 		goto out;
+ 	}
+-	lower_inode = unionfs_lower_inode(inode);
++
++	/*
++	 * Get the lower inode directly from lower dentry, in case ibstart
++	 * is -1 (which happens when the file is open but unlinked.
++	 */
++	lower_inode = lower_dentry->d_inode;
+ 
+ 	/* check if user has permission to change lower inode */
+ 	err = inode_change_ok(lower_inode, ia);
+@@ -968,6 +973,16 @@ static int unionfs_setattr(struct dentry *dentry, struct iattr *ia)
+ 		/* get updated lower_dentry/inode after copyup */
+ 		lower_dentry = unionfs_lower_dentry(dentry);
+ 		lower_inode = unionfs_lower_inode(inode);
++		/*
++		 * check for whiteouts in writeable branch, and remove them
++		 * if necessary.
++		 */
++		if (lower_dentry) {
++			err = check_unlink_whiteout(dentry, lower_dentry,
++						    bindex);
++			if (err > 0) /* ignore if whiteout found and removed */
++				err = 0;
++		}
+ 	}
+ 
+ 	/*
+diff --git a/fs/unionfs/whiteout.c b/fs/unionfs/whiteout.c
+index 405073a..9abe566 100644
+--- a/fs/unionfs/whiteout.c
++++ b/fs/unionfs/whiteout.c
+@@ -203,8 +203,8 @@ int unlink_whiteout(struct dentry *wh_dentry)
+  * Checks to see if there's a whiteout in @lower_dentry's parent directory,
+  * whose name is taken from @dentry.  Then tries to remove that whiteout, if
+  * found.  If <dentry,bindex> is a branch marked readonly, return -EROFS.
+- * If it finds both a regular file and a whiteout, return -EIO (this should
+- * never happen).
++ * If it finds both a regular file and a whiteout, delete whiteout (this
++ * should never happen).
+  *
+  * Return 0 if no whiteout was found.  Return 1 if one was found and
+  * successfully removed.  Therefore a value >= 0 tells the caller that
+@@ -234,13 +234,10 @@ int check_unlink_whiteout(struct dentry *dentry, struct dentry *lower_dentry,
+ 	}
+ 
+ 	/* check if regular file and whiteout were both found */
+-	if (unlikely(lower_dentry->d_inode)) {
+-		err = -EIO;
+-		printk(KERN_ERR "unionfs: found both whiteout and regular "
+-		       "file in directory %s (branch %d)\n",
++	if (unlikely(lower_dentry->d_inode))
++		printk(KERN_WARNING "unionfs: removing whiteout; regular "
++		       "file exists in directory %s (branch %d)\n",
+ 		       lower_dir_dentry->d_name.name, bindex);
+-		goto out_dput;
+-	}
+ 
+ 	/* check if branch is writeable */
+ 	err = is_robranch_super(dentry->d_sb, bindex);

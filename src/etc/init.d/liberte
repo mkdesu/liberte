@@ -338,8 +338,12 @@ EndSection'
             if [ ${lmountok} = 0  -a  ! -e ${certsdir} ]; then
                 ebegin Generating communication certificates
                 einfo 'It is a one-time operation - please do not interrupt'
+
+                splash svc_input_begin ${SVCNAME}
                 sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
+
                 eend $?
+                splash svc_input_end ${SVCNAME}
             fi
 
 
