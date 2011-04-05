@@ -11,6 +11,7 @@
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
   * Control groups assist process scheduling
+  * Haveged is used for supplying entropy
   * Xorg server 1.9
   * Easy MP4[H.264+MP3] webcam video encoding
   * Easy Speex audio encoding

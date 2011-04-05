@@ -15,7 +15,7 @@ sslconf=${HOME}/config/ssl/extensions.cnf
 certdir=${ssldir}/certs
 keysdir=${ssldir}/private
 
-rsabits=16384
+rsabits=8192
 shabits=512
 reqsubj='/O=Liberté Linux/CN=Anonymous'
 crtdays=18300

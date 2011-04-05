@@ -74,7 +74,7 @@ app-crypt/gnupg
 app-crypt/mcrypt
 app-crypt/steghide
 app-crypt/ccid
-sys-apps/rng-tools
+sys-apps/haveged
 
 # Network utilities
 net-firewall/iptables
@@ -101,7 +101,7 @@ sys-power/cpufrequtils
 sys-power/powertop
 sys-process/latencytop
 app-laptop/laptop-mode-tools
-# app-emulation/virt-what [hardened gcc]
+app-emulation/virt-what
 sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils

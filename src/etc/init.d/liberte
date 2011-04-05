@@ -9,7 +9,7 @@ depend() {
     use kexec
 
     # use entropy for encrypted storage, if available
-    use urandom rngd
+    use urandom haveged
 
     # password entry is on console
     after  clock numlock gpm consolefont
