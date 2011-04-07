@@ -180,6 +180,12 @@
 /usr/bin/purple-remote
 /usr/bin/purple-url-handler
 
+# OpenSSH server
+/etc/ssh/moduli
+/usr/sbin/sshd
+/usr/lib/misc/sftp-server
+/usr/lib/misc/ssh-keysign
+
 # Individual unnecessary files
 /usr/bin/gdk*pixbuf*source
 /usr/bin/glsl_compiler

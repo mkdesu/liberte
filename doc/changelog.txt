@@ -13,6 +13,7 @@
   * Control groups assist process scheduling
   * Haveged is used for supplying entropy
   * Xorg server 1.9
+  * Added OpenSSH client
   * Easy MP4[H.264+MP3] webcam video encoding
   * Easy Speex audio encoding
   * Added FBReader, XChat, Pidgin

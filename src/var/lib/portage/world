@@ -7,7 +7,6 @@ app-portage/portage-utils         # TEMP
 app-portage/eix                   # TEMP
 # dev-python/pysqlite             # TEMP
 
-
 # LiveCD tools
 sys-apps/kexec-tools
 sys-apps/memtest86+
@@ -69,6 +68,7 @@ app-misc/hatools
 sys-apps/paxctl
 app-misc/vlock
 x11-misc/alock
+net-misc/ssh-askpass-fullscreen
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
@@ -86,6 +86,7 @@ gnome-extra/nm-applet
 net-misc/ntp
 net-misc/htpdate
 net-misc/tor
+net-misc/connect
 net-proxy/tsocks
 net-proxy/privoxy
 www-servers/nginx

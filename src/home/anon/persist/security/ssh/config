@@ -1,0 +1,25 @@
+Host *
+
+Ciphers                 aes256-ctr,aes256-cbc,aes128-ctr,aes128-cbc,3des-cbc
+MACs                    hmac-sha1,hmac-md5,hmac-ripemd160
+HashKnownHosts          yes
+
+CACertificatePath       /etc/ssl/certs
+CARevocationPath        /etc/ssl/crl
+UserCACertificatePath   ~/.ssh/certs
+UserCARevocationPath    ~/.ssh/crl
+
+Compression             yes
+CompressionLevel        9
+
+ForwardX11              no
+ForwardX11Trusted       no
+
+VAType                  none
+StrictHostKeyChecking   ask
+EscapeChar              none
+
+# Prevent fingerprinting when username was not specified
+User                    root
+
+ProxyCommand            /usr/bin/connect -S 127.0.0.1:9050 %h %p

@@ -2,6 +2,7 @@
 =sys-apps/kexec-tools-2.0.1*
 =sys-apps/haveged-1.01*
 =app-emulation/virt-what-1.2*
+=net-misc/connect-100*
 
 # Applications
 =www-misc/fcgiwrap-1.0.3*

@@ -16,8 +16,8 @@ xset r rate 250 50 m 3/2 0
 # Launch daemons
 # assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
 eval `dbus-launch --sh-syntax`
-#eval `ssh-agent -s`
-eval `gpg-agent -s --daemon`
+# eval `ssh-agent -s`
+eval `gpg-agent -s --daemon --enable-ssh-support`
 
 # assume [ -z "${GNOME_KEYRING_CONTROL}" ]
 set -a
@@ -51,7 +51,7 @@ wait ${WM_PID}
 # Kill daemons
 kill ${GNOME_KEYRING_PID}
 kill `echo ${GPG_AGENT_INFO} | cut -d: -f2`
-#eval `ssh-agent -s -k`
+# eval `ssh-agent -s -k`
 kill ${DBUS_SESSION_BUS_PID}
 
 # Remove X11 cookie

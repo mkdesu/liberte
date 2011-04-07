@@ -26,7 +26,6 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # gtk+:           exclude python  RDEPEND
 # gucharmap:      exclude python  RDEPEND
 # pidgin:         exclude python  RDEPEND (dbus-python)
-# gvfs:           exclude openssh RDEPEND
 # splashutils:    exclude cpio    RDEPEND
 # graphicsmagick: exclude perl    RDEPEND
 # eboard:         exclude perl    RDEPEND
@@ -42,7 +41,6 @@ ebuilds="sys-apps/portage
          x11-libs/gtk+
          gnome-extra/gucharmap
          net-im/pidgin
-         gnome-base/gvfs
          media-gfx/splashutils
          media-gfx/graphicsmagick
          games-board/eboard
@@ -76,9 +74,6 @@ sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
 
 # Python support in libxml2 is only needed in development tools
 sed -i 's:\(dev-libs/libxml2\)\[python\]:\1:' ${ebuild_mesa}
-
-# OpenSSH is only needed for ssh:// support
-sed -i s:net-misc/openssh:: ${ebuild_gvfs}
 
 # cpio is only needed for splash_geninitramfs
 sed -i s:app-arch/cpio:: ${ebuild_splashutils}
@@ -138,7 +133,6 @@ emerge -qC \
     sys-apps/man-pages  \
     sys-apps/texinfo    \
     \
-    net-misc/openssh    \
     app-arch/cpio
 
 mv /tmp/libltdl.* /usr/lib/
