@@ -259,6 +259,7 @@ rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
 rm /etc/env.d/05binutils
 rm /etc/env.d/05gcc-i686-pc-linux-gnu
 rm -rf /etc/env.d/{binutils,gcc,python}
+rm /etc/{init,conf,pam}.d/sshd
 
 rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,gcov}
 rm /sbin/fix_libtool_files.sh

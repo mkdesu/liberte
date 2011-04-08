@@ -18,6 +18,8 @@
   * Easy Speex audio encoding
   * Added FBReader, XChat, Pidgin
 
+  * Added detection and warning about virtualized environment
+
 
 2010-11-15
   + 2010.1 release

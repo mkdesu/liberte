@@ -181,6 +181,7 @@
 /usr/bin/purple-url-handler
 
 # OpenSSH server
+/etc/ssh/sshd_config
 /etc/ssh/moduli
 /usr/sbin/sshd
 /usr/lib/misc/sftp-server

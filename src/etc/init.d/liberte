@@ -112,6 +112,13 @@ EndSection'
     eend $?
 
 
+    if [ ! -e /etc/virt-what.log ]; then
+        ebegin Detecting virtualization state
+        virt-what > /etc/virt-what.log
+        eend $?
+    fi
+
+
     # Arm the poweroff watchdog
     if [ ${cddevpath} != none ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
         ebegin Arming power-off on boot media removal
