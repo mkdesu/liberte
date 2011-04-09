@@ -4,7 +4,7 @@ dir=${HOME}/config/images
 svg=${dir}/liberte-logo-nofont.svg
 png=${dir}/liberte-logo-wallpaper.png
 
-vmlog=/etc/virt-what.log
+vmtype=/etc/vmtype
 vmfont=/usr/share/fonts/dejavu/DejaVuSans.ttf
 
 timeout=120
@@ -29,8 +29,8 @@ if [ ! -e ${png} ]; then
     size=`qalc -t "${calc}"`
 
     # Black background is needed for xlock (display +matte has no antialiasing)
-    if [ -s ${vmlog} ]; then
-        vmname=`cat ${vmlog}`
+    if [ -s ${vmtype} ]; then
+        vmname=`cat ${vmtype}`
         texty=`qalc -t "round(${size} * 3/8)"`
         textpt=`qalc -t "${size} * 13/400"`
 

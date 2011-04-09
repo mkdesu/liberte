@@ -23,6 +23,18 @@ case "${group}" in
                 fi
                 ;;
 
+            lid)
+                case "${id}" in
+                    close)
+                        touch /var/run/lid-close.flag
+                        ;;
+
+                    *)
+                        log_unhandled "$@"
+                        ;;
+                esac
+                ;;
+
             *)
                 log_unhandled "$@"
                 ;;

@@ -107,3 +107,13 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dpor
 iptables -A INPUT   -j LOGDROP
 iptables -A FORWARD -j LOGDROP
 iptables -A OUTPUT  -j LOGREJECT
+
+
+# --- LED blinking ---
+
+# Assign "drop" trigger to any unused leds
+for ledtrigger in /sys/class/leds/*/trigger; do
+    if grep -qs '\[none\]' "${ledtrigger}"; then
+        echo netfilter-drop > "${ledtrigger}"
+    fi
+done

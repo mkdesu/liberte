@@ -1,0 +1,15 @@
+#!/bin/sh -e
+
+lidflag=/var/run/lid-close.flag
+pid=$$
+
+trap 'kill ${pid}' 0
+trap : INT QUIT TERM SEGV
+
+while true; do
+    inotifywait -qq -e attrib ${lidflag} && pid=$!
+    wait ${pid}
+
+    # Depend on internal locking mechanism in xlock
+    xlock || true
+done

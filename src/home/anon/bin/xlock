@@ -64,6 +64,10 @@ if [ ! -e ${pass} ]; then
 fi
 
 
+# Fail before SysRq modification if X access doesn't work
+xhost 1>/dev/null 2>&1
+
+
 # Save current SysRq state, and disable SysRq keyboard sequences
 if [ -e ${sysrq} ]; then
     sysrqsave=`cat ${sysrq}`

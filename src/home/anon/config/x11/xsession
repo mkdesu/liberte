@@ -40,6 +40,9 @@ lxpanel &
 gen-wallpaper
 pcmanfm -d --desktop &
 
+# Launch automatic lid-autolock
+lid-xlock & LIDXLOCK_PID=$!
+
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &
 scim -d &
@@ -47,6 +50,9 @@ nm-applet &
 
 # Wait for WM exit
 wait ${WM_PID}
+
+# Kill lid-autolock
+kill ${LIDXLOCK_PID}
 
 # Kill daemons
 kill ${GNOME_KEYRING_PID}

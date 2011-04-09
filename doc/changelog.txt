@@ -8,6 +8,7 @@
   * More RAM is wiped with KEXEC-based reboot/shutdown
   * RAM is also wiped before power-off on boot media removal
   * Power-off button is ignored when X server screen is locked
+  * X server screen locks automatically on closed lid
 
   * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
   * Control groups assist process scheduling

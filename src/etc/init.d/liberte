@@ -112,9 +112,16 @@ EndSection'
     eend $?
 
 
-    if [ ! -e /etc/virt-what.log ]; then
+    if [ ! -e /var/run/lid-close.flag ]; then
+        ebegin Creating closed lid indicator
+        touch /var/run/lid-close.flag
+        eend $?
+    fi
+
+
+    if [ ! -e /etc/vmtype ]; then
         ebegin Detecting virtualization state
-        virt-what > /etc/virt-what.log
+        virt-what > /etc/vmtype
         eend $?
     fi
 
