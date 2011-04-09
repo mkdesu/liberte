@@ -12,12 +12,13 @@ text-editor=gedit %U
 location-entry-search=http://www.google.com/search?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
+enable-scripts=false
 enable-plugins=false
 accept-cookies=MIDORI_ACCEPT_COOKIES_SESSION
 maximum-cookie-age=3
 maximum-history-age=1
 identify-as=MIDORI_IDENT_CUSTOM
-user-agent=Mozilla/5.0 (X11; U; Linux i686; en-US)
+user-agent=Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3
 preferred-languages=en-US,en
 
 [extensions]
