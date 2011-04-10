@@ -15,11 +15,13 @@
   * Haveged is used for supplying entropy
   * Xorg server 1.9
   * Added OpenSSH client
+
+  * Added detection and warning about virtualized environment
+  * Added blinking of unused LEDs on dropped and rejected packets
+
   * Easy MP4[H.264+MP3] webcam video encoding
   * Easy Speex audio encoding
   * Added FBReader, XChat, Pidgin
-
-  * Added detection and warning about virtualized environment
 
 
 2010-11-15
