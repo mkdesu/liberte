@@ -286,7 +286,7 @@
           <enabled>true</enabled>
           <name>Calculator</name>
         </startupnotify>
-        <command>qalculate</command>
+        <command>qalculate-gtk</command>
       </action>
     </keybind>
     <keybind key="W-l">
