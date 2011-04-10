@@ -1,15 +1,30 @@
 #!/bin/sh -e
 
+# Don't bother detecting whether an external display is connected.
+# The user might forget such a display is connected when closing
+# the lid, and closing the lid in such cases is rare anyway.
+
+
+# Touched by /etc/acpi/default.sh on each lid close ACPI event
 lidflag=/var/run/lid-close.flag
 pid=$$
 
+
+# Make sure to kill inotifywait on exit
 trap 'kill ${pid}' 0
 trap : INT QUIT TERM SEGV
 
+
+# If starting when lid is closed, lock screen immediately
+if grep -qs "\<closed\>" /proc/acpi/button/lid/*/state; then
+    xlock || true
+fi
+
+
+# Wait for inode change events on the lid flag file
 while true; do
     inotifywait -qq -e attrib ${lidflag} && pid=$!
     wait ${pid}
 
-    # Depend on internal locking mechanism in xlock
     xlock || true
 done
