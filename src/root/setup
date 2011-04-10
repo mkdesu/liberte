@@ -86,7 +86,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
 
     sinfo "Cloning kernel to ${kversion}-kexec"
-    rsync -aHAXS /usr/src/linux-${kversion}/ /usr/src/linux-kexec
+    rsync -aHS /usr/src/linux-${kversion}/ /usr/src/linux-kexec
 
     cp ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config
     cp ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config
