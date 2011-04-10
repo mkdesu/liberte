@@ -472,7 +472,7 @@ lzma -t -M ${lzmamem} /usr/local/boot/initrd-kexec.lzm
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config                   || true
+diff ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config       || true
 
 
 sinfo "Kexec kernel config differences:"
@@ -481,7 +481,7 @@ diff ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.conf
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then
     sinfo "BusyBox config differences:"
-    diff /etc/portage/savedconfig/sys-apps/busybox{,-*}
+    diff /etc/portage/savedconfig/sys-apps/busybox{,-*} || true
 fi
 
 
