@@ -6,7 +6,7 @@
 
 
 # Touched by /etc/acpi/default.sh on each lid close ACPI event
-lidflag=/var/run/lid-close.flag
+lidflag=/var/run/lid-events/close.flag
 pid=$$
 
 

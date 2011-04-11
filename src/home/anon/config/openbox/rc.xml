@@ -314,6 +314,15 @@
         <command>xsnapshot ~/persist/desktop</command>
       </action>
     </keybind>
+    <keybind key="XF86Display">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Display Settings</name>
+        </startupnotify>
+        <command>lxrandr</command>
+      </action>
+    </keybind>
     <keybind key="XF86Mail">
       <action name="Execute">
         <startupnotify>

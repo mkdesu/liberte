@@ -26,7 +26,7 @@ case "${group}" in
             lid)
                 case "${id}" in
                     close)
-                        touch /var/run/lid-close.flag
+                        touch /var/run/lid-events/close.flag
                         ;;
 
                     *)

@@ -112,9 +112,11 @@ EndSection'
     eend $?
 
 
-    if [ ! -e /var/run/lid-close.flag ]; then
+    if [ ! -e /var/run/lid-events ]; then
         ebegin Creating closed lid indicator
-        touch /var/run/lid-close.flag
+        mkdir -m 750 /var/run/lid-events \
+            && chown root:video /var/run/lid-events \
+            && touch /var/run/lid-events/close.flag
         eend $?
     fi
 
