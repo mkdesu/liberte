@@ -129,6 +129,7 @@ emerge -qC \
     sys-kernel/linux-headers \
     sys-apps/busybox         \
     \
+    virtual/man         \
     sys-apps/man        \
     sys-apps/man-pages  \
     sys-apps/texinfo    \
