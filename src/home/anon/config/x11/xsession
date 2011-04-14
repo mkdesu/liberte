@@ -17,7 +17,7 @@ xset r rate 250 50 m 3/2 0
 # assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
 eval `dbus-launch --sh-syntax`
 # eval `ssh-agent -s`
-eval `gpg-agent -s --daemon --enable-ssh-support`
+eval `gpg-agent -s --daemon --enable-ssh-support --options ${XDG_CONFIG_HOME}/pgp/gpg-agent.conf`
 
 # assume [ -z "${GNOME_KEYRING_CONTROL}" ]
 set -a

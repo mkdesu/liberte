@@ -1,27 +1,23 @@
 #!/bin/sh -e
 
-umask 077
+# This command can be run via "sudo -u anon"
+. ${HOME}/config/shell/suprofile
+
 
 # NOTE: PSS signatures support in certificates
 # is not yet released for OpenSSL
 
-# This command can be run via "sudo -u anon"
-# Available environment: HOME, USER
-
-ssldir=${HOME}/persist/security/ssl
 base32=hex2base32
 
-sslconf=${HOME}/config/ssl/extensions.cnf
-certdir=${ssldir}/certs
-keysdir=${ssldir}/private
+sslconf=${XDG_CONFIG_HOME}/ssl/extensions.cnf
+certdir=${SECURITY_HOME}/ssl/certs
+keysdir=${SECURITY_HOME}/ssl/private
 
+# reqsubj not influenced by LC_ALL
 rsabits=8192
 shabits=512
 reqsubj='/O=Liberté Linux/CN=Anonymous'
 crtdays=18300
-
-# Rely on pam_mktemp
-export RANDFILE=/tmp/.private/${USER}/openssl.rnd
 
 
 # Intentionally fail if CA dir already exists

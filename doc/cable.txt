@@ -37,7 +37,7 @@ Protocol
   + vulnerable to DoS (e.g., many MSG requests) if username is known
 
   + each loop type is mutually exclusive for a given <msgid>
-  + all code block are restartable (e.g., after crash)
+  + all code blocks are restartable (e.g., after crash)
   + messages and receipts are never lost if filesystem is transactional
 
   + <hostname>/<username>/                         public directory w/o list permission
@@ -45,14 +45,15 @@ Protocol
                   /queue/<msgid>                   outgoing message <msgid>
                   /rqueue/<msgid>                  outgoing receipt <msgid>
                   /request/...                     service interface
+
   + /cables/                                       private directory
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
 
   + [MUA]         reads from MUA directory, writes to /cables/queue
   + [service]     writes to /cables/{queue,rqueue}
-  + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
   + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory
+  + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
   + [comm   loop] sends to network, writes to /{<username>,cables}/{queue,rqueue}
 
 
@@ -64,7 +65,7 @@ Protocol
 
   [fetch loop]
   + check   /cables/queue/<msgid>/send.req
-  + fetch   <hostname>/<username>/certs/*          -> /cables/queue/<msgid>/
+  + fetch   <hostname>/<username>/certs/*          -> /cables/queue/<msgid>/*
   + rename  /cables/queue/<msgid>/send.req         -> send.rdy
 
   [crypto loop]
@@ -92,8 +93,8 @@ Protocol
   [fetch loop]
   + check   /cables/rqueue/<msgid>/recv.req
   + checkno /cables/rqueue/<msgid>/recv.{rdy,ok}
-  + fetch   <hostname>/<username>/queue/<msgid>    -> /cables/rqueue/<msgid>/
-  + fetch   <hostname>/<username>/certs/*          -> /cables/rqueue/<msgid>/
+  + fetch   <hostname>/<username>/queue/<msgid>    -> /cables/rqueue/<msgid>/message.out
+  + fetch   <hostname>/<username>/certs/*          -> /cables/rqueue/<msgid>/*
   + rename  /cables/rqueue/<msgid>/recv.req        -> recv.rdy
 
   [crypto loop]

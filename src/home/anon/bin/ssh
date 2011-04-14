@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec /usr/bin/ssh -F ${SECURITY_HOME}/ssh/config "$@"
+exec /usr/bin/ssh -F ${XDG_CONFIG_HOME}/ssh/config "$@"

@@ -1,19 +1,14 @@
 #!/bin/sh -e
 
-umask 077
+# This command can be run via "sudo -u anon"
+. ${HOME}/config/shell/suprofile
 
-
-# This command is run via "sudo -u anon"
-# Available environment: HOME, USER
 
 # https://gitweb.torproject.org/tor.git/blob/HEAD:/doc/spec/tor-spec.txt
 # https://trac.torproject.org/projects/tor/wiki/TheOnionRouter/HiddenServiceNames
 
-tordir=${HOME}/persist/security/tor/hidden_service
+tordir=${SECURITY_HOME}/tor/hidden_service
 base32=hex2base32
-
-# Rely on pam_mktemp
-export RANDFILE=/tmp/.private/${USER}/openssl.rnd
 
 
 # Intentionally fail if dir already exists

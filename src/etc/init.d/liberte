@@ -255,13 +255,6 @@ EndSection'
                     echo
                     einfo 'OTFE initialized, run "sudo otfe-resize" to resize encrypted storage'
 
-
-                    # Here is a good place to notify the user about certificates generation
-                    echo
-                    einfo 'NOTE: After mounting the OTFE partition, communication certificates'
-                    einfo 'will be generated. It is a one-time operation that may take some time.'
-
-
                     eprompt Please re-enter the password for ${otfefile}
                     cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
 
@@ -352,8 +345,10 @@ EndSection'
 
             # Create (big) private key + communication certificates + username
             if [ ${lmountok} = 0  -a  ! -e ${certsdir} ]; then
+                echo
                 ebegin Generating communication certificates
                 einfo 'It is a one-time operation - please do not interrupt'
+                echo
 
                 splash svc_input_begin ${SVCNAME}
                 sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username

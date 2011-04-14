@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec /usr/bin/gpa -o ${XDG_CONFIG_HOME}/pgp/gpa.conf "$@"
