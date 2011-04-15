@@ -126,6 +126,7 @@ emerge -qC \
     sys-devel/flex      \
     sys-devel/bison     \
     \
+    virtual/os-headers       \
     sys-kernel/linux-headers \
     sys-apps/busybox         \
     \
