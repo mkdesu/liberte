@@ -40,7 +40,7 @@ Protocol
   + all code blocks are restartable (e.g., after crash)
   + messages and receipts are never lost if filesystem is transactional
 
-  + <hostname>/<username>/                         public directory w/o list permission
+  + <hostname>/<username>/                         volatile public directory w/o list permission
                   /certs/                          public X.509 certificates
                   /queue/<msgid>                   outgoing message <msgid>
                   /rqueue/<msgid>                  outgoing receipt <msgid>
@@ -60,7 +60,7 @@ Protocol
 <send>
   [MUA]
   + generate random 160-bit (40 hex digits) <msgid>
-  + prepare /cables/queue/<msgid>/{message,username,hostname}
+  + prepare /cables/queue/<msgid>/{message,message.hdr,username,hostname}
   + create  /cables/queue/<msgid>/send.req
 
   [fetch loop]
@@ -72,7 +72,8 @@ Protocol
   + check   /cables/queue/<msgid>/send.rdy
   + prepare /cables/queue/<msgid>/message.out
   + rename  /cables/queue/<msgid>/send.rdy         -> send.ok  (success)
-  +                                                -> send.req (fail)
+  +                                                -> send.req (crypto fail)
+  + remove  /cables/queue/<msgid>/message          (if success)
 
   [comm loop]
   + check   /cables/queue/<msgid>/send.ok
@@ -102,7 +103,8 @@ Protocol
   + prepare /cables/rqueue/<msgid>/{message,receipt.{ack,out}}
   + create  <mua message>                          <- /cables/rqueue/<msgid>/message
   + rename  /cables/rqueue/<msgid>/recv.rdy        -> recv.ok  (success)
-  +                                                -> recv.req (fail)
+  +                                                -> recv.req (crypto fail)
+  + remove  /cables/rqueue/<msgid>/message{,.out}  (if success)
 
   [comm loop]
   + check   /cables/rqueue/<msgid>/recv.ok
@@ -127,7 +129,8 @@ Protocol
   + prepare /cables/queue/<msgid>/receipt.ack
   + create  <mua acknowledge>
   + rename  /cables/queue/<msgid>/ack.rdy          -> ack.ok  (success)
-  +                                                -> ack.req (fail)
+  +                                                -> ack.req (crypto fail)
+  + remove  /cables/queue/<msgid>/{message.{out,sig},receipt.out}  (if success)
 
   [comm loop]
   + check   /cables/queue/<msgid>/ack.ok

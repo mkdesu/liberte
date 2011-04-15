@@ -18,13 +18,19 @@ trap : INT QUIT TERM SEGV
 
 
 # Remove X-*: and Date: (which may be non-UTC) headers
-formail -f -I X- -I Date: > ${tmpdir}/message
+formail -f -I X- > ${tmpdir}/message
+
+
+# Prepare headers for local MUA confirmation message
+formail -f -X From: -X To: -X Cc: -X Bcc: -X Subject: -X Date: \
+        -X Message-ID: -X In-Reply-To: -X References:          \
+    < ${tmpdir}/message > ${tmpdir}/message.hdr
 
 
 # Extract bare x@y addresses
-addresses=`formail -c -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
-    | tr , '\n'                                                 \
-    | sed 's/^.*<\([^>]*\)>/\1/'                                \
+addresses=`formail -fc -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
+    | tr , '\n'                                                  \
+    | sed 's/^.*<\([^>]*\)>/\1/'                                 \
     | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
 
 
@@ -37,9 +43,9 @@ for addr in ${addresses}; do
 done
 
 
-# Remove Bcc: header and add a UTC Date:
+# Remove Bcc: header and replace Date: with an UTC one:
 date=`date -uR`
-formail -f -I Bcc: -a "Date: ${date}" < ${tmpdir}/message \
+formail -f -I Bcc: -I "Date: ${date}" < ${tmpdir}/message \
     | gzip -c9nT > ${tmpdir}/message.gz
 mv ${tmpdir}/message.gz ${tmpdir}/message
 
@@ -55,7 +61,8 @@ for addr in ${addresses}; do
     echo ${addr} | sed 's/.*@//' > ${tmpdir}/${msgid}/hostname
 
     # copy the sanitized message (assume the file will not be modified later)
-    ln ${tmpdir}/message ${tmpdir}/${msgid}/message
+    ln ${tmpdir}/message     ${tmpdir}/${msgid}/message
+    ln ${tmpdir}/message.hdr ${tmpdir}/${msgid}/message.hdr
 
     # atomically move directory to queue dir, and create send.req indicator
     # (works even if the move is not atomic)

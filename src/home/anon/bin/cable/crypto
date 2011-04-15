@@ -1,0 +1,127 @@
+#!/bin/sh -e
+
+umask 077
+export LC_ALL=C
+
+
+if [ $# != 2 ]; then
+    echo "Format: $0 send|recv|ack <msgid>"
+    exit 1
+fi
+
+
+# Helpers
+cms=`dirname "$0"`/cms
+
+# Directories
+ssldir=${SECURITY_HOME}/ssl
+queue=${HOME}/persist/cables/queue
+rqueue=${HOME}/persist/cables/rqueue
+inbox=${HOME}/persist/mail/inbox
+
+# Parameters
+cmd="$1"
+msgid="$2"
+
+
+error() {
+    echo "crypto: $1"
+    exit 1
+}
+
+
+getfreemsg() {
+    local last=`find ${inbox} -maxdepth 1 -type f -name '[1-9]*' -printf '%f\n' \
+        | sort -nr | head -1`
+
+    if [ -z "${last}" ]; then
+        last=0
+    fi
+
+    # dash supports $((...))
+    last=$((last + 1))
+
+    if [ -e ${inbox}/${last} ]; then
+        error "could not create new message name"
+    fi
+
+    echo ${last}
+}
+
+
+case "${cmd}" in
+send)
+    if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
+            mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
+            rm ${queue}/"${msgid}"/message
+        else
+            mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.req
+            error "${cmd} failed"
+        fi
+    else
+        error "${cmd}.rdy not found"
+    fi
+    ;;
+
+recv)
+    if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
+        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}"; then
+            username=`cat ${rqueue}/"${msgid}"/username`
+            hostname=`cat ${rqueue}/"${msgid}"/hostname`
+            date=`date -uR`
+
+            /bin/gzip -cd ${rqueue}/"${msgid}"/message            \
+                | formail -f -I "From: <${username}@${hostname}>" \
+                             -I "X-Received-Date: ${date}"        \
+                > ${rqueue}/"${msgid}"/message.ibx
+
+            mv -nT ${rqueue}/"${msgid}"/message.ibx ${inbox}/`getfreemsg`
+
+            if [ ! -e ${rqueue}/"${msgid}"/message.ibx ]; then
+                mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
+                rm ${rqueue}/"${msgid}"/message    ${rqueue}/"${msgid}"/message.out
+            else
+                error "failed to move received message to inbox"
+            fi
+        else
+            mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.req
+            error "${cmd} failed"
+        fi
+    else
+        error "${cmd}.rdy not found"
+    fi
+    ;;
+
+ack)
+    if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
+            username=`cat ${queue}/"${msgid}"/username`
+            hostname=`cat ${queue}/"${msgid}"/hostname`
+
+            (cat ${queue}/"${msgid}"/message.hdr; echo;                \
+                echo "Successful delivery to ${username}@${hostname}") \
+                > ${queue}/"${msgid}"/message.ack
+
+            mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/`getfreemsg`
+
+            if [ ! -e ${queue}/"${msgid}"/message.ack ]; then
+                mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
+                rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \
+                   ${queue}/"${msgid}"/message.sig ${queue}/"${msgid}"/message.hdr
+            else
+                error "failed to move delivery acknowledgment to inbox"
+            fi
+        else
+            mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.req
+            error "${cmd} failed"
+        fi
+    else
+        error "${cmd}.rdy not found"
+    fi
+    ;;
+
+*)
+    error "unknown command"
+    ;;
+esac

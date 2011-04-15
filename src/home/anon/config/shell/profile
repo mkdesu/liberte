@@ -3,7 +3,7 @@ umask 077
 
 # Add ${HOME}/bin and *sbin dirs to PATH
 if [ -n "${PATH##*${HOME}/bin:*}" ]; then
-    PATH=${HOME}/bin:/usr/local/sbin:/usr/sbin:/sbin:${PATH}
+    PATH=${HOME}/bin:${HOME}/bin/wrappers:/usr/local/sbin:/usr/sbin:/sbin:${PATH}
 fi
 
 # Configuration dirs

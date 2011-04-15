@@ -13,7 +13,7 @@ sslconf=${XDG_CONFIG_HOME}/ssl/extensions.cnf
 certdir=${SECURITY_HOME}/ssl/certs
 keysdir=${SECURITY_HOME}/ssl/private
 
-# reqsubj not influenced by LC_ALL
+# reqsubj not affected by LC_ALL
 rsabits=8192
 shabits=512
 reqsubj='/O=Liberté Linux/CN=Anonymous'

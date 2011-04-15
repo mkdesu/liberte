@@ -26,6 +26,12 @@ if [ \( "${cmd}" != send -a "${cmd}" != recv -a "${cmd}" != ack \) \
 fi
 
 
+error() {
+    echo "cms: $1"
+    exit 1
+}
+
+
 # Verifying the ca/verify/encrypt certificates triple
 # * parses and extracts the first certificate from each file
 # * verifies the certificates chain (important only for encrypt.pem)
@@ -60,8 +66,7 @@ ${cvedir}/encrypt.pem: OK
 EOF
 
     if ! cmp -s -- "${cvedir}"/certs.vfy "${cvedir}"/certs.cmp; then
-        echo "Certificates chain verification failed"
-        return 1
+        error "certificates chain verification failed"
     fi
 
     rm -- "${cvedir}"/certs.cmp "${cvedir}"/certs.vfy
@@ -73,8 +78,7 @@ EOF
     ${base32} "${fingerprint}" > "${cvedir}"/username.cmp
 
     if ! cmp -s -- "${cvedir}"/username "${cvedir}"/username.cmp; then
-        echo "Username verification failed"
-        return 1
+        error "username verification failed"
     fi
 
     rm -- "${cvedir}"/username.cmp
@@ -98,19 +102,19 @@ keysdir="${ssldir}"/private
 #
 # <send>
 #     in:  message, username
-#     out: message.sig, message.out   (removed: message)
+#     out: message.sig, message.out
 #
 # ---> message.out
 #
 # <recv>
 #     in:  message.out, username
-#     out: message, receipt.{ack,out} (removed: message.out)
+#     out: message, receipt.{ack,out}
 #
 # <--- receipt.out
 #
 # <ack> (expects <send>'s directory)
 #     in:  receipt.out, message.sig
-#     out: receipt.ack                (removed: receipt.out, message.sig)
+#     out: receipt.ack
 
 case ${cmd} in
 send)
@@ -132,8 +136,6 @@ send)
                 -in       "${msgdir}"/message.sig \
                 -out      "${msgdir}"/message.out \
                           "${msgdir}"/encrypt.pem
-
-    rm -- "${msgdir}"/message
     ;;
 
 
@@ -173,7 +175,7 @@ recv)
                  >  "${msgdir}"/receipt.ack
     [ -s "${msgdir}"/receipt.ack ]
 
-    rm -- "${msgdir}"/message.out "${msgdir}"/message.sig "${msgdir}"/receipt.sig
+    rm -- "${msgdir}"/message.sig "${msgdir}"/receipt.sig
     ;;
 
 
@@ -197,12 +199,11 @@ ack)
                  >  "${msgdir}"/receipt.ack
     [ -s "${msgdir}"/receipt.ack ]
 
-    rm -- "${msgdir}"/receipt.out "${msgdir}"/receipt.sig "${msgdir}"/message.sig
+    rm -- "${msgdir}"/receipt.sig
     ;;
 
 
 *)
-    echo "Internal error"
-    exit 1
+    error "unknown command"
     ;;
 esac
