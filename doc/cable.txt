@@ -60,12 +60,12 @@ Protocol
 <send>
   [MUA]
   + generate random 160-bit (40 hex digits) <msgid>
-  + prepare /cables/queue/<msgid>/{message,message.hdr,username,hostname}
+  + prepare /cables/queue/<msgid>/{message{,.hdr},username,hostname}
   + create  /cables/queue/<msgid>/send.req
 
   [fetch loop]
   + check   /cables/queue/<msgid>/send.req
-  + fetch   <hostname>/<username>/certs/*          -> /cables/queue/<msgid>/*
+  + fetch   <hostname>/<username>/certs/*.pem      -> /cables/queue/<msgid>/*.pem
   + rename  /cables/queue/<msgid>/send.req         -> send.rdy
 
   [crypto loop]
@@ -95,7 +95,7 @@ Protocol
   + check   /cables/rqueue/<msgid>/recv.req
   + checkno /cables/rqueue/<msgid>/recv.{rdy,ok}
   + fetch   <hostname>/<username>/queue/<msgid>    -> /cables/rqueue/<msgid>/message.out
-  + fetch   <hostname>/<username>/certs/*          -> /cables/rqueue/<msgid>/*
+  + fetch   <hostname>/<username>/certs/*.pem      -> /cables/rqueue/<msgid>/*.pem
   + rename  /cables/rqueue/<msgid>/recv.req        -> recv.rdy
 
   [crypto loop]
@@ -160,7 +160,7 @@ Message format
 
 <send>
   + extract all To:, Cc:, Bcc: addresses
-  + check that all hosts are recognized (e.g., *.onion)
+  + check that all addresses are recognized (e.g., *.onion)
   + remove Bcc: and all X-*: headers
   + reformat Date: as UTC
   + compress with gzip

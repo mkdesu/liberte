@@ -17,6 +17,12 @@ trap 'rm -r ${tmpdir}' 0
 trap : INT QUIT TERM SEGV
 
 
+error() {
+    echo "send: $1" 1>&2
+    exit 1
+}
+
+
 # Remove X-*: and Date: (which may be non-UTC) headers
 formail -f -I X- > ${tmpdir}/message
 
@@ -28,17 +34,20 @@ formail -f -X From: -X To: -X Cc: -X Bcc: -X Subject: -X Date: \
 
 
 # Extract bare x@y addresses
-addresses=`formail -fc -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
-    | tr , '\n'                                                  \
-    | sed 's/^.*<\([^>]*\)>/\1/'                                 \
+addresses=`formail -fcz -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
+    | tr , '\n'                                                   \
+    | sed 's/^.*<\([^>]*\)>/\1/'                                  \
     | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
 
+# Extract the bare From: address
+fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
+    | sed 's/^.*<\([^>]*\)>/\1/'`
 
-# Check address validity to prevent mistaken information leaks
-for addr in ${addresses}; do
+
+# Check address validity to prevent inadvertent information leaks
+for addr in "${fromaddr}" ${addresses}; do
     if ! echo "x ${addr}" | sed 's/^x //' | egrep -q "${emailregex}"; then
-        echo "Unsupported address: ${addr}" 1>&2
-        exit 1
+        error "unsupported address: ${addr}"
     fi
 done
 

@@ -31,7 +31,7 @@ error() {
 
 
 getfreemsg() {
-    local last=`find ${inbox} -maxdepth 1 -type f -name '[1-9]*' -printf '%f\n' \
+    local last=`find ${inbox} -maxdepth 1 -type f -regex '.*/[1-9][0-9]*' -printf '%f\n' \
         | sort -nr | head -1`
 
     if [ -z "${last}" ]; then
@@ -51,6 +51,7 @@ getfreemsg() {
 
 case "${cmd}" in
 send)
+    # <send> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
         if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
@@ -65,6 +66,7 @@ send)
     ;;
 
 recv)
+    # <recv> [crypto loop]
     if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
         if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}"; then
             username=`cat ${rqueue}/"${msgid}"/username`
@@ -72,7 +74,7 @@ recv)
             date=`date -uR`
 
             /bin/gzip -cd ${rqueue}/"${msgid}"/message            \
-                | formail -f -I "From: <${username}@${hostname}>" \
+                | formail -z -i "From: <${username}@${hostname}>" \
                              -I "X-Received-Date: ${date}"        \
                 > ${rqueue}/"${msgid}"/message.ibx
 
@@ -94,19 +96,20 @@ recv)
     ;;
 
 ack)
+    # <ack> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
         if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
             username=`cat ${queue}/"${msgid}"/username`
             hostname=`cat ${queue}/"${msgid}"/hostname`
 
-            (cat ${queue}/"${msgid}"/message.hdr; echo;                \
-                echo "Successful delivery to ${username}@${hostname}") \
+            (cat ${queue}/"${msgid}"/message.hdr; echo;                       \
+                echo "Message delivery to ${username}@${hostname} verified.") \
                 > ${queue}/"${msgid}"/message.ack
 
             mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/`getfreemsg`
 
             if [ ! -e ${queue}/"${msgid}"/message.ack ]; then
-                mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
+                mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
                 rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \
                    ${queue}/"${msgid}"/message.sig ${queue}/"${msgid}"/message.hdr
             else
