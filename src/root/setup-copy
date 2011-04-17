@@ -29,6 +29,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # splashutils:    exclude cpio    RDEPEND
 # graphicsmagick: exclude perl    RDEPEND
 # eboard:         exclude perl    RDEPEND
+# xdg-utils:      exclude perl    RDEPEND (File-MimeInfo)
 # mpg123:         exclude libtool RDEPEND
 # libqalculate:   exclude gnuplot RDEPEND
 # mesa:           replace libxml2[python] with libxml2 in RDEPEND
@@ -44,6 +45,7 @@ ebuilds="sys-apps/portage
          media-gfx/splashutils
          media-gfx/graphicsmagick
          games-board/eboard
+         x11-misc/xdg-utils
          media-sound/mpg123
          dev-libs/opensc
          sci-libs/libqalculate
@@ -80,6 +82,9 @@ sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 
 # perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
+
+# Perl is needed by mimeopen, which is an optional dependency
+sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 
 # libltdl.* libraries are kept during libtool unmerge
 sed -i s:sys-devel/libtool:: ${ebuild_mpg123} ${ebuild_opensc}

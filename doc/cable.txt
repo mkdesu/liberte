@@ -50,15 +50,15 @@ Protocol
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
 
-  + [MUA]         reads from MUA directory, writes to /cables/queue
+  + [send]        reads from MUA directory, writes to /cables/queue
   + [service]     writes to /cables/{queue,rqueue}
-  + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory
+  + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory; reads from X.509 directory
   + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
   + [comm   loop] sends to network, writes to /{<username>,cables}/{queue,rqueue}
 
 
 <send>
-  [MUA]
+  [send]
   + generate random 160-bit (40 hex digits) <msgid>
   + prepare /cables/queue/<msgid>/{message{,.hdr},username,hostname}
   + create  /cables/queue/<msgid>/send.req
@@ -158,7 +158,7 @@ Protocol
 Message format
 --------------
 
-<send>
+(send)
   + extract all To:, Cc:, Bcc: addresses
   + check that all addresses are recognized (e.g., *.onion)
   + remove Bcc: and all X-*: headers
@@ -166,7 +166,7 @@ Message format
   + compress with gzip
 
 
-<recv>
+(recv)
   + uncompress with classic (single-threaded) gzip
-  + replace From: header with the actual address
+  + replace From: header with the verified address (rename old header)
   + add X-Received-Date: header

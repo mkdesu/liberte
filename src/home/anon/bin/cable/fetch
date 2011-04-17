@@ -1,0 +1,47 @@
+#!/bin/sh -e
+
+umask 077
+export LC_ALL=C
+
+
+if [ $# != 2 ]; then
+    echo "Format: $0 send|recv|ack <msgid>"
+    exit 1
+fi
+
+
+# Directories
+queue=${HOME}/persist/cables/queue
+rqueue=${HOME}/persist/cables/rqueue
+
+# Parameters
+cmd="$1"
+msgid="$2"
+
+
+error() {
+    echo "fetch: $1"
+    exit 1
+}
+
+
+case "${cmd}" in
+send)
+    # <send> [fetch loop]
+
+    ;;
+
+recv)
+    # <recv> [fetch loop]
+
+    ;;
+
+ack)
+    # <ack> [fetch loop]
+
+    ;;
+
+*)
+    error "unknown command"
+    ;;
+esac
