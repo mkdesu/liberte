@@ -1,5 +1,8 @@
 #!/bin/sh
 
+export LC_ALL=C
+
+
 sinfo() {
     echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
@@ -86,17 +89,24 @@ ${FIND} -type d -perm /a+st,o+w -printf '%M %u %g\t%p\n'
 sinfo "Build environment:"
 if [ -e ${SRC}/conf/checkregexps ]; then
     regexps=`cat ${SRC}/conf/checkregexps | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
+
     chroot ${LIVECD}/../src grep   -iE "${regexps}"         \
         /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin \
         /usr/src/linux-kexec/arch/x86/boot/compressed/vmlinux.bin
+
     chroot ${LIVECD}        lzgrep -iE "${regexps}" \
         /boot/initrd-x86.lzm                        \
         /usr/local/boot/initrd-kexec.lzm
+
     ${FIND} -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
         ! -name 'libgucharmap.so.*' ! -name oui.txt -print0 \
         | chroot ${LIVECD} xargs -0 grep -liE "${regexps}"
 else
     echo "checkregexp file not found, skipping"
 fi
+
+sinfo "Unsupported scripts"
+${FIND} -type f -print0  | chroot ${LIVECD} xargs -0 grep -lE \
+    '^#![[:blank:]]*/usr/bin/(perl|python|env[[:blank:]]+(perl|python))\>'
 
 true

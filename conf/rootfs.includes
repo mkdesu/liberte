@@ -4,7 +4,7 @@
 /root/.inputrc
 
 # Include needed .la files for dynamic modules
-# revdep-rebuild -p --library '.*libltdl\.so.*'
+# revdep-rebuild -p --library '.*\<libltdl\.so.*'
 /usr/lib/GraphicsMagick-[0-9]**.la
 /usr/lib/scim-[0-9]**.la
 /usr/lib/gtk-[0-9]*/immodules/im-scim.la

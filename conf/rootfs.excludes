@@ -179,6 +179,10 @@
 # net-im/pidgin: non-separated dbus-python dependency
 /usr/bin/purple-remote
 /usr/bin/purple-url-handler
+# gnome-base/gconf: semi-automatic GConf to GSettings schema conversion
+/usr/bin/gsettings-schema-convert
+# net-misc/rsync: non-essential auxiliary scripts
+/usr/share/rsync/
 
 # OpenSSH server
 /etc/ssh/sshd_config
