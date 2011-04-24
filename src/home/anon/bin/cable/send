@@ -30,7 +30,7 @@ formail -fz -I X- > ${tmpdir}/message
 # Prepare headers for local MUA confirmation message
 formail -f -X From: -X To: -X Cc: -X Bcc: -X Subject: -X Date: \
         -X Message-ID: -X In-Reply-To: -X References:          \
-    < ${tmpdir}/message > ${tmpdir}/message.hdr
+    < ${tmpdir}/message | sed 's/^Subject: /\0[vfy] /' > ${tmpdir}/message.hdr
 
 
 # Extract bare x@y addresses
@@ -44,7 +44,7 @@ fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
     | sed 's/^.*<\([^>]*\)>/\1/'`
 
 
-# Check address validity to prevent inadvertent information leaks
+# Check address validity to prevent accidental information leaks
 for addr in "${fromaddr}" ${addresses}; do
     if ! echo "x ${addr}" | sed 's/^x //' | egrep -q "${emailregex}"; then
         error "unsupported address: ${addr}"
@@ -53,7 +53,7 @@ done
 
 
 # Extract the from-host
-echo "x ${fromaddr}" | cut -d@ -f2 > ${tmpdir}/shostname
+echo ${fromaddr} | cut -d@ -f2 > ${tmpdir}/shostname
 
 
 # Remove Bcc: header and replace Date: with an UTC one:
@@ -70,8 +70,8 @@ for addr in ${addresses}; do
     mkdir ${tmpdir}/${msgid}
 
     # extract username and hostname from address, and generate respective files
-    echo ${addr} | sed 's/@.*//' > ${tmpdir}/${msgid}/username
-    echo ${addr} | sed 's/.*@//' > ${tmpdir}/${msgid}/hostname
+    echo ${addr} | cut -d@ -f1 > ${tmpdir}/${msgid}/username
+    echo ${addr} | cut -d@ -f2 > ${tmpdir}/${msgid}/hostname
 
     # copy the sanitized message (assume the files will not be modified later)
     ln ${tmpdir}/message ${tmpdir}/message.hdr ${tmpdir}/shostname \

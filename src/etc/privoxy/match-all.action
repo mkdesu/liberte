@@ -16,6 +16,5 @@
 +overwrite-last-modified{randomize} \
 +session-cookies-only \
 +set-image-blocker{pattern} \
-+filter{webbugs} \
 }
 / # Match all URLs

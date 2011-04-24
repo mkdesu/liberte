@@ -2,10 +2,15 @@ confdir         /etc/privoxy
 logdir          /var/log/privoxy
 
 actionsfile     match-all.action        # Actions that are applied to all sites and maybe overruled later on.
-actionsfile     default.action          # Main actions file
-actionsfile     user.action             # User customizations
 
-filterfile      default.filter          # Main filters file
+# Ad-blocking is done in browsers nowadays, and removing
+# page blocking and content manipulation from Privoxy makes
+# it more robust (e.g., for cables communication).
+
+# actionsfile     default.action          # Main actions file
+# actionsfile     user.action             # User customizations
+
+# filterfile      default.filter          # Main filters file
 
 logfile         privoxy.log
 

@@ -53,7 +53,7 @@ case "${cmd}" in
 send)
     # <send> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message
         else
@@ -68,7 +68,7 @@ send)
 recv)
     # <recv> [crypto loop]
     if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}"; then
+        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" >/dev/null; then
             username=`cat ${rqueue}/"${msgid}"/username`
             hostname=`cat ${rqueue}/"${msgid}"/hostname`
             date=`date -uR`
@@ -79,7 +79,8 @@ recv)
                              -I "X-Received-Date: ${date}"        \
                 > ${rqueue}/"${msgid}"/message.ibx
 
-            mv -nT ${rqueue}/"${msgid}"/message.ibx ${inbox}/`getfreemsg`
+            freemsg=`getfreemsg`
+            mv -nT ${rqueue}/"${msgid}"/message.ibx ${inbox}/"${freemsg}"
 
             if [ ! -e ${rqueue}/"${msgid}"/message.ibx ]; then
                 mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
@@ -99,7 +100,7 @@ recv)
 ack)
     # <ack> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
             username=`cat ${queue}/"${msgid}"/username`
             hostname=`cat ${queue}/"${msgid}"/hostname`
             date=`date -uR`
@@ -108,7 +109,8 @@ ack)
                 echo "Verified message delivery to ${username}@${hostname} (${date}).") \
                 > ${queue}/"${msgid}"/message.ack
 
-            mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/`getfreemsg`
+            freemsg=`getfreemsg`
+            mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/"${freemsg}"
 
             if [ ! -e ${queue}/"${msgid}"/message.ack ]; then
                 mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
