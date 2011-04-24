@@ -8,6 +8,8 @@
 /usr/lib/GraphicsMagick-[0-9]**.la
 /usr/lib/scim-[0-9]**.la
 /usr/lib/gtk-[0-9]*/immodules/im-scim.la
+/usr/lib/libcanberra-[0-9]**.la
+/usr/lib/gtk-[0-9]*/modules/libcanberra-gtk-module.la
 /usr/lib/mpg123/*.la
 /usr/lib/*pkcs11*.la
 

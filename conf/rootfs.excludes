@@ -13,6 +13,7 @@
 /usr/share/gnome/
 /usr/share/gnome-control-center/
 /usr/share/control-center-[0-9]*/
+/usr/share/gdm/
 
 # Portage directories
 /usr/portage/
@@ -51,6 +52,7 @@
 /usr/share/ntp/
 /usr/share/readline/
 /usr/share/splashutils/
+/usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
 

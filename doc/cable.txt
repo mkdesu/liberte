@@ -60,7 +60,7 @@ Protocol
 <send>
   [send]
   + generate random 160-bit (40 hex digits) <msgid>
-  + prepare /cables/queue/<msgid>/{message{,.hdr},username,hostname}
+  + prepare /cables/queue/<msgid>/{message{,.hdr},username,{,s}hostname}
   + create  /cables/queue/<msgid>/send.req
 
   [fetch loop]
@@ -78,7 +78,7 @@ Protocol
   [comm loop]
   + check   /cables/queue/<msgid>/send.ok
   + checkno /cables/queue/<msgid>/ack.ok
-  + copy    /cables/queue/<msgid>/message.out -> //<susername>/queue/<msgid> (if not exists)
+  + copy    /cables/queue/<msgid>/message.out -> //<susername>/queue/<msgid> (atomic, if not exists)
   + request <hostname>/<username>/request/msg/<msgid>/<shostname>/<susername>
 
 
@@ -108,7 +108,7 @@ Protocol
 
   [comm loop]
   + check   /cables/rqueue/<msgid>/recv.ok
-  + copy    /cables/rqueue/<msgid>/receipt.out -> //<rusername>/rqueue/<msgid> (if not exists)
+  + copy    /cables/rqueue/<msgid>/receipt.out -> //<rusername>/rqueue/<msgid> (atomic, if not exists)
   + request <hostname>/<username>/request/rcp/<msgid>
 
 

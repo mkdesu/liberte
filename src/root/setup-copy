@@ -31,6 +31,8 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # eboard:         exclude perl    RDEPEND
 # xdg-utils:      exclude perl    RDEPEND (File-MimeInfo)
 # mpg123:         exclude libtool RDEPEND
+# opensc:         exclude libtool RDEPEND
+# libcanberra:    exclude libtool RDEPEND
 # libqalculate:   exclude gnuplot RDEPEND
 # mesa:           replace libxml2[python] with libxml2 in RDEPEND
 sinfo "Patching copies of selected ebuilds"
@@ -48,6 +50,7 @@ ebuilds="sys-apps/portage
          x11-misc/xdg-utils
          media-sound/mpg123
          dev-libs/opensc
+         media-libs/libcanberra
          sci-libs/libqalculate
          media-libs/mesa"
 
@@ -88,6 +91,7 @@ sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 
 # libltdl.* libraries are kept during libtool unmerge
 sed -i s:sys-devel/libtool:: ${ebuild_mpg123} ${ebuild_opensc}
+sed -i 's:>=sys-devel/libtool-[a-z0-9._-]\+::' ${ebuild_libcanberra}
 
 # Gnuplot is an overkill, and is superficially integrated
 sed -i 's:>=sci-visualization/gnuplot-[a-z0-9._-]\+::' ${ebuild_libqalculate}

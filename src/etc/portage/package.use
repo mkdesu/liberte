@@ -47,6 +47,7 @@ media-video/mplayer             cpudetection custom-cpuopts 3dnow 3dnowext mmx m
 media-video/mplayer             mpg123 -mp3 libmpeg2 rtmp -rar
 media-video/mplayer             -encode -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
+media-plugins/audacious-plugins lame libsamplerate mms
 media-video/gpac                -* aac mad ogg vorbis
 
 # Unnecessary functionality

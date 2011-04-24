@@ -1,0 +1,109 @@
+#!/bin/sh -e
+
+umask 077
+export LC_ALL=C
+
+
+if [ $# != 2 ]; then
+    echo "Format: $0 send|recv|ack|fin <msgid>"
+    exit 1
+fi
+
+
+# Directories and files
+username=`cat ${SECURITY_HOME}/ssl/certs/username`
+queue=${HOME}/persist/cables/queue
+rqueue=${HOME}/persist/cables/rqueue
+pubqueue=/var/www/"${username}"/queue
+pubrqueue=/var/www/"${username}"/rqueue
+
+# Parameters
+cmd="$1"
+msgid="$2"
+
+
+error() {
+    echo "comm: $1"
+    exit 1
+}
+
+
+urlprefix() {
+    local username=`cat $1/"${msgid}"/username`
+    local hostname=`cat $1/"${msgid}"/hostname`
+
+    echo http://"${hostname}"/"${username}"/request
+}
+
+
+# Atomic no-clobber copy
+atomicnccopy() {
+    local src="$1" dst="$2"
+
+    if [ ! -e "${dst}" ]; then
+        cp -T "${src}" "${dst}".new
+        chmod 640 "${dst}".new
+        mv -T "${dst}".new "${dst}"
+    fi
+}
+
+
+case "${cmd}" in
+send)
+    # <send> [comm loop]
+    if [ -e ${queue}/"${msgid}"/${cmd}.ok     \
+         -a   ! -e ${queue}/"${msgid}"/ack.ok ]; then
+        prefix=`urlprefix ${queue}`
+        shostname=`cat ${queue}/"${msgid}"/shostname`
+
+        atomicnccopy ${queue}/"${msgid}"/message.out "${pubqueue}"/"${msgid}"
+        curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans \
+                   "${prefix}"/msg/"${msgid}"/"${shostname}"/"${username}"
+    else
+        error "${cmd}.ok (without ack.ok) not found"
+    fi
+    ;;
+
+recv)
+    # <recv> [comm loop]
+    if [ -e ${rqueue}/"${msgid}"/${cmd}.ok ]; then
+        prefix=`urlprefix ${rqueue}`
+
+        atomicnccopy ${rqueue}/"${msgid}"/receipt.out "${pubrqueue}"/"${msgid}"
+        curl -sSfg -o ${rqueue}/"${msgid}"/${cmd}.ans "${prefix}"/rcp/"${msgid}"
+    else
+        error "${cmd}.ok not found"
+    fi
+    ;;
+
+ack)
+    # <ack> [comm loop]
+    if [ -e ${queue}/"${msgid}"/${cmd}.ok ]; then
+        prefix=`urlprefix ${queue}`
+
+        rm -f "${pubqueue}"/"${msgid}"
+
+        ackhash=`cat ${queue}/"${msgid}"/receipt.ack`
+        curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"
+
+        mv -T ${queue}/"${msgid}" ${queue}/"${msgid}".trash
+        rm -r --one-file-system   ${queue}/"${msgid}".trash
+    else
+        error "${cmd}.ok not found"
+    fi
+    ;;
+
+fin)
+    # <fin> [comm loop]
+    if [ -e ${rqueue}/"${msgid}".trash ]; then
+        rm -f "${pubrqueue}"/"${msgid}"
+        rm -r --one-file-system ${rqueue}/"${msgid}".trash
+    else
+        error "${msgid}.trash not found"
+    fi
+    ;;
+
+*)
+    error "unknown command"
+    ;;
+esac

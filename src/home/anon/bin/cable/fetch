@@ -39,9 +39,10 @@ send)
     if [ -e ${queue}/"${msgid}"/${cmd}.req ]; then
         prefix=`urlprefix ${queue}`
 
-        curl -sfg -o ${queue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem     \
-                  -o ${queue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem \
-                  -o ${queue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
+        # A multi-URI curl command deosn't fail on a bad early fetch
+        curl -sSfg -o ${queue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem
+        curl -sSfg -o ${queue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem
+        curl -sSfg -o ${queue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
 
         mv ${queue}/"${msgid}"/${cmd}.req ${queue}/"${msgid}"/${cmd}.rdy
     else
@@ -56,10 +57,11 @@ recv)
          -a  ! -e ${rqueue}/"${msgid}"/${cmd}.ok  ]; then
         prefix=`urlprefix ${rqueue}`
 
-        curl -sfg -o ${rqueue}/"${msgid}"/message.out "${prefix}"/queue/"${msgid}" \
-                  -o ${rqueue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem     \
-                  -o ${rqueue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem \
-                  -o ${rqueue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
+        # A multi-URI curl command deosn't fail on a bad early fetch
+        curl -sSfg -o ${rqueue}/"${msgid}"/message.out "${prefix}"/queue/"${msgid}"
+        curl -sSfg -o ${rqueue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem
+        curl -sSfg -o ${rqueue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem
+        curl -sSfg -o ${rqueue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
 
         mv ${rqueue}/"${msgid}"/${cmd}.req ${rqueue}/"${msgid}"/${cmd}.rdy
     else
@@ -74,7 +76,7 @@ ack)
          -a  ! -e ${queue}/"${msgid}"/${cmd}.ok  ]; then
         prefix=`urlprefix ${queue}`
 
-        curl -sfg -o ${queue}/"${msgid}"/receipt.out "${prefix}"/rqueue/"${msgid}"
+        curl -sSfg -o ${queue}/"${msgid}"/receipt.out "${prefix}"/rqueue/"${msgid}"
 
         mv ${queue}/"${msgid}"/${cmd}.req ${queue}/"${msgid}"/${cmd}.rdy
     else

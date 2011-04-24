@@ -23,8 +23,8 @@ error() {
 }
 
 
-# Remove X-*: and Date: (which may be non-UTC) headers
-formail -f -I X- > ${tmpdir}/message
+# Read the message on stdin, and remove X-*: headers
+formail -fz -I X- > ${tmpdir}/message
 
 
 # Prepare headers for local MUA confirmation message
@@ -52,6 +52,10 @@ for addr in "${fromaddr}" ${addresses}; do
 done
 
 
+# Extract the from-host
+echo "x ${fromaddr}" | cut -d@ -f2 > ${tmpdir}/shostname
+
+
 # Remove Bcc: header and replace Date: with an UTC one:
 date=`date -uR`
 formail -f -I Bcc: -I "Date: ${date}" < ${tmpdir}/message \
@@ -69,9 +73,9 @@ for addr in ${addresses}; do
     echo ${addr} | sed 's/@.*//' > ${tmpdir}/${msgid}/username
     echo ${addr} | sed 's/.*@//' > ${tmpdir}/${msgid}/hostname
 
-    # copy the sanitized message (assume the file will not be modified later)
-    ln ${tmpdir}/message     ${tmpdir}/${msgid}/message
-    ln ${tmpdir}/message.hdr ${tmpdir}/${msgid}/message.hdr
+    # copy the sanitized message (assume the files will not be modified later)
+    ln ${tmpdir}/message ${tmpdir}/message.hdr ${tmpdir}/shostname \
+       ${tmpdir}/${msgid}/
 
     # atomically move directory to queue dir, and create send.req indicator
     # (works even if the move is not atomic)
