@@ -74,7 +74,8 @@ recv)
             date=`date -uR`
 
             /bin/gzip -cd ${rqueue}/"${msgid}"/message            \
-                | formail -z -i "From: <${username}@${hostname}>" \
+                | formail -z -I 'From '                           \
+                             -i "From: <${username}@${hostname}>" \
                              -I "X-Received-Date: ${date}"        \
                 > ${rqueue}/"${msgid}"/message.ibx
 
@@ -101,9 +102,10 @@ ack)
         if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}"; then
             username=`cat ${queue}/"${msgid}"/username`
             hostname=`cat ${queue}/"${msgid}"/hostname`
+            date=`date -uR`
 
-            (cat ${queue}/"${msgid}"/message.hdr; echo;                       \
-                echo "Message delivery to ${username}@${hostname} verified.") \
+            (cat ${queue}/"${msgid}"/message.hdr; echo;                                 \
+                echo "Verified message delivery to ${username}@${hostname} (${date}).") \
                 > ${queue}/"${msgid}"/message.ack
 
             mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/`getfreemsg`

@@ -25,20 +25,61 @@ error() {
 }
 
 
+urlprefix() {
+    local username=`cat $1/"${msgid}"/username`
+    local hostname=`cat $1/"${msgid}"/hostname`
+
+    echo http://"${hostname}"/"${username}"
+}
+
+
 case "${cmd}" in
 send)
     # <send> [fetch loop]
+    if [ -e ${queue}/"${msgid}"/${cmd}.req ]; then
+        prefix=`urlprefix ${queue}`
 
+        curl -sfg -o ${queue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem     \
+                  -o ${queue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem \
+                  -o ${queue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
+
+        mv ${queue}/"${msgid}"/${cmd}.req ${queue}/"${msgid}"/${cmd}.rdy
+    else
+        error "${cmd}.req not found"
+    fi
     ;;
 
 recv)
     # <recv> [fetch loop]
+    if [ -e ${rqueue}/"${msgid}"/${cmd}.req       \
+         -a  ! -e ${rqueue}/"${msgid}"/${cmd}.rdy \
+         -a  ! -e ${rqueue}/"${msgid}"/${cmd}.ok  ]; then
+        prefix=`urlprefix ${rqueue}`
 
+        curl -sfg -o ${rqueue}/"${msgid}"/message.out "${prefix}"/queue/"${msgid}" \
+                  -o ${rqueue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem     \
+                  -o ${rqueue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem \
+                  -o ${rqueue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem
+
+        mv ${rqueue}/"${msgid}"/${cmd}.req ${rqueue}/"${msgid}"/${cmd}.rdy
+    else
+        error "${cmd}.req (without ${cmd}.rdy/${cmd}.ok) not found"
+    fi
     ;;
 
 ack)
     # <ack> [fetch loop]
+    if [ -e ${queue}/"${msgid}"/${cmd}.req       \
+         -a  ! -e ${queue}/"${msgid}"/${cmd}.rdy \
+         -a  ! -e ${queue}/"${msgid}"/${cmd}.ok  ]; then
+        prefix=`urlprefix ${queue}`
 
+        curl -sfg -o ${queue}/"${msgid}"/receipt.out "${prefix}"/rqueue/"${msgid}"
+
+        mv ${queue}/"${msgid}"/${cmd}.req ${queue}/"${msgid}"/${cmd}.rdy
+    else
+        error "${cmd}.req (without ${cmd}.rdy/${cmd}.ok) not found"
+    fi
     ;;
 
 *)
