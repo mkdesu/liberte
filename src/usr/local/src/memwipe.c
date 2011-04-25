@@ -6,6 +6,7 @@
 #include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 
 #define KIB    (1 << 10)
 #define BLOCK  (KIB << 2)
@@ -14,8 +15,7 @@
 #define PATT_B 0xAA
 
 
-static volatile void*     brkstartsave;
-static volatile ptrdiff_t wipesize;
+static volatile ptrdiff_t* wipesize;
 
 
 static void cocoon() {
@@ -54,8 +54,7 @@ static void wipe(int pass, int fillbyte) {
     brkstart     = sbrk(0);
     brkend       = brkstart;
 
-    wipesize     = 0;
-    brkstartsave = brkstart;
+    *wipesize    = 0;
 
     /* brk(brkend + BLOCK); printf("%#x\n", *((int*)brkend)); */
 
@@ -64,7 +63,7 @@ static void wipe(int pass, int fillbyte) {
         memset(brkend, fillbyte, BLOCK);
         brkend += BLOCK;
 
-        wipesize = brkend - brkstart;
+        *wipesize = brkend - brkstart;
     }
 
     /*
@@ -91,13 +90,23 @@ int main() {
     cocoon();
 
 
+    /* Allocate shared memory */
+    wipesize = (volatile ptrdiff_t*) mmap(NULL, sizeof(ptrdiff_t), PROT_READ | PROT_WRITE,
+                                          MAP_SHARED | MAP_ANONYMOUS | MAP_LOCKED, -1, 0);
+    if (wipesize == (void*) -1) {
+        fprintf(stderr, "Failed to allocate shared memory\n");
+        return 1;
+    }
+
+
     /* Flip bits 0 -> 1 and 1 -> 0 in checkerboard pattern */
     for (pass = 0;  pass < 3;  ++pass) {
         fillbyte = (pass % 2) ? PATT_A : PATT_B;
 
-        /* Suspends parent, all memory and resources are common,
-           everything is common - even the sky, even Allah! (c) */
-        pid = vfork();
+        /* Can't use vfork() since 2.6.37, because mm/oom_kill.c
+           kills all memory-sharing processes on OOM. */
+        *wipesize = 0;
+        pid = fork();
 
         /* printf("PID = %d, clone PID = %d\n", getpid(), pid); */
 
@@ -116,23 +125,23 @@ int main() {
                 fprintf(stderr, "Failed to wait on child process\n");
 
             else {
-                if (WIFSIGNALED(status)) {
-                    /* Release allocated memory if it wasn't freed after OOM kill */
-                    /* Note: PAX_MEMORY_SANITIZE does not come into effect here   */
-                    if (brk((void*) brkstartsave))
-                        fprintf(stderr, "Failed to release assumed-unfreed memory\n");
-
+                if (WIFSIGNALED(status))
                     printf("[killed] ");
-                }
 
                 printf("Pass %d: wiped %ld MiB + %d KiB of RAM with 0x%X\n",
                        pass,
-                       (long) (wipesize / KIB / KIB),
-                       (int)  (wipesize / KIB % KIB),
+                       (long) (*wipesize / KIB / KIB),
+                       (int)  (*wipesize / KIB % KIB),
                        fillbyte);
             }
         }
     }
+
+
+    /* Free shared memory */
+    if (munmap((void*) wipesize, sizeof(ptrdiff_t)))
+        fprintf(stderr, "Failed to free shared dmemory\n");
+
 
     return 0;
 }

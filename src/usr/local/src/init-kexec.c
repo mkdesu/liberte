@@ -1,7 +1,10 @@
 /*
  * Supported kernel parameters:
+ *
  *   - halt  : power-off after memory wipe
+ *
  *   - alert : take special precautions against cold-boot attacks
+ *             [unused at present]
  */
 
 #include <unistd.h>
@@ -126,7 +129,7 @@ int main(int argc, char **argv) {
     if (mount("proc", "/proc", "proc", MS_NOATIME | MS_NODEV | MS_NOEXEC | MS_NOSUID, ""))
         fprintf(stderr, "Failed to mount /proc\n");
     else {
-        sysctl("kernel.printk",        "0");
+        sysctl("kernel.printk",        "3");
         sysctl("vm.overcommit_memory", "1");
         sysctl("vm.drop_caches",       "3");
 
