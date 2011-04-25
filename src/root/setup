@@ -86,7 +86,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
 
     sinfo "Cloning kernel to ${kversion}-kexec"
-    rsync -aHS /usr/src/linux-${kversion}/ /usr/src/linux-kexec
+    rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec
 
     cp ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config
     cp ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config
@@ -99,8 +99,8 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
 
     sinfo "Applying kernel patches"
-    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.36-rc8.patch    -d /usr/src/linux -p1
-    spatch /usr/local/portage/distfiles/unionfs-2.5.8_for_2.6.36.4.diff.gz   -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.37.patch        -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/unionfs-2.5.8_for_2.6.37.2.diff.gz   -d /usr/src/linux -p1
     spatch /usr/local/portage/distfiles/kernel-squashfs-lzma.patch'?rev=1.7' -d /usr/src/linux -p1
     # http://www.fsl.cs.sunysb.edu/pipermail/unionfs/2011-March/006091.html (NULL deref in 2.6.36)
     # spatch ${HOME}/patches/unionfs-setattr.patch                             -d /usr/src/linux -p1

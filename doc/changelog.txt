@@ -10,7 +10,7 @@
   * Power-off button is ignored when X server screen is locked
   * X server screen locks automatically on closed lid
 
-  * Kernel 2.6.36 with PLD Linux SquashFS LZMA patches
+  * Kernel 2.6.37 with PLD Linux SquashFS LZMA patches
   * Control groups assist process scheduling
   * Haveged is used for supplying entropy
   * Xorg server 1.9

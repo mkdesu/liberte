@@ -17,7 +17,7 @@
 #define REQVAR              "PATH_INFO"
 #define MAX_REQ_LENGTH      256
 
-/* caller shouldn't be able to distinguish OK/ERROR */
+/* caller shouldn't be able to differentiate OK/ERROR */
 #define OK                  "OK"
 #define BADREQ              "BADREQ"
 #define BADFMT              "BADFMT"

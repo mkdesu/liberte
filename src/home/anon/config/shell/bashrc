@@ -12,5 +12,5 @@ alias ..="cd .."
 alias mcrypt='mcrypt -c ${MCRYPTRC}'
 
 # http://lkml.org/lkml/2010/11/16/392
-cgdir=`mktemp -d --tmpdir=/sys/fs/cgroup/user cg.$$.XXXXXXXXXX` \
+cgdir=`mktemp -d --tmpdir=/var/cgroup/user cg.$$.XXXXXXXXXX` \
     && echo $$ > ${cgdir}/tasks

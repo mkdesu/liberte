@@ -39,7 +39,7 @@ send)
     if [ -e ${queue}/"${msgid}"/${cmd}.req ]; then
         prefix=`urlprefix ${queue}`
 
-        # A multi-URI curl command deosn't fail on a bad early fetch
+        # A multi-URI curl command doesn't fail on a bad early fetch
         curl -sSfg -o ${queue}/"${msgid}"/ca.pem      "${prefix}"/certs/ca.pem
         curl -sSfg -o ${queue}/"${msgid}"/verify.pem  "${prefix}"/certs/verify.pem
         curl -sSfg -o ${queue}/"${msgid}"/encrypt.pem "${prefix}"/certs/encrypt.pem

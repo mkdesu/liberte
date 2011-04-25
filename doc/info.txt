@@ -131,4 +131,5 @@ configuration persistence
   + NTFS: user.* xattrs correspond to NTFS streams
   + ext2/3/4 removable media is mounted with ACLs and user.* xattrs
 
-SquashFS LZMA support is available as a patch (PLD Linux) as of kernel 2.6.36.
+SquashFS LZMA support is available as a patch (PLD Linux) as of kernel 2.6.36,
+and natively (XZ format) as of kernel 2.6.38.

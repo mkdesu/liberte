@@ -6,7 +6,8 @@ unionfs  /               unionfs  defaults                 0 0
 tmpfs    /dev/shm        tmpfs    nosuid,nodev             0 0
 
 # Control groups (mount just the cpu subsystem)
-cgroup   /sys/fs/cgroup  cgroup   cpu,nosuid,nodev,noexec  0 0
+# Not using /sys/fs/cgroup due to GRKERNSEC_SYSFS_RESTRICT
+cgroup   /var/cgroup     cgroup   cpu,nosuid,nodev,noexec  0 0
 
 # /proc, /sys, /dev, and /dev/pts are mounted by /sbin/rc
 # see RC_USE_FSTAB in /etc/conf.d/rc
