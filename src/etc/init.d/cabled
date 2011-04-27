@@ -11,14 +11,13 @@ depend() {
 
 start() {
     ebegin "Starting cabled"
-    start-stop-daemon -S -q -u ${user} -p ${pidfile} -c ${user} -b -m     \
-        -a /usr/bin/env -x ${daemon} -- - USER=${user} HOME=/home/${user} \
-                                          PATH=${PATH} ${daemon}
+    start-stop-daemon -S -q -e CHUSER=${user} -p ${pidfile} \
+                      -a ${daemon} -- fork
     eend $?
 }
 
 stop() {
     ebegin "Stopping cabled"
-    start-stop-daemon -K -q -u ${user} -p ${pidfile}
+    start-stop-daemon -K -q -p ${pidfile}
     eend $?
 }
