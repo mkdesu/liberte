@@ -1,0 +1,24 @@
+#!/sbin/runscript
+
+daemon=/usr/local/libexec/cable/cabled
+pidfile=/var/run/cabled.pid
+user=anon
+
+depend() {
+    after  liberte
+    before nginx
+}
+
+start() {
+    ebegin "Starting cabled"
+    start-stop-daemon -S -q -u ${user} -p ${pidfile} -c ${user} -b -m     \
+        -a /usr/bin/env -x ${daemon} -- - USER=${user} HOME=/home/${user} \
+                                          PATH=${PATH} ${daemon}
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping cabled"
+    start-stop-daemon -K -q -u ${user} -p ${pidfile}
+    eend $?
+}

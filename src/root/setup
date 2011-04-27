@@ -331,7 +331,7 @@ bootsvc="microcode_ctl irqbalance haveged kexec metalog
          iptables consolekit alsasound fbcondecor"
 defaultsvc="liberte acpid laptop_mode gpm smartd bluetooth
             nscd autofs NetworkManager privoxy
-            nginx spawn-fcgi.cable"
+            nginx spawn-fcgi.cable cabled"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do
