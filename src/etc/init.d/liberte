@@ -317,7 +317,7 @@ EndSection'
                 ewarn Skipping persistent configuration extraction
             elif [ -e ${lmount}/settings/config.tar.xz ]; then
                 ebegin Restoring persistent configuration: ${lmount}/settings
-                sudo -n -u ${luser} /home/${luser}/bin/persistence restore ${lmount}/settings
+                sudo -n -u ${luser} /usr/local/libexec/suexec/persistence restore ${lmount}/settings
                 eend $?
             fi
 
@@ -325,7 +325,7 @@ EndSection'
             # Create (small) Tor hidden service key + hostname, if they don't exist
             if [ ! -e ${ltordir} ]; then
                 ebegin Initializing Tor hidden service directory
-                sudo -n -u ${luser} /home/${luser}/bin/gen-anon-hostname
+                sudo -n -u ${luser} /usr/local/libexec/suexec/gen-anon-hostname
                 eend $?
             fi
 
@@ -351,7 +351,7 @@ EndSection'
                 echo
 
                 splash svc_input_begin ${SVCNAME}
-                sudo -n -u ${luser} /home/${luser}/bin/gen-anon-username
+                sudo -n -u ${luser} /usr/local/libexec/suexec/gen-anon-username
 
                 eend $?
                 splash svc_input_end ${SVCNAME}
@@ -386,7 +386,7 @@ stop() {
             ewarn Skipping persistent configuration saving
         else
             ebegin Saving configuration: ${lmount}/settings
-            sudo -n -u ${luser} /home/${luser}/bin/persistence save ${lmount}/settings /mnt/live
+            sudo -n -u ${luser} /usr/local/libexec/suexec/persistence save ${lmount}/settings /mnt/live
             eend $?
         fi
 

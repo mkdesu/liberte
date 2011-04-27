@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # This command can be run via "sudo -u anon"
-. ${HOME}/config/shell/suprofile
+. /usr/local/libexec/suexec/suprofile
 
 
 if [ $# -lt 2 ]; then
