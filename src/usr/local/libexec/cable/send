@@ -8,7 +8,7 @@ export LC_ALL=C
 queuedir=${HOME}/persist/cables/queue
 
 msgidbytes=20
-emailregex='^[a-z2-7]{32}@[a-z2-7]{16}\.onion$'
+emailregex='^x [a-z2-7]{32}@[a-z2-7]{16}\.onion$'
 
 # Temporary directory on same filesystem
 tmpdir=`mktemp -d --tmpdir=${queuedir}`
@@ -38,7 +38,7 @@ addresses=`formail -fcz -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
     | tr , '\n'                                                   \
     | sed 's/^.*<\([^>]*\)>/\1/'                                  \
     | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
-addresses=`echo ${addresses} | tr '[[:blank:]]' '\n' | sort -u`
+addresses=`echo ${addresses} | tr '[:blank:]' '\n' | sort -u`
 
 # Extract the bare From: address
 fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
@@ -47,7 +47,7 @@ fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
 
 # Check address validity to prevent accidental information leaks
 for addr in "${fromaddr}" ${addresses}; do
-    if ! echo "x ${addr}" | sed 's/^x //' | egrep -q "${emailregex}"; then
+    if ! echo x "${addr}" | egrep -q "${emailregex}"; then
         error "unsupported address: ${addr}"
     fi
 done

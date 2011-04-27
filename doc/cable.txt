@@ -50,11 +50,13 @@ Protocol
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
 
-  + [send]        (MUA-invoked script) reads from MUA directory, writes to /cables/queue
+  + [send]        (MUA-invoked script)          writes to /cables/queue
   + [service]     (fast and secure web service) writes to /cables/{queue,rqueue}
-  + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory; reads from X.509 directory
-  + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
-  + [comm   loop] sends to network, writes to /{<username>,cables}/{queue,rqueue}
+  + [crypto loop] writes to /cables/{queue,rqueue}, MUA inbox directory;
+                  reads from X.509 directory
+  + [fetch  loop] writes to /cables/{queue,rqueue}; reads from network
+  + [comm   loop] writes to /{<username>,cables}/{queue,rqueue}, network;
+                  reads username from X.509 directory
 
 
 <send>
@@ -138,7 +140,7 @@ Protocol
   + read    /cables/queue/<msgid>/receipt.ack      (128 hex digits)
   + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait) -> ack.ans
   + rename  /cables/queue/<msgid>                  -> <msgid>.trash
-  + remove  /cables/queue/<msgid>.trash/           (+ gc before start)
+  + remove  /cables/queue/<msgid>.trash/
   (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
 
 
@@ -158,26 +160,29 @@ Protocol
 Loop scheduler
 --------------
 
+Initialization (for <msgid>s of 40 hex digits):
+  + remove /cables/rqueue/<msgid>.new/                (before [service] startup)
+  + remove /cables/queue/<msgid>.trash/
+
 Watch list (for <msgid>s of 40 hex digits):
-  + /cables/queue/<msgid>/send.req                    (with timed retry)
+  + /cables/queue/<msgid>/send.req                    (fetch-send.seq)
   + /cables/queue/<msgid>/send.rdy
-  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      (with timed retry, based on send.ans)
+  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      (comm-send.seq + ?send.ans)
 
-  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] (with timed retry)
+  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] (fetch-recv.seq)
   + /cables/rqueue/<msgid>/recv.rdy
-  + /cables/rqueue/<msgid>/recv.ok                    (with timed retry, based on recv.ans)
+  + /cables/rqueue/<msgid>/recv.ok                    (comm-recv.seq + ?recv.ans)
 
-  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  (with timed retry)
+  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  (fetch-ack.seq)
   + /cables/queue/<msgid>/ack.rdy
-  + /cables/queue/<msgid>/ack.ok                      (with timed retry)
+  + /cables/queue/<msgid>/ack.ok                      (comm-ack.seq + false)
 
-  + /cables/queue/<msgid>.trash/                      (remove on scheduler startup only)
   + /cables/rqueue/<msgid>.trash/
 
 Retry policies:
+  + maintain (fetch/comm)-(send/recv/ack).seq
   + fetch-delay(send/recv/ack, retry-num)
   + comm-delay(send/recv/ack, have-ans, retry-num)
-  + maintain retry-fetch/comm-send/recv/ack.seq
 
 Upon reaching max retry-num:
   + (rqueue) rename  /cables/rqueue/<msgid>           -> <msgid>.trash

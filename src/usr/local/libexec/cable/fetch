@@ -26,8 +26,8 @@ error() {
 
 
 urlprefix() {
-    local username=`cat $1/"${msgid}"/username`
-    local hostname=`cat $1/"${msgid}"/hostname`
+    local username=`cat $1/"${msgid}"/username | tr -cd a-z2-7`
+    local hostname=`cat $1/"${msgid}"/hostname | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
     check_userhost "${username}" "${hostname}"
 
     echo http://"${hostname}"/"${username}"

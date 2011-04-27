@@ -30,6 +30,13 @@ error() {
 }
 
 
+getuserhost() {
+    username=`cat $1/"${msgid}"/username | tr -cd a-z2-7`
+    hostname=`cat $1/"${msgid}"/hostname | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
+    check_userhost "${username}" "${hostname}"
+}
+
+
 getfreemsg() {
     local last=`find ${inbox} -maxdepth 1 -type f -regex '.*/[1-9][0-9]*' -printf '%f\n' \
         | sort -nr | head -1`
@@ -78,10 +85,7 @@ recv)
     # <recv> [crypto loop]
     if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
         if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" >/dev/null; then
-            username=`cat ${rqueue}/"${msgid}"/username`
-            hostname=`cat ${rqueue}/"${msgid}"/hostname`
-            check_userhost "${username}" "${hostname}"
-
+            getuserhost ${rqueue}
             date=`date -uR`
 
             /bin/gzip -cd ${rqueue}/"${msgid}"/message            \
@@ -112,10 +116,7 @@ ack)
     # <ack> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
         if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
-            username=`cat ${queue}/"${msgid}"/username`
-            hostname=`cat ${queue}/"${msgid}"/hostname`
-            check_userhost "${username}" "${hostname}"
-
+            getuserhost ${queue}
             date=`date -uR`
 
             (cat ${queue}/"${msgid}"/message.hdr; echo;                                 \

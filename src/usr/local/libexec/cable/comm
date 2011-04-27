@@ -11,7 +11,7 @@ fi
 
 
 # Directories and files
-username=`cat ${SECURITY_HOME}/ssl/certs/username`
+username=`cat ${SECURITY_HOME}/ssl/certs/username | tr -cd a-z2-7`
 queue=${HOME}/persist/cables/queue
 rqueue=${HOME}/persist/cables/rqueue
 pubqueue=/var/www/"${username}"/queue
@@ -29,8 +29,8 @@ error() {
 
 
 urlprefix() {
-    local username=`cat $1/"${msgid}"/username`
-    local hostname=`cat $1/"${msgid}"/hostname`
+    local username=`cat $1/"${msgid}"/username | tr -cd a-z2-7`
+    local hostname=`cat $1/"${msgid}"/hostname | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
     check_userhost "${username}" "${hostname}"
 
     echo http://"${hostname}"/"${username}"/request
@@ -57,6 +57,8 @@ atomicnccopy() {
 # Sanity checks
 [ ${#msgid}    = 40 ] || error "bad msgid"
 [ ${#username} = 32 ] || error "bad own username"
+[ -e "${pubqueue}"  ] || error "public queue does not exist"
+[ -e "${pubrqueue}" ] || error "public rqueue does not exist"
 
 check_userhost() {
     [ ${#1} = 32 ] || error "bad username"
@@ -71,7 +73,7 @@ send)
          -a   ! -e ${queue}/"${msgid}"/ack.ok ]; then
         prefix=`urlprefix ${queue}`
 
-        shostname=`cat ${queue}/"${msgid}"/shostname`
+        shostname=`cat ${queue}/"${msgid}"/shostname | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
         check_userhost "${username}" "${shostname}"
 
         atomicnccopy ${queue}/"${msgid}"/message.out "${pubqueue}"/"${msgid}"
@@ -101,7 +103,7 @@ ack)
 
         rm -f "${pubqueue}"/"${msgid}"
 
-        ackhash=`cat ${queue}/"${msgid}"/receipt.ack`
+        ackhash=`cat ${queue}/"${msgid}"/receipt.ack | tr -cd '[:xdigit:]' | tr A-F a-f`
         [ ${#ackhash} = 128 ] || error "bad ackhash"
 
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"

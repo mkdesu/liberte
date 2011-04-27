@@ -58,7 +58,7 @@ else
         exit 1
     fi
 
-    mac=`echo x "$2" | tr -cd '[[:xdigit:]:]' | tr '[A-F]' '[a-f]'`
+    mac=`echo x "$2" | tr -cd '[:xdigit:]:' | tr A-F a-f`
 
     if [ ${#2} != ${#mac} ] || \
             ! echo "${mac}" | egrep -q '^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$'; then

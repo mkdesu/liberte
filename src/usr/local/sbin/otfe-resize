@@ -113,7 +113,7 @@ fi
 
 
 # Sanitize the parameter and discard the original
-size=`echo x "$1" | tr -cd '[[:digit:]]'`
+size=`echo x "$1" | tr -cd '[:digit:]'`
 shift
 
 
