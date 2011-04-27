@@ -23,7 +23,7 @@ msgid="$2"
 
 
 error() {
-    echo "comm: $1"
+    echo "comm: $1" 1>&2
     exit 1
 }
 
@@ -31,6 +31,7 @@ error() {
 urlprefix() {
     local username=`cat $1/"${msgid}"/username`
     local hostname=`cat $1/"${msgid}"/hostname`
+    check_userhost "${username}" "${hostname}"
 
     echo http://"${hostname}"/"${username}"/request
 }
@@ -41,10 +42,25 @@ atomicnccopy() {
     local src="$1" dst="$2"
 
     if [ ! -e "${dst}" ]; then
-        cp -T "${src}" "${dst}".new
-        chmod 640 "${dst}".new
-        mv -T "${dst}".new "${dst}"
+        # prevent race condition in possible implementations of max retry-num
+        if cp -T "${src}" "${dst}".new && [ -e "${src}" ]; then
+            chmod 640 "${dst}".new
+            mv -T "${dst}".new "${dst}"
+        else
+            rm -f "${dst}".new
+            error "failed to copy ${src}"
+        fi
     fi
+}
+
+
+# Sanity checks
+[ ${#msgid}    = 40 ] || error "bad msgid"
+[ ${#username} = 32 ] || error "bad own username"
+
+check_userhost() {
+    [ ${#1} = 32 ] || error "bad username"
+    [ ${#2} != 0 ] || error "bad hostname"
 }
 
 
@@ -54,7 +70,9 @@ send)
     if [ -e ${queue}/"${msgid}"/${cmd}.ok     \
          -a   ! -e ${queue}/"${msgid}"/ack.ok ]; then
         prefix=`urlprefix ${queue}`
+
         shostname=`cat ${queue}/"${msgid}"/shostname`
+        check_userhost "${username}" "${shostname}"
 
         atomicnccopy ${queue}/"${msgid}"/message.out "${pubqueue}"/"${msgid}"
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans \
@@ -84,6 +102,8 @@ ack)
         rm -f "${pubqueue}"/"${msgid}"
 
         ackhash=`cat ${queue}/"${msgid}"/receipt.ack`
+        [ ${#ackhash} = 128 ] || error "bad ackhash"
+
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"
 
         mv -T ${queue}/"${msgid}" ${queue}/"${msgid}".trash

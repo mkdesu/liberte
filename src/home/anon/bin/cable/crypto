@@ -25,7 +25,7 @@ msgid="$2"
 
 
 error() {
-    echo "crypto: $1"
+    echo "crypto: $1" 1>&2
     exit 1
 }
 
@@ -46,6 +46,15 @@ getfreemsg() {
     fi
 
     echo ${last}
+}
+
+
+# Sanity checks
+[ ${#msgid} = 40 ] || error "bad msgid"
+
+check_userhost() {
+    [ ${#1} = 32 ] || error "bad username"
+    [ ${#2} != 0 ] || error "bad hostname"
 }
 
 
@@ -71,6 +80,8 @@ recv)
         if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" >/dev/null; then
             username=`cat ${rqueue}/"${msgid}"/username`
             hostname=`cat ${rqueue}/"${msgid}"/hostname`
+            check_userhost "${username}" "${hostname}"
+
             date=`date -uR`
 
             /bin/gzip -cd ${rqueue}/"${msgid}"/message            \
@@ -103,6 +114,8 @@ ack)
         if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
             username=`cat ${queue}/"${msgid}"/username`
             hostname=`cat ${queue}/"${msgid}"/hostname`
+            check_userhost "${username}" "${hostname}"
+
             date=`date -uR`
 
             (cat ${queue}/"${msgid}"/message.hdr; echo;                                 \

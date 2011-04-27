@@ -27,7 +27,7 @@ fi
 
 
 error() {
-    echo "cms: $1"
+    echo "cms: $1" 1>&2
     exit 1
 }
 

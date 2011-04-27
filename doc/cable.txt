@@ -36,11 +36,11 @@ Protocol
   + resistant against fingerprinting if username is unknown
   + vulnerable to DoS (e.g., many MSG requests) if username is known
 
-  + each loop type is mutually exclusive for a given <msgid>
+  + each loop type is mutually exclusive for a given (r)queue/<msgid>
   + all code blocks are restartable (e.g., after crash)
-  + messages and receipts are never lost if filesystem is transactional
+  + messages and receipts are never lost if /cables filesystem is transactional
 
-  + <hostname>/<username>/                         volatile public directory w/o list permission
+  + <hostname>/<username>/                         transient public directory w/o list permission
                   /certs/                          public X.509 certificates
                   /queue/<msgid>                   outgoing message <msgid>
                   /rqueue/<msgid>                  outgoing receipt <msgid>
@@ -50,8 +50,8 @@ Protocol
                   /queue/<msgid>/                  outgoing message <msgid> work dir
                   /rqueue/<msgid>/                 outgoing receipt <msgid> work dir
 
-  + [send]        reads from MUA directory, writes to /cables/queue
-  + [service]     writes to /cables/{queue,rqueue}
+  + [send]        (MUA-invoked script) reads from MUA directory, writes to /cables/queue
+  + [service]     (fast and secure web service) writes to /cables/{queue,rqueue}
   + [crypto loop] writes to /cables/{queue,rqueue}, MUA directory; reads from X.509 directory
   + [fetch  loop] fetches from network, writes to /cables/{queue,rqueue}
   + [comm   loop] sends to network, writes to /{<username>,cables}/{queue,rqueue}
@@ -79,7 +79,7 @@ Protocol
   + check   /cables/queue/<msgid>/send.ok
   + checkno /cables/queue/<msgid>/ack.ok
   + copy    /cables/queue/<msgid>/message.out -> //<susername>/queue/<msgid> (atomic, if not exists)
-  + request <hostname>/<username>/request/msg/<msgid>/<shostname>/<susername>
+  + request <hostname>/<username>/request/msg/<msgid>/<shostname>/<susername> -> send.ans
 
 
 <recv>
@@ -109,7 +109,7 @@ Protocol
   [comm loop]
   + check   /cables/rqueue/<msgid>/recv.ok
   + copy    /cables/rqueue/<msgid>/receipt.out -> //<rusername>/rqueue/<msgid> (atomic, if not exists)
-  + request <hostname>/<username>/request/rcp/<msgid>
+  + request <hostname>/<username>/request/rcp/<msgid> -> recv.ans
 
 
 <ack>
@@ -136,7 +136,7 @@ Protocol
   + check   /cables/queue/<msgid>/ack.ok
   + remove  //<susername>/queue/<msgid>            (if exists)
   + read    /cables/queue/<msgid>/receipt.ack      (128 hex digits)
-  + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait)
+  + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait) -> ack.ans
   + rename  /cables/queue/<msgid>                  -> <msgid>.trash
   + remove  /cables/queue/<msgid>.trash/           (+ gc before start)
   (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
@@ -155,12 +155,44 @@ Protocol
   + remove  /cables/rqueue/<msgid>.trash/
 
 
+Loop scheduler
+--------------
+
+Watch list (for <msgid>s of 40 hex digits):
+  + /cables/queue/<msgid>/send.req                    (with timed retry)
+  + /cables/queue/<msgid>/send.rdy
+  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      (with timed retry, based on send.ans)
+
+  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] (with timed retry)
+  + /cables/rqueue/<msgid>/recv.rdy
+  + /cables/rqueue/<msgid>/recv.ok                    (with timed retry, based on recv.ans)
+
+  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  (with timed retry)
+  + /cables/queue/<msgid>/ack.rdy
+  + /cables/queue/<msgid>/ack.ok                      (with timed retry)
+
+  + /cables/queue/<msgid>.trash/                      (remove on scheduler startup only)
+  + /cables/rqueue/<msgid>.trash/
+
+Retry policies:
+  + fetch-delay(send/recv/ack, retry-num)
+  + comm-delay(send/recv/ack, have-ans, retry-num)
+  + maintain retry-fetch/comm-send/recv/ack.seq
+
+Upon reaching max retry-num:
+  + (rqueue) rename  /cables/rqueue/<msgid>           -> <msgid>.trash
+
+  + (queue)  rename  /cables/queue/<msgid>            -> <msgid>.trash
+  + (queue)  remove  /cables/queue/<msgid>.trash/
+  + (queue)  remove  //<susername>/queue/<msgid>      (if exists)
+
+
 Message format
 --------------
 
 (send)
-  + extract all To:, Cc:, Bcc: addresses
-  + check that all addresses are recognized (e.g., *.onion)
+  + extract all unique To:, Cc:, Bcc: addresses
+  + check that all addresses (+ From:) are recognized (e.g., *.onion)
   + remove Bcc: and all X-*: headers
   + reformat Date: as UTC
   + compress with gzip
@@ -170,3 +202,11 @@ Message format
   + uncompress with classic (single-threaded) gzip
   + replace From: header with the verified address (rename old header)
   + add X-Received-Date: header
+
+
+(ack)
+  + extract original From:, To:, Cc:, Bcc:, Subject:, Date:, Message-ID:,
+                     In-Reply-To:, References: fields
+  + prepend [vfy] to Subject: field contents
+  + append body with verification message, including current timestamp
+    and verified delivery address

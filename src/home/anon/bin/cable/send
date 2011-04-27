@@ -38,6 +38,7 @@ addresses=`formail -fcz -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
     | tr , '\n'                                                   \
     | sed 's/^.*<\([^>]*\)>/\1/'                                  \
     | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
+addresses=`echo ${addresses} | tr '[[:blank:]]' '\n' | sort -u`
 
 # Extract the bare From: address
 fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
@@ -67,6 +68,8 @@ mv ${tmpdir}/message.gz ${tmpdir}/message
 for addr in ${addresses}; do
     # generate <msgid> and create as subdirectory
     msgid=`openssl rand -hex ${msgidbytes}`
+    [ ${#msgid} = $((msgidbytes * 2)) ] || error "could not generate msgid"
+
     mkdir ${tmpdir}/${msgid}
 
     # extract username and hostname from address, and generate respective files

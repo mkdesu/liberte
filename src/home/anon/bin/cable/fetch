@@ -20,7 +20,7 @@ msgid="$2"
 
 
 error() {
-    echo "fetch: $1"
+    echo "fetch: $1" 1>&2
     exit 1
 }
 
@@ -28,8 +28,18 @@ error() {
 urlprefix() {
     local username=`cat $1/"${msgid}"/username`
     local hostname=`cat $1/"${msgid}"/hostname`
+    check_userhost "${username}" "${hostname}"
 
     echo http://"${hostname}"/"${username}"
+}
+
+
+# Sanity checks
+[ ${#msgid} = 40 ] || error "bad msgid"
+
+check_userhost() {
+    [ ${#1} = 32 ] || error "bad username"
+    [ ${#2} != 0 ] || error "bad hostname"
 }
 
 
