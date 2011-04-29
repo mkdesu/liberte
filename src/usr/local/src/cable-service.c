@@ -204,7 +204,7 @@ static void handle_rcp(const char *msgid) {
 
 
 static void handle_ack(const char *msgid, const char *ackhash) {
-    char path[MAX_PATH_LENGTH+1], trpath[MAX_PATH_LENGTH+6+1];
+    char path[MAX_PATH_LENGTH+1], trpath[MAX_PATH_LENGTH+4+1];
     char recack[ACKHASH_LENGTH+2];
     int  baselen;
 
@@ -225,10 +225,10 @@ static void handle_ack(const char *msgid, const char *ackhash) {
     if (strcmp(ackhash, recack))
         retstatus(ERROR);
 
-    /* rename .../cables/rqueue/<msgid> -> <msgid>.trash */
+    /* rename .../cables/rqueue/<msgid> -> <msgid>.del */
     path[baselen] = '\0';
     strcpy(trpath, path);
-    strcat(trpath, ".trash");
+    strcat(trpath, ".del");
 
     if (rename(path, trpath))
         retstatus(ERROR);

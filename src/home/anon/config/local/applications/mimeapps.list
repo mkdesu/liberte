@@ -1,0 +1,5 @@
+
+[Added Associations]
+x-scheme-handler/http=midori.desktop;
+x-scheme-handler/https=midori.desktop;
+x-scheme-handler/mailto=claws-mail.desktop;

@@ -37,12 +37,14 @@ formail -f -X From: -X To: -X Cc: -X Bcc: -X Subject: -X Date: \
 addresses=`formail -fcz -x To: -x Cc: -x Bcc: < ${tmpdir}/message \
     | tr , '\n'                                                   \
     | sed 's/^.*<\([^>]*\)>/\1/'                                  \
-    | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'`
+    | sed 's/^[[:blank:]]\+//; s/[[:blank:]]\+$//'                \
+    | tr '[:upper:]' '[:lower:]'`
 addresses=`echo ${addresses} | tr '[:blank:]' '\n' | sort -u`
 
 # Extract the bare From: address
 fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
-    | sed 's/^.*<\([^>]*\)>/\1/'`
+    | sed 's/^.*<\([^>]*\)>/\1/'                                  \
+    | tr '[:upper:]' '[:lower:]'`
 
 
 # Check address validity to prevent accidental information leaks

@@ -1,8 +1,9 @@
 #!/sbin/runscript
 
+cableflag=/var/www/cable
 daemon=/usr/local/libexec/cable/cabled
 pidfile=/var/run/cabled.pid
-user=anon
+luser=anon
 
 depend() {
     after  liberte
@@ -10,14 +11,22 @@ depend() {
 }
 
 start() {
-    ebegin "Starting cabled"
-    start-stop-daemon -S -q -e CHUSER=${user} -p ${pidfile} \
-                      -a ${daemon} -- fork
-    eend $?
+    if [ ! -e ${cableflag} ]; then
+        ebegin "Starting cabled"
+        start-stop-daemon -S -q -e CHUSER=${luser} -p ${pidfile} \
+                          -a ${daemon} -- fork
+        eend $?
+    else
+        ewarn "Skipping cabled startup"
+    fi
 }
 
 stop() {
-    ebegin "Stopping cabled"
-    start-stop-daemon -K -q -p ${pidfile}
-    eend $?
+    if [ -e ${pidfile}  -o  ! -e ${cableflag} ]; then
+        ebegin "Stopping cabled"
+        start-stop-daemon -K -q -p ${pidfile}
+        eend $?
+    else
+        ewarn "Skipping cabled stop"
+    fi
 }

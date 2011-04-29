@@ -16,43 +16,33 @@ sinfo "Cleaning up portage configuration"
 sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 
 
-# equery requires gentoolkit, copy ebuilds early
+# equery requires gentoolkit, so copy ebuilds early
 # NOTE: the below patches are intended for depclean
-# portage:        exclude python  RDEPEND
-# gentoolkit:     exclude perl    RDEPEND
-# lm_sensors:     exclude perl    RDEPEND
-# xcb-proto:      exclude python  RDEPEND
-# libglade:       exclude python  RDEPEND
-# gtk+:           exclude python  RDEPEND
-# gucharmap:      exclude python  RDEPEND
-# pidgin:         exclude python  RDEPEND (dbus-python)
-# splashutils:    exclude cpio    RDEPEND
-# graphicsmagick: exclude perl    RDEPEND
-# eboard:         exclude perl    RDEPEND
-# xdg-utils:      exclude perl    RDEPEND (File-MimeInfo)
-# mpg123:         exclude libtool RDEPEND
-# opensc:         exclude libtool RDEPEND
-# libcanberra:    exclude libtool RDEPEND
-# libqalculate:   exclude gnuplot RDEPEND
-# mesa:           replace libxml2[python] with libxml2 in RDEPEND
+#
+# python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, pidgin, mesa
+# perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils
+# libtool: mpg123, opensc, libcanberra
+# cpio:    splashutils
+# gnuplot: libqalculate
 sinfo "Patching copies of selected ebuilds"
-ebuilds="sys-apps/portage
-         app-portage/gentoolkit
-         sys-apps/lm_sensors
-         x11-proto/xcb-proto
-         gnome-base/libglade
-         x11-libs/gtk+
-         gnome-extra/gucharmap
-         net-im/pidgin
-         media-gfx/splashutils
-         media-gfx/graphicsmagick
-         games-board/eboard
-         x11-misc/xdg-utils
-         media-sound/mpg123
+ebuilds="app-portage/gentoolkit
+         dev-libs/glib
          dev-libs/opensc
+         games-board/eboard
+         gnome-base/libglade
+         gnome-extra/gucharmap
+         media-gfx/graphicsmagick
+         media-gfx/splashutils
          media-libs/libcanberra
+         media-libs/mesa
+         media-sound/mpg123
+         net-im/pidgin
          sci-libs/libqalculate
-         media-libs/mesa"
+         sys-apps/lm_sensors
+         sys-apps/portage
+         x11-libs/gtk+
+         x11-misc/xdg-utils
+         x11-proto/xcb-proto"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -70,9 +60,9 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
-# Python is not needed at all by gtk+ and gucharmap
+# Python is not needed at all by gtk+, gucharmap and glib
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
-                                         ${ebuild_gtk} ${ebuild_gucharmap}
+                                         ${ebuild_gtk} ${ebuild_gucharmap} ${ebuild_glib}
 
 # Python is needed by dbus-python, which is a non-separated dependency in ebuild
 sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
@@ -86,7 +76,7 @@ sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 # perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
 
-# Perl is needed by mimeopen, which is an optional dependency
+# Perl is needed by mimeopen (File-MimeInfo), which is an optional dependency
 sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 
 # libltdl.* libraries are kept during libtool unmerge

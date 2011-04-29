@@ -108,20 +108,22 @@ ack)
 
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"
 
-        mv -T ${queue}/"${msgid}" ${queue}/"${msgid}".trash
-        rm -r --one-file-system   ${queue}/"${msgid}".trash
+        mv -T ${queue}/"${msgid}" ${queue}/"${msgid}".del
+    elif [ -e ${queue}/"${msgid}".del ]; then
+        rm -f "${pubqueue}"/"${msgid}"
+        rm -r --one-file-system ${queue}/"${msgid}".del
     else
-        error "${cmd}.ok not found"
+        error "${cmd}.ok or ${msgid}.del not found"
     fi
     ;;
 
 fin)
     # <fin> [comm loop]
-    if [ -e ${rqueue}/"${msgid}".trash ]; then
+    if [ -e ${rqueue}/"${msgid}".del ]; then
         rm -f "${pubrqueue}"/"${msgid}"
-        rm -r --one-file-system ${rqueue}/"${msgid}".trash
+        rm -r --one-file-system ${rqueue}/"${msgid}".del
     else
-        error "${msgid}.trash not found"
+        error "${msgid}.del not found"
     fi
     ;;
 

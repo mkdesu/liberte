@@ -139,9 +139,14 @@ Protocol
   + remove  //<susername>/queue/<msgid>            (if exists)
   + read    /cables/queue/<msgid>/receipt.ack      (128 hex digits)
   + request <hostname>/<username>/request/ack/<msgid>/<ackhash> (wait) -> ack.ans
-  + rename  /cables/queue/<msgid>                  -> <msgid>.trash
-  + remove  /cables/queue/<msgid>.trash/
+  + rename  /cables/queue/<msgid>                  -> <msgid>.del
   (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
+
+  -or-
+
+  + check   /cables/queue/<msgid>.del/
+  + remove  //<susername>/queue/<msgid>            (if exists)
+  + remove  /cables/queue/<msgid>.del/
 
 
 <fin>
@@ -149,12 +154,12 @@ Protocol
   + upon    ack/<msgid>/<ackhash>
   + check   /cables/rqueue/<msgid>/recv.ok
   + compare /cables/rqueue/<msgid>/receipt.ack    <-> <ackhash>
-  + rename  /cables/rqueue/<msgid>                 -> <msgid>.trash
+  + rename  /cables/rqueue/<msgid>                 -> <msgid>.del
 
   [comm loop]
-  + check   /cables/rqueue/<msgid>.trash/
+  + check   /cables/rqueue/<msgid>.del/
   + remove  //<rusername>/rqueue/<msgid>           (if exists)
-  + remove  /cables/rqueue/<msgid>.trash/
+  + remove  /cables/rqueue/<msgid>.del/
 
 
 Loop scheduler
@@ -162,22 +167,22 @@ Loop scheduler
 
 Initialization (for <msgid>s of 40 hex digits):
   + remove /cables/rqueue/<msgid>.new/                (before [service] startup)
-  + remove /cables/queue/<msgid>.trash/
 
 Watch list (for <msgid>s of 40 hex digits):
-  + /cables/queue/<msgid>/send.req                    (fetch-send.seq)
-  + /cables/queue/<msgid>/send.rdy
-  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      (comm-send.seq + ?send.ans)
+  + /cables/queue/<msgid>/send.req                    -> fetch  send <msgid>
+  + /cables/queue/<msgid>/send.rdy                    -> crytpo send <msgid>
+  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      -> comm   send <msgid>
 
-  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] (fetch-recv.seq)
-  + /cables/rqueue/<msgid>/recv.rdy
-  + /cables/rqueue/<msgid>/recv.ok                    (comm-recv.seq + ?recv.ans)
+  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] -> fetch  recv <msgid>
+  + /cables/rqueue/<msgid>/recv.rdy                   -> crytpo recv <msgid>
+  + /cables/rqueue/<msgid>/recv.ok                    -> comm   recv <msgid>
 
-  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  (fetch-ack.seq)
-  + /cables/queue/<msgid>/ack.rdy
-  + /cables/queue/<msgid>/ack.ok                      (comm-ack.seq + false)
+  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  -> fetch  ack  <msgid>
+  + /cables/queue/<msgid>/ack.rdy                     -> crytpo ack  <msgid>
+  + /cables/queue/<msgid>/ack.ok                      -> comm   ack  <msgid>
 
-  + /cables/rqueue/<msgid>.trash/
+  + /cables/queue/<msgid>.del/                        -> comm   ack  <msgid>
+  + /cables/rqueue/<msgid>.del/                       -> comm   fin  <msgid>
 
 Retry policies:
   + maintain (fetch/comm)-(send/recv/ack).seq
@@ -185,11 +190,16 @@ Retry policies:
   + comm-delay(send/recv/ack, have-ans, retry-num)
 
 Upon reaching max retry-num:
-  + (rqueue) rename  /cables/rqueue/<msgid>           -> <msgid>.trash
+  + (queue) create  <mua message>
+                 no send.ok: failed to fetch certificates and encrypt message
+                 no ack.ok:  failed to send message and receive receipt
+                 ack.ok:     failed to acknowledge receipt
+  + (queue)  rename  /cables/queue/<msgid>  -> <msgid>.del
 
-  + (queue)  rename  /cables/queue/<msgid>            -> <msgid>.trash
-  + (queue)  remove  /cables/queue/<msgid>.trash/
-  + (queue)  remove  //<susername>/queue/<msgid>      (if exists)
+  + (rqueue) create  <mua message>
+                 no recv.ok: failed to fetch and decrypt message
+                 recv.ok:    failed to send receipt and receive acknowledgment
+  + (rqueue) rename  /cables/rqueue/<msgid> -> <msgid>.del
 
 
 Message format

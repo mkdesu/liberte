@@ -4,19 +4,39 @@ if [ "$1" = fork ]; then
     nginxflag=/var/lib/init.d/started/nginx
     pidfile=/var/run/cabled.pid
 
+    # If nginx is not running, perform initialization tasks
     if [ ! -e ${nginxflag} ]; then
-        :
+        sudo -n -u "${CHUSER}" "$0" init
     fi
 
     sudo -n -u "${CHUSER}" -s /bin/sh -c "$0"' & echo $!' > ${pidfile}
     exit
 fi
 
+
+# Setup restricted environment
 . /usr/local/libexec/suexec/suprofile
+
+
+# Preliminary variables
+msgidre='[[:xdigit:]]{40}'
+queue=${HOME}/persist/cables/queue
+rqueue=${HOME}/persist/cables/rqueue
+
+
+# Initialization tasks
+if [ "$1" = init ]; then
+    rm -rf --one-file-system `find ${rqueue} -maxdepth 1 -type d \
+        -regextype posix-egrep -regex ".*/${msgidre}\.new"`
+    exit
+fi
 
 
 # Variables
 cableexec=`dirname $0`
+
+
+
 
 
 sleep 999999
