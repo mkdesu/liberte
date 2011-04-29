@@ -1,0 +1,87 @@
+#!/sbin/runscript
+
+luser=anon
+lmount=/home/${luser}/persist
+
+ltordir=${lmount}/security/tor/hidden_service
+certsdir=${lmount}/security/ssl/certs
+
+genhost=/usr/local/libexec/suexec/gen-anon-hostname
+genuser=/usr/local/libexec/suexec/gen-anon-username
+
+gtordir=/var/lib/tor/hidden_service
+cableflag=/var/www/cable
+
+depend() {
+    # need OTFE mount
+    need liberte
+
+    # use entropy for keys generation / MAC randomization, if available
+    use urandom entropy
+
+    # Tor config (if any) must be initialized before running NetworkManager/Tor
+    # MAC randomization needs to occur before NetworkManager startup
+    # nginx www directory is initialized here
+    before NetworkManager tor
+    before nginx
+
+    # spawn-fcgi needs to start before nginx
+    # bluetooth needs to start before NetworkManager
+    after  spawn-fcgi.cable
+    after  bluetooth
+}
+
+start() {
+    # Create (small) Tor hidden service key + hostname, if they don't exist
+    if [ ! -e ${ltordir} ]; then
+        ebegin Initializing Tor hidden service directory
+        sudo -n -u ${luser} ${genhost}
+        eend $?
+    fi
+
+
+    # Propagate Tor hidden service files
+    if [ -e ${gtordir} ]; then
+        ebegin Verifying existing Tor hidden service hostname
+        cmp -s ${ltordir}/hostname ${gtordir}/hostname
+        eend $?
+    else
+        ebegin Propagating Tor hidden service directory
+        rsync -rlptHS --safe-links --chmod=u=rwX,go= ${ltordir}/ ${gtordir} \
+            && chown -hR tor:tor ${gtordir}
+        eend $?
+    fi
+
+
+    # Create (big) private key + communication certificates + username
+    if [ ! -e ${certsdir} ]  &&  mountpoint -q ${lmount}; then
+        echo
+        ebegin Generating communication certificates
+        einfo 'It is a one-time operation - please do not interrupt'
+        echo
+
+        splash svc_input_begin ${SVCNAME}
+        sudo -n -u ${luser} ${genuser}
+
+        eend $?
+        splash svc_input_end ${SVCNAME}
+    fi
+
+
+    # Initialize public cables directory
+    if [ -e ${certsdir}/username  -a  -e ${cableflag} ]; then
+        ebegin Initializing cables directory
+        username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
+        rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem ${cableflag}/certs \
+            && mv -T ${cableflag} /var/www/"${username}"                \
+            && sed -i "s/CABLE/${username}/"      /etc/nginx/nginx.conf \
+            && sed -i 's/127\.0\.0\.2/127.0.0.1/' /etc/nginx/nginx.conf
+        eend $?
+    fi
+
+
+    # Randomize endings of wireless interfaces MAC addresses
+    ebegin Randomizing wireless MACs
+    mac-randomize wireless 1>/dev/null
+    eend $?
+}

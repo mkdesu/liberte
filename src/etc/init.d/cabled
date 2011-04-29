@@ -6,7 +6,10 @@ pidfile=/var/run/cabled.pid
 luser=anon
 
 depend() {
-    after  liberte
+    # need identity setup
+    need identity
+
+    # initialization in cabled is done before nginx is up
     before nginx
 }
 
@@ -27,6 +30,6 @@ stop() {
         start-stop-daemon -K -q -p ${pidfile}
         eend $?
     else
-        ewarn "Skipping cabled stop"
+        ewarn "Skipping cabled shutdown"
     fi
 }

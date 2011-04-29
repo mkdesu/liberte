@@ -328,10 +328,11 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 bootsvc="microcode_ctl irqbalance haveged kexec metalog
-         iptables consolekit alsasound fbcondecor"
-defaultsvc="liberte acpid laptop_mode gpm smartd bluetooth
+         iptables consolekit alsasound fbcondecor lockdown"
+defaultsvc="liberte identity cabled persist xconfig
+            acpid laptop_mode gpm smartd bluetooth
             nscd autofs NetworkManager privoxy
-            nginx spawn-fcgi.cable cabled"
+            nginx spawn-fcgi.cable"
 delsvc="rmnologin netmount local"
 
 for svc in ${bootsvc}; do

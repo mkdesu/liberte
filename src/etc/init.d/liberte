@@ -5,23 +5,13 @@ depend() {
     # start after power management is enabled
     after laptop_mode
 
-    # power-off watchdog needs kexec
-    use kexec
-
     # use entropy for encrypted storage, if available
-    use urandom haveged
+    use urandom entropy
 
     # password entry is on console
     after  clock numlock gpm consolefont
     use    fbcondecor
     before xdm
-
-    # Tor config (if any) must be initialized before running Tor
-    # nginx www directory is initialized here
-    # bluetooth  needs to start before NetworkManager
-    # spawn-fcgi needs to start before nginx
-    after  bluetooth spawn-fcgi.cable
-    before NetworkManager tor nginx
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
     before autofs
@@ -59,9 +49,8 @@ eprompt() {
 luser=anon
 lgroup=legion
 lmount=/home/${luser}/persist
-ltordir=${lmount}/security/tor/hidden_service
-certsdir=${lmount}/security/ssl/certs
-otfefile=/mnt/boot${OTFEFILE}
+boot=/mnt/boot
+otfefile=${boot}${OTFEFILE}
 
 start() {
     # see the /usr/local/sbin/ps-mount script
@@ -69,148 +58,13 @@ start() {
     # (permissions: rwX------)
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
-    # No mountpoint if there is no loop (direct mount on /mnt/live)
-    if mountpoint -q /mnt/boot; then
-        cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d /mnt/boot))
-        cdtype=$(udevadm info -q property -p ${cddevpath} | sed -n 's/^ID_FS_TYPE=//p')
-    else
-        cddevpath=none
-        cdtype=none
-    fi
 
-    xorg_extra='Section "ServerFlags"
-    Option "DontZap"      "true"
-    Option "DontVTSwitch" "true"
-EndSection'
-
-
-    # Lock root account's password
-    ebegin Disabling root password
-    usermod -L root
-    eend $?
-
-
-    ebegin Updating mtab
-    egrep -v ' (rootfs|autofs|/mnt/hidden/rwroot) ' /proc/mounts > /etc/mtab
-    eend $?
-
-
-    if [ ! -e /var/cgroup/user ]; then
-        ebegin Setting up control groups
-        echo /usr/local/sbin/cgroup-release > /var/cgroup/release_agent
-        echo 1                              > /var/cgroup/notify_on_release
-        mkdir -m 3770 /var/cgroup/user
-        chgrp users   /var/cgroup/user
-        eend $?
-    fi
-
-
-    # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
-    ebegin Reducing kernel console logging level
-    rm -f /var/log/wtmp
-    dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
-    eend $?
-
-
-    if [ ! -e /var/run/lid-events ]; then
-        ebegin Creating closed lid indicator
-        mkdir -m 750 /var/run/lid-events \
-            && chown root:video /var/run/lid-events \
-            && touch /var/run/lid-events/close.flag
-        eend $?
-    fi
-
-
-    if [ ! -e /etc/vmtype ]; then
-        ebegin Detecting virtualization state
-        virt-what > /etc/vmtype
-        eend $?
-    fi
-
-
-    # Arm the poweroff watchdog
-    if [ ${cddevpath} != none ] && ! pgrep -u root -x udev-watchdog 1>/dev/null; then
-        ebegin Arming power-off on boot media removal
-        poweroff-watchdog ${cddevpath} &
-        eend $?
-    fi
-
-
-    # Configure X server, unless "nox" is given to kernel
-    if ! get_bootparam 'nox' && [ ! -e /etc/X11/xorg.conf ]; then
-        ebegin Configuring X server
-        if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
-            echo "${xorg_extra}" >> /root/xorg.conf.new
-            mv /root/xorg.conf.new /etc/X11/xorg.conf
-
-            # QEMU + 24bpp + Openbox: http://bugzilla.icculus.org/show_bug.cgi?id=4363
-            if egrep -q '^[[:blank:]]*BoardName[[:blank:]]+"GD 5446"$' /etc/X11/xorg.conf; then
-                sed -i 's/[[:blank:]]*Identifier[[:blank:]]\+"Screen0"$/&\n\tDefaultDepth 16/' /etc/X11/xorg.conf
-            fi
-
-            eend 0
-        else
-            eend 1
-        fi
-    fi
-
-
-    # Put ATA/SCSI drives into standby
-    # /dev/disk/by-path should contain only physical devices
-    if [ -e /dev/disk/by-path ]; then
-        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b  \
-                                      -exec udevadm info -q path -n {} \;`
-        for devpath in ${hdevs}; do
-            dev=/dev/`udevadm info -q name -p ${devpath}`
-
-            if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
-                ebegin Enabled acoustic settings: ${dev}
-                eend 0
-            fi
-
-            # ignore boot media (desirable if it is a disk)
-            if [ "${cddevpath#${devpath}}" = ${cddevpath} ]; then
-                if hdparm -y ${dev} 1>/dev/null 2>&1; then
-                    ebegin Enabled standby mode: ${dev}
-                    eend 0
-                fi
-            fi
-        done
-    fi
-
-
-    # Randomize endings of wireless interfaces MAC addresses
-    ebegin Randomizing wireless MACs
-    mac-randomize wireless 1>/dev/null
-    eend $?
-
-
-    # Select preferred audio card based on the number of mixer controls
-    if [ -e /proc/asound ]; then
-        ebegin Selecting preferred audio card
-        acards=`sed -n 's/^[[:blank:]]*[[:digit:]]\+[[:blank:]]*\[\([^][:blank:]]\+\)[[:blank:]]*\].*$/\1/p' /proc/asound/cards`
-        bestcount=-1
-        for acard in ${acards}; do
-            acount=`amixer -c ${acard} controls | wc -l`
-            if [ ${acount} -gt ${bestcount} ]; then
-                bestcard=${acard}
-                bestcount=${acount}
-            fi
-        done
-        if [ ${bestcount} -gt -1 ]; then
-            sed -i "s/\<card .*\$/card ${bestcard}/" /etc/asound.conf
-        else
-            false
-        fi
-        eend $?
-    fi
-
-
+    # Remount media root read-write (for vfat/ext2)
     remount=1
-    if [ ${cdtype} = vfat  -o  ${cdtype} = ext2 ]; then
-        # Remount media root read-write (assuming vfat)
-        ebegin Remounting /mnt/boot read-write
-        mount -o remount,rw /mnt/boot
+    cdtype=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_TYPE=//p')
+    if [ "${cdtype}" = vfat  -o  "${cdtype}" = ext2 ]; then
+        ebegin Remounting ${boot} read-write
+        mount -o remount,rw ${boot}
         remount=$?
         eend ${remount}
     fi
@@ -229,7 +83,7 @@ EndSection'
         # Initialize LUKS image mapping (create if it doesn't exist)
         if [ ! -e ${otfefile} ]; then
             # FAT free space is precise, but df rounds up - ignore this issue
-            freespace=`df -P -B 1M /mnt/boot | awk '/\// { print $4 }'`
+            freespace=`df -P -B 1M ${boot} | awk '/\// { print $4 }'`
             otfesize=$[ ${freespace} * ${OTFESIZE%/*} / ${OTFESIZE#*/} ]
 
             # 3 MiB is the minimum possible size (rounded up to MiB)
@@ -297,78 +151,9 @@ EndSection'
 
         # Mount OTFE filesystem
         if [ -e /dev/mapper/${OTFEVOLUME} ]; then
-
             ebegin Mounting encrypted storage: ${lmount}
             mount ${lmount}
-            lmountok=$?
-            eend ${lmountok}
-
-
-            # Recreate persist subdirs (for xdg-user-dir and claws-mail)
-            if [ ${lmountok} = 0 ]; then
-                ebegin Recreating persistence directories
-                cp -an /mnt/live${lmount} `dirname ${lmount}`
-                eend $?
-            fi
-
-
-            # Extract configuration archive, if present
-            if get_bootparam 'nosettings'; then
-                ewarn Skipping persistent configuration extraction
-            elif [ -e ${lmount}/settings/config.tar.xz ]; then
-                ebegin Restoring persistent configuration: ${lmount}/settings
-                sudo -n -u ${luser} /usr/local/libexec/suexec/persistence restore ${lmount}/settings
-                eend $?
-            fi
-
-
-            # Create (small) Tor hidden service key + hostname, if they don't exist
-            if [ ! -e ${ltordir} ]; then
-                ebegin Initializing Tor hidden service directory
-                sudo -n -u ${luser} /usr/local/libexec/suexec/gen-anon-hostname
-                eend $?
-            fi
-
-
-            # Propagate Tor hidden service files
-            if [ -e /var/lib/tor/hidden_service ]; then
-                ebegin Verifying existing Tor hidden service hostname
-                cmp -s ${ltordir}/hostname /var/lib/tor/hidden_service/hostname
-                eend $?
-            else
-                ebegin Propagating Tor hidden service directory
-                rsync -rlptHS --safe-links --chmod=u=rwX,go= ${ltordir} /var/lib/tor \
-                    && chown -hR tor:tor /var/lib/tor/hidden_service
-                eend $?
-            fi
-
-
-            # Create (big) private key + communication certificates + username
-            if [ ${lmountok} = 0  -a  ! -e ${certsdir} ]; then
-                echo
-                ebegin Generating communication certificates
-                einfo 'It is a one-time operation - please do not interrupt'
-                echo
-
-                splash svc_input_begin ${SVCNAME}
-                sudo -n -u ${luser} /usr/local/libexec/suexec/gen-anon-username
-
-                eend $?
-                splash svc_input_end ${SVCNAME}
-            fi
-
-
-            # Initialize public cables directory
-            if [ -e ${certsdir}/username  -a  -e /var/www/cable ]; then
-                ebegin Initializing cables directory
-                username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
-                rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem /var/www/cable/certs \
-                    && mv -T /var/www/cable /var/www/"${username}"              \
-                    && sed -i "s/CABLE/${username}/"      /etc/nginx/nginx.conf \
-                    && sed -i 's/127\.0\.0\.2/127.0.0.1/' /etc/nginx/nginx.conf
-                eend $?
-            fi
-
+            eend $?
         fi
 
     else
@@ -380,16 +165,6 @@ EndSection'
 stop() {
     # Unmount the persistent fs
     if mountpoint -q ${lmount}; then
-
-        # Save configuration (an incremental snapshot)
-        if get_bootparam 'nosettings'; then
-            ewarn Skipping persistent configuration saving
-        else
-            ebegin Saving configuration: ${lmount}/settings
-            sudo -n -u ${luser} /usr/local/libexec/suexec/persistence save ${lmount}/settings /mnt/live
-            eend $?
-        fi
-
 
         ebegin Unmounting ${lmount}
         umount -l ${lmount}
@@ -406,9 +181,9 @@ stop() {
 
     # Remount media root read-only
     # (apparently, does not conflict with write cache)
-    if mountpoint -q /mnt/boot; then
-        ebegin Remounting /mnt/boot read-only
-        mount -o remount,ro /mnt/boot
+    if mountpoint -q ${boot}; then
+        ebegin Remounting ${boot} read-only
+        mount -o remount,ro ${boot}
         eend $?
     fi
 }

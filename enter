@@ -41,16 +41,17 @@ else
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
     rsync -rlptOHS --chmod=u=rwX,go=rX -i \
-          --exclude=/root/            \
-          --exclude=/home/anon/       \
-          --exclude=/home/nofw/       \
-          --exclude=/var/lib/portage/ \
-          --exclude=/etc/nginx/       \
-          --exclude=/var/www/         \
-          --exclude=/etc/privoxy/\*   \
-          --exclude=/etc/sudoers      \
-          --exclude=/etc/sysctl.conf  \
-          --exclude=/etc/.auto.lock   \
+          --exclude=/root/                \
+          --exclude=/home/anon/           \
+          --exclude=/home/nofw/           \
+          --exclude=/var/lib/portage/     \
+          --exclude=/etc/nginx/           \
+          --exclude=/var/www/             \
+          --exclude=/etc/privoxy/\*       \
+          --exclude=/var/run/lid-events   \
+          --exclude=/etc/sudoers          \
+          --exclude=/etc/sysctl.conf      \
+          --exclude=/etc/.auto.lock       \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
     rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
@@ -75,6 +76,9 @@ else
         chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter \
             ${LIVECD}/etc/privoxy/config ${LIVECD}/etc/privoxy/match-all.action
     fi
+
+    rsync -rlptOHS --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run
+    chown -hR --from=0:0 :`grep video ${LIVECD}/etc/group | cut -d: -f3` ${LIVECD}/var/run/lid-events
 
     rsync -rlptOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
     rsync -rlptOHS --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf ${LIVECD}/etc

@@ -1,0 +1,79 @@
+#!/sbin/runscript
+
+cgrouprel=/usr/local/sbin/cgroup-release
+vmflag=/etc/vmtype
+xorg_extra='Section "ServerFlags"
+    Option "DontZap"      "true"
+    Option "DontVTSwitch" "true"
+EndSection'
+xorgrc=/etc/X11/xorg.conf
+asoundrc=/etc/asound.conf
+
+depend() {
+    need   localmount
+    before xdm
+}
+
+start() {
+    # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
+    ebegin Reducing kernel console logging level
+    rm -f /var/log/wtmp
+    dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
+    eend $?
+
+    # Setup cgroups
+    if [ ! -e /var/cgroup/user ]; then
+        ebegin Setting up control groups
+        echo ${cgrouprel} > /var/cgroup/release_agent
+        echo 1            > /var/cgroup/notify_on_release
+        mkdir -m 3770 /var/cgroup/user
+        chgrp users   /var/cgroup/user
+        eend $?
+    fi
+
+    # VM flag is used for X wallpaper
+    if [ ! -e ${vmflag} ]; then
+        ebegin Detecting virtualization state
+        virt-what > ${vmflag}
+        eend $?
+    fi
+
+    # Select preferred audio card based on the number of mixer controls
+    if [ -e /proc/asound ]; then
+        ebegin Selecting preferred audio card
+        acards=`sed -n 's/^[[:blank:]]*[[:digit:]]\+[[:blank:]]*\[\([^][:blank:]]\+\)[[:blank:]]*\].*$/\1/p' /proc/asound/cards`
+        bestcount=-1
+        for acard in ${acards}; do
+            acount=`amixer -c ${acard} controls | wc -l`
+            if [ ${acount} -gt ${bestcount} ]; then
+                bestcard=${acard}
+                bestcount=${acount}
+            fi
+        done
+        if [ ${bestcount} -gt -1 ]; then
+            sed -i "s/\<card .*\$/card ${bestcard}/" ${asoundrc}
+        else
+            false
+        fi
+        eend $?
+    fi
+
+    # Configure X server, unless "nox" is given to kernel
+    if get_bootparam 'nox'; then
+        ewarn Skipping X server configuration
+    elif [ ! -e ${xorgrc} ]; then
+        ebegin Configuring X server
+        if HOME=/root Xorg -configure 2>/dev/null && [ -e /root/xorg.conf.new ]; then
+            echo "${xorg_extra}" >> /root/xorg.conf.new
+            mv /root/xorg.conf.new ${xorgrc}
+
+            # QEMU + 24bpp + Openbox: http://bugzilla.icculus.org/show_bug.cgi?id=4363
+            if egrep -q '^[[:blank:]]*BoardName[[:blank:]]+"GD 5446"$' ${xorgrc}; then
+                sed -i 's/[[:blank:]]*Identifier[[:blank:]]\+"Screen0"$/&\n\tDefaultDepth 16/' ${xorgrc}
+            fi
+        else
+            false
+        fi
+        eend $?
+    fi
+}

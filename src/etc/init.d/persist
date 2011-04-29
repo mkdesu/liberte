@@ -1,0 +1,46 @@
+#!/sbin/runscript
+
+luser=anon
+lmount=/home/${luser}/persist
+live=/mnt/live
+persist=/usr/local/libexec/suexec/persistence
+
+depend() {
+    # need OTFE mount
+    need liberte
+}
+
+start() {
+    if mountpoint -q ${lmount}; then
+        # Recreate persist subdirs
+        ebegin Recreating persistence directories
+        cp -an ${live}${lmount} ${lmount}/..
+        eend $?
+
+        # Extract configuration archive, if present
+        if get_bootparam 'nosettings'; then
+            ewarn Skipping persistent configuration extraction
+        elif [ -e ${lmount}/settings/config.tar.xz ]; then
+            ebegin Restoring persistent configuration: ${lmount}/settings
+            sudo -n -u ${luser} ${persist} restore ${lmount}/settings
+            eend $?
+        fi
+    else
+        ewarn Skipping persistent configuration startup
+    fi
+}
+
+stop() {
+    if mountpoint -q ${lmount}; then
+        # Save configuration (an incremental snapshot)
+        if get_bootparam 'nosettings'; then
+            ewarn Skipping persistent configuration saving
+        else
+            ebegin Saving configuration: ${lmount}/settings
+            sudo -n -u ${luser} ${persist} save ${lmount}/settings ${live}
+            eend $?
+        fi
+    else
+        ewarn Skipping persistent configuration shutdown
+    fi
+}

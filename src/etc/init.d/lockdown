@@ -1,0 +1,60 @@
+#!/sbin/runscript
+
+boot=/mnt/boot
+
+depend() {
+    # power-off watchdog needs kexec
+    use kexec
+}
+
+start() {
+    # No mountpoint if there is no loop (direct mount on /mnt/live)
+    cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null)
+
+
+    # Lock root account's password
+    ebegin Disabling root password
+    usermod -L root
+    eend $?
+
+
+    ebegin Updating mtab
+    egrep -v ' (rootfs|autofs|/mnt/hidden/rwroot) ' /proc/mounts > /etc/mtab
+    eend $?
+
+
+    # Arm the poweroff watchdog
+    if [ -n "${cddevpath}" ]; then
+        if ! pgrep -u root -x udev-watchdog 1>/dev/null; then
+            ebegin Arming power-off on boot media removal
+            poweroff-watchdog ${cddevpath} &
+            eend $?
+        fi
+    else
+        ewarn Skipping boot media removal watchdog
+    fi
+
+
+    # Put ATA/SCSI drives into standby
+    # /dev/disk/by-path should contain only physical devices
+    if [ -e /dev/disk/by-path ]; then
+        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b  \
+                                      -exec udevadm info -q path -n {} \;`
+        for devpath in ${hdevs}; do
+            dev=/dev/`udevadm info -q name -p ${devpath}`
+
+            if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
+                ebegin Enabled acoustic settings: ${dev}
+                eend 0
+            fi
+
+            # Ignore boot media (desirable if it is a disk)
+            if [ "${cddevpath#${devpath}}" = "${cddevpath}" ]; then
+                if hdparm -y ${dev} 1>/dev/null 2>&1; then
+                    ebegin Enabled standby mode: ${dev}
+                    eend 0
+                fi
+            fi
+        done
+    fi
+}
