@@ -62,9 +62,7 @@ send)
 
 recv)
     # <recv> [fetch loop]
-    if [ -e ${rqueue}/"${msgid}"/${cmd}.req       \
-         -a  ! -e ${rqueue}/"${msgid}"/${cmd}.rdy \
-         -a  ! -e ${rqueue}/"${msgid}"/${cmd}.ok  ]; then
+    if [ -e ${rqueue}/"${msgid}"/${cmd}.req ]; then
         prefix=`urlprefix ${rqueue}`
 
         # A multi-URI curl command deosn't fail on a bad early fetch
@@ -75,7 +73,7 @@ recv)
 
         mv ${rqueue}/"${msgid}"/${cmd}.req ${rqueue}/"${msgid}"/${cmd}.rdy
     else
-        error "${cmd}.req (without ${cmd}.rdy/${cmd}.ok) not found"
+        error "${cmd}.req not found"
     fi
     ;;
 

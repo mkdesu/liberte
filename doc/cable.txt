@@ -95,7 +95,6 @@ Protocol
 
   [fetch loop]
   + check   /cables/rqueue/<msgid>/recv.req
-  + checkno /cables/rqueue/<msgid>/recv.{rdy,ok}
   + fetch   <hostname>/<username>/queue/<msgid>    -> /cables/rqueue/<msgid>/message.out
   + fetch   <hostname>/<username>/certs/*.pem      -> /cables/rqueue/<msgid>/*.pem
   + rename  /cables/rqueue/<msgid>/recv.req        -> recv.rdy
@@ -173,7 +172,7 @@ Watch list (for <msgid>s of 40 hex digits):
   + /cables/queue/<msgid>/send.rdy                    -> crytpo send <msgid>
   + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      -> comm   send <msgid>
 
-  + /cables/rqueue/<msgid>/recv.req [w/o recv.rdy/ok] -> fetch  recv <msgid>
+  + /cables/rqueue/<msgid>/recv.req                   -> fetch  recv <msgid>
   + /cables/rqueue/<msgid>/recv.rdy                   -> crytpo recv <msgid>
   + /cables/rqueue/<msgid>/recv.ok                    -> comm   recv <msgid>
 

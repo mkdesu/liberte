@@ -29,7 +29,5 @@ stop() {
         ebegin "Stopping cabled"
         start-stop-daemon -K -q -p ${pidfile}
         eend $?
-    else
-        ewarn "Skipping cabled shutdown"
     fi
 }

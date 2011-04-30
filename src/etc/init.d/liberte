@@ -67,6 +67,8 @@ start() {
         mount -o remount,rw ${boot}
         remount=$?
         eend ${remount}
+    else
+        ewarn Skipping boot media read-write remount
     fi
 
 
