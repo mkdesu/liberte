@@ -32,9 +32,49 @@ if [ "$1" = init ]; then
 fi
 
 
+# FIFO
+fifodir=$(mktemp -d --tmpdir=${TMPDIR} cabled.$$.XXXXX)
+inpid=0
+
+
 # Variables
 prefix=`dirname $0`
 loop="${prefix}"/loop
 
 
-sleep 999999
+# Set some traps
+trap 'set +e; kill ${inpid} 2>/dev/null; rm -rf ${fifodir}' 0
+trap : INT QUIT TERM SEGV
+
+
+# Launch inotify daemon
+mkfifo ${fifodir}/inotify.fifo; sleep 1
+inotifywait -qm -e moved_to -e attrib --format '%w:%f' ${queue} ${rqueue} \
+    > ${fifodir}/inotify.fifo & inpid=$!
+
+
+exec 1>>/tmp/cabled.log 2>&1
+
+# Read inotify events
+while read -r event < ${fifodir}/inotify.fifo; do
+    # Sanitize the input line
+    event=`echo ' ' "${event}" | tr -cd '[:lower:][:digit:]/:.'`
+
+    if echo x "${event}" | egrep -q "^x (${queue}|${rqueue})/:${msgidre}(\.del)?\$"; then
+        qtype="${event%%/:*}"
+        dirid="${event#*:}"
+
+        if [ "${qtype}" = ${queue} ]; then
+            qtype=queue
+        elif [ "${qtype}" = ${rqueue} ]; then
+            qtype=rqueue
+        else
+            qtype=unknown
+        fi
+
+        logger -p 6 -t cabled "processing ${qtype}/${dirid}"
+        "${loop}" ${qtype} "${dirid}" &
+    else
+        logger -p 4 -t cabled "unable to parse event: ${event}"
+    fi
+done

@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-# There should be at most one running instance of this script for an <msgid>
+# This script ensures at most one running instance for a <msgid>
 
 if [ $# -lt 2  -o  \( queue != "$1"  -a  rqueue != "$1" \) ]; then
     echo "Format: $0 queue|rqueue <msgid>[.del]"
