@@ -51,32 +51,30 @@ else
 
         set +e
 
-        # ack.rdy/ack.ok are checked in reverse order, but it's fine,
-        # since this script is exclusive for a given <msgid>
-        if   [ -e ${queue}/"${msgid}"/ack.ok  ]; then
-            "${comm}"   ack  "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/ack.rdy ]; then
-            "${crypto}" ack  "${msgid}" && \
-            "${comm}"   ack  "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/ack.req ]; then
-            "${fetch}"  ack  "${msgid}" && \
-            "${crypto}" ack  "${msgid}" && \
-            "${comm}"   ack  "${msgid}"
-        fi
-
-        if   [ -e ${queue}/"${msgid}"/send.ok  ]; then
-            if [ ! -e ${queue}/"${msgid}"/ack.ok ]; then
-                exec "${comm}" send "${msgid}"
-            fi
+        if   [ -e ${queue}/"${msgid}"/send.req ]; then
+            "${fetch}"  send "${msgid}" && \
+            "${crypto}" send "${msgid}" && \
+            "${comm}"   send "${msgid}"
         elif [ -e ${queue}/"${msgid}"/send.rdy ]; then
-                 "${crypto}" send "${msgid}" && \
-            exec "${comm}"   send "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/send.req ]; then
-                 "${fetch}"  send "${msgid}" && \
-                 "${crypto}" send "${msgid}" && \
-            exec "${comm}"   send "${msgid}"
+            "${crypto}" send "${msgid}" && \
+            "${comm}"   send "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/send.ok  ]; then
+            if [ ! -e ${queue}/"${msgid}"/ack.ok ]; then
+                "${comm}" send "${msgid}"
+            fi
         else
             error "send.req/rdy/ok not found"
+        fi
+
+        if   [ -e ${queue}/"${msgid}"/ack.rdy ]; then
+                 "${crypto}" ack  "${msgid}" && \
+            exec "${comm}"   ack  "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/ack.ok  ]; then
+            exec "${comm}"   ack  "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/ack.req ]; then
+                 "${fetch}"  ack  "${msgid}" && \
+                 "${crypto}" ack  "${msgid}" && \
+            exec "${comm}"   ack  "${msgid}"
         fi
 
     else
@@ -88,14 +86,14 @@ else
 
         set +e
 
-        if   [ -e ${rqueue}/"${msgid}"/recv.ok  ]; then
+        if   [ -e ${rqueue}/"${msgid}"/recv.req ]; then
+                 "${fetch}"  recv "${msgid}" && \
+                 "${crypto}" recv "${msgid}" && \
             exec "${comm}"   recv "${msgid}"
         elif [ -e ${rqueue}/"${msgid}"/recv.rdy ]; then
                  "${crypto}" recv "${msgid}" && \
             exec "${comm}"   recv "${msgid}"
-        elif [ -e ${rqueue}/"${msgid}"/recv.req ]; then
-                 "${fetch}"  recv "${msgid}" && \
-                 "${crypto}" recv "${msgid}" && \
+        elif [ -e ${rqueue}/"${msgid}"/recv.ok  ]; then
             exec "${comm}"   recv "${msgid}"
         else
             error "recv.req/rdy/ok not found"
