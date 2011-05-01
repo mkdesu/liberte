@@ -64,6 +64,7 @@ Protocol
   + generate random 160-bit (40 hex digits) <msgid>
   + prepare /cables/queue/<msgid>/{message{,.hdr},username,{,s}hostname}
   + create  /cables/queue/<msgid>/send.req
+  * (atomic via rename from /cables/queue/tmp.<random>/<msgid>/)
 
   [fetch loop]
   + check   /cables/queue/<msgid>/send.req
@@ -117,7 +118,8 @@ Protocol
   [service]
   + upon    rcp/<msgid>
   + check   /cables/queue/<msgid>/send.ok
-  + create  /cables/queue/<msgid>/ack.req          (ok if exists)
+  + create  /cables/queue/<msgid>/ack.req          (atomic, ok if exists)
+  + touch   /cables/queue/<msgid>/                 (if ack.req did not exist)
 
   [fetch loop]
   + check   /cables/queue/<msgid>/ack.req
@@ -168,28 +170,17 @@ Initialization (for <msgid>s of 40 hex digits):
   + remove /cables/rqueue/<msgid>.new/                (before [service] startup)
 
 Watch list (for <msgid>s of 40 hex digits):
-  + /cables/queue/<msgid>/send.req                    -> fetch  send <msgid>
-  + /cables/queue/<msgid>/send.rdy                    -> crytpo send <msgid>
-  + /cables/queue/<msgid>/send.ok   [w/o ack.ok]      -> comm   send <msgid>
+  + /cables/queue/  <msgid>, <msgid>.del              (inotify: moved_to, attrib)
+  + /cables/rqueue/ <msgid>, <msgid>.del              (inotify: moved_to)
 
-  + /cables/rqueue/<msgid>/recv.req                   -> fetch  recv <msgid>
-  + /cables/rqueue/<msgid>/recv.rdy                   -> crytpo recv <msgid>
-  + /cables/rqueue/<msgid>/recv.ok                    -> comm   recv <msgid>
-
-  + /cables/queue/<msgid>/ack.req   [w/o ack.rdy/ok]  -> fetch  ack  <msgid>
-  + /cables/queue/<msgid>/ack.rdy                     -> crytpo ack  <msgid>
-  + /cables/queue/<msgid>/ack.ok                      -> comm   ack  <msgid>
-
-  + /cables/queue/<msgid>.del/                        -> comm   ack  <msgid>
-  + /cables/rqueue/<msgid>.del/                       -> comm   fin  <msgid>
+  + <msgid>:     non-blocking lock attempt
+  + <msgid>.del: blocking lock (with timeout)
 
 Retry policies:
-  + maintain (fetch/comm)-(send/recv/ack).seq
-  + fetch-delay(send/recv/ack, retry-num)
-  + comm-delay(send/recv/ack, have-ans, retry-num)
+  + retry every X min. (+ random component)
 
-Upon reaching max retry-num:
-  + (queue) create  <mua message>
+Upon reaching max age (from <msgid>/username timestamp):
+  + (queue)  create  <mua message>
                  no send.ok: failed to fetch certificates and encrypt message
                  no ack.ok:  failed to send message and receive receipt
                  ack.ok:     failed to acknowledge receipt

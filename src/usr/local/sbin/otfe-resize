@@ -52,7 +52,7 @@ The OTFE header is unaffected by the resize, so any existing header
 backup is still valid.
 
 WARNING: Disconnect all network interfaces before running otfe-resize
-         in order to avoid losing cables received during the process.
+         in order to avoid interfering with cables communication.
 EOF
     exit 1
 fi

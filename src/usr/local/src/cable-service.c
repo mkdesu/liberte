@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
+#include <utime.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -111,7 +112,7 @@ static void write_line(const char *path, const char *s) {
 
 
 static void create_file(const char *path) {
-    if(access(path, F_OK))
+    if (access(path, F_OK))
         write_line(path, NULL);
 }
 
@@ -185,7 +186,7 @@ static void handle_msg(const char *msgid, const char *hostname, const char *user
 
 
 static void handle_rcp(const char *msgid) {
-    char path[MAX_PATH_LENGTH+1];
+    char path[MAX_PATH_LENGTH+1], npath[MAX_PATH_LENGTH+1];
     int  baselen;
 
     /* base: .../cables/queue/<msgid> */
@@ -197,9 +198,18 @@ static void handle_rcp(const char *msgid) {
     strcpy(path + baselen, "/send.ok");
     check_file(path);
 
-    /* create ack.req */
-    strcpy(path + baselen, "/ack.req");
-    create_file(path);
+    /* create ack.req (atomic) */
+    strcpy(npath, path);
+    strcpy(npath + baselen, "/ack.req");
+    if (! link(path, npath)) {
+        /* touch /cables/queue/<msgid>/ (if ack.req didn't exist) */
+        path[baselen] = '\0';
+
+        if (utime(path, NULL))
+            retstatus(ERROR);
+    }
+    else if (errno != EEXIST)
+        retstatus(ERROR);
 }
 
 

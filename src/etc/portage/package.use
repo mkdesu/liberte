@@ -58,6 +58,7 @@ sys-apps/kexec-tools            -zlib -lzma
 sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
+x11-libs/cairo                  -glib
 x11-libs/libfm                  -udev
 gnome-extra/zenity              -compat
 app-editors/nano                -spell

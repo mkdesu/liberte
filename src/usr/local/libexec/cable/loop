@@ -1,0 +1,105 @@
+#!/bin/sh -e
+
+# There should be at most one running instance of this script for an <msgid>
+
+if [ $# -lt 2  -o  \( queue != "$1"  -a  rqueue != "$1" \) ]; then
+    echo "Format: $0 queue|rqueue <msgid>[.del]"
+    exit 1
+fi
+
+
+# Helpers
+prefix="${0##*/}"
+prefix="${0%${prefix}}"
+fetch="${prefix}"fetch
+crypto="${prefix}"crypto
+comm="${prefix}"comm
+
+# Directories
+queue=${HOME}/persist/cables/queue
+rqueue=${HOME}/persist/cables/rqueue
+
+# Parameters
+qtype=$1
+msgid="${2%.del}"
+dirid="${2}"
+
+lockmagick="$3"
+locktmout=30
+
+
+error() {
+    echo "loop: $1" 1>&2
+    exit 1
+}
+
+
+# .del actions: blocking lock (to let the renaming action finish)
+if [ "${dirid}" != "${msgid}" ]; then
+    if [ ${qtype} = queue ]; then
+        exec flock -w ${locktmout} ${queue}/"${dirid}"/  "${comm}" ack "${msgid}"
+    else
+        exec flock -w ${locktmout} ${rqueue}/"${dirid}"/ "${comm}" fin "${msgid}"
+    fi
+else
+    if [ ${qtype} = queue ]; then
+
+        # non-blocking lock of combined operations
+        if [ lockmagick != "${lockmagick}" ]; then
+            exec flock -n ${queue}/"${msgid}"/ "$0" ${qtype} "${msgid}" lockmagick
+        fi
+
+        set +e
+
+        # ack.rdy/ack.ok are checked in reverse order, but it's fine,
+        # since this script is exclusive for a given <msgid>
+        if   [ -e ${queue}/"${msgid}"/ack.ok  ]; then
+            "${comm}"   ack  "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/ack.rdy ]; then
+            "${crypto}" ack  "${msgid}" && \
+            "${comm}"   ack  "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/ack.req ]; then
+            "${fetch}"  ack  "${msgid}" && \
+            "${crypto}" ack  "${msgid}" && \
+            "${comm}"   ack  "${msgid}"
+        fi
+
+        if   [ -e ${queue}/"${msgid}"/send.ok  ]; then
+            if [ ! -e ${queue}/"${msgid}"/ack.ok ]; then
+                exec "${comm}" send "${msgid}"
+            fi
+        elif [ -e ${queue}/"${msgid}"/send.rdy ]; then
+                 "${crypto}" send "${msgid}" && \
+            exec "${comm}"   send "${msgid}"
+        elif [ -e ${queue}/"${msgid}"/send.req ]; then
+                 "${fetch}"  send "${msgid}" && \
+                 "${crypto}" send "${msgid}" && \
+            exec "${comm}"   send "${msgid}"
+        else
+            error "send.req/rdy/ok not found"
+        fi
+
+    else
+
+        # non-blocking lock of combined operations
+        if [ lockmagick != "${lockmagick}" ]; then
+            exec flock -n ${rqueue}/"${msgid}"/ "$0" ${qtype} "${msgid}" lockmagick
+        fi
+
+        set +e
+
+        if   [ -e ${rqueue}/"${msgid}"/recv.ok  ]; then
+            exec "${comm}"   recv "${msgid}"
+        elif [ -e ${rqueue}/"${msgid}"/recv.rdy ]; then
+                 "${crypto}" recv "${msgid}" && \
+            exec "${comm}"   recv "${msgid}"
+        elif [ -e ${rqueue}/"${msgid}"/recv.req ]; then
+                 "${fetch}"  recv "${msgid}" && \
+                 "${crypto}" recv "${msgid}" && \
+            exec "${comm}"   recv "${msgid}"
+        else
+            error "recv.req/rdy/ok not found"
+        fi
+
+    fi
+fi
