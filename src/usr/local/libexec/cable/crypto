@@ -69,7 +69,7 @@ case "${cmd}" in
 send)
     # <send> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message
         else
@@ -84,7 +84,7 @@ send)
 recv)
     # <recv> [crypto loop]
     if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" >/dev/null; then
+        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" 2>/dev/null; then
             getuserhost ${rqueue}
             date=`date -uR`
 
@@ -115,7 +115,7 @@ recv)
 ack)
     # <ack> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" >/dev/null; then
+        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
             getuserhost ${queue}
             date=`date -uR`
 

@@ -32,35 +32,31 @@ if [ "$1" = init ]; then
 fi
 
 
-# FIFO
-fifodir=$(mktemp -d --tmpdir=${TMPDIR} cabled.$$.XXXXX)
-inpid=0
-
-
 # Variables
 prefix=`dirname $0`
 loop="${prefix}"/loop
+inpid=0
+maxproc=50
 
 
 # Set some traps
-trap 'set +e; kill ${inpid} 2>/dev/null; rm -rf ${fifodir}' 0
+trap 'set +e; kill ${inpid} 2>/dev/null' 0
 trap : INT QUIT TERM SEGV
 
 
-# Launch inotify daemon
-mkfifo ${fifodir}/inotify.fifo; sleep 1
-inotifywait -qm -e moved_to -e attrib --format '%w:%f' ${queue} ${rqueue} \
-    > ${fifodir}/inotify.fifo & inpid=$!
+exec 1>>${TMPDIR}/cabled.log 2>&1
 
+# Read inotify events (close events may be ignored)
+# NOTE: inotifywait dies on blocking output
+# TODO: umount events (wait for mount), synthetic events (retries),
+#       message timeout, proper signal handling, proper logging
+while :; do
+    # Sanitize the output line (also cleans inotifywait's failure status,
+    # and will get inotifywait killed if parent process is killed)
+    event=`inotifywait -q -e moved_to -e attrib --format '%w:%f' ${queue} ${rqueue} \
+               | tr -cd '[:lower:][:digit:]/:.'`
 
-exec 1>>/tmp/cabled.log 2>&1
-
-# Read inotify events
-while read -r event < ${fifodir}/inotify.fifo; do
-    # Sanitize the input line
-    event=`echo ' ' "${event}" | tr -cd '[:lower:][:digit:]/:.'`
-
-    if echo x "${event}" | egrep -q "^x (${queue}|${rqueue})/:${msgidre}(\.del)?\$"; then
+    if echo "${event}" | egrep -q "^(${queue}|${rqueue})/:${msgidre}(\.del)?\$"; then
         qtype="${event%%/:*}"
         dirid="${event#*:}"
 
@@ -72,9 +68,15 @@ while read -r event < ${fifodir}/inotify.fifo; do
             qtype=unknown
         fi
 
-        logger -p 6 -t cabled "processing ${qtype}/${dirid}"
-        "${loop}" ${qtype} "${dirid}" &
+        # Identify loop-related processes by flock (pipe clears failure status)
+        pcount=`pgrep -u ${USER} -x flock | wc -l`
+        if [ "${pcount}" -lt ${maxproc} ]; then
+            logger -p 6 -t cabled "processing ${qtype}/${dirid}"
+            "${loop}" ${qtype} "${dirid}" &
+        else
+            logger -p 4 -t cabled "too many processes, ignoring ${qtype}/${dirid}"
+        fi
     else
-        logger -p 4 -t cabled "unable to parse event: ${event}"
+        logger -p 7 -t cabled "ignoring event: ${event}"
     fi
 done

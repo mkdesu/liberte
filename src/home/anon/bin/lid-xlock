@@ -23,7 +23,7 @@ fi
 
 # Wait for inode change events on the lid flag file
 while true; do
-    inotifywait -qq -e attrib ${lidflag} && pid=$!
+    inotifywait -qq -e attrib ${lidflag} & pid=$!
     wait ${pid}
 
     xlock || true
