@@ -1,5 +1,7 @@
 #!/sbin/runscript
 
+description="Sets up cgroups, configures X server and sound."
+
 cgrouprel=/usr/local/sbin/cgroup-release
 vmflag=/etc/vmtype
 xorg_extra='Section "ServerFlags"
@@ -16,9 +18,9 @@ depend() {
 
 start() {
     # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
-    ebegin Reducing kernel console logging level
+    ebegin Truncating kernel console logs
     rm -f /var/log/wtmp
-    dmesg -n 4  &&  truncate -s 0 /var/log/dmesg
+    truncate -s 0 /var/log/dmesg
     eend $?
 
     # Setup cgroups

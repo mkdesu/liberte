@@ -37,9 +37,21 @@ error() {
 # .del actions: blocking lock (to let the renaming action finish)
 if [ "${dirid}" != "${msgid}" ]; then
     if [ ${qtype} = queue ]; then
-        exec flock -w ${locktmout} ${queue}/"${dirid}"/  "${comm}" ack "${msgid}"
+
+        if [ -e ${queue}/"${msgid}".del ]; then
+            exec flock -w ${locktmout} ${queue}/"${dirid}"/  "${comm}" ack "${msgid}"
+        else
+            error "${msgid}.del not found"
+        fi
+
     else
-        exec flock -w ${locktmout} ${rqueue}/"${dirid}"/ "${comm}" fin "${msgid}"
+
+        if [ -e ${rqueue}/"${msgid}".del ]; then
+            exec flock -w ${locktmout} ${rqueue}/"${dirid}"/ "${comm}" fin "${msgid}"
+        else
+            error "${msgid}.del not found"
+        fi
+
     fi
 else
     if [ ${qtype} = queue ]; then
@@ -63,7 +75,7 @@ else
                 "${comm}" send "${msgid}"
             fi
         else
-            error "send.req/rdy/ok not found"
+            error "${msgid}/send.req/rdy/ok not found"
         fi
 
         if   [ -e ${queue}/"${msgid}"/ack.rdy ]; then
@@ -96,7 +108,7 @@ else
         elif [ -e ${rqueue}/"${msgid}"/recv.ok  ]; then
             exec "${comm}"   recv "${msgid}"
         else
-            error "recv.req/rdy/ok not found"
+            error "${msgid}/recv.req/rdy/ok not found"
         fi
 
     fi

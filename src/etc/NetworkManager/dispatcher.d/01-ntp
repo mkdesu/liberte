@@ -8,9 +8,9 @@ action=$2
 case ${action} in
 *up)
         # ntpd gracefully adds/removes interfaces
-        if [ ! -e /var/lib/init.d/started/ntpd ]; then
+        if ! /etc/init.d/ntpd -q status; then
             logger -p 6 -t nm.dispatch "Starting NTP service (${iface})"
-            /etc/init.d/ntpd start --quiet
+            /etc/init.d/ntpd -q start
         fi
         ;;
 esac

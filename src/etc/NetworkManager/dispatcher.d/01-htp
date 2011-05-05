@@ -9,14 +9,14 @@ case ${action} in
 *up)
         # htpdate doesn't bind itself to interfaces, it resolves
         # hostnames every time it sends a HEAD request
-        if [ ! -e /var/lib/init.d/started/htpdate ]; then
+        if ! /etc/init.d/htpdate -q status; then
             logger -p 6 -t nm.dispatch "Starting HTP service (${iface})"
-            /etc/init.d/htpdate start --quiet
+            /etc/init.d/htpdate -q start
         # However, htpdate can be started when there is no connection to
         # the sites; time difference might be too big for adjtime then
         else
             logger -p 6 -t nm.dispatch "Restarting HTP service (${iface})"
-            /etc/init.d/htpdate restart --quiet
+            /etc/init.d/htpdate -q restart
         fi
         ;;
 esac

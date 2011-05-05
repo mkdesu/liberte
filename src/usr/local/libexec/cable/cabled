@@ -1,33 +1,21 @@
 #!/bin/sh -e
 
-if [ "$1" = fork ]; then
-    nginxflag=/var/lib/init.d/started/nginx
-    pidfile=/var/run/cabled.pid
-
-    # If nginx is not running, perform initialization tasks
-    if [ ! -e ${nginxflag} ]; then
-        sudo -n -u "${CHUSER}" "$0" init
-    fi
-
-    sudo -n -u "${CHUSER}" -s /bin/sh -c "$0"' & echo $!' > ${pidfile}
-    exit
-fi
-
-
 # Setup restricted environment
+# (rely on init via sudo to set up TMPDIR)
 . /usr/local/libexec/suexec/suprofile
 
 
 # Preliminary variables
-msgidre='[[:xdigit:]]{40}'
+msgidre='[0-9a-f]{40}'
 queue=${HOME}/persist/cables/queue
 rqueue=${HOME}/persist/cables/rqueue
 
 
 # Initialization tasks
 if [ "$1" = init ]; then
-    rm -rf --one-file-system `find ${rqueue} -maxdepth 1 -type d \
-        -regextype posix-egrep -regex ".*/${msgidre}\.new"`
+    find ${rqueue} -maxdepth 1 -type d -regextype posix-egrep \
+                   -regex "${rqueue}/${msgidre}\.new" -print0 \
+        | xargs -0 rm -rf --one-file-system --
     exit
 fi
 
@@ -35,12 +23,11 @@ fi
 # Variables
 prefix=`dirname $0`
 loop="${prefix}"/loop
-inpid=0
-maxproc=50
+wpid=0
 
 
 # Set some traps
-trap 'set +e; kill ${inpid} 2>/dev/null' 0
+trap 'set +e; kill ${wpid} 2>/dev/null' 0
 trap : INT QUIT TERM SEGV
 
 
@@ -49,34 +36,23 @@ exec 1>>${TMPDIR}/cabled.log 2>&1
 # Read inotify events (close events may be ignored)
 # NOTE: inotifywait dies on blocking output
 # TODO: umount events (wait for mount), synthetic events (retries),
-#       message timeout, proper signal handling, proper logging
+#       message timeout, proper signal handling, proper logging,
+#       process pooling
 while :; do
-    # Sanitize the output line (also cleans inotifywait's failure status,
-    # and will get inotifywait killed if parent process is killed)
-    event=`inotifywait -q -e moved_to -e attrib --format '%w:%f' ${queue} ${rqueue} \
-               | tr -cd '[:lower:][:digit:]/:.'`
+    pcount=`pgrep -u ${USER} -x flock | wc -l`
+    qmsgids=`find ${queue}   -maxdepth 1 -type d -regextype posix-egrep \
+                             -regex "${queue}/${msgidre}(\.del)?"  -printf 'queue:%f\n'`
+    rqmsgids=`find ${rqueue} -maxdepth 1 -type d -regextype posix-egrep \
+                             -regex "${rqueue}/${msgidre}(\.del)?" -printf 'rqueue:%f\n'`
 
-    if echo "${event}" | egrep -q "^(${queue}|${rqueue})/:${msgidre}(\.del)?\$"; then
-        qtype="${event%%/:*}"
-        dirid="${event#*:}"
+    for entry in ${qmsgids} ${rqmsgids}; do
+        qtype="${entry%%:*}"
+        dirid="${entry#*:}"
 
-        if [ "${qtype}" = ${queue} ]; then
-            qtype=queue
-        elif [ "${qtype}" = ${rqueue} ]; then
-            qtype=rqueue
-        else
-            qtype=unknown
-        fi
+        logger -p 6 -t cabled "processing ${qtype}/${dirid}"
+        "${loop}" "${qtype}" "${dirid}" &
+    done
 
-        # Identify loop-related processes by flock (pipe clears failure status)
-        pcount=`pgrep -u ${USER} -x flock | wc -l`
-        if [ "${pcount}" -lt ${maxproc} ]; then
-            logger -p 6 -t cabled "processing ${qtype}/${dirid}"
-            "${loop}" ${qtype} "${dirid}" &
-        else
-            logger -p 4 -t cabled "too many processes, ignoring ${qtype}/${dirid}"
-        fi
-    else
-        logger -p 7 -t cabled "ignoring event: ${event}"
-    fi
+    sleep 60 & wpid=$!
+    wait ${wpid}
 done

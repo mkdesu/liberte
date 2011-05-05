@@ -1,1 +1,9 @@
-CONSOLEFONT="LatArCyrHeb-16"
+# /usr/share/consolefonts
+# setfont <font> [ -C /dev/ttyX ]
+consolefont="LatArCyrHeb-16"
+
+# /usr/share/consoletrans
+# consoletranslation="8859-1_to_uni"
+
+# /usr/share/unimaps
+# unicodemap="iso01"

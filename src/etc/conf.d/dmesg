@@ -1,0 +1,2 @@
+# The level at which logging of messages is done to the console.
+dmesg_level="4"

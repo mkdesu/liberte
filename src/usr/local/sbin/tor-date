@@ -68,7 +68,7 @@ date -us "${vmid}" 1>/dev/null
 
 
 # Tor is unreliable with picking a circuit after time change
-if [ -e /var/lib/init.d/started/tor ]; then
+if /etc/init.d/tor -q status; then
     logger -p 6 -t ${tag} "Restarting Tor service"
     /etc/init.d/tor restart
 fi

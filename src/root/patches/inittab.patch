@@ -1,5 +1,22 @@
---- /etc/inittab	2010-04-28 16:00:27.000000000 +0000
-+++ /etc/inittab.new	2010-09-19 12:59:29.000000000 +0000
+--- /etc/inittab	2011-05-05 13:02:21.000000000 +0000
++++ /etc/inittab.new	2011-05-05 13:03:20.000000000 +0000
+@@ -21,14 +21,14 @@
+ rc::bootwait:/sbin/rc boot
+ 
+ l0:0:wait:/sbin/rc shutdown 
+-l0s:0:wait:/sbin/halt -dhp
++l0s:0:wait:/usr/local/sbin/kexec-halt
+ l1:1:wait:/sbin/rc single
+ l2:2:wait:/sbin/rc nonetwork
+ l3:3:wait:/sbin/rc default
+ l4:4:wait:/sbin/rc default
+ l5:5:wait:/sbin/rc default
+ l6:6:wait:/sbin/rc reboot
+-l6r:6:wait:/sbin/reboot -dk
++l6r:6:wait:/usr/local/sbin/kexec-reboot
+ #z6:6:respawn:/sbin/sulogin
+ 
+ # new-style single-user
 @@ -36,12 +36,8 @@
  su1:S:wait:/sbin/sulogin
  

@@ -1,15 +1,8 @@
-# The / entry prevents /etc/init.d/checkroot's "mount -f /" complaint
-# (the /etc/mtab entry is overwritten in /etc/init.d/liberte anyway)
-unionfs  /               unionfs  defaults                 0 0
-
-# Used by poweroff watchdog
-tmpfs    /dev/shm        tmpfs    nosuid,nodev             0 0
+# /proc, /sys{,/kernel{/security,/debug}}, /dev{,/shm,/pts}
+# are mounted via init.d boot services
 
 # Control groups (mount just the cpu subsystem)
 # Not using /sys/fs/cgroup due to GRKERNSEC_SYSFS_RESTRICT
 cgroup   /var/cgroup     cgroup   cpu,nosuid,nodev,noexec  0 0
-
-# /proc, /sys, /dev, and /dev/pts are mounted by /sbin/rc
-# see RC_USE_FSTAB in /etc/conf.d/rc
 
 # Persistence mount is added below by /etc/init.d/liberte

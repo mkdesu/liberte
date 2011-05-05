@@ -14,6 +14,7 @@ fi
 
 # Variables
 SRC=`dirname $0`/src
+RSYNC="rsync -rlptOHS"
 
 version=`cat ${SRC}/../conf/version`
 environment="VERSION=${version} LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
@@ -40,7 +41,7 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    rsync -rlptOHS --chmod=u=rwX,go=rX -i \
+    ${RSYNC} --chmod=u=rwX,go=rX -i \
           --exclude=/root/                \
           --exclude=/home/anon/           \
           --exclude=/home/nofw/           \
@@ -54,14 +55,14 @@ else
           --exclude=/etc/.auto.lock       \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
-    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
-    rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
-    rsync -rlptOHS --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
-    rsync -rlptOHS --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
+    ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
+    ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
+    ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
 
-    rsync -rlptOHS --chmod=u=rwX,go=X    -i --delete \
+    ${RSYNC} --chmod=u=rwX,go=X    -i --delete \
           --exclude=/www/cable/\*/ -C ${SRC}/var/www ${LIVECD}/var
-    rsync -rlptOHS --chmod=u=wX,g=sX,o=t -i --delete-excluded -C ${SRC}/var/www/cable/* ${LIVECD}/var/www/cable
+    ${RSYNC} --chmod=u=wX,g=sX,o=t -i --delete-excluded -C ${SRC}/var/www/cable/* ${LIVECD}/var/www/cable
     chown -h --from=0 2101 ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     if [ -e ${LIVECD}/tmp/nginx-ref ]; then
         chown -h --from=0:0 --reference=${LIVECD}/tmp/nginx-ref \
@@ -71,33 +72,33 @@ else
               ${LIVECD}/var/www/cable/certs ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     fi
 
-    rsync -rlptOHS --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
+    ${RSYNC} --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
     if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then
         chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter \
             ${LIVECD}/etc/privoxy/config ${LIVECD}/etc/privoxy/match-all.action
     fi
 
-    rsync -rlptOHS --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run
+    ${RSYNC} --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run
     chown -hR --from=0:0 :`grep video ${LIVECD}/etc/group | cut -d: -f3` ${LIVECD}/var/run/lid-events
 
-    rsync -rlptOHS --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
-    rsync -rlptOHS --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf ${LIVECD}/etc
-    rsync -rlptOHS --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock  ${LIVECD}/etc
+    ${RSYNC} --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
+    ${RSYNC} --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf ${LIVECD}/etc
+    ${RSYNC} --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock  ${LIVECD}/etc
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons
-    rsync -rlptOHS --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
+    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
 
     # rwX------
-    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete \
+    ${RSYNC} --chmod=u=rwX,go=   -i --delete \
           --exclude=/anon/persist/security/pgp/\*.gpg --exclude=/anon/persist/security/pgp/\*.crt \
           -C ${SRC}/home/anon ${LIVECD}/home
     chown -hR --from=0:0 2101:9000 ${LIVECD}/home/anon
 
-    rsync -rlptOHS --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
+    ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
     chown -hR --from=0:0 2102:9001 ${LIVECD}/home/nofw
 
     if [ -e /etc/resolv.conf ]; then
-        rsync -rlptOHS --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
+        ${RSYNC} --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
     fi
 
     if [ -e ${LIVECD}/usr/bin/xcdroast ]; then

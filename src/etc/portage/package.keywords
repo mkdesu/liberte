@@ -3,6 +3,11 @@
 =sys-apps/haveged-1.01*
 =app-emulation/virt-what-1.2*
 =net-misc/connect-100*
+=app-admin/paxtest-0.9.9*
+
+# baselayout2 stabilization (#295613)
+=sys-apps/baselayout-2.0.2
+=sys-apps/openrc-0.8.2-r1
 
 # Applications
 =www-misc/fcgiwrap-1.0.3*

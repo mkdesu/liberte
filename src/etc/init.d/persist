@@ -1,5 +1,7 @@
 #!/sbin/runscript
 
+description="Restores and saves user configuration."
+
 luser=anon
 lmount=/home/${luser}/persist
 live=/mnt/live

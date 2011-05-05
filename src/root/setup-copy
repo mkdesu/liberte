@@ -248,9 +248,9 @@ gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`
 
 
-sinfo "Patching scripts to use dynamic executables"
-sed -i 's:\(s\?bin/.*\)\.static:usr/\1:' /sbin/splash-functions.sh
-sed -i 's:\.static::' /usr/bin/splash_manager
+# /lib/rc/plugins/splash.so can't be patched
+sinfo "Substituting dynamic executables for splashutils"
+ln -snf ../usr/sbin/fbsplashd /sbin/fbsplashd.static
 
 
 sinfo "Removing invalid symlinks, dirs and files"
@@ -281,7 +281,7 @@ sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /
 
 
 sinfo "Updating init scripts dependencies cache"
-depscan.sh
+rc-update -u
 
 
 sinfo "Setting dash as /bin/sh"

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+kexecflag=`cat /sys/kernel/kexec_loaded 2>/dev/null`
+
+# Add -f so that reboot works for runlevel 0, too
+# Add -i to shutdown network interfaces
+if [ 1 = "${kexecflag}" ]; then
+    /sbin/reboot   -fdik
+else
+    /sbin/poweroff -fdi
+fi
+
+echo Normal shutdown failed
+/sbin/poweroff -fn
+/sbin/halt     -fn

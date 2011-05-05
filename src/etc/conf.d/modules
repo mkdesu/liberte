@@ -1,0 +1,25 @@
+modules=
+
+# Support for CPU frequency scaling governors
+# compiled in: cpufreq_conservative, cpufreq_performance
+# modules:     cpufreq_powersave, cpufreq_userspace
+# (acpi-cpufreq has also been compiled in)
+# modules="${modules} acpi-cpufreq"
+
+
+# LED target support for iptables
+# (not autoloaded when supplying -j LED)
+modules="${modules} xt_LED"
+
+
+# Modules can be loaded and assigned a different name for later reference
+# modules="dummy:dummy1"
+
+# Modules may be specified for a specific kernel, released version, etc.
+# modules_2_6_23_gentoo_r5="ieee1394 ohci1394"
+# modules_2_6_23="tun ieee1394"
+# modules_2_6="tun"
+# modules="ohci1394"
+
+# Modules may be given (version-specific) arguments
+# module_cx88_dvb_args_2_6="video_br=2"

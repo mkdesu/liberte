@@ -109,6 +109,10 @@ ack)
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"
 
         mv -T ${queue}/"${msgid}" ${queue}/"${msgid}".del
+
+        # try to run 2nd ack variant immediately
+        rm -f "${pubqueue}"/"${msgid}"
+        rm -r --one-file-system ${queue}/"${msgid}".del
     elif [ -e ${queue}/"${msgid}".del ]; then
         rm -f "${pubqueue}"/"${msgid}"
         rm -r --one-file-system ${queue}/"${msgid}".del

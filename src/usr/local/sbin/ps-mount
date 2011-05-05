@@ -16,8 +16,6 @@ if [ "$1" = fork ]; then
     prefix=/mnt/media
     mounts=/etc/auto.media
     daemon=/etc/init.d/autofs
-    daemonpid=/var/run/autofs.pid
-    started=/var/lib/init.d/started/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)
     supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf "
@@ -108,9 +106,9 @@ if [ "$1" = fork ]; then
         local actual
         local expected
 
-        if [ -e ${started} ]; then
+        if ${daemon} -q status; then
             # Sends SIGHUP to automount (autofs 5.0.4: only effective when adding mount points)
-            kill -HUP `cat ${daemonpid}`
+            ${daemon} -q reload
 
             # Wait up to 2s for changes to take effect
             local count=0
@@ -187,6 +185,7 @@ if [ "$1" = fork ]; then
         local key
 
         for key in ${keys}; do
+            # NOTE: lazy unmount
             umount -l ${prefix}/${key} 2>/dev/null || true
             autokeys="${autokeys/ ${key} / }"
         done

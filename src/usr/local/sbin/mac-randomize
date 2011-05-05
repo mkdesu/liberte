@@ -110,9 +110,9 @@ if [ -n "${ifaces}" ]; then
         ifconfig ${iface} up
     done
 
-    if [ ${wired} = 1  -a  -e /var/lib/init.d/started/NetworkManager ]; then
+    if [ ${wired} = 1 ]  &&  /etc/init.d/NetworkManager -q status; then
         echo "Restarting NetworkManager"
-        /etc/init.d/NetworkManager restart --quiet
+        /etc/init.d/NetworkManager -q restart
     elif [ ${wireless} = 1 ] && pgrep -u root -x wpa_supplicant 1>/dev/null; then
         echo "Killing wpa_supplicant"
         pkill -u root -x wpa_supplicant

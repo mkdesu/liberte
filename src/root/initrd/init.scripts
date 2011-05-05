@@ -29,7 +29,7 @@ warn_msg() {
 
 
 quiet_kmsg() {
-    echo 0 > /proc/sys/kernel/printk
+    echo 4 > /proc/sys/kernel/printk
 }
 
 verbose_kmsg() {

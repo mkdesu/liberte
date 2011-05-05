@@ -1,5 +1,16 @@
-KEYMAP="us"
-SET_WINDOWKEYS="yes"
+# /usr/share/keymaps
+# loadkeys -u <keymap>
+keymap="us"
 
-EXTENDED_KEYMAPS=""
-DUMPKEYS_CHARSET=""
+# Load 'windowkeys' keymap first
+windowkeys="YES"
+
+extended_keymaps=""
+# extended_keymaps="backspace keypad euro2"
+
+# Only matters for unicode="yes" in /etc/rc.conf
+dumpkeys_charset=""
+
+# Some fonts map AltGr-E to the currency symbol ¤ instead of the Euro €
+# To fix this, set to "yes"
+fix_euro="NO"

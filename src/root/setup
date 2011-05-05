@@ -189,9 +189,6 @@ else
     updlist=`mktemp`
     emerge -qupvDN --with-bdeps y --color y world | tee ${updlist}
 
-    eselect news read all
-    eselect news purge
-
     if [ -s ${updlist} ]; then
         echo -n "Press Enter to continue..."
         read
@@ -203,6 +200,11 @@ fi
 
 sinfo "Compiling world"
 emerge -quDN --with-bdeps y world
+
+
+# Some news are delayed until first emerge
+eselect news read all
+eselect news purge
 
 
 sinfo "Removing unnecessary packages"
@@ -319,7 +321,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="rc inittab kexec iptables smartd"
+initpatches="inittab kexec iptables smartd splashutils"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
@@ -327,24 +329,33 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 
 sinfo "Configuring start-up services"
-bootsvc="microcode_ctl irqbalance haveged kexec metalog
-         iptables consolekit alsasound fbcondecor lockdown"
-defaultsvc="liberte identity cabled persist xconfig
+svcsysinit="udev"
+svcboot="consolefont microcode_ctl irqbalance haveged kexec
+         metalog iptables consolekit alsasound fbcondecor
+         lockdown"
+svcdefault="liberte identity cabled persist xconfig
             acpid laptop_mode gpm smartd bluetooth
             nscd autofs NetworkManager privoxy
-            nginx spawn-fcgi.cable"
-delsvc="rmnologin netmount local"
+            nginx spawn-fcgi.cable udev-postmount"
+delsvcboot="urandom swap"
+delsvcdefault="netmount local"
+delsvcshutdown="savecache"
 
-for svc in ${bootsvc}; do
-    rc-update add ${svc} boot
+for runlevel in sysinit boot default; do
+    eval svcs=\${svc${runlevel}}
+    for svc in ${svcs}; do
+        [   -e /etc/runlevels/${runlevel}/${svc} ] || rc-update add ${svc} ${runlevel}
+    done
 done
-for svc in ${defaultsvc}; do
-    rc-update add ${svc} default
+
+for runlevel in boot default shutdown; do
+    eval svcs=\${delsvc${runlevel}}
+    for svc in ${svcs}; do
+        [ ! -e /etc/runlevels/${runlevel}/${svc} ] || rc-update del ${svc} ${runlevel}
+    done
 done
-for svc in ${delsvc}; do
-    rc-update del ${svc}
-done
-depscan.sh
+
+rc-update -u
 
 
 # (lastlog is not sparse on unionfs, wtmp has no growth limit)

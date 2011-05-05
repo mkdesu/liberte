@@ -1,2 +1,2 @@
 export LANG=en_GB.UTF-8
-export TZ=Zulu
+export TZ=UTC

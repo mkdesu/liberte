@@ -1,5 +1,7 @@
 #!/sbin/runscript
 
+description="Sets up user anonymous identity, and randomizes wireless MACs."
+
 luser=anon
 lmount=/home/${luser}/persist
 
@@ -17,7 +19,7 @@ depend() {
     need liberte
 
     # use entropy for keys generation / MAC randomization, if available
-    use urandom entropy
+    use entropy
 
     # Tor config (if any) must be initialized before running NetworkManager/Tor
     # MAC randomization needs to occur before NetworkManager startup
@@ -25,11 +27,10 @@ depend() {
     before NetworkManager tor
     before nginx
 
-    # spawn-fcgi needs to start before nginx
-    # bluetooth needs to start before NetworkManager
-    after  spawn-fcgi.cable
-    after  bluetooth
+    # Dependents wait indefinitely (important for parallel startup)
+    keyword -timeout
 }
+
 
 start() {
     # Create (small) Tor hidden service key + hostname, if they don't exist
@@ -55,16 +56,23 @@ start() {
 
     # Create (big) private key + communication certificates + username
     if [ ! -e ${certsdir} ]  &&  mountpoint -q ${lmount}; then
+        # Import splash functions (with an OpenRC compatibility hack)
+        . /sbin/splash-functions.sh
+        input_begin()   { splash svc_input_begin ${RC_SVCNAME}; }
+        input_end()     { splash svc_input_end ${RC_SVCNAME};   }
+        splash_silent() { splash_comm_send "set mode silent"; chvt ${SPLASH_TTY}; }
+
+
         echo
         ebegin Generating communication certificates
         einfo 'It is a one-time operation - please do not interrupt'
         echo
 
-        splash svc_input_begin ${SVCNAME}
+        input_begin
         sudo -n -u ${luser} ${genuser}
 
         eend $?
-        splash svc_input_end ${SVCNAME}
+        input_end
     fi
 
 

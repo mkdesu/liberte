@@ -1,12 +1,13 @@
 #!/sbin/runscript
 
+description="Sets up OTFE virtual partition."
 
 depend() {
     # start after power management is enabled
     after laptop_mode
 
     # use entropy for encrypted storage, if available
-    use urandom entropy
+    use entropy
 
     # password entry is on console
     after  clock numlock gpm consolefont
@@ -15,21 +16,9 @@ depend() {
 
     # Avoid ps-mount reloading autofs upon LVM partition attachment
     before autofs
-}
 
-
-# Fix a bug in /sbin/splash-functions.sh
-splash_get_mode() {
-    local ctty=`${spl_bindir}/fgconsole`
-    local mode=`${spl_util} -c getmode`
-
-    if [ "${mode}" = silent ]; then
-        echo silent
-    elif ${spl_decor} -c getstate --tty=${ctty} 2>/dev/null | grep -q off; then
-        echo off
-    else
-        echo verbose
-    fi
+    # Dependents wait indefinitely (important for parallel startup)
+    keyword -timeout
 }
 
 
@@ -75,6 +64,12 @@ start() {
     # Proceed with OTFE attachment only if remount-rw succeeded
     # (a read-only persist directory is more problematic than tmpfs)
     if [ ${remount} = 0 ]; then
+        # Import splash functions (with an OpenRC compatibility hack)
+        . /sbin/splash-functions.sh
+        input_begin()   { splash svc_input_begin ${RC_SVCNAME}; }
+        input_end()     { splash svc_input_end ${RC_SVCNAME};   }
+        splash_silent() { splash_comm_send "set mode silent"; chvt ${SPLASH_TTY}; }
+
 
         # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
         # device later, and for otfe-resize script to be able to mount it
@@ -100,7 +95,7 @@ start() {
                 eend $?
 
                 eprompt Please specify new password for ${otfefile}
-                splash svc_input_begin ${SVCNAME}
+                input_begin
 
                 inittries=10
                 while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -s ${OTFEKEYSIZE} -h ${OTFEHASH} luksFormat ${loop}; do
@@ -114,7 +109,7 @@ start() {
                     eprompt Please re-enter the password for ${otfefile}
                     cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
 
-                    splash svc_input_end ${SVCNAME}
+                    input_end
                     echo
 
                     ebegin Backing up crypto header: ${otfefile}-hdr.bak
@@ -131,7 +126,7 @@ start() {
                     rm ${otfefile}
 
                     eerror Failed to initialize encrypted storage
-                    splash svc_input_end ${SVCNAME}
+                    input_end
                 fi
             else
                 rm -f ${otfefile}
@@ -139,14 +134,14 @@ start() {
             fi
         else
             eprompt Please provide a password for ${otfefile}
-            splash svc_input_begin ${SVCNAME}
+            input_begin
 
             loop=`losetup -f ${otfefile} --show`
             if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
                 eerror Failed to attach encrypted storage: ${otfefile}
             fi
 
-            splash svc_input_end ${SVCNAME}
+            input_end
             echo
         fi
 
@@ -169,7 +164,7 @@ stop() {
     if mountpoint -q ${lmount}; then
 
         ebegin Unmounting ${lmount}
-        umount -l ${lmount}
+        umount ${lmount}
         eend $?
 
 

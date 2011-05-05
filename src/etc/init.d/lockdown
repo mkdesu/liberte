@@ -1,10 +1,18 @@
 #!/sbin/runscript
 
+description="Arms boot media removal watchdog and suspends disk drives."
+
 boot=/mnt/boot
+
+launcher=/usr/local/sbin/poweroff-watchdog
+pidfile=/var/run/poweroff-watchdog.pid
 
 depend() {
     # power-off watchdog needs kexec
     use kexec
+
+    # no point in shutting down the power-off watchdog
+    keyword -stop
 }
 
 start() {
@@ -18,18 +26,11 @@ start() {
     eend $?
 
 
-    ebegin Updating mtab
-    egrep -v ' (rootfs|autofs|/mnt/hidden/rwroot) ' /proc/mounts > /etc/mtab
-    eend $?
-
-
     # Arm the poweroff watchdog
     if [ -n "${cddevpath}" ]; then
-        if ! pgrep -u root -x udev-watchdog 1>/dev/null; then
-            ebegin Arming power-off on boot media removal
-            poweroff-watchdog ${cddevpath} &
-            eend $?
-        fi
+        ebegin Arming power-off on boot media removal
+        start-stop-daemon -S -q -p ${pidfile} -bm -x ${launcher} -- "${cddevpath}"
+        eend $?
     else
         ewarn Skipping boot media removal watchdog
     fi
@@ -56,5 +57,14 @@ start() {
                 fi
             fi
         done
+    fi
+}
+
+stop() {
+    # Disarm the poweroff watchdog
+    if [ -e ${pidfile} ]; then
+        ebegin Disarming power-off on boot media removal
+        start-stop-daemon -K -q -p ${pidfile}
+        eend $?
     fi
 }

@@ -50,6 +50,7 @@
 /usr/share/icu/
 /usr/share/lsof/
 /usr/share/ntp/
+/usr/share/openrc/
 /usr/share/readline/
 /usr/share/splashutils/
 /usr/share/vala/
@@ -111,11 +112,13 @@
 /usr/share/fonts/*/encodings.dir
 
 # Statically linked binaries (and symlinks)
-# (/sbin/splash-functions.sh and /usr/bin/splash_manager patched
-# to use the dynamic versions in /usr; helper is needed by FBCONDECOR)
-/sbin/*.static
-/bin/*.static
+# (other splashutils static binaries are substituted with dynamic,
+#  except for /sbin/fbcondecor_helper which is needed by FBCONDECOR)
+/sbin/fbcondecor_ctl.static
+/sbin/splash_util.static
+/sbin/fbtruetype.static
 /sbin/fbsplashctl
+/sbin/insmod.static
 /sbin/ldconfig
 /sbin/sln
 

@@ -1,0 +1,11 @@
+# UTC / local (i.e., /etc/timezone) time in Hardware Clock
+clock="local"
+
+# Don't set Hardware Clock to System Time on shutdown
+clock_systohc="NO"
+
+# Not needed for kernel with RTC_HCTOSYS
+clock_hctosys="YES"
+
+# Other hwclock arguments
+clock_args=""

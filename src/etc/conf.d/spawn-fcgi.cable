@@ -1,3 +1,6 @@
+# Need to start before nginx
+rc_before="nginx"
+
 # The filename is suffixed with -1, -2, ... for each child process
 FCGI_SOCKET=/var/run/fastcgi.sock
 

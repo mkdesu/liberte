@@ -1,9 +1,12 @@
 #!/sbin/runscript
 
+description="Starts cables communication daemon."
+
+luser=anon
 cableflag=/var/www/cable
+
 daemon=/usr/local/libexec/cable/cabled
 pidfile=/var/run/cabled.pid
-luser=anon
 
 depend() {
     # need identity setup
@@ -18,9 +21,17 @@ depend() {
 
 start() {
     if [ ! -e ${cableflag} ]; then
+        if service_stopped nginx; then
+            ebegin "Initializing cabled"
+            sudo -n -u ${luser} ${daemon} init
+            eend $?
+        else
+            ewarn "Skipping cabled init (nginx not inactive)"
+        fi
+
+        # SSD -u sets up USER and HOME, and sanitized environment
         ebegin "Starting cabled"
-        start-stop-daemon -S -q -e CHUSER=${luser} -p ${pidfile} \
-                          -a ${daemon} -- fork
+        start-stop-daemon -S -q -u ${luser} -p ${pidfile} -bm -x ${daemon} --
         eend $?
     else
         ewarn "Skipping cabled startup"
@@ -30,7 +41,7 @@ start() {
 stop() {
     if [ -e ${pidfile}  -o  ! -e ${cableflag} ]; then
         ebegin "Stopping cabled"
-        start-stop-daemon -K -q -p ${pidfile}
+        start-stop-daemon -K -q -u ${luser} -p ${pidfile}
         eend $?
     fi
 }

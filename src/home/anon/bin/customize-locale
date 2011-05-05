@@ -12,7 +12,7 @@ the language locale may be exposed via network.</i>" \
     --print-column=3 --hide-column=3`
 
 # Choose timezone
-extratz='Worldwide Zulu "Universal Coordinated Time"'
+extratz='Worldwide UTC "Universal Coordinated Time"'
 newtz=`(echo "${extratz}"; cat /etc/timezone.menu) | xargs -n 10000 -x \
     zenity --list --width=750 --height=450 --window-icon=question \
     --title="Time zone chooser (2/2)" \

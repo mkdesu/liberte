@@ -1,0 +1,6 @@
+#!/bin/sh
+
+/sbin/reboot -fdk
+
+echo Normal reboot failed
+/sbin/reboot -fn

@@ -143,7 +143,7 @@ Protocol
   + rename  /cables/queue/<msgid>                  -> <msgid>.del
   (if ack is lost due to MITM attack, receiver will keep requesting rcp/<msgid>)
 
-  -or-
+  -and/or-
 
   + check   /cables/queue/<msgid>.del/
   + remove  //<susername>/queue/<msgid>            (if exists)

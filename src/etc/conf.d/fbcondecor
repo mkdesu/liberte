@@ -1,0 +1,12 @@
+# Start somewhat earlier in boot runlevel
+rc_use="!localmount modules mtab"
+rc_before="localmount lvm"
+
+# Fix an issue with OpenRC compatibility
+RC_TTY_NUMBER=${rc_tty_number}
+
+# If tty list is not provided, RC_TTY_NUMBER is used
+# FBCONDECOR_TTYS="1 2 3 4"
+
+# Set per-console themes, space-separated
+# FBCONDECOR_TTY_MAP="1:liberte"
