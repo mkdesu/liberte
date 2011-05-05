@@ -11,7 +11,7 @@
   * X server screen locks automatically on closed lid
 
   * Kernel 2.6.37 with PLD Linux SquashFS LZMA patches
-  * OpenRC facilitates faster startup and shutdown
+  * Parallel OpenRC facilitates faster startup and shutdown
   * Control groups assist process scheduling
   * Haveged is used for supplying entropy
   * Xorg server 1.9
