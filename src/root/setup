@@ -292,13 +292,14 @@ for mfam in `eselect mesa list | sed -n 's/^\([^[:blank:]]\+\).*/\1/p'`; do
 done
 
 
-sinfo "Updating PCI and USB lists"
+# The piciids/usbids sites are notorious for various failures
+sinfo "Updating PCI and USB lists (ignoring errors)"
 
 sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
-update-pciids -q
+update-pciids -q || true
 
 rm -f /usr/share/misc/usb.ids.gz
-update-usbids -q
+update-usbids -q || true
 
 if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     sinfo "Do PCI/USB IDs lists use compressed format exclusively?"

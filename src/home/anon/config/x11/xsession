@@ -4,7 +4,7 @@
 prefix=${HOME}/bin/x11
 
 # Restrict X server access
-# xhost +si:localuser:${USER}
+xhost -si:localuser:${USER}
 xhost -
 
 # X settings

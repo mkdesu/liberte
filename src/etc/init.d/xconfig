@@ -2,6 +2,7 @@
 
 description="Sets up cgroups, configures X server and sound."
 
+cgroupmnt=/sys/fs/cgroup
 cgrouprel=/usr/local/sbin/cgroup-release
 vmflag=/etc/vmtype
 xorg_extra='Section "ServerFlags"
@@ -18,12 +19,12 @@ depend() {
 
 start() {
     # Setup cgroups
-    if [ ! -e /var/cgroup/user ]; then
+    if [ ! -e ${cgroupmnt}/user ]; then
         ebegin Setting up control groups
-        echo ${cgrouprel} > /var/cgroup/release_agent
-        echo 1            > /var/cgroup/notify_on_release
-        mkdir -m 3770 /var/cgroup/user
-        chgrp users   /var/cgroup/user
+        echo ${cgrouprel} > ${cgroupmnt}/release_agent
+        echo 1            > ${cgroupmnt}/notify_on_release
+        mkdir -m 3770 ${cgroupmnt}/user
+        chgrp users   ${cgroupmnt}/user
         eend $?
     fi
 
@@ -67,6 +68,9 @@ start() {
             if egrep -q '^[[:blank:]]*BoardName[[:blank:]]+"GD 5446"$' ${xorgrc}; then
                 sed -i 's/[[:blank:]]*Identifier[[:blank:]]\+"Screen0"$/&\n\tDefaultDepth 16/' ${xorgrc}
             fi
+
+            # Turn off text cursor on vt3 (cf. xserverrc)
+            echo -n "\033[?25l" > /dev/tty3
         else
             false
         fi

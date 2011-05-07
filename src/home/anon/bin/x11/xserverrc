@@ -1,4 +1,4 @@
 #!/bin/sh -e
 
-# nice -n -10 doesnt' work with xinit (since run by user)
-exec /usr/bin/X -nolisten tcp -br -deferglyphs 16 "$@"
+# nice -n -10 doesn't work with xinit (since run by user)
+exec /usr/bin/X vt3 -nolisten tcp -br -deferglyphs 16 "$@"

@@ -2,7 +2,7 @@
 # are mounted via init.d boot services
 
 # Control groups (mount just the cpu subsystem)
-# Not using /sys/fs/cgroup due to GRKERNSEC_SYSFS_RESTRICT
-cgroup   /var/cgroup     cgroup   cpu,nosuid,nodev,noexec  0 0
+cgroup   /sys/fs/cgroup   cgroup   cpu,nosuid,nodev,noexec  0 0
 
+# /mnt/boot and /mnt/live entries are added below by initramfs
 # Persistence mount is added below by /etc/init.d/liberte

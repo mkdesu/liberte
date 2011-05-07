@@ -9,6 +9,7 @@
   * RAM is also wiped before power-off on boot media removal
   * Power-off button is ignored when X server screen is locked
   * X server screen locks automatically on closed lid
+  * Boot media filesystem is repaired on startup and shutdown
 
   * Kernel 2.6.37 with PLD Linux SquashFS LZMA patches
   * Parallel OpenRC facilitates faster startup and shutdown

@@ -5,8 +5,8 @@ export PATH="/sbin:/bin"
 
 UNION=/union
 RWROOT=/rwroot
-BOOT=${RWROOT}/mnt/boot
-LIVE=${RWROOT}/mnt/live
+BOOT=/mnt/boot
+LIVE=/mnt/live
 
 . /etc/modules.forced
 . /etc/init.scripts
@@ -126,13 +126,13 @@ while true; do
             if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* >/dev/null 2>&1; then
                 good_msg "Attempting to mount media: ${mediadev}"
 
-                if mount -r -t ${CDROOT_TYPE} -o ${CDROOT_FLAGS} ${mediadev} ${BOOT} >/dev/null 2>&1; then
+                if mount -r -t ${CDROOT_TYPE} -o ${CDROOT_FLAGS} ${mediadev} ${RWROOT}${BOOT} >/dev/null 2>&1; then
                     # Check for the recognition file
-                    if [ -e ${BOOT}/"${LOOP}" ]; then
+                    if [ -e ${RWROOT}${BOOT}"${LOOP}" ]; then
                         good_msg "Media found on ${mediadev}"
                         break 2
                     else
-                        umount ${BOOT}
+                        umount ${RWROOT}${BOOT}
                     fi
                 fi
 
@@ -147,19 +147,24 @@ done
 test_success "find media to mount"
 
 
-# Setup the loopback mounts
+# Setup the loopback mounts and add fstab entries for fsck
 if [ -n "${LOOP}" ]; then
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
-    mount -r -t squashfs ${BOOT}/"${LOOP}" ${LIVE}
+    mount -r -t squashfs -o loop ${RWROOT}${BOOT}"${LOOP}" ${RWROOT}${LIVE}
     test_success 'mount compressed filesystem'
+
+    echo "${mediadev} ${BOOT} ${CDROOT_TYPE} ro,${CDROOT_FLAGS} 0 1" > /etc/fstab.extra
+    echo "${BOOT}${LOOP} ${LIVE} squashfs ro,loop 0 2"              >> /etc/fstab.extra
 else
-    mount -o move ${BOOT} ${LIVE}
+    mount -o move ${RWROOT}${BOOT} ${RWROOT}${LIVE}
+
+    echo "${mediadev} ${LIVE} ${CDROOT_TYPE} ro,${CDROOT_FLAGS} 0 2" > /etc/fstab.extra
 fi
 
 
 good_msg "Creating union mount"
-mount -t unionfs -o dirs=${RWROOT}=rw:${LIVE}=ro unionfs ${UNION}
+mount -t unionfs -o dirs=${RWROOT}=rw:${RWROOT}${LIVE}=ro unionfs ${UNION}
 test_success 'create union mount'
 
 # Move RWROOT submounts to UNION (will be then adjusted after switch_root)
@@ -170,6 +175,10 @@ done
 # Move the RWROOT mount to a hidden directory on UNION
 # (rw layer directly accessible only by root)
 mount -o move ${RWROOT} ${UNION}/mnt/hidden${RWROOT}
+
+
+# Add useful lines to /etc/fstab
+cat /etc/fstab.extra >> ${UNION}/etc/fstab
 
 
 verbose_kmsg
@@ -183,7 +192,9 @@ elif [ -e /etc/init.splash      -a  ! -e ${UNION}/dev/tty1 ]; then
 fi
 
 
-echo > /proc/sys/kernel/hotplug
+# Disable mdev hotplug, and disable time change logging (hwclock starts before sysctl)
+echo   > /proc/sys/kernel/hotplug
+echo 0 > /proc/sys/kernel/grsecurity/timechange_logging
 umount /sys  || bad_msg 'Failed to unmount /sys'
 umount /proc || bad_msg 'Failed to unmount /proc'
 

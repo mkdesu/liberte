@@ -15,10 +15,10 @@
 # Runas alias specification
 
 # User privilege specification (group prefix = %)
-root	ALL=(ALL) ALL
+root	ALL=(ALL : ALL) ALL
 
-anon	liberte = NOPASSWD: /sbin/shutdown -h now,       /sbin/shutdown -r now
-anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
+anon	liberte = NOPASSWD: /sbin/shutdown -[hr] now
 anon	liberte = NOPASSWD: /usr/local/sbin/sysrq [01]
+anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
 
 anon	liberte = (nofw) NOPASSWD: /usr/local/sbin/unsafe-browser ""

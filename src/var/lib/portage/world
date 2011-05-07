@@ -177,7 +177,6 @@ x11-apps/xgamma
 x11-apps/xinit
 x11-apps/xauth
 x11-apps/xhost
-x11-apps/sessreg
 
 # (server queries)
 x11-apps/xdpyinfo

@@ -39,11 +39,13 @@ exec 1>>${TMPDIR}/cabled.log 2>&1
 #       message timeout, proper signal handling, proper logging,
 #       process pooling
 while :; do
+    set +e
     pcount=`pgrep -u ${USER} -x flock | wc -l`
     qmsgids=`find ${queue}   -maxdepth 1 -type d -regextype posix-egrep \
                              -regex "${queue}/${msgidre}(\.del)?"  -printf 'queue:%f\n'`
     rqmsgids=`find ${rqueue} -maxdepth 1 -type d -regextype posix-egrep \
                              -regex "${rqueue}/${msgidre}(\.del)?" -printf 'rqueue:%f\n'`
+    set -e
 
     for entry in ${qmsgids} ${rqmsgids}; do
         qtype="${entry%%:*}"

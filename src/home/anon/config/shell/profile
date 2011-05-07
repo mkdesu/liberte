@@ -67,7 +67,12 @@ if [ -z "${NO_STARTX}" ]; then
         echo -ne "\033[?17;0;64c"
     fi
 
-    if [ -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; then
-        while ! startx; do :; done
+    if [ "`tty`" = /dev/tty1 ]; then
+        if [ -e /etc/X11/xorg.conf ]; then
+            while ! startx; do :; done
+        fi
+
+        # Switch from silent splash mode VT (if any)
+        chvt 1
     fi
 fi
