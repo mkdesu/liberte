@@ -306,7 +306,7 @@
     </keybind>
     <keybind key="Print">
       <action name="Execute">
-        <command>xsnapshot ~/persist/desktop -root</command>
+        <command>xsnapshot ~/persist/desktop -window root</command>
       </action>
     </keybind>
     <keybind key="A-Print">

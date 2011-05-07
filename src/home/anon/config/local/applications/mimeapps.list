@@ -1,5 +1,10 @@
 
 [Added Associations]
-x-scheme-handler/http=midori.desktop;
-x-scheme-handler/https=midori.desktop;
 x-scheme-handler/mailto=claws-mail.desktop;
+application/epub+zip=FBReader.desktop;
+application/x-fictionbook+xml=FBReader.desktop;
+
+[Removed Associations]
+text/plain=abiword.desktop;
+# image/svg+xml=gpicview.desktop;geeqie.desktop;
+# image/svg-xml=gpicview.desktop;geeqie.desktop;

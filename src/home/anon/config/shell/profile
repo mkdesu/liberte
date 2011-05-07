@@ -22,6 +22,7 @@ export MCRYPTRC=${XDG_CONFIG_HOME}/misc/mcryptrc
 export RANDFILE=${TMPDIR}/openssl.rnd
 
 # X11 configuration dirs
+export XSESSION=${XDG_CONFIG_HOME}/x11/xsession
 export XENVIRONMENT=${XDG_CONFIG_HOME}/x11/Xdefaults
 export XUSERFILESEARCHPATH=${XDG_CONFIG_HOME}/x11/app/%N
 export XAUTHORITY=${TMPDIR}/Xauthority
@@ -52,7 +53,9 @@ export no_proxy=127.0.0.1,localhost
 
 # Read interactive shell settings
 # (not read automatically in login shell)
-. ${XDG_CONFIG_HOME}/shell/bashrc
+if [ -n "${BASH}" ]; then
+    . ${XDG_CONFIG_HOME}/shell/bashrc
+fi
 
 # Set terminal settings and possibly start X11
 if [ -z "${NO_STARTX}" ]; then
@@ -64,12 +67,7 @@ if [ -z "${NO_STARTX}" ]; then
         echo -ne "\033[?17;0;64c"
     fi
 
-    while [ -z "${stopx}" -a -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; do
-        startx
-
-        if post-logout; then
-            stopx=1
-        fi
-    done
-    unset stopx
+    if [ -e /etc/X11/xorg.conf -a "`tty`" = /dev/tty1 ]; then
+        while ! startx; do :; done
+    fi
 fi

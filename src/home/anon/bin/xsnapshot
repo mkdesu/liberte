@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 if [ ! -d "$1" ]; then
-    echo "Format: $0 <dir> [options ...]"
+    echo "Format: $0 <dir> [import options ...]"
     exit 1
 fi
 
@@ -9,4 +9,4 @@ dir="$1"
 shift
 
 name=`date -u +%F-Z%H%M.%S`
-exec xwd -silent "$@" | convert -quality 100 -comment '' xwd:- png:"${dir}"/${name}.png
+import -silent -quality 100 -comment '' -frame "$@" png:"${dir}"/${name}.png

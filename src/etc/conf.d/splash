@@ -15,6 +15,6 @@ SPLASH_TEXTBOX="no"
 # Silent mode timeout in seconds, if positive
 SPLASH_AUTOVERBOSE="900"
 
-# Name of the boot service starting X.
-# Set if the tty is wrong after boot.
-# SPLASH_XSERVICE="xdm"
+# Splash plugin stays in silent mode if at splash_stop,
+# this service has been started.
+SPLASH_XSERVICE="xconfig"

@@ -2,7 +2,7 @@
   + 2011.1 release
 
   * Removed SYSLINUX dependency during Linux install
-  * Custom fast initramfs without modules probing
+  * Custom fast initramfs without blind modules probing
   * Separated KMS-dependent and VESA-dependent boots
   * Added option for booting without applying user settings
   * More RAM is wiped with KEXEC-based reboot/shutdown
@@ -17,6 +17,7 @@
   * Xorg server 1.9
   * Added OpenSSH client
 
+  * Added secure and anonymous cables communication
   * Added detection and warning about virtualized environment
   * Added blinking of unused LEDs on dropped and rejected packets
 

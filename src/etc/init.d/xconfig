@@ -17,12 +17,6 @@ depend() {
 }
 
 start() {
-    # Limit dmesg console logging (wtmp is recreated by /sbin/rc in sysinit runlevel)
-    ebegin Truncating kernel console logs
-    rm -f /var/log/wtmp
-    truncate -s 0 /var/log/dmesg
-    eend $?
-
     # Setup cgroups
     if [ ! -e /var/cgroup/user ]; then
         ebegin Setting up control groups

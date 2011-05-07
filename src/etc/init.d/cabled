@@ -21,7 +21,8 @@ depend() {
 
 start() {
     if [ ! -e ${cableflag} ]; then
-        if service_stopped nginx; then
+        # service_stopped doesn't work, since nginx is "starting"
+        if ! service_started nginx; then
             ebegin "Initializing cabled"
             sudo -n -u ${luser} ${daemon} init
             eend $?

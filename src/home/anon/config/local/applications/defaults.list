@@ -1,7 +1,0 @@
-
-[Default Applications]
-text/plain=gedit.desktop;
-image/svg+xml=/usr/bin/rsvg-view;
-image/svg-xml=/usr/bin/rsvg-view;
-application/epub+zip=FBReader.desktop;
-application/x-fictionbook+xml=FBReader.desktop;

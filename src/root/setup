@@ -337,7 +337,7 @@ svcdefault="liberte identity cabled persist xconfig
             acpid laptop_mode gpm smartd bluetooth
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
-delsvcboot="urandom swap"
+delsvcboot="urandom swap bootmisc"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
 

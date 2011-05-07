@@ -1,7 +1,9 @@
 #!/bin/sh
 
+choice=
 if [ -e ${TMPDIR}/logout-choice ]; then
     choice=`cat ${TMPDIR}/logout-choice`
+    rm ${TMPDIR}/logout-choice
 fi
 
 

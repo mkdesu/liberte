@@ -1,12 +1,11 @@
-#!/bin/sh -e
+#!/bin/sh
 
-cklaunch=ck-launch-session
 loglimit=8192
 
-if [ -n "${XDG_SESSION_COOKIE}" ]; then
-    cklaunch=
-fi
+/usr/bin/startx /etc/X11/xinit/xinitrc    --   \
+                ${HOME}/bin/x11/xserverrc 2>&1 \
+    | log-limit ${TMPDIR}/xsession.log ${loglimit}
 
-exec ${cklaunch} /usr/bin/startx ${XDG_CONFIG_HOME}/x11/xsession  --   \
-                                 ${XDG_CONFIG_HOME}/x11/xserverrc 2>&1 \
-         | log-limit ${TMPDIR}/xsession.log ${loglimit}
+
+# Perform logout actions and indicate status to caller (1=relogin)
+${HOME}/bin/x11/post-logout

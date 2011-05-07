@@ -6,7 +6,7 @@ rc_before="localmount lvm"
 RC_TTY_NUMBER=${rc_tty_number}
 
 # If tty list is not provided, RC_TTY_NUMBER is used
-# FBCONDECOR_TTYS="1 2 3 4"
+FBCONDECOR_TTYS="1 2 4"
 
 # Set per-console themes, space-separated
 # FBCONDECOR_TTY_MAP="1:liberte"

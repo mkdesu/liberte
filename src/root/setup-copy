@@ -238,7 +238,8 @@ find /usr/share -mindepth 3 -maxdepth 3 -type d -name hicolor \
 
 # http://www.freedesktop.org/wiki/Specifications/mime-actions-spec
 sinfo "Modifying MIME actions ordering preferences"
-sed -i 's/\<epdfview.desktop;evince.desktop;/evince.desktop;epdfview.desktop;/ ;
+sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
+        s/\<epdfview.desktop;evince.desktop;/evince.desktop;epdfview.desktop;/ ;
         s/\<gnome-mplayer.desktop;audacious2.desktop;/audacious2.desktop;gnome-mplayer.desktop;/' \
     /usr/share/applications/mimeinfo.cache
 

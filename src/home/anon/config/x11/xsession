@@ -1,28 +1,26 @@
 #!/bin/sh
 
-# Import environment
-. ${HOME}/config/shell/profile
+# Variables
+prefix=${HOME}/bin/x11
 
 # Restrict X server access
 # xhost +si:localuser:${USER}
 xhost -
 
 # X settings
-xrdb /dev/null
+# xrdb /dev/null
 # xbacklight -set 100
 xset b off s 300 15 dpms 300 600 900
 xset r rate 250 50 m 3/2 0
 
 # Launch daemons
 # assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
-eval `dbus-launch --sh-syntax`
+# eval `dbus-launch --sh-syntax`
 # eval `ssh-agent -s`
 eval `gpg-agent -s --daemon --enable-ssh-support --options ${XDG_CONFIG_HOME}/pgp/gpg-agent.conf`
 
 # assume [ -z "${GNOME_KEYRING_CONTROL}" ]
-set -a
-eval `gnome-keyring-daemon -sdc secrets`
-set +a
+set -a;  eval `gnome-keyring-daemon -sdc secrets`;  set +a
 
 # Check XDG_*_DIR directories according to
 # ${XDG_CONFIG_HOME}/user-dirs.dirs contents
@@ -37,11 +35,11 @@ lxpanel &
 
 # Delay launch of other apps until the task bar is up
 # (and generate wallpaper along the way)
-gen-wallpaper
+${prefix}/gen-wallpaper
 pcmanfm -d --desktop &
 
 # Launch automatic lid-autolock
-lid-xlock & LIDXLOCK_PID=$!
+${prefix}/lid-xlock & LIDXLOCK_PID=$!
 
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &
@@ -58,7 +56,7 @@ kill ${LIDXLOCK_PID}
 kill ${GNOME_KEYRING_PID}
 kill `echo ${GPG_AGENT_INFO} | cut -d: -f2`
 # eval `ssh-agent -s -k`
-kill ${DBUS_SESSION_BUS_PID}
+# kill ${DBUS_SESSION_BUS_PID}
 
 # Remove X11 cookie
 xauth remove ${DISPLAY}
