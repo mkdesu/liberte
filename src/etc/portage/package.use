@@ -7,7 +7,6 @@ app-text/ghostscript-gpl        -X
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
-app-text/hunspell               -ncurses
 dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
 dev-libs/libxml2                -readline
@@ -24,7 +23,6 @@ x11-libs/libdrm                 -video_cards_vmware
 media-libs/mesa                 -gallium -video_cards_vmware
 media-video/mplayer             -video_cards_*
 sys-fs/udev                     extras
-sys-fs/ntfs3g                   -udev
 sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
@@ -39,7 +37,6 @@ net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 net-irc/xchat                   ssl
 net-im/pidgin                         gnutls
-gnome-base/gvfs                 -http
 
 # Multimedia
 # mplayer: faac, x264, xvid, twolame/toolame and (partly) mp3 are activated only for +encode
@@ -59,7 +56,6 @@ sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 x11-libs/cairo                  -glib
-x11-libs/libfm                  -udev
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
@@ -77,13 +73,11 @@ app-arch/p7zip                  rar
 app-office/abiword              plugins gnome
 gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
-gnome-base/gvfs                 gnome
 media-gfx/graphicsmagick        imagemagick
 www-servers/nginx               aio
 # app-portage/eix               sqlite
 
 # Internationalization
-app-i18n/scim-tables            linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
 sys-apps/man-pages              -linguas_*
