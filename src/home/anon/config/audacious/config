@@ -71,6 +71,7 @@ playlist_manager_width=0
 playlist_manager_height=0
 output_path=/usr/lib/audacious/Output/alsa.so
 iface_path=/usr/lib/audacious/General/gtkui.so
+filesel_path=/home/anon
 chardet_detector=
 chardet_fallback=
 cover_name_include=
@@ -192,3 +193,18 @@ range=0.5
 length=3
 [ladspa]
 plugins=0
+[sndstretch]
+pitch=1
+speed=1
+short_overlap=FALSE
+volume_corr=FALSE
+[resample]
+8000=48000
+16000=48000
+22050=44100
+44100=44100
+48000=48000
+96000=96000
+192000=96000
+method=4
+fallback_rate=44100

@@ -1,13 +1,12 @@
 
 [settings]
 default-encoding=UTF-8
-enable-spell-checking=true
-spell-checking-languages=en
-last-window-width=1022
+spell-checking-languages=en-GB,en
+enable-java-applet=false
+last-window-width=798
 last-window-height=549
 show-bookmarkbar=true
 homepage=file:///home/anon/info/browser.html
-ask-for-destination-folder=true
 text-editor=gedit %U
 location-entry-search=http://www.google.com/search?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE

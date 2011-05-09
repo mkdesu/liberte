@@ -1,5 +1,7 @@
 #!/bin/sh
 
+notify-send -u low -i drive-removable-media -t 2000 'Synchronizing media' 'Synchronizing removable media…'
+
 sync
 sleep 1
 sync

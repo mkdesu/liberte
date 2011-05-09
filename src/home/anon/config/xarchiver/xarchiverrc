@@ -1,6 +1,6 @@
 
 [xarchiver]
-preferred_format=8
+preferred_format=12
 confirm_deletion=true
 sort_filename_content=false
 store_output=false

@@ -241,7 +241,7 @@
         show_thumbnails = "true" 
         show_directory_date = "false" 
         home_path = "" 
-        last_path = "/home/anon/config/images" 
+        last_path = "/home/anon" 
         startup_path = "0" 
         exit_on_close = "false" 
 
