@@ -4,7 +4,7 @@ hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
 consolefont=ter-i16n.psf
 lzmamem=20MiB
-protected="/etc/._cfg????_locale.gen /etc/conf.d/._cfg????_clock /etc/._cfg????_eixrc"
+protected="/etc/._cfg????_locale.gen"
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'

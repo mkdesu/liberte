@@ -1,3 +1,0 @@
-# SQLite support (optional)
-# SQLITE PORTDIR_CACHE_METHOD="sqlite"
-# SQLITE OVERLAY_CACHE_METHOD="sqlite"

@@ -10,12 +10,6 @@ if type -p env-update 1>/dev/null; then
     echo ">sys-kernel/hardened-sources-`cat ${HOME}/config/kversion`" \
         > /etc/portage/package.mask/kernel
 
-    # if [ -e /usr/bin/eix-update ]; then
-    #    export FEATURES="metadata-transfer"
-    #    sed -i 's/^# MODULE //' /etc/portage/modules/sqlite
-    #    sed -i 's/^# SQLITE //' /etc/eixrc
-    # fi
-
     if [ -e /var/lib/layman/make.conf ]; then
         sed -i 's/^# LAYMAN //' /etc/make.conf
     fi
