@@ -11,13 +11,16 @@ fi
 
 
 # Helpers
-cms=`dirname "$0"`/cms
+prefix="${0##*/}"
+prefix="${0%${prefix}}"
+cms="${prefix}"cms
+mhdrop="${prefix}"mhdrop
+
 
 # Directories
 ssldir=${SECURITY_HOME}/ssl
 queue=${HOME}/persist/cables/queue
 rqueue=${HOME}/persist/cables/rqueue
-inbox=${HOME}/persist/mail/inbox
 
 # Parameters
 cmd="$1"
@@ -37,25 +40,6 @@ getuserhost() {
 }
 
 
-getfreemsg() {
-    local last=`find ${inbox} -maxdepth 1 -type f -regex '.*/[1-9][0-9]*' -printf '%f\n' \
-        | sort -nr | head -1`
-
-    if [ -z "${last}" ]; then
-        last=0
-    fi
-
-    # dash supports $((...))
-    last=$((last + 1))
-
-    if [ -e ${inbox}/${last} ]; then
-        error "could not create new message name"
-    fi
-
-    echo ${last}
-}
-
-
 # Sanity checks
 [ ${#msgid} = 40 ] || error "bad msgid"
 
@@ -69,7 +53,7 @@ case "${cmd}" in
 send)
     # <send> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
+        if "${cms}" ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message
         else
@@ -84,7 +68,7 @@ send)
 recv)
     # <recv> [crypto loop]
     if [ -e ${rqueue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${rqueue}/"${msgid}" 2>/dev/null; then
+        if "${cms}" ${cmd} ${ssldir} ${rqueue}/"${msgid}" 2>/dev/null; then
             getuserhost ${rqueue}
             date=`date -uR`
 
@@ -94,15 +78,10 @@ recv)
                              -I "X-Received-Date: ${date}"        \
                 > ${rqueue}/"${msgid}"/message.ibx
 
-            freemsg=`getfreemsg`
-            mv -nT ${rqueue}/"${msgid}"/message.ibx ${inbox}/"${freemsg}"
+            "${mhdrop}" ${rqueue}/"${msgid}"/message.ibx
 
-            if [ ! -e ${rqueue}/"${msgid}"/message.ibx ]; then
-                mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
-                rm ${rqueue}/"${msgid}"/message    ${rqueue}/"${msgid}"/message.out
-            else
-                error "failed to move received message to inbox"
-            fi
+            mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
+            rm ${rqueue}/"${msgid}"/message    ${rqueue}/"${msgid}"/message.out
         else
             mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.req
             error "${cmd} failed"
@@ -115,7 +94,7 @@ recv)
 ack)
     # <ack> [crypto loop]
     if [ -e ${queue}/"${msgid}"/${cmd}.rdy ]; then
-        if ${cms} ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
+        if "${cms}" ${cmd} ${ssldir} ${queue}/"${msgid}" 2>/dev/null; then
             getuserhost ${queue}
             date=`date -uR`
 
@@ -123,16 +102,11 @@ ack)
                 echo "Verified message delivery to ${username}@${hostname} (${date}).") \
                 > ${queue}/"${msgid}"/message.ack
 
-            freemsg=`getfreemsg`
-            mv -nT ${queue}/"${msgid}"/message.ack ${inbox}/"${freemsg}"
+            "${mhdrop}" ${queue}/"${msgid}"/message.ack
 
-            if [ ! -e ${queue}/"${msgid}"/message.ack ]; then
-                mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
-                rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \
-                   ${queue}/"${msgid}"/message.sig ${queue}/"${msgid}"/message.hdr
-            else
-                error "failed to move delivery acknowledgment to inbox"
-            fi
+            mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
+            rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \
+               ${queue}/"${msgid}"/message.sig ${queue}/"${msgid}"/message.hdr
         else
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.req
             error "${cmd} failed"

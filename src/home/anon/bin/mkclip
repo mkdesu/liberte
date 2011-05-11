@@ -11,7 +11,7 @@ result="$1"
 fps=${2:-7.5}
 audelay=1
 
-tmpdir=$(mktemp -d --tmpdir=$(dirname "${out}") mkclip.XXXXX)
+tmpdir=$(mktemp -d --tmpdir=$(dirname "${out}") mkclip.XXXXXX)
 fifodir=$(mktemp -d)
 
 

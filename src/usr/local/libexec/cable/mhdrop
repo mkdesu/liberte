@@ -1,0 +1,60 @@
+#!/bin/sh -e
+
+umask 077
+export LC_ALL=C
+
+
+if [ $# -lt 1 ]; then
+    echo "Format: $0 <file>"
+    exit 1
+fi
+
+
+# Directories
+inbox=${HOME}/persist/mail/inbox
+
+# Parameters
+msg="$1"
+
+lockmagick="$2"
+locktmout=300
+
+
+# Automatic locking of inbox operations
+if [ lockmagick != "${lockmagick}" ]; then
+    exec flock -w ${locktmout} ${inbox}/ "$0" "${msg}" lockmagick
+fi
+
+
+error() {
+    echo "mhdrop: $1" 1>&2
+    exit 1
+}
+
+
+getfreemsg() {
+    local last=`find ${inbox} -maxdepth 1 -type f -regex '.*/[1-9][0-9]*' -printf '%f\n' \
+        | sort -nr | head -1`
+
+    if [ -z "${last}" ]; then
+        last=0
+    fi
+
+    # dash supports $((...))
+    last=$((last + 1))
+
+    if [ -e ${inbox}/${last} ]; then
+        error "failed to create new message name"
+    fi
+
+    echo ${last}
+}
+
+
+freemsg=`getfreemsg`
+mv -nT -- "${msg}" ${inbox}/"${freemsg}"
+
+
+if [ -e "${msg}" ]; then
+    error "failed to move ${msg} to inbox"
+fi
