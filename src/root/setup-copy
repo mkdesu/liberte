@@ -157,6 +157,12 @@ for mod in `find /usr/lib/GraphicsMagick* -name '*.so'`; do
 done
 
 
+if [ -e /etc/gtk-2.0/gtk.immodules ]; then
+    sinfo "Fixing gtk.immodules"
+    mv /etc/gtk-2.0/gtk.immodules /etc/gtk-2.0/`portageq envvar CHOST`/
+fi
+
+
 # Any problem will cause a fatal error
 sinfo "Checking linking consistency"
 revdep-rebuild -qi

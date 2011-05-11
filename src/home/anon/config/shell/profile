@@ -33,10 +33,10 @@ export XAUTHORITY=${TMPDIR}/Xauthority
 # export LC_PAPER=en_GB.UTF-8
 # export LC_TIME=en_GB.UTF-8
 
-# X11 internationalization (xim is apparently more robust than scim)
+# X11 internationalization
 export XMODIFIERS=@im=SCIM
-export GTK_IM_MODULE=xim
-export QT_IM_MODULE=xim
+export GTK_IM_MODULE=scim
+export QT_IM_MODULE=scim-bridge
 
 # Application settings
 export BROWSER=midori
