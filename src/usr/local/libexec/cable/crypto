@@ -78,6 +78,12 @@ recv)
                              -I "X-Received-Date: ${date}"        \
                 > ${rqueue}/"${msgid}"/message.ibx
 
+            # Prepare headers for local MUA failure message
+            formail -f -X From: -X To: -X Cc: -X Bcc: -X Subject: -X Date:         \
+                    -X Message-ID: -X In-Reply-To: -X References: -a 'Subject: '   \
+                < ${rqueue}/"${msgid}"/message.ibx | sed 's/^Subject: /&[fail] /i' \
+                > ${rqueue}/"${msgid}"/message.hdr
+
             "${mhdrop}" ${rqueue}/"${msgid}"/message.ibx
 
             mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
@@ -98,15 +104,15 @@ ack)
             getuserhost ${queue}
             date=`date -uR`
 
-            (cat ${queue}/"${msgid}"/message.hdr; echo;                                 \
-                echo "Verified message delivery to ${username}@${hostname} (${date}).") \
+            (cat ${queue}/"${msgid}"/message.hdr; \
+                echo "\nVerified message delivery to ${username}@${hostname}.\n${date}") \
                 > ${queue}/"${msgid}"/message.ack
 
             "${mhdrop}" ${queue}/"${msgid}"/message.ack
 
             mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \
-               ${queue}/"${msgid}"/message.sig ${queue}/"${msgid}"/message.hdr
+               ${queue}/"${msgid}"/message.sig
         else
             mv ${queue}/"${msgid}"/${cmd}.rdy ${queue}/"${msgid}"/${cmd}.req
             error "${cmd} failed"

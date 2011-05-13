@@ -102,7 +102,7 @@ Protocol
 
   [crypto loop]
   + check   /cables/rqueue/<msgid>/recv.rdy
-  + prepare /cables/rqueue/<msgid>/{message,receipt.{ack,out}}
+  + prepare /cables/rqueue/<msgid>/{message{,.hdr},receipt.{ack,out}}
   + create  <mua message>                          <- /cables/rqueue/<msgid>/message
   + rename  /cables/rqueue/<msgid>/recv.rdy        -> recv.ok  (success)
   +                                                -> recv.req (crypto fail)
@@ -179,16 +179,18 @@ Watch list (for <msgid>s of 40 hex digits):
 Retry policies:
   + retry every X min. (+ random component)
 
-Upon reaching max age (from <msgid>/username timestamp):
+Validation: upon reaching max age (from <msgid>/username timestamp):
+  (mutually exclusive with all loop types)
+
   + (queue)  create  <mua message>
-                 no send.ok: failed to fetch certificates and encrypt message
-                 no ack.ok:  failed to send message and receive receipt
-                 ack.ok:     failed to acknowledge receipt
+                 send.req/rdy:        failed to fetch certificates and encrypt message
+                 send.ok + no ack.ok: failed to send message and receive receipt
+                 ack.ok:              failed to acknowledge receipt
   + (queue)  rename  /cables/queue/<msgid>  -> <msgid>.del
 
   + (rqueue) create  <mua message>
-                 no recv.ok: failed to fetch and decrypt message
-                 recv.ok:    failed to send receipt and receive acknowledgment
+                 recv.req/rdy:        failed to fetch and decrypt message
+                 recv.ok:             failed to send receipt and receive acknowledgment
   + (rqueue) rename  /cables/rqueue/<msgid> -> <msgid>.del
 
 

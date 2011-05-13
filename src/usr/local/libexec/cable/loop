@@ -2,6 +2,10 @@
 
 # This script ensures at most one running instance for a <msgid>
 
+umask 077
+export LC_ALL=C
+
+
 if [ $# -lt 2  -o  \( queue != "$1"  -a  rqueue != "$1" \) ]; then
     echo "Format: $0 queue|rqueue <msgid>[.del]"
     exit 1
@@ -11,13 +15,10 @@ fi
 # Helpers
 prefix="${0##*/}"
 prefix="${0%${prefix}}"
+validate="${prefix}"validate
 fetch="${prefix}"fetch
 crypto="${prefix}"crypto
 comm="${prefix}"comm
-
-# Directories
-queue=${HOME}/persist/cables/queue
-rqueue=${HOME}/persist/cables/rqueue
 
 # Parameters
 qtype=$1
@@ -26,6 +27,9 @@ dirid="${2}"
 
 lockmagick="$3"
 locktmout=30
+
+# Directories
+msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
 
 
 error() {
@@ -38,16 +42,16 @@ error() {
 if [ "${dirid}" != "${msgid}" ]; then
     if [ ${qtype} = queue ]; then
 
-        if [ -e ${queue}/"${msgid}".del ]; then
-            exec flock -w ${locktmout} ${queue}/"${dirid}"/  "${comm}" ack "${msgid}"
+        if [ -e "${msgdir}".del ]; then
+            exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" ack "${msgid}"
         else
             error "${msgid}.del not found"
         fi
 
     else
 
-        if [ -e ${rqueue}/"${msgid}".del ]; then
-            exec flock -w ${locktmout} ${rqueue}/"${dirid}"/ "${comm}" fin "${msgid}"
+        if [ -e "${msgdir}".del ]; then
+            exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" fin "${msgid}"
         else
             error "${msgid}.del not found"
         fi
@@ -58,32 +62,33 @@ else
 
         # non-blocking lock of combined operations
         if [ lockmagick != "${lockmagick}" ]; then
-            exec flock -n ${queue}/"${msgid}"/ "$0" ${qtype} "${msgid}" lockmagick
+            exec flock -n "${msgdir}"/ "$0" ${qtype} "${msgid}" lockmagick
         fi
 
+        "${validate}" ${qtype} "${msgid}"
         set +e
 
-        if   [ -e ${queue}/"${msgid}"/send.req ]; then
+        if   [ -e "${msgdir}"/send.req ]; then
             "${fetch}"  send "${msgid}" && \
             "${crypto}" send "${msgid}" && \
             "${comm}"   send "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/send.rdy ]; then
+        elif [ -e "${msgdir}"/send.rdy ]; then
             "${crypto}" send "${msgid}" && \
             "${comm}"   send "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/send.ok  ]; then
-            if [ ! -e ${queue}/"${msgid}"/ack.ok ]; then
+        elif [ -e "${msgdir}"/send.ok  ]; then
+            if [ ! -e "${msgdir}"/ack.ok ]; then
                 "${comm}" send "${msgid}"
             fi
         else
             error "${msgid}/send.req/rdy/ok not found"
         fi
 
-        if   [ -e ${queue}/"${msgid}"/ack.rdy ]; then
+        if   [ -e "${msgdir}"/ack.rdy ]; then
                  "${crypto}" ack  "${msgid}" && \
             exec "${comm}"   ack  "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/ack.ok  ]; then
+        elif [ -e "${msgdir}"/ack.ok  ]; then
             exec "${comm}"   ack  "${msgid}"
-        elif [ -e ${queue}/"${msgid}"/ack.req ]; then
+        elif [ -e "${msgdir}"/ack.req ]; then
                  "${fetch}"  ack  "${msgid}" && \
                  "${crypto}" ack  "${msgid}" && \
             exec "${comm}"   ack  "${msgid}"
@@ -93,19 +98,20 @@ else
 
         # non-blocking lock of combined operations
         if [ lockmagick != "${lockmagick}" ]; then
-            exec flock -n ${rqueue}/"${msgid}"/ "$0" ${qtype} "${msgid}" lockmagick
+            exec flock -n "${msgdir}"/ "$0" ${qtype} "${msgid}" lockmagick
         fi
 
+        "${validate}" ${qtype} "${msgid}"
         set +e
 
-        if   [ -e ${rqueue}/"${msgid}"/recv.req ]; then
+        if   [ -e "${msgdir}"/recv.req ]; then
                  "${fetch}"  recv "${msgid}" && \
                  "${crypto}" recv "${msgid}" && \
             exec "${comm}"   recv "${msgid}"
-        elif [ -e ${rqueue}/"${msgid}"/recv.rdy ]; then
+        elif [ -e "${msgdir}"/recv.rdy ]; then
                  "${crypto}" recv "${msgid}" && \
             exec "${comm}"   recv "${msgid}"
-        elif [ -e ${rqueue}/"${msgid}"/recv.ok  ]; then
+        elif [ -e "${msgdir}"/recv.ok  ]; then
             exec "${comm}"   recv "${msgid}"
         else
             error "${msgid}/recv.req/rdy/ok not found"
