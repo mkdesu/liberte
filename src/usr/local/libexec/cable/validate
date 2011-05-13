@@ -65,17 +65,18 @@ check_userhost "${username}" "${hostname}"
 if [ ${qtype} = queue ]; then
 
     # message.hdr is available, but [vfy] must be replaced with [fail]
-    sed "${subjrep}" "${msgdir}"/message.hdr > "${msgdir}"/message.rej
+    formail -f -i "Date: ${date}" < "${msgdir}"/message.hdr \
+        | sed "${subjrep}" > "${msgdir}"/message.rej
 
     if [ -e "${msgdir}"/send.req  -o  -e "${msgdir}"/send.rdy ]; then
-        echo "\nFailed to fetch certificates and encrypt message for ${username}@${hostname}.\n${date}" \
+        echo "Failed to fetch certificates and encrypt message for\n  ${username}@${hostname}" \
             >> "${msgdir}"/message.rej
     elif [ -e "${msgdir}"/send.ok ]; then
         if [ ! -e "${msgdir}"/ack.ok ]; then
-            echo "\nFailed to send message and receive receipt from ${username}@${hostname}.\n${date}" \
+            echo "Failed to send message and receive receipt from\n  ${username}@${hostname}"  \
                 >> "${msgdir}"/message.rej
         else
-            echo "\nFailed to acknowledge receipt received from ${username}@${hostname}.\n${date}" \
+            echo "Failed to acknowledge receipt received from\n  ${username}@${hostname}"      \
                 >> "${msgdir}"/message.rej
         fi
     else
@@ -88,12 +89,15 @@ else
         # no message.hdr is available at this point
         msgdate=$(date -d "$(stat --printf=%y "${tsfile}")" -uR)
 
-        echo "From: ${username}@${hostname}\nDate: ${msgdate}\nSubject: [fail]\n\nFailed to fetch and decrypt message from ${username}@${hostname}.\n${date}" \
+        (formail -f -I "From: <${username}@${hostname}>"         \
+                    -I "Old-Date: ${msgdate}" -I "Date: ${date}" \
+                    -I "Subject: [fail]" <&-;                    \
+            echo "Failed to fetch and decrypt message from\n  ${username}@${hostname}") \
             > "${msgdir}"/message.rej
     elif [ -e "${msgdir}"/recv.ok ]; then
         # message.hdr is available
-        (cat "${msgdir}"/message.hdr; \
-            echo "\nFailed to send receipt and receive acknowledgment from ${username}@${hostname}.\n${date}") \
+        (formail -f -i "Date: ${date}" < "${msgdir}"/message.hdr; \
+            echo "Failed to send receipt and receive acknowledgment from\n  ${username}@${hostname}") \
             > "${msgdir}"/message.rej
     else
         error "${msgid}: inconsistent state"

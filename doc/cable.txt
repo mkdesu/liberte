@@ -214,6 +214,7 @@ Message format
 (ack)
   + extract original From:, To:, Cc:, Bcc:, Subject:, Date:, Message-ID:,
                      In-Reply-To:, References: fields
+  + replace Date: header with current date (rename old header)
   + prepend [vfy] to Subject: field contents
   + append body with verification message, including current timestamp
     and verified delivery address
