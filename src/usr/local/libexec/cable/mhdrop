@@ -29,7 +29,7 @@ fi
 
 
 error() {
-    echo "mhdrop: $1" 1>&2
+    echo "mhdrop (${msg}): $1" 1>&2
     exit 1
 }
 
@@ -46,7 +46,7 @@ getfreemsg() {
     last=$((last + 1))
 
     if [ -e ${inbox}/${last} ]; then
-        error "failed to create new message name"
+        error "failed to create unique message name"
     fi
 
     echo ${last}
@@ -58,5 +58,5 @@ mv -nT -- "${msg}" ${inbox}/"${freemsg}"
 
 
 if [ -e "${msg}" ]; then
-    error "failed to move ${msg} to inbox"
+    error "failed to move message to inbox"
 fi

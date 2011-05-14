@@ -36,8 +36,7 @@ exec 1>>${TMPDIR}/cabled.log 2>&1
 # Read inotify events (close events may be ignored)
 # NOTE: inotifywait dies on blocking output
 # TODO: umount events (wait for mount), synthetic events (retries),
-#       message timeout, proper signal handling, proper logging,
-#       process pooling
+#       proper signal handling, proper logging, process pooling
 while :; do
     set +e
     pcount=`pgrep -u ${USER} -x flock | wc -l`

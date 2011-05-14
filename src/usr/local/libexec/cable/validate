@@ -29,7 +29,7 @@ tsfile="${msgdir}"/username
 
 
 error() {
-    echo "validate: $1" 1>&2
+    echo "validate (${msgid}): $1" 1>&2
     exit 1
 }
 
@@ -80,7 +80,7 @@ if [ ${qtype} = queue ]; then
                 >> "${msgdir}"/message.rej
         fi
     else
-        error "${msgid}: inconsistent state"
+        error "inconsistent state"
     fi
 
 else
@@ -100,7 +100,7 @@ else
             echo "Failed to send receipt and receive acknowledgment from\n  ${username}@${hostname}") \
             > "${msgdir}"/message.rej
     else
-        error "${msgid}: inconsistent state"
+        error "inconsistent state"
     fi
 
 fi

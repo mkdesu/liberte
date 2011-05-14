@@ -23,7 +23,7 @@ msgid="$2"
 
 
 error() {
-    echo "comm: $1" 1>&2
+    echo "comm (${msgid}): $1" 1>&2
     exit 1
 }
 
@@ -104,7 +104,7 @@ ack)
         rm -f "${pubqueue}"/"${msgid}"
 
         ackhash=`cat ${queue}/"${msgid}"/receipt.ack | tr -cd '[:xdigit:]' | tr A-F a-f`
-        [ ${#ackhash} = 128 ] || error "bad ackhash"
+        [ ${#ackhash} = 128 ] || error "bad ackhash in receipt.ack"
 
         curl -sSfg -o ${queue}/"${msgid}"/${cmd}.ans "${prefix}"/ack/"${msgid}"/"${ackhash}"
 
@@ -117,7 +117,7 @@ ack)
         rm -f "${pubqueue}"/"${msgid}"
         rm -r --one-file-system ${queue}/"${msgid}".del
     else
-        error "${cmd}.ok or ${msgid}.del not found"
+        error "${cmd}.ok or .del directory not found"
     fi
     ;;
 
@@ -127,7 +127,7 @@ fin)
         rm -f "${pubrqueue}"/"${msgid}"
         rm -r --one-file-system ${rqueue}/"${msgid}".del
     else
-        error "${msgid}.del not found"
+        error ".del directory not found"
     fi
     ;;
 

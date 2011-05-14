@@ -20,7 +20,7 @@ msgid="$2"
 
 
 error() {
-    echo "fetch: $1" 1>&2
+    echo "fetch (${msgid}): $1" 1>&2
     exit 1
 }
 

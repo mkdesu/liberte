@@ -33,9 +33,13 @@ msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
 
 
 error() {
-    echo "loop: $1" 1>&2
+    echo "loop (${msgid}): $1" 1>&2
     exit 1
 }
+
+
+# Sanity checks
+[ ${#msgid} = 40 ] || error "bad msgid"
 
 
 # .del actions: blocking lock (to let the renaming action finish)
@@ -45,7 +49,7 @@ if [ "${dirid}" != "${msgid}" ]; then
         if [ -e "${msgdir}".del ]; then
             exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" ack "${msgid}"
         else
-            error "${msgid}.del not found"
+            error ".del directory not found"
         fi
 
     else
@@ -53,7 +57,7 @@ if [ "${dirid}" != "${msgid}" ]; then
         if [ -e "${msgdir}".del ]; then
             exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" fin "${msgid}"
         else
-            error "${msgid}.del not found"
+            error ".del directory not found"
         fi
 
     fi
@@ -80,7 +84,7 @@ else
                 "${comm}" send "${msgid}"
             fi
         else
-            error "${msgid}/send.req/rdy/ok not found"
+            error "send.req/rdy/ok not found"
         fi
 
         if   [ -e "${msgdir}"/ack.rdy ]; then
@@ -114,7 +118,7 @@ else
         elif [ -e "${msgdir}"/recv.ok  ]; then
             exec "${comm}"   recv "${msgid}"
         else
-            error "${msgid}/recv.req/rdy/ok not found"
+            error "recv.req/rdy/ok not found"
         fi
 
     fi

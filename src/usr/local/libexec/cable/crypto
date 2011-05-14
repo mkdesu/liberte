@@ -28,7 +28,7 @@ msgid="$2"
 
 
 error() {
-    echo "crypto: $1" 1>&2
+    echo "crypto (${msgid}): $1" 1>&2
     exit 1
 }
 
