@@ -6,9 +6,9 @@
 
 
 # Preliminary variables
-msgidre='[0-9a-f]{40}'
-queue=${HOME}/persist/cables/queue
-rqueue=${HOME}/persist/cables/rqueue
+mpoint=${HOME}/persist
+queue=${mpoint}/cables/queue
+rqueue=${mpoint}/cables/rqueue
 
 
 # Initialization tasks
@@ -21,39 +21,13 @@ fi
 
 
 # Variables
-prefix=`dirname $0`
-loop="${prefix}"/loop
-wpid=0
-
-
-# Set some traps
-trap 'set +e; kill ${wpid} 2>/dev/null' 0
-trap : INT QUIT TERM SEGV
+prefix="${0##*/}"
+prefix="${0%${prefix}}"
+daemon="${prefix}"daemon
 
 
 exec 1>>${TMPDIR}/cabled.log 2>&1
 
-# Read inotify events (close events may be ignored)
-# NOTE: inotifywait dies on blocking output
-# TODO: umount events (wait for mount), synthetic events (retries),
-#       proper signal handling, proper logging, process pooling
-while :; do
-    set +e
-    pcount=`pgrep -u ${USER} -x flock | wc -l`
-    qmsgids=`find ${queue}   -maxdepth 1 -type d -regextype posix-egrep \
-                             -regex "${queue}/${msgidre}(\.del)?"  -printf 'queue:%f\n'`
-    rqmsgids=`find ${rqueue} -maxdepth 1 -type d -regextype posix-egrep \
-                             -regex "${rqueue}/${msgidre}(\.del)?" -printf 'rqueue:%f\n'`
-    set -e
-
-    for entry in ${qmsgids} ${rqmsgids}; do
-        qtype="${entry%%:*}"
-        dirid="${entry#*:}"
-
-        logger -p 6 -t cabled "processing ${qtype}/${dirid}"
-        "${loop}" "${qtype}" "${dirid}" &
-    done
-
-    sleep 60 & wpid=$!
-    wait ${wpid}
-done
+# Launch the inotify-based daemon
+# TODO: synthetic events (retries), proper logging, process pooling
+exec "${daemon}" ${mpoint} ${queue} ${rqueue}

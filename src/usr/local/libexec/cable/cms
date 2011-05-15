@@ -37,7 +37,7 @@ error() {
 # * verifies the certificates chain (important only for encrypt.pem)
 # * generates username from ca.pem and checks it against the given one
 verify_certs() {
-    local cvedir="$1" name count fingerprint
+    local cvedir="$1" name count fingerprint username
 
     for name in ca verify encrypt; do
         openssl x509 -in  "${cvedir}"/${name}.pem \
@@ -59,29 +59,29 @@ verify_certs() {
         -CApath /dev/null -CAfile "${cvedir}"/ca.pem "${cvedir}"/encrypt.pem \
         >> "${cvedir}"/certs.vfy 2>&1
 
-    cat > "${cvedir}"/certs.cmp <<EOF
+    if ! cmp -s -- "${cvedir}"/certs.vfy - <<EOF
 ${cvedir}/ca.pem: OK
 ${cvedir}/verify.pem: OK
 ${cvedir}/encrypt.pem: OK
 EOF
-
-    if ! cmp -s -- "${cvedir}"/certs.vfy "${cvedir}"/certs.cmp; then
+    then
         error "certificates chain verification failed"
     fi
 
-    rm -- "${cvedir}"/certs.cmp "${cvedir}"/certs.vfy
+    rm -- "${cvedir}"/certs.vfy
 
 
     openssl x509 -in "${cvedir}"/ca.pem -outform der -out /dev/null
     fingerprint=`openssl x509 -in "${cvedir}"/ca.pem -outform der | sha1sum | head -c 40`
     [ ${#fingerprint} = 40 ]
-    ${base32} "${fingerprint}" > "${cvedir}"/username.cmp
+    username=`${base32} "${fingerprint}"`
 
-    if ! cmp -s -- "${cvedir}"/username "${cvedir}"/username.cmp; then
+    if ! cmp -s -- "${cvedir}"/username - <<EOF
+${username}
+EOF
+    then
         error "username verification failed"
     fi
-
-    rm -- "${cvedir}"/username.cmp
 }
 
 
