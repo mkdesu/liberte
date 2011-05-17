@@ -45,7 +45,7 @@ verify_certs() {
         mv -- "${cvedir}"/${name}.norm.pem "${cvedir}"/${name}.pem
 
         # Sanity check - OpenSSL should output exactly 1 certificate
-        count=`sed -n '/^-----BEGIN /p' -- "${cvedir}"/${name}.pem | wc -l`
+        count=`grep -c -- '^-----BEGIN ' "${cvedir}"/${name}.pem`
         [ "${count}" = 1 ]
     done
 

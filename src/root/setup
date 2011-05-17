@@ -233,7 +233,7 @@ gcc  ${cflags} -o /usr/local/sbin/udev-watchdog    /usr/local/src/udev-watchdog.
 gcc  ${cflags} -o /usr/local/bin/hex2base32        /usr/local/src/hex2base32.c
 gcc  ${cflags} -o /usr/local/bin/log-limit         /usr/local/src/log-limit.c
 gcc  ${cflags} -o /usr/local/libexec/cable/service /usr/local/src/cable-service.c
-gcc  ${cflags} -o /usr/local/libexec/cable/daemon  /usr/local/src/cable-daemon.c
+gcc  ${cflags} -o /usr/local/libexec/cable/daemon  /usr/local/src/cable-daemon.c  -lrt
 
 cflags="-Wall `portageq envvar CFLAGS`"
 mkdir -p /usr/local/addons/initrd

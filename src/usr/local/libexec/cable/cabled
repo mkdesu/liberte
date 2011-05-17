@@ -28,6 +28,11 @@ daemon="${prefix}"daemon
 
 exec 1>>${TMPDIR}/cabled.log 2>&1
 
+
+# Let fuse-vfs inotify emulation stabilize
+sleep 30
+
+
 # Launch the inotify-based daemon
-# TODO: synthetic events (retries), proper logging, process pooling
+# TODO: proper logging, killing all processes
 exec "${daemon}" ${mpoint} ${queue} ${rqueue}
