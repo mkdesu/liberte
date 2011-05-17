@@ -99,8 +99,8 @@ static void error() {
 
 /* INT/TERM signals handler */
 static void sig_handler(int signum) {
-	if (signum == SIGINT || signum == SIGTERM)
-		stop = 1;
+    if (signum == SIGINT || signum == SIGTERM)
+        stop = 1;
 }
 
 
@@ -237,7 +237,7 @@ static void sleepsec(double sec) {
     /* support negative arguments */
     if (sec > 0) {
         req.tv_sec  = (time_t) sec;
-        req.tv_nsec = (long) ((sec - req.tv_sec) * 1e9f);
+        req.tv_nsec = (long) ((sec - req.tv_sec) * 1e9);
 
         if (nanosleep(&req, &rem) == -1) {
             /* try to complete the sleep at most once */
@@ -274,18 +274,18 @@ static void wait_reg_watches(const char *mppath, const char *qpath, const char *
 
 /* set signal handlers */
 static void set_signals() {
-	struct sigaction sa;
+    struct sigaction sa;
 
-	sa.sa_handler  = sig_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags    = 0;
+    sa.sa_handler  = sig_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags    = 0;
     sa.sa_restorer = NULL;
 
-	if (sigaction(SIGINT,  &sa, NULL) == -1  ||  sigaction(SIGTERM, &sa, NULL) == -1)
+    if (sigaction(SIGINT,  &sa, NULL) == -1  ||  sigaction(SIGTERM, &sa, NULL) == -1)
         error();
 
     sa.sa_handler  = chld_handler;
-	sa.sa_flags    = SA_RESTART;
+    sa.sa_flags    = SA_RESTART;
 
     if (sigaction(SIGCHLD, &sa, NULL) == -1)
         error();
@@ -349,7 +349,7 @@ static int wait_read(double sec) {
         sec = 0;
 
     tv.tv_sec  = (time_t)      sec;
-    tv.tv_usec = (suseconds_t) ((sec - tv.tv_sec) * 1e6f);
+    tv.tv_usec = (suseconds_t) ((sec - tv.tv_sec) * 1e6);
 
     FD_ZERO(&rfds);
     FD_SET(inotfd, &rfds);
@@ -440,7 +440,7 @@ int main(int argc, char *argv[]) {
     /* using FILENAME_MAX prevents EINVAL on read() */
     char  buf[sizeof(struct inotify_event) + FILENAME_MAX+1];
     const char *mppath, *qpath, *rqpath;
-    int   sz, offset, rereg, readok = 0;
+    int   sz, offset, rereg, evqok = 0;
     struct inotify_event *iev;
     double retrytmout, lastclock;
 
@@ -480,7 +480,7 @@ int main(int argc, char *argv[]) {
                     error();
 
                 /* process all events in buffer, sz = -1 and 0 are automatically ignored */
-                for (offset = 0;  offset < sz  &&  !stop  &&  !rereg;  readok = 1) {
+                for (offset = 0;  offset < sz  &&  !stop  &&  !rereg;  evqok = 1) {
                     /* get handler to next event in read buffer, and update offset */
                     iev     = (struct inotify_event*) (buf + offset);
                     offset += sizeof(struct inotify_event) + iev->len;
@@ -518,9 +518,9 @@ int main(int argc, char *argv[]) {
                 lastclock = getmontime();
 
                 /* inotify is apparently unreliable on fuse, so reregister watches from time to time */
-                if (!readok)
+                if (!evqok)
                     rereg  = 1;
-                readok = 0;
+                evqok = 0;
             }
         }
     }
