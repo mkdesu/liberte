@@ -1,9 +1,5 @@
 #!/bin/sh -e
 
-umask 077
-export LC_ALL=C
-
-
 if [ $# != 2 ]; then
     echo "Format: $0 send|recv|ack <msgid>"
     exit 1
@@ -19,8 +15,9 @@ cmd="$1"
 msgid="$2"
 
 
+trap '[ $? = 0 ] || error failed' 0
 error() {
-    echo "fetch (${msgid}): $1" 1>&2
+    logger -t fetch -p mail.err "$@ (${msgid})"
     exit 1
 }
 

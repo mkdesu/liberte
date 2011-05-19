@@ -26,13 +26,10 @@ prefix="${0%${prefix}}"
 daemon="${prefix}"daemon
 
 
-exec 1>>${TMPDIR}/cabled.log 2>&1
-
-
 # Let fuse-vfs inotify emulation stabilize
 sleep 30
 
 
 # Launch the inotify-based daemon
-# TODO: proper logging
+exec 0<&- 1>/dev/null 2>&1
 exec "${daemon}" ${mpoint} ${queue} ${rqueue}

@@ -32,8 +32,9 @@ locktmout=30
 msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
 
 
+trap '[ $? = 0 ] || error failed' 0
 error() {
-    echo "loop (${msgid}): $1" 1>&2
+    logger -t loop -p mail.err "$@ (${msgid})"
     exit 1
 }
 

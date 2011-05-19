@@ -25,6 +25,7 @@
 #include <signal.h>
 #include <locale.h>
 #include <stdarg.h>
+#include <syslog.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
@@ -72,26 +73,29 @@ static volatile int stop = 0;
 static volatile long pstarted = 0, pfinished = 0;
 
 
+/* logging init */
+static void syslog_init() {
+    openlog("cable", LOG_PID, LOG_MAIL);
+}
+
 /* logging */
-void flog(const char *format, ...) {
+static void flog(int priority, const char *format, ...) {
     va_list ap;
 
     va_start(ap, format);
-    vfprintf(stderr, format, ap);
+    vsyslog(priority, format, ap);
     va_end(ap);
-
-    fprintf(stderr, "\n");
 }
 
 
 /* non-fatal error */
 static void warning() {
-    perror("cabled (warning)");
+    flog(LOG_WARNING, "%m");
 }
 
 /* fatal errors which shouldn't happen in a correct program */
 static void error() {
-    perror("cabled (fatal)");
+    flog(LOG_ERR, "%m");
 
     if (inotfd != -1  &&  close(inotfd) == -1)
         warning();
@@ -104,7 +108,7 @@ static void error() {
 static void sig_handler(int signum) {
     if (signum == SIGINT || signum == SIGTERM) {
         if (!stop) {
-            flog("signal caught: %d", signum);
+            /* flog(LOG_NOTICE, "signal caught: %d", signum); */
             stop = 1;
 
             /* kill pgroup; also sends signal to self, but stop=1 prevents recursion */
@@ -128,7 +132,7 @@ static void chld_handler(int signum) {
 
         /* -1/ECHILD is returned for no pending completed processes */
         if (pid == -1  &&  errno != ECHILD)
-            error();
+            _exit(EXIT_FAILURE);
     }
 }
 
@@ -213,15 +217,15 @@ static int try_reg_watches(const char *mppath, const char *qpath, const char *rq
 
     /* try to quickly open a fd */
     if ((mpfd = open(mppath, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_NONBLOCK)) == -1)
-        flog("failed to open %s, waiting...", mppath);
+        flog(LOG_NOTICE, "failed to open %s, waiting...", mppath);
 
     else if (! is_mountpoint(mppath))
-        flog("%s is not a mount point, waiting...", mppath);
+        flog(LOG_NOTICE, "%s is not a mount point, waiting...", mppath);
 
     else if (lstat(qpath, &st) == -1  ||  !S_ISDIR(st.st_mode))
-        flog("%s is not a directory, waiting...", qpath);
+        flog(LOG_NOTICE, "%s is not a directory, waiting...", qpath);
     else if (lstat(rqpath, &st) == -1  ||  !S_ISDIR(st.st_mode))
-        flog("%s is not a directory, waiting...", rqpath);
+        flog(LOG_NOTICE, "%s is not a directory, waiting...", rqpath);
 
     /* if registering inotify watches is unsuccessful, immediately unregister */
     else if (reg_watches(qpath, rqpath))
@@ -278,7 +282,7 @@ static void wait_reg_watches(const char *mppath, const char *qpath, const char *
     }
 
     if (ok)
-        flog("registered watches");
+        flog(LOG_INFO, "registered watches");
 }
 
 
@@ -334,7 +338,7 @@ static void run_loop(const char *qtype, const char *msgid) {
 
     /* wait if too many processes have been launched */
     while (!stop  &&  (pcount = pstarted - pfinished) >= MAX_PROC) {
-        flog("too many processes (%ld), waiting...", pcount);
+        flog(LOG_NOTICE, "too many processes (%ld), waiting...", pcount);
         sleepsec(WAIT_PROC);
     }
 
@@ -349,7 +353,7 @@ static void run_loop(const char *qtype, const char *msgid) {
             error();
         }
         else {
-            flog("processing: %s %s", qtype, msgid);
+            flog(LOG_INFO, "processing: %s %s", qtype, msgid);
             ++pstarted;
         }
     }
@@ -386,7 +390,7 @@ static int wait_read(double sec) {
 
 
 /* initialize rng */
-void rand_init() {
+static void rand_init() {
     struct timespec tp;
 
     if (clock_gettime(CLOCK_MONOTONIC_RAW, &tp) == -1)
@@ -397,13 +401,13 @@ void rand_init() {
 
 
 /* uniformly distributed value in [-1, 1] */
-double rand_shift() {
+static double rand_shift() {
     return random() / (RAND_MAX / 2.0) - 1;
 }
 
 
 /* get strictly monotonic time (unaffected by ntp/htp) in seconds */
-double getmontime() {
+static double getmontime() {
     struct timespec tp;
 
     if (clock_gettime(CLOCK_MONOTONIC_RAW, &tp) == -1)
@@ -414,7 +418,7 @@ double getmontime() {
 
 
 /* exec run_loop for all correct entries in (r)queue directory */
-void retry_dir(const char *qtype, const char *qpath) {
+static void retry_dir(const char *qtype, const char *qpath) {
     DIR    *qdir;
     struct dirent *de = NULL;
     struct stat   st;
@@ -470,6 +474,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    /* init logging */
+    syslog_init();
+
     /* set INT/TERM handler */
     set_signals();
 
@@ -518,7 +525,7 @@ int main(int argc, char *argv[]) {
                     /* ignore non-subdirectory events, and events with incorrect name */
                     else if (iev->len > 0  &&  (iev->mask & IN_ISDIR)  &&  is_msgdir(iev->name)) {
                         if (iev->wd != inotqwd  &&  iev->wd != inotrqwd)
-                            flog("unknown watch descriptor");
+                            flog(LOG_WARNING, "unknown watch descriptor");
                         else {
                             /* stop can be indicated here (while waiting for less processes) */
                             const char *qtype = (iev->wd == inotqwd) ? QUEUE_NAME : RQUEUE_NAME;
@@ -532,7 +539,7 @@ int main(int argc, char *argv[]) {
               if sufficient time passed since last retries, retry again
             */
             if (!stop  &&  getmontime() - lastclock >= retrytmout) {
-                flog("retrying queue directories");
+                flog(LOG_INFO, "retrying queue directories");
 
                 retry_dir(QUEUE_NAME,  qpath);
                 retry_dir(RQUEUE_NAME, rqpath);
@@ -548,6 +555,8 @@ int main(int argc, char *argv[]) {
     }
 
     unreg_watches();
-    flog("exiting");
+    flog(LOG_INFO, "exiting");
+
+    closelog();
     return 0;
 }

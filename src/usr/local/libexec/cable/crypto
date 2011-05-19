@@ -1,9 +1,5 @@
 #!/bin/sh -e
 
-umask 077
-export LC_ALL=C
-
-
 if [ $# != 2 ]; then
     echo "Format: $0 send|recv|ack <msgid>"
     exit 1
@@ -18,6 +14,7 @@ mhdrop="${prefix}"mhdrop
 
 
 # Directories
+inbox=${HOME}/persist/mail/inbox
 ssldir=${SECURITY_HOME}/ssl
 queue=${HOME}/persist/cables/queue
 rqueue=${HOME}/persist/cables/rqueue
@@ -27,8 +24,9 @@ cmd="$1"
 msgid="$2"
 
 
+trap '[ $? = 0 ] || error failed' 0
 error() {
-    echo "crypto (${msgid}): $1" 1>&2
+    logger -t crypto -p mail.err "$@ (${msgid})"
     exit 1
 }
 
@@ -84,7 +82,7 @@ recv)
                 < ${rqueue}/"${msgid}"/message.ibx | sed 's/^Subject: /&[fail] /i' \
                 > ${rqueue}/"${msgid}"/message.hdr
 
-            "${mhdrop}" ${rqueue}/"${msgid}"/message.ibx
+            "${mhdrop}" ${inbox} ${rqueue}/"${msgid}"/message.ibx
 
             mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
             rm ${rqueue}/"${msgid}"/message    ${rqueue}/"${msgid}"/message.out
@@ -108,7 +106,7 @@ ack)
                 echo "Verified message delivery to\n  ${username}@${hostname}") \
                 > ${queue}/"${msgid}"/message.ack
 
-            "${mhdrop}" ${queue}/"${msgid}"/message.ack
+            "${mhdrop}" ${inbox} ${queue}/"${msgid}"/message.ack
 
             mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \

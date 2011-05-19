@@ -22,7 +22,8 @@ trap : INT QUIT TERM SEGV
 
 
 error() {
-    echo "send: $1" 1>&2
+    # don't log via syslog, since invocation is interactive
+    echo "send: $@" 1>&2
     exit 1
 }
 

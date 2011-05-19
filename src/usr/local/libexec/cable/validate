@@ -1,9 +1,5 @@
 #!/bin/sh -e
 
-umask 077
-export LC_ALL=C
-
-
 if [ $# != 2  -o  \( queue != "$1"  -a  rqueue != "$1" \) ]; then
     echo "Format: $0 queue|rqueue <msgid>"
     exit 1
@@ -24,12 +20,14 @@ sectmout=$((7 * 24 * 60 * 60))
 subjrep='s/^\(Subject: \)\(\[vfy\] \)\?/\1[fail] /i'
 
 # Directories
+inbox=${HOME}/persist/mail/inbox
 msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
 tsfile="${msgdir}"/username
 
 
+trap '[ $? = 0 ] || error failed' 0
 error() {
-    echo "validate (${msgid}): $1" 1>&2
+    logger -t validate -p mail.err "$@ (${msgid})"
     exit 1
 }
 
@@ -107,7 +105,7 @@ fi
 
 
 # Deliver the reject message
-"${mhdrop}" "${msgdir}"/message.rej
+"${mhdrop}" ${inbox} "${msgdir}"/message.rej
 
 # Schedule message directory for removal
 mv -T "${msgdir}" "${msgdir}".del

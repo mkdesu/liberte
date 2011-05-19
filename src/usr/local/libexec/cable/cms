@@ -3,10 +3,6 @@
 # Encryption, decryption and verification of messages and message receipts
 # NOTE: the "-e" switch above is important (script failure on error)!
 
-umask 077
-export LC_ALL=C
-
-
 # Variables
 cmd="$1"
 ssldir="$2"
@@ -26,8 +22,9 @@ if [ \( "${cmd}" != send -a "${cmd}" != recv -a "${cmd}" != ack \) \
 fi
 
 
+trap '[ $? = 0 ] || error failed' 0
 error() {
-    echo "cms (${msgdir##*/}): $1" 1>&2
+    logger -t cms -p mail.err "$@ (${msgdir##*/})"
     exit 1
 }
 
