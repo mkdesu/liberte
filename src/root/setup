@@ -60,7 +60,7 @@ fi
 
 # Intentionally fail if there is there are multiple hardened profiles
 sinfo "Setting a hardened profile"
-hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/'`
+hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/' | grep -v /selinux`
 eselect profile set ${hardened}
 rm -f /etc/portage/savedconfig/sys-apps/busybox-*
 

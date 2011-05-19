@@ -1,11 +1,14 @@
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 199309L
+/* Alternative: _POSIX_C_SOURCE 200809L */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
 #endif
 
+/* DT_DIR, DT_UNKNOWN, dirfd() */
 #ifndef _BSD_SOURCE
 #define _BSD_SOURCE
 #endif
 
+/* O_DIRECTORY, O_NOFOLLOW */
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -99,8 +102,15 @@ static void error() {
 
 /* INT/TERM signals handler */
 static void sig_handler(int signum) {
-    if (signum == SIGINT || signum == SIGTERM)
-        stop = 1;
+    if (signum == SIGINT || signum == SIGTERM) {
+        if (!stop) {
+            flog("signal caught: %d", signum);
+            stop = 1;
+
+            /* kill pgroup; also sends signal to self, but stop=1 prevents recursion */
+            kill(0, SIGTERM);
+        }
+    }
 }
 
 
@@ -277,9 +287,17 @@ static void set_signals() {
     struct sigaction sa;
 
     sa.sa_handler  = sig_handler;
-    sigemptyset(&sa.sa_mask);
     sa.sa_flags    = 0;
     sa.sa_restorer = NULL;
+
+    /*
+      block signals from killed processes during INT/TERM,
+      also block simultaneous INT/TERM, and interference with CHLD
+    */
+    sigemptyset(&sa.sa_mask);
+    sigaddset(&sa.sa_mask, SIGINT);
+    sigaddset(&sa.sa_mask, SIGTERM);
+    sigaddset(&sa.sa_mask, SIGCHLD);
 
     if (sigaction(SIGINT,  &sa, NULL) == -1  ||  sigaction(SIGTERM, &sa, NULL) == -1)
         error();
@@ -455,6 +473,10 @@ int main(int argc, char *argv[]) {
     /* set INT/TERM handler */
     set_signals();
 
+    /* become one's own process group */
+    if (setpgid(0, 0) == -1)
+        error();
+
     /* initialize rng */
     rand_init();
 
@@ -517,7 +539,7 @@ int main(int argc, char *argv[]) {
 
                 lastclock = getmontime();
 
-                /* inotify is apparently unreliable on fuse, so reregister watches from time to time */
+                /* inotify is apparently unreliable on fuse, so reregister when no events */
                 if (!evqok)
                     rereg  = 1;
                 evqok = 0;

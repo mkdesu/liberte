@@ -34,5 +34,5 @@ sleep 30
 
 
 # Launch the inotify-based daemon
-# TODO: proper logging, killing all processes
+# TODO: proper logging
 exec "${daemon}" ${mpoint} ${queue} ${rqueue}

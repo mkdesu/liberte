@@ -13,7 +13,11 @@ emailregex='^x [a-z2-7]{32}@[a-z2-7]{16}\.onion$'
 # Temporary directory on same filesystem
 tmpdir=`mktemp -d --tmpdir=${queuedir}`
 
-trap 'rm -r ${tmpdir}' 0
+cleanup() {
+    rm -r ${tmpdir}
+}
+
+trap 'st=$?; set +e; cleanup; kill 0; exit ${st}' 0
 trap : INT QUIT TERM SEGV
 
 

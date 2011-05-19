@@ -7,11 +7,10 @@
 
 # Touched by /etc/acpi/default.sh on each lid close ACPI event
 lidflag=/var/run/lid-events/close.flag
-pid=0
 
 
 # Make sure to kill inotifywait on exit
-trap 'kill ${pid} 2>/dev/null' 0
+trap 'st=$?; set +e; kill 0; exit ${st}' 0
 trap : INT QUIT TERM SEGV
 
 
@@ -23,8 +22,8 @@ fi
 
 # Wait for inode change events on the lid flag file
 while true; do
-    inotifywait -qq -e attrib ${lidflag} & pid=$!
-    wait ${pid}
+    inotifywait -qq -e attrib ${lidflag} &
+    wait
 
     xlock || true
 done
