@@ -17,7 +17,7 @@ cleanup() {
     rm -r ${tmpdir}
 }
 
-trap 'st=$?; set +e; cleanup; kill 0; exit ${st}' 0
+trap 'st=$?; set +e; cleanup; exit ${st}' 0
 trap : INT QUIT TERM SEGV
 
 

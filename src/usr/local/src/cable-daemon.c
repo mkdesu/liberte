@@ -282,7 +282,7 @@ static void wait_reg_watches(const char *mppath, const char *qpath, const char *
     }
 
     if (ok)
-        flog(LOG_INFO, "registered watches");
+        flog(LOG_DEBUG, "registered watches");
 }
 
 
@@ -480,9 +480,11 @@ int main(int argc, char *argv[]) {
     /* set INT/TERM handler */
     set_signals();
 
-    /* become one's own process group */
+    /* become one's own process group (EPERM if session leader) */
+    /*
     if (setpgid(0, 0) == -1)
         error();
+    */
 
     /* initialize rng */
     rand_init();
@@ -539,7 +541,7 @@ int main(int argc, char *argv[]) {
               if sufficient time passed since last retries, retry again
             */
             if (!stop  &&  getmontime() - lastclock >= retrytmout) {
-                flog(LOG_INFO, "retrying queue directories");
+                flog(LOG_DEBUG, "retrying queue directories");
 
                 retry_dir(QUEUE_NAME,  qpath);
                 retry_dir(RQUEUE_NAME, rqpath);
