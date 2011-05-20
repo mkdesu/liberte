@@ -1,6 +1,6 @@
-# URL http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5.8_for_2.6.37.2.diff.gz
+# URL http://download.filesystems.org/unionfs/unionfs-2.x-latest/unionfs-2.5.9.1_for_2.6.37.6.diff.gz
 # URL http://dev.gentoo.org/~spock/projects/fbcondecor/archive/fbcondecor-0.9.6-2.6.37.patch
 # URL http://cvs.pld-linux.org/cgi-bin/cvsweb.cgi/~checkout~/packages/kernel/kernel-squashfs-lzma.patch?rev=1.7
-8a94137715d866e268d9a6e78f5e9c234298f5ce7667ad292284c36982002bfb  /usr/local/portage/distfiles/unionfs-2.5.8_for_2.6.37.2.diff.gz
+e792b0b81e05730401bc6fa0b31a0a31a3e29c1a2341bc4e75a8b03792e2538b  /usr/local/portage/distfiles/unionfs-2.5.9.1_for_2.6.37.6.diff.gz
 134f27472f02f76037b8a0098a5e19b2957ad9099df8acbd86b2845b0d4e57f9  /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.37.patch
 a147f5e7682676f6cdb2c75170e8c589a7c3ec8669d19c721e885d742a8eaef1  /usr/local/portage/distfiles/kernel-squashfs-lzma.patch?rev=1.7
