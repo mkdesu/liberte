@@ -436,7 +436,7 @@ cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec.zi
 
 
 sinfo "Creating initramfs image"
-modules=`sed -n 's/^FORCE_LOAD=//p' ${HOME}/initrd/modules.forced | tr -d \'\"`
+modules=`. ${HOME}/initrd/modules.forced  &&  echo "${FORCE_LOAD}"`
 extmods=`sed -n '/^[^#]/p' ${HOME}/initrd/modules.extra`
 globmods=
 for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
@@ -446,11 +446,16 @@ done
 
 cpiodir=`mktemp -d`
 for mod in ${modules} ${extmods} ${globmods}; do
-    grep /${mod}.ko: /lib/modules/${kversion}/modules.dep \
+    # extract canonical name (e.g., _ vs. -)
+    mod=$(basename $(modinfo -F filename -k ${kversion} ${mod}))
+
+    # unlike "modinfo -F depends", modules.dep lists nested dependencies
+    grep /${mod}: /lib/modules/${kversion}/modules.dep \
         | tr -d : | tr ' ' '\n' >> ${cpiodir}/modules.extra
 done
 
 for mod in `sort -u ${cpiodir}/modules.extra`; do
+    mod=/lib/modules/${kversion}/${mod}
     mkdir -p     ${cpiodir}`dirname ${mod}`
     cp -p ${mod} ${cpiodir}`dirname ${mod}`
 done

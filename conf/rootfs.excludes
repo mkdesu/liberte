@@ -118,7 +118,6 @@
 /sbin/splash_util.static
 /sbin/fbtruetype.static
 /sbin/fbsplashctl
-/sbin/insmod.static
 /sbin/ldconfig
 /sbin/sln
 
