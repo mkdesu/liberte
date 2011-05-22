@@ -10,6 +10,10 @@
 =app-text/fbreader-0.12.10*
 =dev-libs/liblinebreak-2.0*
 
+# Stabilization (#365231)
+=x11-misc/pcmanfm-0.9.9_pre20110422
+=x11-libs/libfm-0.1.15_pre20110422
+
 # Firmware
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter

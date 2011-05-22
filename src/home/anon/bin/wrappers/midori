@@ -1,4 +1,4 @@
 #!/bin/sh
 
-export TZ=UTC
+export TZ=:UTC
 exec /usr/bin/midori "$@"

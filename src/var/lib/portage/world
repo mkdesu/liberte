@@ -286,6 +286,6 @@ x11-themes/claws-mail-themes
 # Debugging
 # (can be removed in release)
 app-admin/paxtest
-net-analyzer/netcat
 dev-util/strace
+# net-analyzer/netcat
 # net-analyzer/wireshark

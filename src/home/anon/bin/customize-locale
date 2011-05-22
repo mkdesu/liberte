@@ -33,10 +33,10 @@ if [ -n "${newloc}" ]; then
 fi
 
 if [ -n "${newtz}" ]; then
-    echo "Configuring timezone: TZ=${newtz}"
-    sed -i "s:^export TZ=.*:export TZ=${newtz}:" ${XDG_CONFIG_HOME}/shell/locale
+    echo "Configuring timezone: TZ=:${newtz}"
+    sed -i "s@^export TZ=.*@export TZ=:${newtz}@" ${XDG_CONFIG_HOME}/shell/locale
 
-    if ! grep -q TZ=${newtz} ${XDG_CONFIG_HOME}/shell/locale; then
-        echo "export TZ=${newtz}" >> ${XDG_CONFIG_HOME}/shell/locale
+    if ! grep -q TZ=:${newtz} ${XDG_CONFIG_HOME}/shell/locale; then
+        echo "export TZ=:${newtz}" >> ${XDG_CONFIG_HOME}/shell/locale
     fi
 fi

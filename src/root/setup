@@ -4,7 +4,7 @@ hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
 consolefont=ter-i16n.psf
 lzmamem=20MiB
-protected="/etc/._cfg????_locale.gen"
+protected="/etc/._cfg????_locale.gen /etc/._cfg????_timezone"
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
@@ -137,7 +137,7 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     env-update
     source /etc/profile
 
-    emerge -q1 virtual/libc
+    emerge -q1 sys-libs/glibc
     rm -f ${protected}
 
 
@@ -342,6 +342,7 @@ svcdefault="liberte identity cabled persist xconfig
 delsvcboot="urandom swap bootmisc"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
+delsvcnonetwork="local"
 
 for runlevel in sysinit boot default; do
     eval svcs=\${svc${runlevel}}
@@ -350,7 +351,7 @@ for runlevel in sysinit boot default; do
     done
 done
 
-for runlevel in boot default shutdown; do
+for runlevel in boot default shutdown nonetwork; do
     eval svcs=\${delsvc${runlevel}}
     for svc in ${svcs}; do
         [ ! -e /etc/runlevels/${runlevel}/${svc} ] || rc-update del ${svc} ${runlevel}

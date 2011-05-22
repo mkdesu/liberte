@@ -1,4 +1,5 @@
 # UTC / local (i.e., /etc/timezone) time in Hardware Clock
+# /etc/timezone is used by sys-libs/timezone-data for /etc/localtime
 clock="local"
 
 # Don't set Hardware Clock to System Time on shutdown
