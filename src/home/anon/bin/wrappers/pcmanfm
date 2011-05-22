@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+pcmanfm=/usr/bin/pcmanfm
+
+# PCManFM requires at least one argument
+if [ $# = 0 ]; then
+    exec ${pcmanfm} "${PWD}"
+else
+    exec ${pcmanfm} "$@"
+fi

@@ -69,7 +69,9 @@ if [ -z "${NO_STARTX}" ]; then
 
     if [ "`tty`" = /dev/tty1 ]; then
         if [ -e /etc/X11/xorg.conf ]; then
-            while ! startx; do :; done
+            while ! startx; do
+                . ${XDG_CONFIG_HOME}/shell/locale
+            done
         fi
 
         # Switch from silent splash mode VT (if any)

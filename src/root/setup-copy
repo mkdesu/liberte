@@ -162,6 +162,11 @@ if [ -e /etc/gtk-2.0/gtk.immodules ]; then
     mv /etc/gtk-2.0/gtk.immodules /etc/gtk-2.0/`portageq envvar CHOST`/
 fi
 
+if [ -e /etc/gtk-2.0/gdk-pixbuf.loaders ]; then
+    sinfo "Removing deprecated gdk-pixbuf.loaders"
+    rm /etc/gtk-2.0/gdk-pixbuf.loaders
+fi
+
 
 # Any problem will cause a fatal error
 sinfo "Checking linking consistency"
