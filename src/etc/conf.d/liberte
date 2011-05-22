@@ -2,7 +2,7 @@
 OTFEFILE=/otfe/liberte.vol
 OTFELABEL="Liberté OTFE"
 
-# Size, fraction of the free space on media (A/B)
+# Size, can be fraction of the free space on media (A or A/B)
 OTFESIZE=1/4
 
 # Encryption cipher + block mode, key size,

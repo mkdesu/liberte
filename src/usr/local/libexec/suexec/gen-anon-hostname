@@ -10,27 +10,36 @@
 tordir=${SECURITY_HOME}/tor/hidden_service
 base32=hex2base32
 
-
-# Intentionally fail if dir already exists
-mkdir ${tordir}
+tordirtmp=${tordir}.tmp
 
 
-# Key generation can be lengthy, set some traps
-trap 'if [ $? != 0 ]; then rm -r ${tordir}; fi' 0
-trap : INT QUIT TERM SEGV
+# Fail if dir already exists
+if [ -e ${tordir} ]; then
+    echo ${tordir} already exists
+    exit 1
+fi
+
+
+# Create temporary directory (erase previous one, if exists)
+rm -rf ${tordirtmp}
+mkdir  ${tordirtmp}
 
 
 # Generate RSA-1024 with exponent 65537, as per spec
 # Use genrsa instead of genpkey, for result similarity
-openssl genrsa -f4 -out ${tordir}/private_key 1024 2>/dev/null
+openssl genrsa -f4 -out ${tordirtmp}/private_key 1024 2>/dev/null
 
 
 # Tor hashes ASN.1 RSAPublicKey instead of SubjectPublicKeyInfo,
 # which contains RSAPublicKey at offset 22; it then converts the
 # first half of SHA-1 hash to Base32
-hex=`openssl pkey -in ${tordir}/private_key -pubout -outform der 2>/dev/null \
+hex=`openssl pkey -in ${tordirtmp}/private_key -pubout -outform der 2>/dev/null \
          | tail -c +23 | sha1sum | head -c 20`
 [ ${#hex} = 20 ]
 b32=`${base32} ${hex}`
 
-echo ${b32}.onion > ${tordir}/hostname
+echo ${b32}.onion > ${tordirtmp}/hostname
+
+
+# Commit new directory
+mv -T ${tordirtmp} ${tordir}

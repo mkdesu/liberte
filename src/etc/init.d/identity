@@ -4,6 +4,7 @@ description="Sets up user anonymous identity, and randomizes wireless MACs."
 
 luser=anon
 lmount=/home/${luser}/persist
+live=/mnt/live
 
 ltordir=${lmount}/security/tor/hidden_service
 certsdir=${lmount}/security/ssl/certs
@@ -33,6 +34,16 @@ depend() {
 
 
 start() {
+    if mountpoint -q ${lmount}; then
+        # Recreate persist subdirs
+        ebegin Verifying persistence directories
+        cp -an ${live}${lmount} ${lmount}/..
+        eend $?
+    else
+        ewarn Skipping persistence directories verification
+    fi
+
+
     # Create (small) Tor hidden service key + hostname, if they don't exist
     if [ ! -e ${ltordir} ]; then
         ebegin Initializing Tor hidden service directory

@@ -1,4 +1,4 @@
-#!/bin/bash -pe
+#!/bin/sh -e
 
 # This script should be safe to run via sudo
 # (with env_reset and secure_path set)
@@ -7,7 +7,7 @@ export LC_ALL=C
 
 
 # Get OTFEVOLUME (everything else is deduced)
-source /etc/conf.d/liberte
+. /etc/conf.d/liberte
 
 # Mirrors /etc/init.d/liberte
 luser=anon
@@ -81,14 +81,14 @@ oldsize=`du -b "${file}" | cut -f1`
 
 # More sanity checks
 # Minimum is (1M + 512B) for NTFS, and (1M + 8K) for OTFE
-if [ ${oldsize} -lt $[2*1024*1024 + 512 + 8*1024] ]; then
+if [ ${oldsize} -lt $((2*1024*1024 + 512 + 8*1024)) ]; then
     echo "Sanity check failed: ${file} is too small"
     exit 1
 fi
 
 # Check that OTFE offset+size add up (assume 512B sectors)
 # This also ensures that OTFE file size is a multiple of 512
-if [ ${oldsize} -ne $[ (${otfeoffset} + ${otfesize}) * 512 ] ]; then
+if [ ${oldsize} -ne $(((otfeoffset + otfesize) * 512)) ]; then
     echo "Sanity check failed: [${OTFEVOLUME}] size and offset don't match size of ${file}"
     exit 1
 fi
@@ -102,7 +102,7 @@ OTFE logical device:    ${otfe}
 Container loop device:  ${loop}
 Container file:         ${file}
 File size:              ${oldsize}
-File size (rounded up): $[ (${oldsize} + 1024*1024-1) / (1024*1024) ] MiB
+File size (rounded up): $(((oldsize + 1024*1024-1) / (1024*1024))) MiB
 EOF
     exit
 fi
@@ -132,7 +132,7 @@ if [ ${size} -lt 3 ]; then
     echo "Minimum supported size is 3 MiB"
     exit 1
 fi
-size=$[ ${size} * 1024 * 1024 ]
+size=$((size * 1024 * 1024))
 
 
 # Running either in growth or in shrink mode
@@ -177,13 +177,13 @@ if [ ${size} -ge ${oldsize} ]; then
 
 else
 
-    sizediff=$[ ${oldsize} - ${size} ]
+    sizediff=$((oldsize - size))
 
     # Resize the NTFS filesystem on encrypted volume
     # (assuming 512B sectors - see sanity checks above)
     umount_fs
     echo "Shrinking the NTFS filesystem on ${otfe}"
-    if ! echo y | ntfsresize -f -P -s $[ ${otfesize}*512 - ${sizediff} ] "${otfe}"; then
+    if ! echo y | ntfsresize -f -P -s $((otfesize*512 - sizediff)) "${otfe}"; then
         echo "NTFS shrinking failed, attempting remount"
         mount_fs
         exit 1
@@ -194,7 +194,7 @@ else
     # Resize the OTFE volume according to loop device size
     # (assuming 512B sectors - see sanity checks above)
     echo "Shrinking the [${OTFEVOLUME}] volume"
-    cryptsetup -b $[ ${otfesize} - ${sizediff}/512 ] resize ${OTFEVOLUME}
+    cryptsetup -b $((otfesize - sizediff/512)) resize ${OTFEVOLUME}
 
 
     # Decrease OTFE file size

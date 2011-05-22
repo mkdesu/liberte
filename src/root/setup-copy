@@ -228,7 +228,7 @@ done
 htpmin=`echo ${htpdates} | tr ' ' '\n' | sort -n | head -n 1`
 htpmax=`echo ${htpdates} | tr ' ' '\n' | sort -n | tail -n 1`
 
-if [ $[${htpmax} - ${htpmin}] -gt 60 ]; then
+if [ $((htpmax - htpmin)) -gt 60 ]; then
     echo "HTP servers disagreement > 1min, fix /etc/conf.d/htpdate"
     false
 fi

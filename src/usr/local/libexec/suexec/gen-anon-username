@@ -9,9 +9,12 @@
 
 base32=hex2base32
 
-sslconf=${XDG_CONFIG_HOME}/ssl/extensions.cnf
+sslconf=/mnt/live${XDG_CONFIG_HOME}/ssl/extensions.cnf
 certdir=${SECURITY_HOME}/ssl/certs
 keysdir=${SECURITY_HOME}/ssl/private
+
+certdirtmp=${certdir}.tmp
+keysdirtmp=${keysdir}.tmp
 
 # reqsubj not affected by LC_ALL
 rsabits=8192
@@ -20,60 +23,70 @@ reqsubj='/O=Liberté Linux/CN=Anonymous'
 crtdays=18300
 
 
-# Intentionally fail if CA dir already exists
-mkdir ${certdir} ${keysdir}
+# Fail if CA dir already exists
+if [ -e ${certdir}  -a  -e ${keysdir} ]; then
+    echo ${certdir} and ${keysdir} already exist
+    exit 1
+fi
 
 
-# Key generation can be lengthy, set some traps
-trap 'if [ $? != 0 ]; then rm -r ${certdir} ${keysdir}; fi' 0
-trap : INT QUIT TERM SEGV
+# Create temporary directories (erase previous ones, if exist)
+rm -rf ${certdirtmp} ${keysdirtmp} ${certdir} ${keysdir}
+mkdir  ${certdirtmp} ${keysdirtmp}
 
 
 # Generate RSA key + X.509 self-signed root CA certificate
 openssl req -batch -new -utf8 -subj "${reqsubj}" \
-            -newkey rsa:${rsabits} -nodes -keyout ${keysdir}/root.pem    \
-            -x509 -days ${crtdays} -sha${shabits} -out ${certdir}/ca.pem \
+            -newkey rsa:${rsabits} -nodes -keyout ${keysdirtmp}/root.pem    \
+            -x509 -days ${crtdays} -sha${shabits} -out ${certdirtmp}/ca.pem \
             -config ${sslconf} -extensions root
 
 
 # Save 32-character Base32 username (root CA SHA-1 hash)
-fingerprint=`openssl x509 -in ${certdir}/ca.pem -outform der | sha1sum | head -c 40`
+fingerprint=`openssl x509 -in ${certdirtmp}/ca.pem -outform der | sha1sum | head -c 40`
 [ ${#fingerprint} = 40 ]
-${base32} ${fingerprint} > ${certdir}/username
+${base32} ${fingerprint} > ${certdirtmp}/username
 
 
 # In absence of lifetime/backup policy and in presence of padding,
 # it's fine to use the same key for encryption and authentication
-ln -s root.pem ${keysdir}/sign.pem
-ln -s root.pem ${keysdir}/decrypt.pem
+ln -s root.pem ${keysdirtmp}/sign.pem
+ln -s root.pem ${keysdirtmp}/decrypt.pem
 
 
 # Generate X.509 verification certificate
 openssl req -batch -new -utf8 -subj "${reqsubj}" \
-            -key ${keysdir}/sign.pem |           \
-openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdir}/verify.pem  \
-             -CA ${certdir}/ca.pem -CAkey ${keysdir}/root.pem -CAcreateserial \
+            -key ${keysdirtmp}/sign.pem |        \
+openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdirtmp}/verify.pem \
+             -CA ${certdirtmp}/ca.pem -CAkey ${keysdirtmp}/root.pem             \
+             -CAcreateserial -CAserial ${certdirtmp}/certs.srl                  \
              -extfile ${sslconf} -extensions verify 2>/dev/null
 
 
 # Generate X.509 encryption certificate
 openssl req -batch -new -utf8 -subj "${reqsubj}" \
-            -key ${keysdir}/decrypt.pem |        \
-openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdir}/encrypt.pem \
-             -CA ${certdir}/ca.pem -CAkey ${keysdir}/root.pem                 \
+            -key ${keysdirtmp}/decrypt.pem |     \
+openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdirtmp}/encrypt.pem \
+             -CA ${certdirtmp}/ca.pem -CAkey ${keysdirtmp}/root.pem              \
+             -CAserial ${certdirtmp}/certs.srl                                   \
              -extfile ${sslconf} -extensions encrypt 2>/dev/null
 
 
 # Sanity checks
 checks=`
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose crlsign      \
-              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/ca.pem
+              -CAfile ${certdirtmp}/ca.pem -CApath /dev/null ${certdirtmp}/ca.pem
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose smimesign    \
-              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/verify.pem
+              -CAfile ${certdirtmp}/ca.pem -CApath /dev/null ${certdirtmp}/verify.pem
 openssl verify -x509_strict -check_ss_sig -policy_check -purpose smimeencrypt \
-              -CAfile ${certdir}/ca.pem -CApath /dev/null ${certdir}/encrypt.pem
+              -CAfile ${certdirtmp}/ca.pem -CApath /dev/null ${certdirtmp}/encrypt.pem
 `
 
-test "${checks}" = "${certdir}/ca.pem: OK
-${certdir}/verify.pem: OK
-${certdir}/encrypt.pem: OK"
+test "${checks}" = "${certdirtmp}/ca.pem: OK
+${certdirtmp}/verify.pem: OK
+${certdirtmp}/encrypt.pem: OK"
+
+
+# Commit new directories
+mv -T ${certdirtmp} ${certdir}
+mv -T ${keysdirtmp} ${keysdir}

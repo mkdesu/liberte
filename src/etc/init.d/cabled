@@ -12,9 +12,6 @@ depend() {
     # need identity setup
     need identity
 
-    # persist/(r)queue directories should be ready
-    after persist
-
     # initialization in cabled is done before nginx is up
     before nginx
 }

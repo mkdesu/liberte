@@ -294,13 +294,13 @@ done
 
 
 # The piciids/usbids sites are notorious for various failures
-sinfo "Updating PCI and USB lists (ignoring errors)"
+sinfo "Updating PCI and USB lists"
 
 sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
-update-pciids -q || true
+update-pciids -q || echo "update-pciids failed (ignoring)"
 
 rm -f /usr/share/misc/usb.ids.gz
-update-usbids -q || true
+update-usbids -q || echo "update-usbids failed (ignoring)"
 
 if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     sinfo "Do PCI/USB IDs lists use compressed format exclusively?"

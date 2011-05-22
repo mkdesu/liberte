@@ -14,11 +14,6 @@ depend() {
 
 start() {
     if mountpoint -q ${lmount}; then
-        # Recreate persist subdirs
-        ebegin Recreating persistence directories
-        cp -an ${live}${lmount} ${lmount}/..
-        eend $?
-
         # Extract configuration archive, if present
         if get_bootparam 'nosettings'; then
             ewarn Skipping persistent configuration extraction
@@ -38,6 +33,7 @@ stop() {
         if get_bootparam 'nosettings'; then
             ewarn Skipping persistent configuration saving
         else
+            # ${lmount}/settings is created in identity service for the first time
             ebegin Saving configuration: ${lmount}/settings
             sudo -n -u ${luser} ${persist} save ${lmount}/settings ${live}
             eend $?

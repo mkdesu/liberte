@@ -81,7 +81,7 @@ start() {
         if [ ! -e ${otfefile} ]; then
             # FAT free space is precise, but df rounds up - ignore this issue
             freespace=`df -P -B 1M ${boot} | awk '/\// { print $4 }'`
-            otfesize=$[ ${freespace} * ${OTFESIZE%/*} / ${OTFESIZE#*/} ]
+            otfesize=$((freespace * ${OTFESIZE}))
 
             # 3 MiB is the minimum possible size (rounded up to MiB)
             if [ ${otfesize} -lt 3 ]; then
