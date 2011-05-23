@@ -20,7 +20,7 @@ HKP(S)
   + [alt: x-hkp://pool.sks-keyservers.net]
   + [alt: x-hkp://keys.gnupg.net]
 
-NTP
+NTP [disabled]
   + [0-3].pool.ntp.org
 
 HTP

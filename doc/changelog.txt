@@ -17,6 +17,7 @@
   * Haveged is used for supplying entropy
   * Xorg server 1.9
   * Added OpenSSH client
+  * Disabled NTP in favor of exclusive HTP use
 
   * Added secure and anonymous cables communication
   * Added detection and warning about virtualized environment
