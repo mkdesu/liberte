@@ -1,19 +1,19 @@
 
 [settings]
 default-encoding=UTF-8
-enable-spell-checking=true
-spell-checking-languages=en
-last-window-width=1022
+spell-checking-languages=en-GB,en
+enable-java-applet=false
+last-window-width=798
 last-window-height=549
 show-bookmarkbar=false
 homepage=file:///home/nofw/info/warning.html
-ask-for-destination-folder=true
 text-editor=gedit %U
 location-entry-search=http://www.google.com/search?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
 enable-scripts=false
 enable-plugins=false
+enable-html5-database=false
 accept-cookies=MIDORI_ACCEPT_COOKIES_SESSION
 maximum-cookie-age=3
 maximum-history-age=1

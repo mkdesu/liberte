@@ -73,30 +73,33 @@ else
         "${validate}" ${qtype} "${msgid}"
         set +e
 
-        if   [ -e "${msgdir}"/send.req ]; then
-            "${fetch}"  send "${msgid}" && \
-            "${crypto}" send "${msgid}" && \
-            "${comm}"   send "${msgid}"
-        elif [ -e "${msgdir}"/send.rdy ]; then
-            "${crypto}" send "${msgid}" && \
-            "${comm}"   send "${msgid}"
-        elif [ -e "${msgdir}"/send.ok  ]; then
-            if [ ! -e "${msgdir}"/ack.ok ]; then
-                "${comm}" send "${msgid}"
-            fi
-        else
-            error "send.req/rdy/ok not found"
+        if   [ -e "${msgdir}"/ack.rdy ]; then
+            "${crypto}" ack  "${msgid}" && \
+            "${comm}"   ack  "${msgid}"
+        elif [ -e "${msgdir}"/ack.ok  ]; then
+            "${comm}"   ack  "${msgid}"
+        elif [ -e "${msgdir}"/ack.req ]; then
+            "${fetch}"  ack  "${msgid}" && \
+            "${crypto}" ack  "${msgid}" && \
+            "${comm}"   ack  "${msgid}"
         fi
 
-        if   [ -e "${msgdir}"/ack.rdy ]; then
-                 "${crypto}" ack  "${msgid}" && \
-            exec "${comm}"   ack  "${msgid}"
-        elif [ -e "${msgdir}"/ack.ok  ]; then
-            exec "${comm}"   ack  "${msgid}"
-        elif [ -e "${msgdir}"/ack.req ]; then
-                 "${fetch}"  ack  "${msgid}" && \
-                 "${crypto}" ack  "${msgid}" && \
-            exec "${comm}"   ack  "${msgid}"
+        # if ack succeeds, ${msgdir} is renamed
+        if [ -e "${msgdir}" ]; then
+            if   [ -e "${msgdir}"/send.req ]; then
+                     "${fetch}"  send "${msgid}" && \
+                     "${crypto}" send "${msgid}" && \
+                exec "${comm}"   send "${msgid}"
+            elif [ -e "${msgdir}"/send.rdy ]; then
+                     "${crypto}" send "${msgid}" && \
+                exec "${comm}"   send "${msgid}"
+            elif [ -e "${msgdir}"/send.ok  ]; then
+                if [ ! -e "${msgdir}"/ack.ok ]; then
+                    exec "${comm}" send "${msgid}"
+                fi
+            else
+                error "send.req/rdy/ok not found"
+            fi
         fi
 
     else

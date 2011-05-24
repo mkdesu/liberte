@@ -1,13 +1,12 @@
 #!/bin/sh -e
 
+cableid=/usr/local/libexec/cable/cable-id
 confdir=${XDG_CONFIG_HOME}/claws-mail
 
 username=${SECURITY_HOME}/ssl/certs/username
 hostname=${SECURITY_HOME}/tor/hidden_service/hostname
 
-if [ -e ${username} -a -e ${hostname} ]; then
-    address=`cat ${username}`@`cat ${hostname}`
-
+if address=`${cableid} 2>/dev/null`; then
     if ! grep -q "^address=${address}\$" ${confdir}/accountrc; then
         sed -i "s/^\(address=\).*/\1${address}/" ${confdir}/accountrc
     fi

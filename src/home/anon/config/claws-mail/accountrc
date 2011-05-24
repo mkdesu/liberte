@@ -1,7 +1,7 @@
 [Account: 1]
 account_name=Liberté Mail
 is_default=1
-name=Anonymous
+name=
 address=anonymous@liberte
 organization=
 protocol=5

@@ -1,0 +1,27 @@
+#!/bin/sh -e
+
+export LC_ALL=C
+
+error() {
+    echo "cable-id: $@" 1>&2
+    exit 1
+}
+
+hostname=${SECURITY_HOME}/tor/hidden_service/hostname
+username=${SECURITY_HOME}/ssl/certs/username
+
+if [ ! -e ${hostname} ]; then
+    error "host identity not initialized yet"
+fi
+
+if [ ! -e ${username} ]; then
+    error "cable identity not initialized yet"
+fi
+
+hostname=`cat ${hostname} | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
+username=`cat ${username} | tr -cd a-z2-7`
+
+[ ${#hostname} != 0 ] || error "bad hostname"
+[ ${#username} = 32 ] || error "bad username"
+
+echo "${username}"@"${hostname}"
