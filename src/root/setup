@@ -415,6 +415,9 @@ sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp \
 sudo -n -u anon cp -p /usr/local/addons/keys/mfpl.crt /home/anon/persist/security/pgp
 sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
 
+# clear pam_mktemp's append-only attribute to allow later livecd directory removal
+chattr -f -a /tmp/.private || true
+
 
 sinfo "Installing wrappers"
 mv -n /sbin/iwconfig{,.orig}
