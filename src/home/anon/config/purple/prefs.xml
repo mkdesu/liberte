@@ -340,7 +340,7 @@
 			<pref name='theme' type='string' value=''/>
 			<pref name='conv_focus' type='bool' value='1'/>
 			<pref name='mute' type='bool' value='0'/>
-			<pref name='command' type='path' value='play -q %s'/>
+			<pref name='command' type='path' value='aplay -q %s'/>
 			<pref name='method' type='string' value='custom'/>
 			<pref name='volume' type='int' value='50'/>
 		</pref>

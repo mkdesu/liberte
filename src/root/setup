@@ -424,6 +424,8 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 sinfo "Compiling kernel"
 makeopts=`portageq envvar MAKEOPTS`
 export KBUILD_BUILD_VERSION=0
+export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
+rm -f /usr/src/linux/include/generated/compile.h
 
 make -s ${makeopts} -C /usr/src/linux 2>/dev/null
 make -s ${makeopts} -C /usr/src/linux modules_install
@@ -432,6 +434,7 @@ cp -a /usr/src/linux/arch/x86/boot/bzImage /boot/kernel-x86.zi
 
 
 sinfo "Compiling kexec kernel"
+rm -f /usr/src/linux-kexec/include/generated/compile.h
 make -s ${makeopts} -C /usr/src/linux-kexec 2>/dev/null
 cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec.zi
 

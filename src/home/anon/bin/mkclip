@@ -41,14 +41,14 @@ mplayer -really-quiet -noconfig all -fps "${fps}" -slave \
         -vo yuv4mpeg:file=${fifodir}/video.y4m & vstrpid=$!
 echo pausing get_property pause > ${fifodir}/mplayer_ctl
 
-arecord -qN -t raw -f S16_LE -r 16000 -c 1 - \
+arecord -D mono -qN -t raw -f S16_LE -r 16000 -c 1 - \
         > ${fifodir}/audio.pcm & astrpid=$!
 kill -STOP ${astrpid}
 
 
 # Signal streamers to start on user input
 echo "Press [Enter] to start..."
-read
+read dummy
 
 kill -CONT ${astrpid}
 sleep ${audelay}
@@ -57,7 +57,7 @@ echo pause > ${fifodir}/mplayer_ctl
 
 # Kill streams on user input, then wait for encoders
 echo "Encoding, press [Enter] when done..."
-read
+read dummy
 
 if ! kill -0 ${vstrpid} 2>/dev/null; then
     vstrpid=err

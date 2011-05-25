@@ -27,21 +27,21 @@ speexenc -w --rate 16000 --16bit --vbr --dtx \
 
 
 # Launch stream, note PID for killing
-arecord -qN -t raw -f S16_LE -r 16000 -c 1 - \
+arecord -D mono -qN -t raw -f S16_LE -r 16000 -c 1 - \
         > ${fifodir}/audio.pcm & astrpid=$!
 kill -STOP ${astrpid}
 
 
 # Signal streamers to start on user input
 echo "Press [Enter] to start..."
-read
+read dummy
 
 kill -CONT ${astrpid}
 
 
 # Kill streams on user input, then wait for encoders
 echo "Encoding, press [Enter] when done..."
-read
+read dummy
 
 if ! kill -INT ${astrpid} 2>/dev/null; then
     astrpid=err
