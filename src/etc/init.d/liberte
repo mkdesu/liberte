@@ -83,9 +83,12 @@ start() {
             freespace=`df -P -B 1M ${boot} | awk '/\// { print $4 }'`
             otfesize=$((freespace * ${OTFESIZE}))
 
-            # 3 MiB is the minimum possible size (rounded up to MiB)
+            #    3 MiB is the minimum possible size (rounded up to MiB)
+            # 4095 MiB is the maximum possible file size on FAT32 (2^32-1 B)
             if [ ${otfesize} -lt 3 ]; then
                 otfesize=3
+            elif [ ${otfesize} -gt 4095 ]; then
+                otfesize=4095
             fi
 
             # FAT has no sparse files, so insufficient space will fail here

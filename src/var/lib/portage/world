@@ -43,6 +43,7 @@ net-wireless/bluez-firmware
 sys-apps/hdparm
 sys-apps/sdparm
 sys-apps/smartmontools
+sys-apps/dcfldd
 virtual/eject
 app-misc/secure-delete
 app-arch/libarchive
@@ -198,6 +199,7 @@ x11-apps/xrefresh
 x11-apps/xsetroot
 x11-apps/xlsfonts
 x11-apps/xfd
+x11-apps/xmag
 
 # X11 [truetype fonts]
 # Inconsolata:    extremely good Latin monospace terminal font
