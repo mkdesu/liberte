@@ -1,35 +1,31 @@
 # ANSI codes for message functions
-NORMAL="\033[0m"
-WARN="\033[33;1m"
-BAD="\033[31;1m"
-BOLD="\033[1m"
-GOOD="\033[32;1m"
+tag_normal="\033[0m"
+tag_warn="\033[33;1m"
+tag_bad="\033[31;1m"
+tag_bold="\033[1m"
+tag_good="\033[32;1m"
 
-
-parse_opt() {
-    case "$1" in
-        *\=*)
-            echo "$1" | cut -d= -f2-
-        ;;
-    esac
-}
 
 good_msg() {
-    echo -e "${GOOD}>>${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+    echo -e "${tag_good}>>${tag_normal}${tag_bold} ${1:-...}${tag_normal}"
 }
 
 bad_msg() {
     splash verbose
-    echo -e "${BAD}!!${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+    echo -e "${tag_bad}!!${tag_normal}${tag_bold} ${1:-...}${tag_normal}"
 }
 
 warn_msg() {
-    echo -e "${WARN}**${NORMAL}${BOLD} ${1:-...}${NORMAL}"
+    echo -e "${tag_warn}**${tag_normal}${tag_bold} ${1:-...}${tag_normal}"
 }
 
 
 quiet_kmsg() {
-    echo 4 > /proc/sys/kernel/printk
+    if [ -z "${param_debug}" ]; then
+        echo 4 > /proc/sys/kernel/printk
+    else
+        verbose_kmsg
+    fi
 }
 
 verbose_kmsg() {
@@ -45,7 +41,7 @@ test_success() {
 }
 
 rundebugshell() {
-    if [ -n "${DEBUG}" ]; then
+    if [ -n "${param_debug}" ]; then
         good_msg 'Starting debug shell as requested by "debug" option.'
         good_msg 'Type "exit" to continue with normal bootup.'
         ash

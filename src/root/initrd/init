@@ -3,73 +3,50 @@
 # Default variables
 export PATH="/sbin:/bin"
 
-UNION=/union
-RWROOT=/rwroot
-BOOT=/mnt/boot
-LIVE=/mnt/live
+union=/union
+rwroot=/rwroot
+boot=/mnt/boot
+live=/mnt/live
 
+
+# External scripts
 . /etc/modules.forced
 . /etc/init.scripts
 [ -e /etc/init.splash ] && . /etc/init.splash
-
-
-# Clean input/output
-exec </dev/console >/dev/console 2>&1
 
 
 # Mount virtual filesystems
 mount -t proc  proc  /proc
 mount -t sysfs sysfs /sys
 
-mount -t tmpfs -o mode=755 tmpfs ${UNION}
-cp -a ${RWROOT}/* ${UNION}
-mount -o move ${UNION} ${RWROOT}
-
-
-quiet_kmsg
+mount -t tmpfs -o mode=755 tmpfs ${union}
+cp -a ${rwroot}/* ${union}
+mount -o move ${union} ${rwroot}
 
 
 # Parse kernel options
-CDROOT_DEV=
-CDROOT_TYPE=auto
-CDROOT_FLAGS=noatime
-LOOP=
-DEBUG=
-VESA_MODE=
-for x in `cat /proc/cmdline`; do
-    case "${x}" in
-        cdroot\=*)
-            CDROOT_DEV=`parse_opt "${x}"`
-        ;;
-        cdroot_type\=*)
-            CDROOT_TYPE=`parse_opt "${x}"`
-        ;;
-        cdroot_flags\=*)
-            CDROOT_FLAGS=`parse_opt "${x}"`
-        ;;
-        loop\=*)
-            LOOP=`parse_opt "${x}"`
-        ;;
-        debug)
-            DEBUG=1
-        ;;
-        video\=uvesafb:*)
-            VESA_MODE=`parse_opt "${x}" | cut -d: -f2 | cut -d, -f1`
-        ;;
-    esac
+param_cdroot='/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*'
+param_cdroot_type=auto
+param_cdroot_flags=noatime
+for param in `cat /proc/cmdline`; do
+    eval param_${param%%=*}=${param#*=}
 done
 
 
 # Handle uvesafb
-if [ -n "${VESA_MODE}" ]; then
-    echo "options uvesafb mode_option=${VESA_MODE} mtrr=3 scroll=ywrap"
+if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
+    vesa_mode=${param_video#uvesafb:}
+    vesa_mode=${vesa_mode%%,*}
+
+    echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap"
     FORCE_LOAD="${FORCE_LOAD} uvesafb"
 else
     echo "blacklist uvesafb"
 fi > /etc/modprobe.d/framebuffer.conf
-cp -a /etc/modprobe.d ${RWROOT}/etc
+cp -a /etc/modprobe.d ${rwroot}/etc
 
 
+quiet_kmsg
 good_msg 'Loading modules'
 
 # Setup hotplugging before starting coldplugging
@@ -114,7 +91,7 @@ while true; do
         modprobe -q usb-storage 2>/dev/null
     fi
 
-    for mediadev in ${CDROOT_DEV:-/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*}; do
+    for mediadev in ${param_cdroot}; do
         # Check for a block device to mount
         if [ -b "${mediadev}" ] && ! echo "${tested}" | grep -q " ${mediadev} "; then
             tested="${tested}${mediadev} "
@@ -124,13 +101,13 @@ while true; do
             if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* >/dev/null 2>&1; then
                 good_msg "Attempting to mount media: ${mediadev}"
 
-                if mount -r -t ${CDROOT_TYPE} -o ${CDROOT_FLAGS} ${mediadev} ${RWROOT}${BOOT} >/dev/null 2>&1; then
+                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
                     # Check for the recognition file
-                    if [ -e ${RWROOT}${BOOT}"${LOOP}" ]; then
+                    if [ -e ${rwroot}${boot}${param_loop} ]; then
                         good_msg "Media found on ${mediadev}"
                         break 2
                     else
-                        umount ${RWROOT}${BOOT}
+                        umount ${rwroot}${boot}
                     fi
                 fi
 
@@ -146,46 +123,44 @@ test_success "find media to mount"
 
 
 # Setup the loopback mounts and add fstab entries for fsck
-if [ -n "${LOOP}" ]; then
+if [ -n "${param_loop}" ]; then
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
-    mount -r -t squashfs -o loop ${RWROOT}${BOOT}"${LOOP}" ${RWROOT}${LIVE}
+    mount -r -t squashfs -o loop ${rwroot}${boot}${param_loop} ${rwroot}${live}
     test_success 'mount compressed filesystem'
 
-    echo "${mediadev} ${BOOT} ${CDROOT_TYPE} ro,${CDROOT_FLAGS} 0 1" > /etc/fstab.extra
-    echo "${BOOT}${LOOP} ${LIVE} squashfs ro,loop 0 2"              >> /etc/fstab.extra
+    echo "${mediadev} ${boot} ${param_cdroot_type} ro,${param_cdroot_flags} 0 1" > /etc/fstab.extra
+    echo "${boot}${param_loop} ${live} squashfs ro,loop 0 2"                    >> /etc/fstab.extra
 else
-    mount -o move ${RWROOT}${BOOT} ${RWROOT}${LIVE}
+    mount -o move ${rwroot}${boot} ${rwroot}${live}
 
-    echo "${mediadev} ${LIVE} ${CDROOT_TYPE} ro,${CDROOT_FLAGS} 0 2" > /etc/fstab.extra
+    echo "${mediadev} ${live} ${param_cdroot_type} ro,${param_cdroot_flags} 0 2" > /etc/fstab.extra
 fi
 
 
 good_msg "Creating union mount"
-mount -t unionfs -o dirs=${RWROOT}=rw:${RWROOT}${LIVE}=ro unionfs ${UNION}
+mount -t unionfs -o dirs=${rwroot}=rw:${rwroot}${live}=ro unionfs ${union}
 test_success 'create union mount'
 
-# Move RWROOT submounts to UNION (will be then adjusted after switch_root)
-for mnt in $(cut -d' ' -f2 /proc/mounts | sed -n "s:^${RWROOT}/:/:p"); do
-    mount -o move ${RWROOT}${mnt} ${UNION}${mnt}
+# Move rwroot submounts to union (will be then adjusted after switch_root)
+for mnt in $(cut -d' ' -f2 /proc/mounts | sed -n "s:^${rwroot}/:/:p"); do
+    mount -o move ${rwroot}${mnt} ${union}${mnt}
 done
 
-# Move the RWROOT mount to a hidden directory on UNION
+# Move the rwroot mount to a hidden directory on union
 # (rw layer directly accessible only by root)
-mount -o move ${RWROOT} ${UNION}/mnt/hidden${RWROOT}
+mount -o move ${rwroot} ${union}/mnt/hidden${rwroot}
 
 
 # Add useful lines to /etc/fstab
-cat /etc/fstab.extra >> ${UNION}/etc/fstab
+cat /etc/fstab.extra >> ${union}/etc/fstab
 
 
 verbose_kmsg
-
-
 good_msg 'Booting (initramfs)'
-if [ ! -e ${UNION}/dev/console  -o  ! -e ${UNION}/dev/null ]; then
+if [ ! -e ${union}/dev/console  -o  ! -e ${union}/dev/null ]; then
     bad_msg 'Real /dev is missing files required to boot (console and null)'
-elif [ -e /etc/init.splash      -a  ! -e ${UNION}/dev/tty1 ]; then
+elif [ -e /etc/init.splash      -a  ! -e ${union}/dev/tty1 ]; then
     bad_msg 'Real /dev is missing tty1, which is required for splash'
 fi
 
@@ -197,8 +172,8 @@ umount /sys  || bad_msg 'Failed to unmount /sys'
 umount /proc || bad_msg 'Failed to unmount /proc'
 
 
-cd ${UNION}
-exec switch_root -c /dev/console ${UNION} /sbin/init
+cd ${union}
+exec switch_root -c /dev/console ${union} /sbin/init
 
 
 # If we get here, something bad has happened
