@@ -78,10 +78,13 @@ start() {
         fi
 
         # Initialize LUKS image mapping (create if it doesn't exist)
-        if [ ! -e ${otfefile} ]; then
-            # FAT free space is precise, but df rounds up - ignore this issue
-            freespace=`df -P -B 1M ${boot} | awk '/\// { print $4 }'`
-            otfesize=$((freespace * ${OTFESIZE}))
+        if [ ! -e ${otfefile}  -o  -e ${otfefile}.tag ]; then
+            mkdir -p `dirname ${otfefile}`  &&  touch ${otfefile}.tag
+            rm -f ${otfefile} ${otfefile}-hdr.bak
+
+            # Round down to prevent problems with OTFESIZE=1
+            freespace=$((`stat -fc '%a*%S' ${boot}`))
+            otfesize=$((freespace * ${OTFESIZE} / (1024*1024)))
 
             #    3 MiB is the minimum possible size (rounded up to MiB)
             # 4095 MiB is the maximum possible file size on FAT32 (2^32-1 B)
@@ -93,7 +96,7 @@ start() {
 
             # FAT has no sparse files, so insufficient space will fail here
             ebegin "Initializing ${otfesize} MiB encrypted storage (${OTFESIZE} of free space)"
-            if mkdir -p `dirname ${otfefile}` && truncate -s ${otfesize}M ${otfefile}; then
+            if [ -n "${otfesize}"  -a  -e ${otfefile}.tag ]  &&  truncate -s ${otfesize}M ${otfefile}; then
                 loop=`losetup -f ${otfefile} --show`
                 eend $?
 
@@ -102,7 +105,7 @@ start() {
 
                 inittries=10
                 while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -s ${OTFEKEYSIZE} -h ${OTFEHASH} luksFormat ${loop}; do
-                    let inittries=inittries-1
+                    inittries=$((inittries-1))
                 done
 
                 if [ ${inittries} -ne 0 ]; then
@@ -110,20 +113,27 @@ start() {
                     einfo 'OTFE initialized, run "sudo otfe-resize" to resize encrypted storage'
 
                     eprompt Please re-enter the password for ${otfefile}
-                    cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}
+                    if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
+                        eerror Failed to attach encrypted storage, removing ${otfefile}
+                        losetup -d ${loop}
+                        rm ${otfefile}
+                    else
+                        rm ${otfefile}.tag
+                    fi
 
                     input_end
                     echo
 
-                    ebegin Backing up crypto header: ${otfefile}-hdr.bak
-                    rm -f ${otfefile}-hdr.bak
-                    cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
-                    eend $?
+                    if [ ! -e ${otfefile}.tag ]; then
+                        ebegin Backing up crypto header: ${otfefile}-hdr.bak
+                        cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
+                        eend $?
 
-                    # LC_ALL enables UTF-8 label support
-                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                    LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
-                    eend $?
+                        # LC_ALL enables UTF-8 label support
+                        ebegin Formatting encrypted storage as NTFS: ${otfefile}
+                        LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                        eend $?
+                    fi
                 else
                     losetup -d ${loop}
                     rm ${otfefile}

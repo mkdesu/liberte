@@ -34,7 +34,7 @@ error() {
 
 # Sanity checks
 [ ${#msgid} = 40 ] || error "bad msgid"
-[ -s ${tsfile} ]   || error "bad username file"
+[ -s "${tsfile}" ] || error "bad username file"
 
 check_userhost() {
     [ ${#1} = 32 ] || error "bad username"
@@ -43,7 +43,7 @@ check_userhost() {
 
 
 # Determine if the message has timed out
-secstart=`stat --printf=%Y ${tsfile}`
+secstart=`stat -c %Y "${tsfile}"`
 secend=`date -u +%s`
 secdiff=$((secend - secstart))
 
@@ -85,7 +85,7 @@ else
 
     if [ -e "${msgdir}"/recv.req  -o  -e "${msgdir}"/recv.rdy ]; then
         # no message.hdr is available at this point
-        msgdate=$(date -d "$(stat --printf=%y "${tsfile}")" -uR)
+        msgdate=$(date -d "$(stat -c %y "${tsfile}")" -uR)
 
         (formail -f -I "From: <${username}@${hostname}>"         \
                     -I "Old-Date: ${msgdate}" -I "Date: ${date}" \
