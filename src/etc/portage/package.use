@@ -36,6 +36,7 @@ net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 net-irc/xchat                   ssl
 net-im/pidgin                         gnutls
+net-analyzer/netcat             -crypt
 
 # Multimedia
 # mplayer: faac, x264, xvid, twolame/toolame and (partly) mp3 are activated only for +encode

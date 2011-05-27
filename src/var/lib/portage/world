@@ -285,9 +285,8 @@ x11-themes/gnome-icon-theme
 x11-themes/sound-theme-freedesktop
 x11-themes/claws-mail-themes
 
-# Debugging
+# Troubleshooting
 # (can be removed in release)
 app-admin/paxtest
 dev-util/strace
-# net-analyzer/netcat
-# net-analyzer/wireshark
+net-analyzer/netcat

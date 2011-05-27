@@ -30,8 +30,12 @@ quiet_kmsg
 
 
 # Parse kernel options
+CDROOT_DEV=
 CDROOT_TYPE=auto
 CDROOT_FLAGS=noatime
+LOOP=
+DEBUG=
+VESA_MODE=
 for x in `cat /proc/cmdline`; do
     case "${x}" in
         cdroot\=*)
@@ -110,13 +114,7 @@ while true; do
         modprobe -q usb-storage 2>/dev/null
     fi
 
-    if [ -n "${CDROOT_DEV}" ]; then
-        devices="${CDROOT_DEV}"
-    else
-        devices="/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*"
-    fi
-
-    for mediadev in ${devices}; do
+    for mediadev in ${CDROOT_DEV:-/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*}; do
         # Check for a block device to mount
         if [ -b "${mediadev}" ] && ! echo "${tested}" | grep -q " ${mediadev} "; then
             tested="${tested}${mediadev} "
