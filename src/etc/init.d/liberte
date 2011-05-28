@@ -28,7 +28,7 @@ eprompt() {
     echo
     einfo "${stars}"
     einfo "$@"
-    einfo "Keyboard map: `awk -F= '/^KEYMAP=/ { print toupper($2) }' /etc/conf.d/keymaps | tr -d '\042'`"
+    einfo "Keyboard map: `. /etc/conf.d/keymaps; echo \"${keymap}\" | tr '[:lower:]' '[:upper:]'`"
     einfo "${stars}"
     echo
 }
