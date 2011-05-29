@@ -1,4 +1,8 @@
 2011-XX-XX
+  + 2011.2 release
+
+
+2011-05-29
   + 2011.1 release
 
   * Removed SYSLINUX dependency during Linux install
