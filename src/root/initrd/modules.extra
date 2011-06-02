@@ -1,3 +1,17 @@
+# Filesystem modules
+loop
+squashfs
+unionfs
+
+vfat
+isofs
+ext2
+
+nls_cp437
+nls_iso8859-1
+nls_utf8
+
+
 # USB input devices
 usbhid
 
@@ -17,6 +31,7 @@ mmc_block
 # PCMCIA-attached storage
 yenta_socket
 pcmcia
+
 
 # VESA framebuffer
 uvesafb

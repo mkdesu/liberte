@@ -13,17 +13,28 @@ fi
 
 
 # Variables
-SRC=`dirname $0`
-LIVECD=$1/copy
-USBROOT=$1/dist/liberte
+src=`dirname $0`
+livecd=$1/copy
+cdroot=$1/dist/cdroot
 
-version=`cat ${SRC}/conf/version`
+version=`cat ${src}/conf/version`
 distname=liberte-${version}
-sysver=`cat ${LIVECD}/boot/syslinux/version`
+sysver=`cat ${livecd}/boot/syslinux/version`
 mksqver=4.1
 
-# see the /usr/local/sbin/ps-mount script
-vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=2101,gid=9000,umask=0137,dmask=067
+luser=2101
+lgroup=9000
+
+# see /usr/local/sbin/ps-mount
+vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0137,dmask=067
+isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},dmode=0510
+
+
+# POSIX shells should (probably) support $(())
+mibsize() {
+    bytes=`stat -c %s "$1"`
+    echo $(((bytes + 512 * 1024) / (1024 * 1024)))
+}
 
 
 if type mksquashfs 1>/dev/null 2>&1; then
@@ -41,40 +52,62 @@ fi
 
 
 sinfo "Copying USB /boot"
-mkdir -p -m 755 ${USBROOT}
+mkdir -p -m 755 ${cdroot} ${cdroot}/liberte ${cdroot}/isolinux
 rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
-    ${LIVECD}/boot ${USBROOT}
-sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/" ${USBROOT}/boot/syslinux/syslinux.cfg
+    ${livecd}/boot ${cdroot}/liberte
+sed -i "s/TAG //; s/ROOTFS/vfat/;    s/FSFLAGS/${vfatflags}/"  \
+    ${cdroot}/liberte/boot/syslinux/syslinux.cfg
+
+# ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
+cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+sed -i "s/TAG //; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
+        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
+    ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
 
 
 sinfo "Copying USB add-ons"
 rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
     --delete-excluded -C -f "P /boot/"             \
-    ${SRC}/dist/ ${USBROOT}
-sed -i "s/SYSVER/${sysver}/" ${USBROOT}/setup.sh
+    ${src}/dist/ ${cdroot}/liberte
+sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 
 
 # Using default block size of 128KiB
 # Multi-threaded execution often causes deadlock after image creation
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${LIVECD} ${USBROOT}/boot/root-x86.sfs         \
+${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs  \
     -noappend -no-exports -no-progress -no-xattrs -comp lzma \
-    -sort ${SRC}/conf/rootfs.sort -e boot tmp/packages
-chmod 644 ${USBROOT}/boot/root-x86.sfs
+    -sort ${src}/conf/rootfs.sort -e boot tmp/packages
+chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
 
 
 sinfo "Converting text files to DOS line endings"
-find ${USBROOT} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
+find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
     -exec sed -i 's/$/\r/' {} \;
 
 
 sinfo "Building binary distribution ${distname}.zip"
-(cd `dirname ${USBROOT}`; zip -FS -r9 -q ${distname}.zip `basename ${USBROOT}`)
+zipfile=${cdroot}/../${distname}.zip
+(cd ${cdroot}; zip -FS -r9 -q ${zipfile} liberte)
 
-zipfile=`dirname ${USBROOT}`/${distname}.zip
-echo "Disk usage: `du -s --apparent-size -B 1M ${USBROOT} | cut -f1` MiB"
-echo "ZIP size:   `du    --apparent-size -B 1M ${zipfile} | cut -f1` MiB"
+
+# Hide root directories on Windows, and reset volume information
+sinfo "Creating ISO image ${distname}.iso"
+isofile=${cdroot}/../${distname}.iso
+mkisofs -quiet -iso-level 2 -no-pad -J -sysid '' -V '' -A '' \
+    -r -dir-mode 0510 -new-dir-mode 0510                     \
+    -no-emul-boot -boot-load-size 4 -boot-info-table         \
+    -c boot.cat -hide boot.cat -hide-joliet boot.cat         \
+    -b liberte/boot/syslinux/isolinux.bin -o ${isofile}      \
+    -hidden isolinux -hidden liberte -hide-joliet isolinux -hide-joliet liberte ${cdroot}
+isovfy ${isofile}
+
+
+echo "Disk usage: `du -s --apparent-size -B 1M ${cdroot} | cut -f1` MiB"
+echo "ZIP size:   `mibsize ${zipfile}` MiB"
+echo "ISO size:   `mibsize ${isofile}` MiB"
 
 
 sinfo "Done."

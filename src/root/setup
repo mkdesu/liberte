@@ -443,7 +443,6 @@ cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec.zi
 
 
 sinfo "Creating initramfs image"
-modules=`. ${HOME}/initrd/modules.forced  &&  echo "${FORCE_LOAD}"`
 extmods=`sed -n '/^[^#]/p' ${HOME}/initrd/modules.extra`
 globmods=
 for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
@@ -452,8 +451,8 @@ for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
 done
 
 cpiodir=`mktemp -d`
-for mod in ${modules} ${extmods} ${globmods}; do
-    # extract canonical name (e.g., _ vs. -)
+for mod in ${extmods} ${globmods}; do
+    # extract canonical name (e.g., _ vs. -, aliases, ...)
     mod=$(basename $(modinfo -F filename -k ${kversion} ${mod}))
 
     # unlike "modinfo -F depends", modules.dep lists nested dependencies
@@ -514,8 +513,9 @@ sinfo "Generating SYSLINUX configuration"
 rm    -f /boot/boot
 mkdir -p /boot/syslinux
 syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
-cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,mbr.bin} /boot/syslinux/
+cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,{isolinux,mbr}.bin} /boot/syslinux/
 cp -p /usr/bin/syslinux /boot/syslinux/syslinux-x86
+cp -p /sbin/extlinux    /boot/syslinux/extlinux-x86
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
 rm -f /boot/syslinux/${consolefont}
 gunzip /boot/syslinux/${consolefont}.gz

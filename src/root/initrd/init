@@ -10,9 +10,9 @@ live=/mnt/live
 
 
 # External scripts
-. /etc/modules.forced
+. /etc/modules.fs
 . /etc/init.scripts
-[ -e /etc/init.splash ] && . /etc/init.splash
+# . /etc/init.splash
 
 
 # Mount virtual filesystems
@@ -33,13 +33,17 @@ for param in `cat /proc/cmdline`; do
 done
 
 
+# Specify required filesystem modules (no autoloading on mount)
+eval force_load=\"loop squashfs unionfs \${force_load_"${param_cdroot_type}"}\"
+
+
 # Handle uvesafb
 if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
     vesa_mode=${param_video#uvesafb:}
     vesa_mode=${vesa_mode%%,*}
 
     echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap"
-    FORCE_LOAD="${FORCE_LOAD} uvesafb"
+    force_load="${force_load} uvesafb"
 else
     echo "blacklist uvesafb"
 fi > /etc/modprobe.d/framebuffer.conf
@@ -53,7 +57,7 @@ good_msg 'Loading modules'
 echo /bin/mdev > /proc/sys/kernel/hotplug
 
 oldmods=
-newmods=" ${FORCE_LOAD} "
+newmods=" ${force_load} "
 while [ "${oldmods}" != "${newmods}" ]; do
     for modalias in ${newmods}; do
         if ! echo "${oldmods}" | grep -q " ${modalias} "; then

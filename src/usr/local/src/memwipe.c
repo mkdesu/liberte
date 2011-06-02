@@ -23,7 +23,7 @@ static void cocoon() {
     sa.sa_handler  = SIG_IGN;
     sa.sa_flags    = 0;
     sa.sa_restorer = 0;
-    sigfillset(&sa.sa_mask);
+    sigemptyset(&sa.sa_mask);
 
     if (sigaction(SIGTSTP, &sa, 0))
         fprintf(stderr, "Failed to ignore SIGTSTP\n");
