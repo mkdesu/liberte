@@ -17,9 +17,9 @@ This script installs SYSLINUX on a device with Liberté Linux.
 You need the following installed.
 
     Syslinux ${sysver} (Gentoo: sys-boot/syslinux)
-        [bundled 32-bit version will be used if unavailable]
+        [if unavailable, bundled 32-bit version will be used]
     GNU Parted    (Gentoo: sys-apps/parted)
-        [only needed if the master boot record must be changed]
+        [if unavailable, partition must be made bootable manually]
     udev + sysfs  (Gentoo: sys-fs/udev)
         [available on most modern Linux distributions]
 
@@ -51,10 +51,10 @@ fi
 # Check for pre-4.x Syslinux (without the -v switch)
 sysok=1
 if ! ${sysbin} -v 1>/dev/null 2>&1; then
-    echo "Syslinux v4+ not found"
+    echo "Syslinux v4+ not found, will use bundled binary"
     sysok=0
 elif [ ! -e ${sysmbr}  -a  ! -e ${sysmbr2} ]; then
-    echo "${sysmbr} or ${sysmbr2} not found"
+    echo "${sysmbr} or ${sysmbr2} not found, will use bundled Syslinux"
     sysok=0
 else
     # Check for wrong Syslinux version (exact match required)
@@ -99,7 +99,7 @@ fi
 # Check for installation directory
 mntdir=`mktemp -d`
 mount -r -t vfat -o noatime,nosuid,nodev,noexec "${dev}" ${mntdir}
-if [ -e ${mntdir}${sysdir}/syslinux-x86  -a  -e ${mntdir}${sysdir}/mbr.bin ]; then
+if [ -e ${mntdir}${sysdir}/syslinux-x86 ]; then
     hassysdir=1
 else
     hassysdir=0
@@ -109,11 +109,18 @@ fi
 if [ ${hassysdir} = 1  -a  ${sysok} = 0 ]; then
     systmpdir=`mktemp -d`
 
-    cp ${mntdir}${sysdir}/syslinux-x86 ${mntdir}${sysdir}/mbr.bin ${systmpdir}
-    sysbin=${systmpdir}/syslinux-x86;  chmod 755 ${sysbin}
-    sysmbr=${systmpdir}/mbr.bin;       chmod 644 ${sysmbr}
+    cp ${mntdir}${sysdir}/syslinux-x86 ${systmpdir}/syslinux
+    cp ${mntdir}${sysdir}/mtools-x86   ${systmpdir}/mtools
+    ln -s mtools ${systmpdir}/mcopy
+    ln -s mtools ${systmpdir}/mmove
+    ln -s mtools ${systmpdir}/mattrib
+    chmod 755 ${systmpdir}/syslinux ${systmpdir}/mtools
 
-    echo "Using bundled Syslinux binary and MBR"
+    cp ${mntdir}${sysdir}/mbr.bin ${systmpdir}
+    sysmbr=${systmpdir}/mbr.bin
+
+    echo "Using bundled 32-bit Syslinux/Mtools binaries and MBR"
+    export PATH=${systmpdir}:"${PATH}"
 fi
 
 umount ${mntdir}
@@ -132,13 +139,6 @@ ${sysbin} -i -d ${sysdir} "${dev}"
 
 # If necessary, install Syslinux-supplied MBR
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
-    # Check that GNU Parted is available
-    if ! type parted 1>/dev/null 2>&1; then
-        echo "GNU Parted not found, unable to install Syslinux MBR"
-        exit 1
-    fi
-
-
     # Get the parent device
     rdevpath=`dirname ${devpath}`
     rdev=`udevadm info -q property -p ${rdevpath} | grep '^DEVNAME=' | cut -d= -f2`
@@ -170,21 +170,29 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Check that the partition table is MSDOS
-    ptable=`parted -ms "${rdev}" print | grep "^${rdev}:" | cut -d: -f6`
-    if [ "${ptable}" != msdos ]; then
+    ptable=`udevadm info -q property -p ${rdevpath} | grep '^ID_PART_TABLE_TYPE=' | cut -d= -f2`
+    if [ "${ptable}" != dos ]; then
         echo "Partition table is of type [${ptable}], need MS-DOS"
         exit 1
     fi
 
 
-    # Make the partition with SYSLINUX active
-    echo "*** Making ${dev} the active partition ***"
+    # Determine partition number
     if [ ! -e /sys${devpath}/partition ]; then
         echo "Unable to reliably determine partition number of ${dev}"
         exit 1
     fi
     devpart=`cat /sys${devpath}/partition`
-    parted -s "${rdev}" set "${devpart}" boot on
+
+
+    # Make the partition with SYSLINUX active if GNU Parted is available
+    echo "*** Making ${dev} the active partition ***"
+    if type parted 1>/dev/null 2>&1; then
+        parted -s "${rdev}" set "${devpart}" boot on
+    else
+        echo "--> GNU Parted not found, please run \"cfdisk ${rdev}\""
+        echo "--> and make partition #${devpart} bootable."
+    fi
 
 
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)

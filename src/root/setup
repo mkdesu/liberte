@@ -516,12 +516,13 @@ syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
 cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,{isolinux,mbr}.bin} /boot/syslinux/
 cp -p /usr/bin/syslinux /boot/syslinux/syslinux-x86
 cp -p /sbin/extlinux    /boot/syslinux/extlinux-x86
+cp -p /usr/bin/mtools   /boot/syslinux/mtools-x86
 cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
 rm -f /boot/syslinux/${consolefont}
 gunzip /boot/syslinux/${consolefont}.gz
 
 cat ${HOME}/config/syslinux.cfg \
-    | sed "/^#/d ;
+    | sed "/^##/d ;
            s@PREFIX@/liberte@ ;
            s@VERSION@${VERSION}@ ;
            s@CONSOLEFONT@${consolefont}@" \
