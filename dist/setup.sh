@@ -6,6 +6,7 @@ sysbin=syslinux
 extbin=extlinux
 sysmbr=/usr/share/syslinux/altmbr_c.bin
 sysmbr2=/usr/lib/syslinux/altmbr_c.bin
+mattrbin=mattrib
 
 # Directory for ldlinux.sys and bundled syslinux binary
 sysdir=/liberte/boot/syslinux
@@ -111,7 +112,7 @@ if [ ${devfs} = fat ]; then
     # Check for installation directory
     mntdir=`mktemp -d`
     mount -r -t vfat -o noatime,nosuid,nodev,noexec "${dev}" ${mntdir}
-    if [ -e ${mntdir}${sysdir}/syslinux-x86 ]; then
+    if [ -e ${mntdir}${sysdir}/syslinux-x86.tbz ]; then
         hassysdir=1
     else
         hassysdir=0
@@ -122,18 +123,19 @@ if [ ${devfs} = fat ]; then
         echo "Using bundled 32-bit SYSLINUX/Mtools binaries and MBR"
 
         systmpdir=`mktemp -d`
+        tar -xpjf ${mntdir}${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
-        cp ${mntdir}${sysdir}/syslinux-x86 ${systmpdir}/syslinux
-        cp ${mntdir}${sysdir}/mtools-x86   ${systmpdir}/mtools
-        ln -s mtools ${systmpdir}/mcopy
-        ln -s mtools ${systmpdir}/mmove
-        ln -s mtools ${systmpdir}/mattrib
-        chmod 755 ${systmpdir}/syslinux ${systmpdir}/mtools
-
-        cp ${mntdir}${sysdir}/altmbr_c.bin ${systmpdir}
+        sysbin=${systmpdir}/syslinux
         sysmbr=${systmpdir}/altmbr_c.bin
 
+        mattrbin=${systmpdir}/mattrib
         export PATH=${systmpdir}:"${PATH}"
+    fi
+
+    # Create OTFE directory so that it can be hidden, too
+    if [ ! -e ${mntdir}/otfe ]; then
+        mount -o remount,rw ${mntdir}
+        mkdir ${mntdir}/otfe
     fi
 
     umount ${mntdir}
@@ -149,6 +151,15 @@ if [ ${devfs} = fat ]; then
     echo "*** Installing SYSLINUX on ${dev} ***"
     ${sysbin} -i -d ${sysdir} "${dev}"
 
+    # Hide directories
+    echo "*** Hiding /liberte and /otfe directories ***"
+
+    unset  MTOOLSRC
+    export MTOOLS_SKIP_CHECK=1
+    export MTOOLS_FAT_COMPATIBILITY=1
+
+    ${mattrbin} -i "${dev}" +h ::/liberte ::/otfe
+
 elif [ ${devfs} = ext2 ]; then
 
     devdir=`grep "^${dev} " /proc/mounts | head -n 1 | cut -d' ' -f2`
@@ -159,19 +170,16 @@ elif [ ${devfs} = ext2 ]; then
         exit 1
     fi
 
-    if [ ! -e "${devdir}"${sysdir}/extlinux-x86 ]; then
+    if [ ! -e "${devdir}"${sysdir}/syslinux-x86.tbz ]; then
         echo "Directory ${sysdir} not found or incorrect in ${devdir}"
         exit 1
     elif [ ${sysok} = 0 ]; then
         echo "Using bundled 32-bit EXTLINUX binary and MBR"
 
         systmpdir=`mktemp -d`
+        tar -xpjf "${devdir}"${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
-        cp "${devdir}"${sysdir}/extlinux-x86 ${systmpdir}/extlinux
-        chmod 755 ${systmpdir}/extlinux
         extbin=${systmpdir}/extlinux
-
-        cp "${devdir}"${sysdir}/altmbr_c.bin ${systmpdir}
         sysmbr=${systmpdir}/altmbr_c.bin
     fi
 
@@ -187,12 +195,11 @@ fi
 
 # If necessary, install Syslinux-supplied MBR
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
-    echo "*** Installing bootloader to the MBR of ${rdev} ***"
-
     # Get the parent device
     rdevpath=`dirname ${devpath}`
     rdev=`udevadm info -q property -p ${rdevpath} | grep '^DEVNAME=' | cut -d= -f2`
 
+    echo "*** Installing bootloader to the MBR of ${rdev} ***"
 
     # Check that the parent device is a block device
     if [ ! -b "${rdev}" ]; then
@@ -254,3 +261,5 @@ fi
 # Synchronize
 echo "*** Synchronizing ***"
 sync
+
+echo "*** Done ***"

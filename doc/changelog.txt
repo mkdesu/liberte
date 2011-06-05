@@ -1,6 +1,10 @@
 2011-XX-XX
   + 2011.2 release
 
+  + ISO image generation, useful for VMs and independent installs
+  + Support for installing to ext2/3/4 filesystems
+  + Directories are hidden on FAT (during install) and ISO (in Joliet layer)
+
 
 2011-05-29
   + 2011.1 release
