@@ -28,6 +28,7 @@ lgroup=9000
 # see /usr/local/sbin/ps-mount
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0137,dmask=067
 isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},dmode=0510
+extflags=noatime,nosuid,nodev,acl,user_xattr
 
 
 # POSIX shells should (probably) support $(())
@@ -58,10 +59,16 @@ rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
 sed -i "s/TAG //; s/ROOTFS/vfat/;    s/FSFLAGS/${vfatflags}/"  \
     ${cdroot}/liberte/boot/syslinux/syslinux.cfg
 
+# EXTLINUX config takes precedence over SYSLINUX one when in same directory
+mkdir -m 755 ${cdroot}/liberte/boot/syslinux/ext
+cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+sed -i "s/TAG //; s/ROOTFS/ext4/;    s/FSFLAGS/${extflags}/"   \
+    ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+
 # ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
 cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 sed -i "s/TAG //; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
-        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
+        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/"             \
     ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
 

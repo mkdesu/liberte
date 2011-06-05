@@ -48,7 +48,7 @@ start() {
     ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
 
 
-    # Remount media root read-write (for vfat/ext2)
+    # Remount media root read-write (for non-loop/cd/dvd)
     remount=1
     cdtype=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_TYPE=//p')
     case "${cdtype}" in
@@ -82,7 +82,7 @@ start() {
 
         # Initialize LUKS image mapping (create if it doesn't exist)
         if [ ! -e ${otfefile}  -o  -e ${otfefile}.tag ]; then
-            mkdir -p `dirname ${otfefile}`  &&  touch ${otfefile}.tag
+            mkdir -p -m 700 `dirname ${otfefile}`  &&  touch ${otfefile}.tag
             rm -f ${otfefile} ${otfefile}-hdr.bak
 
             # Round down to prevent problems with OTFESIZE=1

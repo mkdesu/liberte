@@ -3,11 +3,13 @@
 # Required Syslinux version
 sysver=SYSVER
 sysbin=syslinux
-sysmbr=/usr/share/syslinux/mbr.bin
-sysmbr2=/usr/lib/syslinux/mbr.bin
+extbin=extlinux
+sysmbr=/usr/share/syslinux/altmbr_c.bin
+sysmbr2=/usr/lib/syslinux/altmbr_c.bin
 
 # Directory for ldlinux.sys and bundled syslinux binary
 sysdir=/liberte/boot/syslinux
+systmpdir=
 
 
 if [ ! \( $# = 1 -o \( $# = 2 -a "$2" = nombr \) \) ]; then
@@ -18,8 +20,6 @@ You need the following installed.
 
     Syslinux ${sysver} (Gentoo: sys-boot/syslinux)
         [if unavailable, bundled 32-bit version will be used]
-    GNU Parted    (Gentoo: sys-apps/parted)
-        [if unavailable, partition must be made bootable manually]
     udev + sysfs  (Gentoo: sys-fs/udev)
         [available on most modern Linux distributions]
 
@@ -77,68 +77,118 @@ if [ "${devtype}" != partition -a "${devtype}" != disk ]; then
 fi
 
 
-# Check for wrong filesystem type
-devfs=`udevadm info -q property -p ${devpath} | grep '^ID_FS_VERSION=' | cut -d= -f2`
-if [ -z "${devfs}" ]; then
-    echo "${dev} is not formatted, format it as FAT/FAT32 or specify a partition instead"
-    exit 1
-elif [ "${devfs}" != FAT16 -a "${devfs}" != FAT32 ]; then
-    devfstype=`udevadm info -q property -p ${devpath} | grep '^ID_FS_TYPE=' | cut -d= -f2`
-    echo "${dev} has a [${devfstype} ${devfs}] filesystem type, need FAT/FAT32"
-    exit 1
-fi
+# Check and normalize filesystem type
+devfs=`udevadm info -q property -p ${devpath} | grep '^ID_FS_TYPE=' | cut -d= -f2`
+case "${devfs}" in
+    '')
+        echo "${dev} is not formatted, format it as FAT/ext2 or specify a partition instead"
+        exit 1
+        ;;
+    vfat|msdos)
+        echo "Detected FAT/FAT32 filesystem, will install using SYSLINUX"
+        devfs=fat
+        ;;
+    ext2|ext3|ext4)
+        echo "Detected ext[234] filesystem, will install using EXTLINUX"
+        devfs=ext2
+        ;;
+    *)
+        echo "${dev} has a [${devfs}] filesystem type, need FAT/ext2"
+        exit 1
+        ;;
+esac
 
 
-# Check for mounted filesystem (be a bit paranoid, so no '$' after ${dev})
-if cut -d' ' -f1 /proc/mounts | grep -q "^${dev}"; then
-    echo "${dev} is mounted, unmount it or wait for auto-unmount"
-    exit 1
-fi
+if [ ${devfs} = fat ]; then
+
+    # Check for mounted filesystem (be a bit paranoid, so no '$' after ${dev})
+    if cut -d' ' -f1 /proc/mounts | grep -q "^${dev}"; then
+        echo "${dev} is mounted, unmount it or wait for auto-unmount"
+        exit 1
+    fi
 
 
-# Check for installation directory
-mntdir=`mktemp -d`
-mount -r -t vfat -o noatime,nosuid,nodev,noexec "${dev}" ${mntdir}
-if [ -e ${mntdir}${sysdir}/syslinux-x86 ]; then
-    hassysdir=1
+    # Check for installation directory
+    mntdir=`mktemp -d`
+    mount -r -t vfat -o noatime,nosuid,nodev,noexec "${dev}" ${mntdir}
+    if [ -e ${mntdir}${sysdir}/syslinux-x86 ]; then
+        hassysdir=1
+    else
+        hassysdir=0
+    fi
+
+    # Copy bundled syslinux binary if system versions are wrong
+    if [ ${hassysdir} = 1  -a  ${sysok} = 0 ]; then
+        echo "Using bundled 32-bit SYSLINUX/Mtools binaries and MBR"
+
+        systmpdir=`mktemp -d`
+
+        cp ${mntdir}${sysdir}/syslinux-x86 ${systmpdir}/syslinux
+        cp ${mntdir}${sysdir}/mtools-x86   ${systmpdir}/mtools
+        ln -s mtools ${systmpdir}/mcopy
+        ln -s mtools ${systmpdir}/mmove
+        ln -s mtools ${systmpdir}/mattrib
+        chmod 755 ${systmpdir}/syslinux ${systmpdir}/mtools
+
+        cp ${mntdir}${sysdir}/altmbr_c.bin ${systmpdir}
+        sysmbr=${systmpdir}/altmbr_c.bin
+
+        export PATH=${systmpdir}:"${PATH}"
+    fi
+
+    umount ${mntdir}
+    rmdir  ${mntdir}
+
+    if [ ${hassysdir} = 0 ]; then
+        echo "Directory ${sysdir} not found or incorrect on ${dev}"
+        exit 1
+    fi
+
+
+    # Install SYSLINUX
+    echo "*** Installing SYSLINUX on ${dev} ***"
+    ${sysbin} -i -d ${sysdir} "${dev}"
+
+elif [ ${devfs} = ext2 ]; then
+
+    devdir=`grep "^${dev} " /proc/mounts | head -n 1 | cut -d' ' -f2`
+    if [ -n "${devdir}" ]  &&  mountpoint -q "${devdir}"; then
+        echo "Detected ${dev} mount on ${devdir}"
+    else
+        echo "${dev} is not mounted, please manually mount or auto-mount it"
+        exit 1
+    fi
+
+    if [ ! -e "${devdir}"${sysdir}/extlinux-x86 ]; then
+        echo "Directory ${sysdir} not found or incorrect in ${devdir}"
+        exit 1
+    elif [ ${sysok} = 0 ]; then
+        echo "Using bundled 32-bit EXTLINUX binary and MBR"
+
+        systmpdir=`mktemp -d`
+
+        cp "${devdir}"${sysdir}/extlinux-x86 ${systmpdir}/extlinux
+        chmod 755 ${systmpdir}/extlinux
+        extbin=${systmpdir}/extlinux
+
+        cp "${devdir}"${sysdir}/altmbr_c.bin ${systmpdir}
+        sysmbr=${systmpdir}/altmbr_c.bin
+    fi
+
+    # Install EXTLINUX
+    echo "*** Installing EXTLINUX in ${devdir} ***"
+    ${extbin} -i "${devdir}"${sysdir}/ext
+
 else
-    hassysdir=0
-fi
-
-# Copy bundled syslinux binary if system versions are wrong
-if [ ${hassysdir} = 1  -a  ${sysok} = 0 ]; then
-    systmpdir=`mktemp -d`
-
-    cp ${mntdir}${sysdir}/syslinux-x86 ${systmpdir}/syslinux
-    cp ${mntdir}${sysdir}/mtools-x86   ${systmpdir}/mtools
-    ln -s mtools ${systmpdir}/mcopy
-    ln -s mtools ${systmpdir}/mmove
-    ln -s mtools ${systmpdir}/mattrib
-    chmod 755 ${systmpdir}/syslinux ${systmpdir}/mtools
-
-    cp ${mntdir}${sysdir}/mbr.bin ${systmpdir}
-    sysmbr=${systmpdir}/mbr.bin
-
-    echo "Using bundled 32-bit Syslinux/Mtools binaries and MBR"
-    export PATH=${systmpdir}:"${PATH}"
-fi
-
-umount ${mntdir}
-rmdir  ${mntdir}
-
-if [ ${hassysdir} = 0 ]; then
-    echo "Directory ${sysdir} not found or incorrect on ${dev}"
+    echo "Internal error"
     exit 1
 fi
-
-
-# Install SYSLINUX
-echo "*** Installing SYSLINUX on ${dev} ***"
-${sysbin} -i -d ${sysdir} "${dev}"
 
 
 # If necessary, install Syslinux-supplied MBR
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
+    echo "*** Installing bootloader to the MBR of ${rdev} ***"
+
     # Get the parent device
     rdevpath=`dirname ${devpath}`
     rdev=`udevadm info -q property -p ${rdevpath} | grep '^DEVNAME=' | cut -d= -f2`
@@ -185,24 +235,18 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
     devpart=`cat /sys${devpath}/partition`
 
 
-    # Make the partition with SYSLINUX active if GNU Parted is available
-    echo "*** Making ${dev} the active partition ***"
-    if type parted 1>/dev/null 2>&1; then
-        parted -s "${rdev}" set "${devpart}" boot on
-    else
-        echo "--> GNU Parted not found, please run \"cfdisk ${rdev}\""
-        echo "--> and make partition #${devpart} bootable."
-    fi
-
-
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)
-    echo "*** Installing bootloader to the MBR of ${rdev} ***"
-    cat ${sysmbr} > ${rdev}
+    devbyte=$((devpart/64))$(((devpart%64)/8))$((devpart%8))
+    if [ ${#devbyte} != 3 ]; then
+        echo "Unable to compute device partition byte"
+        exit 1
+    fi
+    printf "\\${devbyte}" | cat ${sysmbr} - | dd bs=440 count=1 conv=notrunc of=${rdev}
 fi
 
 
 # Erase temporary directories
-if [ ${sysok} = 0 ]; then
+if [ -n "${systmpdir}" ]; then
     rm -r ${systmpdir}
 fi
 

@@ -5,7 +5,7 @@ unionfs
 
 vfat
 isofs
-ext2
+ext4
 
 nls_cp437
 nls_iso8859-1

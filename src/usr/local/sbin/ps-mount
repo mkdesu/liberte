@@ -28,6 +28,8 @@ if [ "$1" = fork ]; then
     opts_iso9660=${opts_common},ro,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},mode=0440,dmode=0510
     opts_udf=${opts_common},ro,iocharset=iso8859-1,uid=${luser},gid=${lgroup},umask=0337
     opts_ext2=${opts_common},acl,user_xattr
+    opts_ext3=${opts_ext2}
+    opts_ext4=${opts_ext2}
     opts_auto=${opts_vfat}
 
     # Checking whether device is in fstab (except root fs), or is mounted
@@ -140,13 +142,8 @@ if [ "$1" = fork ]; then
     # (also update autokeys for reload_autofs)
     add_entry() {
         case "${ID_FS_TYPE}" in
-            auto|ext2|vfat|iso9660|udf)
+            auto|ext2|ext3|ext4|vfat|iso9660|udf)
                 eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
-                ;;
-            ext3|ext4)
-                ID_FS_LABEL="${ID_FS_LABEL}-readonly"
-                type="ext2,${opts_ext2},ro"
-                fixlabel
                 ;;
             msdos)
                 type="vfat,${opts_vfat}"

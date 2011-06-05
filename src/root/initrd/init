@@ -85,6 +85,12 @@ good_msg "Looking for the media"
 tested=' '
 waitmsg=0
 
+# In absence of blockdev --setro/setrw/getro
+ro_flags=
+if [ ${param_cdroot_type} = ext3  -o  ${param_cdroot_type} = ext4 ]; then
+    ro_flags=noload,
+fi
+
 while true; do
     if [ ${waitmsg} = 1 ]; then
         warn_msg 'Waiting for the media ...'
@@ -105,7 +111,7 @@ while true; do
             if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* >/dev/null 2>&1; then
                 good_msg "Attempting to mount media: ${mediadev}"
 
-                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
+                if mount -r -t ${param_cdroot_type} -o ${ro_flags}${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
                     # Check for the recognition file
                     if [ -e ${rwroot}${boot}${param_loop} ]; then
                         good_msg "Media found on ${mediadev}"
