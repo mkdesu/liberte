@@ -94,9 +94,9 @@ if [ -e ${SRC}/conf/checkregexps ]; then
         /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin \
         /usr/src/linux-kexec/arch/x86/boot/compressed/vmlinux.bin
 
-    chroot ${LIVECD}        lzgrep -iE "${regexps}" \
-        /boot/initrd-x86.lzm                        \
-        /usr/local/boot/initrd-kexec.lzm
+    chroot ${LIVECD}        xzgrep -iE "${regexps}" \
+        /boot/initrd-x86.xz                         \
+        /usr/local/boot/initrd-kexec.xz
 
     ${FIND} -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
         ! -name 'libgucharmap.so.*' ! -name oui.txt -print0 \

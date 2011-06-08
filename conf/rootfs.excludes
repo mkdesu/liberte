@@ -5,7 +5,6 @@
 /usr/share/man/
 /usr/share/info/
 /usr/share/gtk-doc/
-/usr/share/gettext/
 /usr/share/nano/man-html/
 /usr/share/gnumeric/[0-9]*/doc
 # (no gnome-extra/yelp with "-gnome")
@@ -187,6 +186,8 @@
 /usr/bin/gsettings-schema-convert
 # net-misc/rsync: non-essential auxiliary scripts
 /usr/share/rsync/
+# media-sound/alsa-utils: Bash script that depends on gettext
+/usr/sbin/alsaconf
 
 # OpenSSH server
 /etc/ssh/sshd_config

@@ -55,15 +55,15 @@ elif [ "$2" = clean ]; then
 
     sinfo "Creating pruned packages list"
     for p in ${LIVECD}/copy/tmp/packages/*; do
-        found=0
-        for f in `cat "${p}"`; do
+        cat ${p} | while read f; do
             if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
-                found=1
-                break
+                echo "${f}" >> ${p}.pruned
             fi
         done
 
-        if [ ${found} = 0 ]; then
+        if [ -e ${p}.pruned ]; then
+            mv ${p}.pruned ${p}
+        else
             rm ${p}
         fi
     done

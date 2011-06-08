@@ -5,6 +5,11 @@
   + Support for installing to ext2/3/4 filesystems
   + Directories are hidden on FAT (during install) and ISO (in Joliet layer)
 
+  + Kernel 2.6.38 with SquashFS XZ compression and NX support
+  + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
+
+  + Audio mixer channels are heuristically set up on boot
+
 
 2011-05-29
   + 2011.1 release

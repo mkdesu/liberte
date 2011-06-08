@@ -19,6 +19,7 @@ media-gfx/splashutils
 # Firmware
 # (no fw for AR9170_USB in portage)
 sys-apps/microcode-ctl
+sys-kernel/amd-ucode
 x11-drivers/radeon-ucode
 media-sound/alsa-firmware
 net-wireless/b43-firmware
@@ -75,6 +76,7 @@ app-crypt/gnupg
 app-crypt/mcrypt
 app-crypt/steghide
 app-crypt/ccid
+app-crypt/tpm-tools
 sys-apps/haveged
 
 # Network utilities
@@ -114,6 +116,7 @@ sys-apps/usb_modeswitch
 sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
+media-tv/v4l-utils
 net-print/ink
 
 # Text utilities

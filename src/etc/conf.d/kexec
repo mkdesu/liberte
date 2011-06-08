@@ -1,6 +1,6 @@
 BOOTPART=/
 KNAME=usr/local/boot/kernel-kexec.zi
-INITRD=/usr/local/boot/initrd-kexec.lzm
+INITRD=/usr/local/boot/initrd-kexec.xz
 
 ROOTPART=none
 KPARAM="quiet"

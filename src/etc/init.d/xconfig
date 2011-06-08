@@ -4,12 +4,16 @@ description="Sets up cgroups, configures X server and sound."
 
 cgroupmnt=/sys/fs/cgroup
 cgrouprel=/usr/local/sbin/cgroup-release
+
 vmflag=/etc/vmtype
+
 xorg_extra='Section "ServerFlags"
     Option "DontZap"      "true"
     Option "DontVTSwitch" "true"
 EndSection'
 xorgrc=/etc/X11/xorg.conf
+
+amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
 
 depend() {
@@ -52,6 +56,10 @@ start() {
         else
             false
         fi
+        eend $?
+
+        ebegin Adjusting audio mixer values
+        ${amixerrst}
         eend $?
     fi
 

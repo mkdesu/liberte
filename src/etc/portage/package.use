@@ -40,7 +40,7 @@ net-analyzer/netcat             -crypt
 
 # Multimedia
 # mplayer: faac, x264, xvid, twolame/toolame and (partly) mp3 are activated only for +encode
-media-video/mplayer             cpudetection custom-cpuopts 3dnow 3dnowext mmx mmxext sse sse2
+media-video/mplayer             cpudetection custom-cpuopts 3dnow 3dnowext mmxext sse2
 media-video/mplayer             mpg123 -mp3 libmpeg2 rtmp -rar
 media-video/mplayer             -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode

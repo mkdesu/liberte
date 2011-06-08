@@ -20,7 +20,7 @@ cdroot=$1/dist/cdroot
 version=`cat ${src}/conf/version`
 distname=liberte-${version}
 sysver=`cat ${livecd}/boot/syslinux/version`
-mksqver=4.1
+mksqver=4.2
 
 luser=2101
 lgroup=9000
@@ -84,8 +84,8 @@ sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 # Multi-threaded execution often causes deadlock after image creation
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs  \
-    -noappend -no-exports -no-progress -no-xattrs -comp lzma \
+${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
+    -noappend -no-exports -no-progress -no-xattrs -comp xz -Xbcj x86 \
     -sort ${src}/conf/rootfs.sort -e boot tmp/packages
 chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
 

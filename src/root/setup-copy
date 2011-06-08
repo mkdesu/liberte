@@ -90,6 +90,9 @@ for ebuild in ${!ebuild_*}; do
     eval ebuild \$${ebuild} manifest
 done
 
+# Packages wrongly rdepend on gettext instead of libintl (provided by glibc)
+echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
+
 
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)
 sinfo "Unmerging build and temporary dependencies"
@@ -146,6 +149,11 @@ emerge -qc --with-bdeps n
 
 if [ -e /usr/bin/perl ]; then
     sinfo "Failed to discard Perl dependencies"
+    false
+fi
+
+if [ -e /usr/bin/gettext ]; then
+    sinfo "Failed to discard gettext dependencies"
     false
 fi
 

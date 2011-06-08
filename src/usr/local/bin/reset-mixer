@@ -1,0 +1,38 @@
+#!/bin/sh
+
+count=0
+sset() {
+    control="$1"
+
+    shift
+    values="$@"
+
+    ok=0
+    for value in ${values}; do
+        if amixer sset -q "${control}" "${value}" 2>/dev/null; then
+            ok=1
+        fi
+    done
+
+    if [ ${ok} = 1 ]; then
+        count=$((count + 1))
+    fi
+}
+
+sset Master         80% mute
+sset Capture        80% nocap
+
+sset PCM            80% unmute
+sset Speaker        80% unmute
+sset Headphone      80% unmute
+
+sset Front         100% unmute
+sset 'Mic Boost'   100% unmute
+sset 'Mic Boost',1 100% unmute
+
+sset Beep            0% mute
+
+sset Digital        0dB
+sset Mic            cap mute
+
+echo "Adjusted ${count} mixer controls (muted Master, disabled Capture)"

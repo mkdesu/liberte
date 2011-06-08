@@ -11,6 +11,7 @@
 =dev-libs/liblinebreak-2.0*
 
 # Firmware
+sys-kernel/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 net-wireless/iwl5150-ucode
