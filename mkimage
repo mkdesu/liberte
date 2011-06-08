@@ -67,7 +67,8 @@ sed -i "s/TAG //; s/ROOTFS/ext4/;    s/FSFLAGS/${extflags}/"   \
 
 # ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
 cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
-sed -i "s/TAG //; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
+sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
+        s/theme:liberte/theme:liberty/;
         s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/"             \
     ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg

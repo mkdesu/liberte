@@ -13,6 +13,9 @@
 /usr/share/gnome-control-center/
 /usr/share/control-center-[0-9]*/
 /usr/share/gdm/
+/usr/local/man
+/usr/local/share/doc/
+/usr/local/share/man/
 
 # Portage directories
 /usr/portage/
@@ -101,6 +104,7 @@
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
 /usr/sbin/libpng-*-update.sh
+/var/lib/dbus/machine-id
 /mnt/floppy/
 /mnt/cdrom/
 # (GeoIP is not used in Tor setup)

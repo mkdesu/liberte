@@ -282,7 +282,8 @@ rm /etc/env.d/05gcc-i686-pc-linux-gnu
 rm -rf /etc/env.d/{binutils,gcc,python}
 rm /etc/{init,conf,pam}.d/sshd
 
-rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,gcov}
+rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,c89,c99,gcov}
+rm /lib/cpp
 rm /sbin/fix_libtool_files.sh
 
 rm /usr/bin/{kernel,profile,python}-config

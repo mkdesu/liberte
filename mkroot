@@ -54,7 +54,7 @@ elif [ "$2" = clean ]; then
 
 
     sinfo "Creating pruned packages list"
-    for p in ${LIVECD}/copy/tmp/packages/*; do
+    for p in ${LIVECD}/copy/tmp/packages/*=*; do
         cat ${p} | while read f; do
             if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
                 echo "${f}" >> ${p}.pruned
@@ -63,14 +63,30 @@ elif [ "$2" = clean ]; then
 
         if [ -e ${p}.pruned ]; then
             mv ${p}.pruned ${p}
+            chmod 644 ${p}
         else
             rm ${p}
         fi
     done
 
-    find ${LIVECD}/copy/tmp/packages -type f -printf '%f\n' | tr = / | sort \
-        > ${LIVECD}/copy/boot/packages.lst
+    find ${LIVECD}/copy/tmp/packages -type f -name '*=*' -printf '%f\n' \
+        | tr = / | sort > ${LIVECD}/copy/boot/packages.lst
     chmod 644 ${LIVECD}/copy/boot/packages.lst
+
+    sinfo "Creating unregistered files list"
+    chroot ${LIVECD}/copy find / -xdev \( -type l -o -type f \) \
+        ! -path '/lib/modules/*' ! -path '/tmp/packages/*' ! -path '/home/*'                     \
+        ! -path '/root/*' ! -path '/usr/share/keymaps/*' ! -path '/usr/share/consolefonts/*'     \
+        ! -path '/usr/share/mime/*' ! -path '/var/cache/fontconfig/*' ! -path '/etc/runlevels/*' \
+        ! -path '/etc/ssl/certs/*' ! -path '/boot/*' ! -path '/etc/gconf/gconf.xml.defaults/*'   \
+        ! -path '/etc/fonts/conf.d/*' ! -path '/lib/firmware/*' \
+        | sort > ${LIVECD}/copy/tmp/packages/all-files
+    cat ${LIVECD}/copy/tmp/packages/*=* | sort -u > ${LIVECD}/copy/tmp/packages/listed-files
+
+    comm -13 ${LIVECD}/copy/tmp/packages/listed-files ${LIVECD}/copy/tmp/packages/all-files \
+        > ${LIVECD}/copy/tmp/packages/unlisted-files
+    rm ${LIVECD}/copy/tmp/packages/listed-files ${LIVECD}/copy/tmp/packages/all-files
+    chmod 644 ${LIVECD}/copy/tmp/packages/unlisted-files
 
 
     sinfo "Done."
