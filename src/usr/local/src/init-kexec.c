@@ -129,9 +129,14 @@ int main(int argc, char **argv) {
     if (mount("proc", "/proc", "proc", MS_NOATIME | MS_NODEV | MS_NOEXEC | MS_NOSUID, ""))
         fprintf(stderr, "Failed to mount /proc\n");
     else {
-        sysctl("kernel.printk",        "3");
-        sysctl("vm.overcommit_memory", "1");
-        sysctl("vm.drop_caches",       "3");
+        sysctl("kernel.printk",               "3");
+
+        sysctl("vm.drop_caches",              "3");
+        sysctl("vm.min_free_kbytes",        "256");
+
+        sysctl("vm.overcommit_memory",        "1");
+        sysctl("vm.oom_kill_allocating_task", "1");
+        sysctl("vm.oom_dump_tasks",           "0");
 
         if (umount("/proc"))
             fprintf(stderr, "Failed to unmount /proc\n");

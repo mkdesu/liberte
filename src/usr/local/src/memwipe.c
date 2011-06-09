@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <signal.h>
+#include <stdint.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/types.h>
@@ -10,24 +10,13 @@
 
 #define KIB    (1 << 10)
 #define BLOCK  (KIB << 2)
+#define MAXMEM (KIB << 20)
 
 #define PATT_A 0x55
 #define PATT_B 0xAA
 
 
-static volatile ptrdiff_t* wipesize;
-
-
-static void cocoon() {
-    struct sigaction sa;
-    sa.sa_handler  = SIG_IGN;
-    sa.sa_flags    = 0;
-    sa.sa_restorer = 0;
-    sigemptyset(&sa.sa_mask);
-
-    if (sigaction(SIGTSTP, &sa, 0))
-        fprintf(stderr, "Failed to ignore SIGTSTP\n");
-}
+static volatile uintmax_t* wipesize;
 
 
 static void unlimit(int resource, const char *name) {
@@ -42,28 +31,20 @@ static void unlimit(int resource, const char *name) {
 }
 
 
-static void wipe(int pass, int fillbyte) {
-    void *brkstart, *brkend;
+static void wipe(int depth, int pass, int fillbyte) {
+    void  *start, *end;
+    pid_t pid;
+    int   status;
 
-    /* Doesn't work with klibc, but defaults are fine */
-    unlimit(RLIMIT_AS,      "as");          /* brk */
-    unlimit(RLIMIT_DATA,    "data");        /* brk: init data / uninit data / heap */
-    unlimit(RLIMIT_STACK,   "stack");       /* stack / command line / env vars */
-    unlimit(RLIMIT_MEMLOCK, "memlock");     /* mlock */
-
-    brkstart     = sbrk(0);
-    brkend       = brkstart;
-
-    *wipesize    = 0;
-
-    /* brk(brkend + BLOCK); printf("%#x\n", *((int*)brkend)); */
+    start     = sbrk(0);
+    end       = start;
 
     /* Incrementally allocate as much memory as possible */
-    while (!brk(brkend + BLOCK)) {
-        memset(brkend, fillbyte, BLOCK);
-        brkend += BLOCK;
+    while (end - start + BLOCK <= MAXMEM  &&  !brk(end + BLOCK)) {
+        memset(end, fillbyte, BLOCK);
 
-        *wipesize = brkend - brkstart;
+        end       += BLOCK;
+        *wipesize += BLOCK;
     }
 
     /*
@@ -75,8 +56,41 @@ static void wipe(int pass, int fillbyte) {
                   vm.drop_caches=3
     */
 
+    /*
+      If maximum allocated memory was reached, spawn a new process in
+      order to avoid exhausting per-process VM space on 32-bit systems.
+
+      NOTE: this relies on vm.oom_kill_allocating_task=1, otherwise
+            one of the parent processes is usually killed.
+    */
+    if (end - start >= MAXMEM) {
+        pid = fork();
+
+        if (pid == -1)
+            fprintf(stderr, "Failed to fork chain process\n");
+
+        /* In child thread */
+        else if (pid == 0) {
+            if (brk(start))
+                fprintf(stderr, "Failed to release chain parent's memory address space\n");
+            else
+                wipe(depth+1, pass, fillbyte);
+
+            _exit(0);
+        }
+
+        /* Continuing in parent thread */
+        else {
+            if (waitpid(pid, &status, 0) != pid)
+                fprintf(stderr, "Failed to wait on chained child process\n");
+
+            else if (WIFSIGNALED(status))
+                printf("[killed (chain %d)] ", depth+1);
+        }
+    }
+
     /* Release allocated memory */
-    if (brk(brkstart))
+    if (brk(start))
         fprintf(stderr, "Failed to release allocated memory\n");
 }
 
@@ -86,14 +100,17 @@ int main() {
     int   status, pass, fillbyte;
 
 
-    /* Ignore some signals */
-    cocoon();
+    /* Doesn't work with klibc, but defaults are fine */
+    unlimit(RLIMIT_AS,      "as");          /* brk */
+    unlimit(RLIMIT_DATA,    "data");        /* brk: init data / uninit data / heap */
+    unlimit(RLIMIT_STACK,   "stack");       /* stack / command line / env vars */
+    unlimit(RLIMIT_MEMLOCK, "memlock");     /* mlock */
 
 
     /* Allocate shared memory */
-    wipesize = (volatile ptrdiff_t*) mmap(NULL, sizeof(ptrdiff_t), PROT_READ | PROT_WRITE,
+    wipesize = (volatile uintmax_t*) mmap(NULL, sizeof(uintmax_t), PROT_READ | PROT_WRITE,
                                           MAP_SHARED | MAP_ANONYMOUS | MAP_LOCKED, -1, 0);
-    if (wipesize == (void*) -1) {
+    if (wipesize == MAP_FAILED) {
         fprintf(stderr, "Failed to allocate shared memory\n");
         return 1;
     }
@@ -108,14 +125,12 @@ int main() {
         *wipesize = 0;
         pid = fork();
 
-        /* printf("PID = %d, clone PID = %d\n", getpid(), pid); */
-
         if (pid == -1)
-            fprintf(stderr, "Failed to vfork process\n");
+            fprintf(stderr, "Failed to fork process\n");
 
         /* In child thread */
         else if (pid == 0) {
-            wipe(pass, fillbyte);
+            wipe(0, pass, fillbyte);
             _exit(0);
         }
 
@@ -139,7 +154,7 @@ int main() {
 
 
     /* Free shared memory */
-    if (munmap((void*) wipesize, sizeof(ptrdiff_t)))
+    if (munmap((void*) wipesize, sizeof(uintmax_t)))
         fprintf(stderr, "Failed to free shared dmemory\n");
 
 
