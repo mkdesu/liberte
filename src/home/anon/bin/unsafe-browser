@@ -8,6 +8,7 @@ xhost +si:localuser:${nofw}
 
 # DISPLAY is preserved by sudo
 sudo -n -u ${nofw} /usr/local/sbin/unsafe-browser
+sudo -n            /usr/local/sbin/slay ${nofw}
 
 
 xhost -si:localuser:${nofw}

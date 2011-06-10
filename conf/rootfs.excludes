@@ -100,6 +100,7 @@
 /etc/issue.logo
 /etc/skel/
 /etc/locale.gen
+/etc/timezone
 /etc/sgml/
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*

@@ -8,5 +8,4 @@ usr/sbin 700
 usr/bin 650
 lib 600
 usr/lib 550
-opt 500
 usr 450

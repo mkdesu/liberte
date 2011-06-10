@@ -4,7 +4,7 @@ hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
 consolefont=ter-i16n.psf
 xzmem=20
-protected="/etc/._cfg????_locale.gen /etc/._cfg????_timezone"
+protected="/etc/._cfg????_locale.gen"
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
@@ -222,9 +222,16 @@ etc-update
 rebuild_locales
 
 
+if [ ! -e /var/cache/eix ]; then
+    sinfo "Creating eix database"
+    eix-update -q
+fi
+
+
 sinfo "Compiling custom executables"
 cflags="-std=c99 -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
 gcc  ${cflags} -o /usr/local/sbin/udev-watchdog    /usr/local/src/udev-watchdog.c -ludev
+gcc  ${cflags} -o /usr/local/sbin/slay             /usr/local/src/slay.c
 gcc  ${cflags} -o /usr/local/bin/hex2base32        /usr/local/src/hex2base32.c
 gcc  ${cflags} -o /usr/local/bin/log-limit         /usr/local/src/log-limit.c
 gcc  ${cflags} -o /usr/local/libexec/cable/service /usr/local/src/cable-service.c
@@ -237,6 +244,7 @@ klcc ${cflags} -o /usr/local/addons/initrd/memwipe    /usr/local/src/memwipe.c
 klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.c
 
 strip -s /usr/local/sbin/udev-watchdog       \
+         /usr/local/sbin/slay                \
          /usr/local/bin/hex2base32           \
          /usr/local/bin/log-limit            \
          /usr/local/libexec/cable/service    \
@@ -340,7 +348,6 @@ svcdefault="liberte identity cabled persist xconfig
 delsvcboot="urandom swap bootmisc"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
-delsvcnonetwork="local"
 
 for runlevel in sysinit boot default; do
     eval svcs=\${svc${runlevel}}
@@ -364,6 +371,10 @@ sinfo "Disabling non-rotating logs"
 ln -sf /dev/null /var/log/ConsoleKit/history
 ln -sf /dev/null /var/log/lastlog
 rm -f  /var/log/wtmp
+
+truncate -s 0   /var/run/utmp
+chown root:utmp /var/run/utmp
+chmod 664       /var/run/utmp
 
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
@@ -400,6 +411,7 @@ usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
+useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
 touch             /tmp/nginx-ref
 chown nginx:nginx /tmp/nginx-ref
