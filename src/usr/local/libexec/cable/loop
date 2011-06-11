@@ -13,12 +13,10 @@ fi
 
 
 # Helpers
-prefix="${0##*/}"
-prefix="${0%${prefix}}"
-validate="${prefix}"validate
-fetch="${prefix}"fetch
-crypto="${prefix}"crypto
-comm="${prefix}"comm
+validate="${CABLE_HOME}"validate
+fetch="${CABLE_HOME}"fetch
+crypto="${CABLE_HOME}"crypto
+comm="${CABLE_HOME}"comm
 
 # Parameters
 qtype=$1
@@ -29,7 +27,7 @@ lockmagick="$3"
 locktmout=30
 
 # Directories
-msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
+msgdir=${CABLE_QUEUES}/${qtype}/"${msgid}"
 
 
 trap '[ $? = 0 ] || error failed' 0

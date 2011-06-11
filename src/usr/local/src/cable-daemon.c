@@ -1,3 +1,8 @@
+/*
+  The following environment variables are used (from suprofile):
+  CABLE_HOME, CABLE_MOUNT, CABLE_QUEUES
+ */
+
 /* Alternative: _POSIX_C_SOURCE 200809L */
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
@@ -56,8 +61,12 @@
 #define MAX_PROC    100
 #define WAIT_PROC   300
 
+/* environment variables */
+#define CABLE_MOUNT  "CABLE_MOUNT"
+#define CABLE_QUEUES "CABLE_QUEUES"
+#define CABLE_HOME   "CABLE_HOME"
+
 /* loop executable */
-#define LOOP_EXEC   "/usr/local/libexec/cable/loop"
 #define LOOP_NAME   "loop"
 #define QUEUE_NAME  "queue"
 #define RQUEUE_NAME "rqueue"
@@ -172,13 +181,13 @@ static int reg_watches(const char *qpath, const char *rqpath) {
         error();
 
     /* existing watch is ok */
-    if ((inotqwd = inotify_add_watch(inotfd, qpath, IN_MOVED_TO | IN_ATTRIB | IN_MOVE_SELF | IN_DONT_FOLLOW | IN_ONLYDIR)) == -1) {
+    if ((inotqwd  = inotify_add_watch(inotfd, qpath,  IN_ATTRIB | IN_MOVED_TO | IN_MOVE_SELF | IN_DONT_FOLLOW | IN_ONLYDIR)) == -1) {
         warning();
         return 0;
     }
 
     /* existing watch is ok */
-    if ((inotrqwd = inotify_add_watch(inotfd, rqpath, IN_MOVED_TO | IN_MOVE_SELF | IN_DONT_FOLLOW | IN_ONLYDIR)) == -1) {
+    if ((inotrqwd = inotify_add_watch(inotfd, rqpath,             IN_MOVED_TO | IN_MOVE_SELF | IN_DONT_FOLLOW | IN_ONLYDIR)) == -1) {
         warning();
         return 0;
     }
@@ -192,8 +201,9 @@ static int is_mountpoint(const char *path) {
     char pathp[MAXPATH+1];
     struct stat st, stp;
 
-    strncpy(pathp, path, MAXPATH);
-    strncat(pathp, "/..", MAXPATH);
+    strncpy(pathp, path,  MAXPATH-3);
+    pathp[MAXPATH-3] = '\0';
+    strcat(pathp, "/..");
 
     if (lstat(path, &st) == -1  ||  lstat(pathp, &stp) == -1
         ||  !S_ISDIR(st.st_mode)  ||  !S_ISDIR(stp.st_mode))
@@ -332,7 +342,7 @@ static int is_msgdir(const char *s) {
 
 
 /* run loop for given queue type and msgid; msgid is a volatile string */
-static void run_loop(const char *qtype, const char *msgid) {
+static void run_loop(const char *qtype, const char *msgid, const char *looppath) {
     pid_t pid;
     long  pcount;
 
@@ -347,7 +357,7 @@ static void run_loop(const char *qtype, const char *msgid) {
         if (pid == -1)
             warning();
         else if (pid == 0) {
-            execl(LOOP_EXEC, LOOP_NAME, qtype, msgid, (char *) NULL);
+            execlp(looppath, LOOP_NAME, qtype, msgid, (char *) NULL);
 
             /* exits just the fork */
             error();
@@ -418,7 +428,7 @@ static double getmontime() {
 
 
 /* exec run_loop for all correct entries in (r)queue directory */
-static void retry_dir(const char *qtype, const char *qpath) {
+static void retry_dir(const char *qtype, const char *qpath, const char *looppath) {
     DIR    *qdir;
     struct dirent *de = NULL;
     struct stat   st;
@@ -445,7 +455,7 @@ static void retry_dir(const char *qtype, const char *qpath) {
                 run = 1;
 
             if (run)
-                run_loop(qtype, de->d_name);
+                run_loop(qtype, de->d_name, looppath);
         }
 
         if (de == NULL  &&  errno != 0  &&  errno != EINTR)
@@ -458,21 +468,17 @@ static void retry_dir(const char *qtype, const char *qpath) {
 }
 
 
-int main(int argc, char *argv[]) {
+int main() {
     /* using FILENAME_MAX prevents EINVAL on read() */
     char  buf[sizeof(struct inotify_event) + FILENAME_MAX+1];
-    const char *mppath, *qpath, *rqpath;
+    char  mppath[MAXPATH+1], qpath[MAXPATH+1], rqpath[MAXPATH+1], looppath[MAXPATH+1];
+    const char *mpenv, *qsenv, *homeenv;
     int   sz, offset, rereg, evqok = 0;
     struct inotify_event *iev;
     double retrytmout, lastclock;
 
     umask(0077);
     setlocale(LC_ALL, "C");
-
-    if (argc != 4) {
-        fprintf(stderr, "%s <mount point> <queue dir> <rqueue dir>\n", argv[0]);
-        return 1;
-    }
 
     /* init logging */
     syslog_init();
@@ -489,10 +495,32 @@ int main(int argc, char *argv[]) {
     /* initialize rng */
     rand_init();
 
-    /* extract arguments */
-    mppath = argv[1];
-    qpath  = argv[2];
-    rqpath = argv[3];
+
+    /* extract environment */
+    mpenv   = getenv(CABLE_MOUNT);
+    qsenv   = getenv(CABLE_QUEUES);
+    homeenv = getenv(CABLE_HOME);
+
+    if (!mpenv || !qsenv || !homeenv) {
+        fprintf(stderr, "environment variables not set\n");
+        return EXIT_FAILURE;
+    }
+
+    strncpy(mppath,   mpenv,   MAXPATH);
+    mppath[MAXPATH]                       = '\0';
+
+    strncpy(qpath,    qsenv,   MAXPATH-sizeof(QUEUE_NAME));
+    qpath[MAXPATH-sizeof(QUEUE_NAME)]     = '\0';
+    strcat(qpath,    "/" QUEUE_NAME);
+
+    strncpy(rqpath,   qsenv,   MAXPATH-sizeof(RQUEUE_NAME));
+    qpath[MAXPATH-sizeof(RQUEUE_NAME)]    = '\0';
+    strcat(rqpath,   "/" RQUEUE_NAME);
+
+    strncpy(looppath, homeenv, MAXPATH-sizeof(LOOP_NAME)+1);
+    looppath[MAXPATH-sizeof(LOOP_NAME)+1] = '\0';
+    strcat(looppath, LOOP_NAME);
+
 
     /* try to reregister watches as long as no signal caught */
     lastclock = getmontime();
@@ -531,7 +559,7 @@ int main(int argc, char *argv[]) {
                         else {
                             /* stop can be indicated here (while waiting for less processes) */
                             const char *qtype = (iev->wd == inotqwd) ? QUEUE_NAME : RQUEUE_NAME;
-                            run_loop(qtype, iev->name);
+                            run_loop(qtype, iev->name, looppath);
                         }
                     }
                 }
@@ -543,8 +571,8 @@ int main(int argc, char *argv[]) {
             if (!stop  &&  getmontime() - lastclock >= retrytmout) {
                 flog(LOG_DEBUG, "retrying queue directories");
 
-                retry_dir(QUEUE_NAME,  qpath);
-                retry_dir(RQUEUE_NAME, rqpath);
+                retry_dir(QUEUE_NAME,  qpath,  looppath);
+                retry_dir(RQUEUE_NAME, rqpath, looppath);
 
                 lastclock = getmontime();
 
@@ -560,5 +588,5 @@ int main(int argc, char *argv[]) {
     flog(LOG_INFO, "exiting");
 
     closelog();
-    return 0;
+    return EXIT_SUCCESS;
 }

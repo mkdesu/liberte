@@ -22,6 +22,7 @@
 #define OK                  "OK"
 #define BADREQ              "BADREQ"
 #define BADFMT              "BADFMT"
+#define BADCFG              "BADCFG"
 #ifndef ERROR
 #define ERROR               OK
 #endif
@@ -31,15 +32,13 @@
 #define USERNAME_LENGTH      32
 #define ACKHASH_LENGTH      128
 
-#ifndef CABLES_PREFIX
-#define CABLES_PREFIX       "/home/anon/persist/cables"
-#endif
-
 /* maximum filename length in (r)q_pfx/<msgid>/: 32 characters */
-#define MAX_PATH_LENGTH     (sizeof(CABLES_PREFIX) + 9 + MSGID_LENGTH + 32)
+#define MAX_PATH_PREFIX     127
+#define MAX_PATH_LENGTH     (MAX_PATH_PREFIX + sizeof(RQUEUE_SUFFIX)-1 + MSGID_LENGTH+1 + 32)
 
-static const char *q_pfx  = CABLES_PREFIX "/queue/";
-static const char *rq_pfx = CABLES_PREFIX "/rqueue/";
+#define CABLE_QUEUES        "CABLE_QUEUES"
+#define QUEUE_SUFFIX        "/queue/"
+#define RQUEUE_SUFFIX       "/rqueue/"
 
 
 static void retstatus(const char *status) {
@@ -145,12 +144,14 @@ static void check_file(const char *path) {
 }
 
 
-static void handle_msg(const char *msgid, const char *hostname, const char *username) {
+static void handle_msg(const char *msgid, const char *hostname, const char *username,
+                       const char *cqueues) {
     char path[MAX_PATH_LENGTH+1], npath[MAX_PATH_LENGTH+4+1];
     int  baselen;
 
     /* base: .../cables/rqueue/<msgid> */
-    strcpy(path, rq_pfx);
+    strcpy(path, cqueues);
+    strcat(path, RQUEUE_SUFFIX);
     strcat(path, msgid);
 
     /* checkno /cables/rqueue/<msgid> */
@@ -185,12 +186,13 @@ static void handle_msg(const char *msgid, const char *hostname, const char *user
 }
 
 
-static void handle_rcp(const char *msgid) {
+static void handle_rcp(const char *msgid, const char *cqueues) {
     char path[MAX_PATH_LENGTH+1], npath[MAX_PATH_LENGTH+1];
     int  baselen;
 
     /* base: .../cables/queue/<msgid> */
-    strcpy(path, q_pfx);
+    strcpy(path, cqueues);
+    strcat(path, QUEUE_SUFFIX);
     strcat(path, msgid);
     baselen = strlen(path);
 
@@ -213,13 +215,14 @@ static void handle_rcp(const char *msgid) {
 }
 
 
-static void handle_ack(const char *msgid, const char *ackhash) {
+static void handle_ack(const char *msgid, const char *ackhash, const char *cqueues) {
     char path[MAX_PATH_LENGTH+1], trpath[MAX_PATH_LENGTH+4+1];
     char recack[ACKHASH_LENGTH+2];
     int  baselen;
 
     /* base: .../cables/rqueue/<msgid> */
-    strcpy(path, rq_pfx);
+    strcpy(path, cqueues);
+    strcat(path, RQUEUE_SUFFIX);
     strcat(path, msgid);
     baselen = strlen(path);
 
@@ -246,8 +249,8 @@ static void handle_ack(const char *msgid, const char *ackhash) {
 
 
 int main() {
-    char       buf[MAX_REQ_LENGTH+1];
-    const char *pathinfo, *delim = "/";
+    char       buf[MAX_REQ_LENGTH+1], cqueues[MAX_PATH_PREFIX+1];
+    const char *pathinfo, *delim = "/", *cqenv;
     char       *cmd, *msgid, *arg1, *arg2;
 
     umask(0077);
@@ -280,6 +283,15 @@ int main() {
         retstatus(BADFMT);
 
 
+    /* Get queues prefix from environment */
+    cqenv = getenv(CABLE_QUEUES);
+    if (!cqenv || strlen(cqenv) >= sizeof(cqueues))
+        retstatus(BADCFG);
+
+    strncpy(cqueues, cqenv, sizeof(cqueues)-1);
+    cqueues[sizeof(cqueues)-1] = '\0';
+
+
     /* Handle commands
 
        ver
@@ -307,7 +319,7 @@ int main() {
             || !vfybase32(USERNAME_LENGTH, arg2))
             retstatus(BADFMT);
 
-        handle_msg(msgid, arg1, arg2);
+        handle_msg(msgid, arg1, arg2, cqueues);
     }
     else if (!strcmp("rcp", cmd)) {
         if (!msgid || arg1)
@@ -316,7 +328,7 @@ int main() {
         if (!vfyhex(MSGID_LENGTH, msgid))
             retstatus(BADFMT);
 
-        handle_rcp(msgid);
+        handle_rcp(msgid, cqueues);
     }
     else if (!strcmp("ack", cmd)) {
         if (!arg1 || arg2)
@@ -326,7 +338,7 @@ int main() {
             || !vfyhex(ACKHASH_LENGTH, arg1))
             retstatus(BADFMT);
 
-        handle_ack(msgid, arg1);
+        handle_ack(msgid, arg1, cqueues);
     }
     else
         retstatus(BADFMT);

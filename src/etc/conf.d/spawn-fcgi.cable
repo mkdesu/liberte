@@ -21,4 +21,5 @@ FCGI_GROUP=legion
 FCGI_EXTRA_OPTIONS="-U nginx -G nginx -M 0600"
 
 # Additional environment variables
-ALLOWED_ENV="PATH"
+ALLOWED_ENV="PATH CABLE_QUEUES"
+CABLE_QUEUES=/home/anon/persist/cables

@@ -7,9 +7,7 @@ fi
 
 
 # Helpers
-prefix="${0##*/}"
-prefix="${0%${prefix}}"
-mhdrop="${prefix}"mhdrop
+mhdrop="${CABLE_HOME}"mhdrop
 
 
 # Parameters
@@ -20,8 +18,8 @@ sectmout=$((7 * 24 * 60 * 60))
 subjrep='s/^\(Subject: \)\(\[vfy\] \)\?/\1[fail] /i'
 
 # Directories
-inbox=${HOME}/persist/mail/inbox
-msgdir=${HOME}/persist/cables/${qtype}/"${msgid}"
+inbox=${CABLE_INBOX}
+msgdir=${CABLE_QUEUES}/${qtype}/"${msgid}"
 tsfile="${msgdir}"/username
 
 

@@ -1,23 +1,20 @@
 # Essential environment variables, to be sourced
-# after "sudo -u anon"
+# after "sudo -u <user>"
 # Available environment: HOME, USER
 
 # rwX------
 umask 077
 export LC_ALL=C
 
+
 # Rely on pam_mktemp
 if [ -z "${TMPDIR}" ]; then
     export TMPDIR=/tmp/.private/${USER}
 fi
 
-export XDG_CONFIG_HOME=${HOME}/config
-export SECURITY_HOME=${HOME}/persist/security
-export RANDFILE=${TMPDIR}/openssl.rnd
 
-# Proxy settings
-export http_proxy=127.0.0.1:8118
-export https_proxy=${http_proxy}
+# Configuration directory
+export XDG_CONFIG_HOME=${HOME}/config
 
 
 # Some sanity checks

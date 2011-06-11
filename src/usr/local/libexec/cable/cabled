@@ -2,13 +2,11 @@
 
 # Setup restricted environment
 # (rely on init via sudo to set up TMPDIR)
-. /usr/local/libexec/suexec/suprofile
+. "${0%"${0##*/}"}"suprofile
 
 
 # Preliminary variables
-mpoint=${HOME}/persist
-queue=${mpoint}/cables/queue
-rqueue=${mpoint}/cables/rqueue
+rqueue=${CABLE_QUEUES}/rqueue
 
 
 # Initialization tasks
@@ -21,9 +19,7 @@ fi
 
 
 # Variables
-prefix="${0##*/}"
-prefix="${0%${prefix}}"
-daemon="${prefix}"daemon
+daemon="${CABLE_HOME}"daemon
 
 
 # Let fuse-vfs inotify emulation stabilize
@@ -32,4 +28,4 @@ sleep 30
 
 # Launch the inotify-based daemon
 exec 0<&- 1>/dev/null 2>&1
-exec "${daemon}" ${mpoint} ${queue} ${rqueue}
+exec "${daemon}"

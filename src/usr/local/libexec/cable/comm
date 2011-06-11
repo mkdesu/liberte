@@ -7,11 +7,11 @@ fi
 
 
 # Directories and files
-username=`cat ${SECURITY_HOME}/ssl/certs/username | tr -cd a-z2-7`
-queue=${HOME}/persist/cables/queue
-rqueue=${HOME}/persist/cables/rqueue
-pubqueue=/var/www/"${username}"/queue
-pubrqueue=/var/www/"${username}"/rqueue
+username=`cat ${CABLE_CERTS}/certs/username | tr -cd a-z2-7`
+queue=${CABLE_QUEUES}/queue
+rqueue=${CABLE_QUEUES}/rqueue
+pubqueue=${CABLE_PUB}/"${username}"/queue
+pubrqueue=${CABLE_PUB}/"${username}"/rqueue
 
 # Parameters
 cmd="$1"

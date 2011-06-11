@@ -7,17 +7,15 @@ fi
 
 
 # Helpers
-prefix="${0##*/}"
-prefix="${0%${prefix}}"
-cms="${prefix}"cms
-mhdrop="${prefix}"mhdrop
+cms="${CABLE_HOME}"cms
+mhdrop="${CABLE_HOME}"mhdrop
 
 
 # Directories
-inbox=${HOME}/persist/mail/inbox
-ssldir=${SECURITY_HOME}/ssl
-queue=${HOME}/persist/cables/queue
-rqueue=${HOME}/persist/cables/rqueue
+inbox=${CABLE_INBOX}
+ssldir=${CABLE_CERTS}
+queue=${CABLE_QUEUES}/queue
+rqueue=${CABLE_QUEUES}/rqueue
 
 # Parameters
 cmd="$1"

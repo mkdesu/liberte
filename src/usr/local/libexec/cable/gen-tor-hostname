@@ -1,13 +1,13 @@
 #!/bin/sh -e
 
 # This command can be run via "sudo -u anon"
-. /usr/local/libexec/suexec/suprofile
+. "${0%"${0##*/}"}"suprofile
 
 
 # https://gitweb.torproject.org/tor.git/blob/HEAD:/doc/spec/tor-spec.txt
 # https://trac.torproject.org/projects/tor/wiki/TheOnionRouter/HiddenServiceNames
 
-tordir=${SECURITY_HOME}/tor/hidden_service
+tordir=${CABLE_TOR}/hidden_service
 base32=hex2base32
 
 tordirtmp=${tordir}.tmp

@@ -1,14 +1,14 @@
 #!/bin/sh -e
 
-umask 077
-export LC_ALL=C
+# Setup environment with needed environment vars
+. "${0%"${0##*/}"}"suprofile
 
 
 # Creates ${queuedir}/<msgid>{username,hostname,message,send.req}
-queuedir=${HOME}/persist/cables/queue
+queuedir=${CABLE_QUEUES}/queue
 
 msgidbytes=20
-emailregex='^x [a-z2-7]{32}@[a-z2-7]{16}\.onion$'
+emailregex="${CABLE_REGEX}"
 
 # Temporary directory on same filesystem
 tmpdir=`mktemp -d --tmpdir=${queuedir}`
@@ -55,7 +55,7 @@ fromaddr=`formail -fcz -x From:               < ${tmpdir}/message \
 
 # Check address validity to prevent accidental information leaks
 for addr in "${fromaddr}" ${addresses}; do
-    if ! echo x "${addr}" | egrep -q "${emailregex}"; then
+    if ! echo x "${addr}" | egrep -q "^x ${emailregex}$"; then
         error "unsupported address: ${addr}"
     fi
 done

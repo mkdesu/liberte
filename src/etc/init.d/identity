@@ -9,8 +9,8 @@ live=/mnt/live
 ltordir=${lmount}/security/tor/hidden_service
 certsdir=${lmount}/security/ssl/certs
 
-genhost=/usr/local/libexec/suexec/gen-anon-hostname
-genuser=/usr/local/libexec/suexec/gen-anon-username
+genhost=/usr/local/libexec/cable/gen-tor-hostname
+genuser=/usr/local/libexec/cable/gen-cable-username
 
 gtordir=/var/lib/tor/hidden_service
 cableflag=/var/www/cable
@@ -92,9 +92,8 @@ start() {
         ebegin Initializing cables directory
         username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
         rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem ${cableflag}/certs \
-            && mv -T ${cableflag} /var/www/"${username}"                \
-            && sed -i "s/CABLE/${username}/"      /etc/nginx/nginx.conf \
-            && sed -i 's/127\.0\.0\.2/127.0.0.1/' /etc/nginx/nginx.conf
+            && mv -T ${cableflag} /var/www/"${username}" \
+            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" /etc/nginx/nginx.conf
         eend $?
     fi
 

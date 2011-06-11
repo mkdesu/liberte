@@ -7,8 +7,8 @@ fi
 
 
 # Directories
-queue=${HOME}/persist/cables/queue
-rqueue=${HOME}/persist/cables/rqueue
+queue=${CABLE_QUEUES}/queue
+rqueue=${CABLE_QUEUES}/rqueue
 
 # Parameters
 cmd="$1"

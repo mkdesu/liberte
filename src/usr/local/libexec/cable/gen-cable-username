@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 # This command can be run via "sudo -u anon"
-. /usr/local/libexec/suexec/suprofile
+. "${0%"${0##*/}"}"suprofile
 
 
 # NOTE: PSS signatures support in certificates
@@ -9,9 +9,9 @@
 
 base32=hex2base32
 
-sslconf=/mnt/live${XDG_CONFIG_HOME}/ssl/extensions.cnf
-certdir=${SECURITY_HOME}/ssl/certs
-keysdir=${SECURITY_HOME}/ssl/private
+sslconf="${CABLE_HOME}"extensions.cnf
+certdir=${CABLE_CERTS}/certs
+keysdir=${CABLE_CERTS}/private
 
 certdirtmp=${certdir}.tmp
 keysdirtmp=${keysdir}.tmp
@@ -39,7 +39,7 @@ mkdir  ${certdirtmp} ${keysdirtmp}
 openssl req -batch -new -utf8 -subj "${reqsubj}" \
             -newkey rsa:${rsabits} -nodes -keyout ${keysdirtmp}/root.pem    \
             -x509 -days ${crtdays} -sha${shabits} -out ${certdirtmp}/ca.pem \
-            -config ${sslconf} -extensions root
+            -config "${sslconf}" -extensions root
 
 
 # Save 32-character Base32 username (root CA SHA-1 hash)
@@ -60,7 +60,7 @@ openssl req -batch -new -utf8 -subj "${reqsubj}" \
 openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdirtmp}/verify.pem \
              -CA ${certdirtmp}/ca.pem -CAkey ${keysdirtmp}/root.pem             \
              -CAcreateserial -CAserial ${certdirtmp}/certs.srl                  \
-             -extfile ${sslconf} -extensions verify 2>/dev/null
+             -extfile "${sslconf}" -extensions verify 2>/dev/null
 
 
 # Generate X.509 encryption certificate
@@ -69,7 +69,7 @@ openssl req -batch -new -utf8 -subj "${reqsubj}" \
 openssl x509 -req -days ${crtdays} -sha${shabits} -out ${certdirtmp}/encrypt.pem \
              -CA ${certdirtmp}/ca.pem -CAkey ${keysdirtmp}/root.pem              \
              -CAserial ${certdirtmp}/certs.srl                                   \
-             -extfile ${sslconf} -extensions encrypt 2>/dev/null
+             -extfile "${sslconf}" -extensions encrypt 2>/dev/null
 
 
 # Sanity checks
