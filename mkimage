@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+export LC_ALL=C
+
+
 sinfo() {
     echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
@@ -81,14 +84,31 @@ rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
 sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 
 
+# Unreferenced files have default priority 0 (which is the top priority)
+sinfo "Preparing <mimetype,dir,package> SquashFS ordering"
+count=0 last= sqsort=`mktemp`
+for p in ${livecd}/tmp/packages/unlisted-files ${livecd}/tmp/packages/*=*; do
+    sed "s:^:${livecd}:" ${p} | file -hN --mime-type -F '' -f - \
+        | sed -n "s:^${livecd}/\(.*\)/\([^/]*\) \(.*\)$:\3 \1 ${p##*/} \1/\2:p"
+done | sort | while read id1 id2 id3 file; do
+    if [ "${id1},${id2},${id3}" != "${last}" ]; then
+        count=$((count-1))
+        last="${id1},${id2},${id3}"
+    fi
+    echo "${file}" ${count} >> ${sqsort}
+done
+
+
 # Using default block size of 128KiB
 # Multi-threaded execution often causes deadlock after image creation
 sinfo "Creating SquashFS image"
 
 ${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
     -noappend -no-exports -no-progress -no-xattrs -comp xz -Xbcj x86 \
-    -sort ${src}/conf/rootfs.sort -e boot tmp/packages
+    -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
+    -sort ${sqsort} -e boot dev tmp/packages
 chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
+rm ${sqsort}
 
 
 sinfo "Converting text files to DOS line endings"

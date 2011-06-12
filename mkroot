@@ -1,5 +1,8 @@
 #!/bin/sh -e
 
+export LC_ALL=C
+
+
 sinfo() {
     echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
@@ -55,7 +58,7 @@ elif [ "$2" = clean ]; then
 
     sinfo "Creating pruned packages list"
     for p in ${LIVECD}/copy/tmp/packages/*=*; do
-        cat ${p} | while read f; do
+        sort ${p} | while read f; do
             if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
                 echo "${f}" >> ${p}.pruned
             fi
@@ -73,14 +76,12 @@ elif [ "$2" = clean ]; then
         | tr = / | sort > ${LIVECD}/copy/boot/packages.lst
     chmod 644 ${LIVECD}/copy/boot/packages.lst
 
+    # Skip files with spaces to prevents problems with SquashFS sorting
     sinfo "Creating unregistered files list"
-    chroot ${LIVECD}/copy find / -xdev \( -type l -o -type f \) \
-        ! -path '/lib/modules/*' ! -path '/tmp/packages/*' ! -path '/home/*'                     \
-        ! -path '/root/*' ! -path '/usr/share/keymaps/*' ! -path '/usr/share/consolefonts/*'     \
-        ! -path '/usr/share/mime/*' ! -path '/var/cache/fontconfig/*' ! -path '/etc/runlevels/*' \
-        ! -path '/etc/ssl/certs/*' ! -path '/boot/*' ! -path '/etc/gconf/gconf.xml.defaults/*'   \
-        ! -path '/etc/fonts/conf.d/*' ! -path '/lib/firmware/*' \
-        | sort > ${LIVECD}/copy/tmp/packages/all-files
+    find ${LIVECD}/copy -xdev \( -type l -o -type f \) ! -name '* *'            \
+        ! -path "${LIVECD}/copy/tmp/packages/*" ! -path "${LIVECD}/copy/boot/*" \
+        ! -path "${LIVECD}/copy/dev/*" | sed "s:^${LIVECD}/copy::" | sort       \
+        > ${LIVECD}/copy/tmp/packages/all-files
     cat ${LIVECD}/copy/tmp/packages/*=* | sort -u > ${LIVECD}/copy/tmp/packages/listed-files
 
     comm -13 ${LIVECD}/copy/tmp/packages/listed-files ${LIVECD}/copy/tmp/packages/all-files \
@@ -193,11 +194,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Extracting stage3 to ${LIVECD}/src"
-    tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude ./dev
-    mkdir -m 755 ${LIVECD}/src/dev
-    mknod -m 600 ${LIVECD}/src/dev/null    c 1 3
-    mknod -m 600 ${LIVECD}/src/dev/tty1    c 4 1
-    mknod -m 200 ${LIVECD}/src/dev/console c 5 1
+    tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude './dev/*'
 
 
     sinfo "Extracting portage to ${LIVECD}/src/usr"

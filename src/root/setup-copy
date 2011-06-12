@@ -42,7 +42,8 @@ ebuilds="app-portage/gentoolkit
          sys-apps/portage
          x11-libs/gtk+
          x11-misc/xdg-utils
-         x11-proto/xcb-proto"
+         x11-proto/xcb-proto
+         app-misc/ca-certificates"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -85,6 +86,9 @@ sed -i 's:>=sys-devel/libtool-[a-z0-9._-]\+::' ${ebuild_libcanberra}
 
 # Gnuplot is an overkill, and is superficially integrated
 sed -i 's:>=sci-visualization/gnuplot-[a-z0-9._-]\+::' ${ebuild_libqalculate}
+
+# debianutils are  only needed for update-ca-certificates
+sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild \$${ebuild} manifest

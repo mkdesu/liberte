@@ -102,6 +102,8 @@
 /etc/locale.gen
 /etc/timezone
 /etc/sgml/
+/etc/ca-certificates/
+/etc/ca-certificates.conf
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
 /usr/sbin/libpng-*-update.sh
@@ -193,6 +195,8 @@
 /usr/share/rsync/
 # media-sound/alsa-utils: Bash script that depends on gettext
 /usr/sbin/alsaconf
+# app-misc/ca-certificates: depends on run-parts
+/usr/sbin/update-ca-certificates
 
 # OpenSSH server
 /etc/ssh/sshd_config

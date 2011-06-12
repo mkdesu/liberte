@@ -117,13 +117,16 @@ chroot=`which chroot`
 
 
 sinfo "Mounting system directories"
-for dir in proc sys dev dev/pts dev/shm; do
+
+for dir in proc dev dev/pts; do
     mount -B /${dir} ${LIVECD}/${dir}
 done
+
 if [ ${PHASE} = copy -a -d ${LIVECD}/usr/portage ]; then
     mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
     mount -o remount,ro ${LIVECD}/usr/portage
 fi
+
 if [ -d /usr/portage/distfiles -a -d ${LIVECD}/usr/portage/distfiles ]; then
     mount -B /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
 fi
@@ -142,13 +145,16 @@ fi
 
 
 sinfo "Unmounting system directories"
+
 if [ -d /usr/portage/distfiles -a -d ${LIVECD}/usr/portage/distfiles ]; then
     umount ${LIVECD}/usr/portage/distfiles
 fi
+
 if [ -d ${LIVECD}/usr/portage -a ${PHASE} = copy ]; then
     umount ${LIVECD}/usr/portage
 fi
-for dir in dev/shm dev/pts dev sys proc; do
+
+for dir in dev/pts dev proc; do
     umount ${LIVECD}/${dir}
 done
 
