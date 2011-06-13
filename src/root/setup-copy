@@ -311,7 +311,6 @@ rc-update -u
 
 sinfo "Setting dash as /bin/sh"
 ln -sf dash /bin/sh
-sed -i 's:^#!/bin/sh$:#!/bin/bash:' /lib/udev/move_tmp_persistent_rules.sh
 
 
 # Spaces in entries are not handled, but it doesn't matter here

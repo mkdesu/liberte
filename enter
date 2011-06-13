@@ -114,13 +114,20 @@ environment="${environment} PHASE=${PHASE}"
 
 setarch=`which setarch`
 chroot=`which chroot`
+tty=`tty`
 
 
 sinfo "Mounting system directories"
 
-for dir in proc dev dev/pts; do
-    mount -B /${dir} ${LIVECD}/${dir}
+if [ "${tty#/dev/pts/}" = "${tty}" ]; then
+    touch ${LIVECD}${tty}
+else
+    tty=
+fi
+for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; do
+    mount -B ${dir} ${LIVECD}${dir}
 done
+mount -o remount,ro ${LIVECD}/proc
 
 if [ ${PHASE} = copy -a -d ${LIVECD}/usr/portage ]; then
     mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
@@ -154,9 +161,13 @@ if [ -d ${LIVECD}/usr/portage -a ${PHASE} = copy ]; then
     umount ${LIVECD}/usr/portage
 fi
 
-for dir in dev/pts dev proc; do
-    umount ${LIVECD}/${dir}
+for dir in ${tty} /dev/pts /dev/ptmx /dev/urandom /dev/random /dev/null /proc; do
+    umount -l ${LIVECD}${dir}
 done
+# Condition is false for empty ${tty} and for block-device ${tty} (i.e., mounted in another session)
+if [ -f ${LIVECD}${tty} ]; then
+    rm ${LIVECD}${tty}
+fi
 
 
 exit ${retval}

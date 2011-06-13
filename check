@@ -40,9 +40,8 @@ fi
 sinfo "Checking ${LIVECD}"
 
 sinfo "Invalid files and symlinks:"
-${FIND} ! \( -type d -o -type f -o -type l \
-             -o \( -path '/dev/*' -a \( -type c -o -type b \) \) \)
-${FIND} -type l ! -xtype f ! -xtype d
+${FIND} ! \( -type d -o -type f -o -type l \)
+${FIND} -type l ! -xtype f ! -xtype d ! -path /dev/fd
 
 sinfo "Archives:"
 ${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
