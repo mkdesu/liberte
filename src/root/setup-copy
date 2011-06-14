@@ -15,6 +15,14 @@ rezip() {
     rmdir ${dir}
 }
 
+regzip() {
+    gz=$1
+
+    # -0 switch is unique to pigz
+    gunzip  ${gz}
+    gzip -0 ${gz%.gz}
+}
+
 
 # Sanity check
 if [ ${PHASE} != copy ]; then
@@ -290,13 +298,21 @@ sinfo "Uncompressing selected files"
 gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`
 
-rezip /usr/gnu-classpath-[0-9]*/share/classpath/glibj.zip
-rezip /usr/lib/jamvm/classes.zip
+gunzip /usr/share/gedit-2/plugins/taglist/*.gz
+
+rezip  /usr/gnu-classpath-[0-9]*/share/classpath/glibj.zip
+rezip  /usr/lib/jamvm/classes.zip
+
+rezip  /usr/share/zlibrary/hyphenationPatterns.zip
+rezip  /usr/share/zlibrary/languagePatterns.zip
+regzip /usr/share/zlibrary/unicode.xml.gz
 
 
-# /lib/rc/plugins/splash.so can't be patched
+# /lib/rc/plugins/splash.so can't be patched (fbsplashd)
 sinfo "Substituting dynamic executables for splashutils"
-ln -snf ../usr/sbin/fbsplashd /sbin/fbsplashd.static
+ln -snf ../usr/sbin/fbsplashd      /sbin/fbsplashd.static
+ln -snf ../usr/sbin/fbcondecor_ctl /sbin/fbcondecor_ctl.static
+ln -snf ../usr/sbin/splash_util    /sbin/splash_util.static
 
 
 sinfo "Removing invalid symlinks, dirs and files"

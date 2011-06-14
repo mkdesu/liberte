@@ -329,7 +329,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab kexec iptables smartd splashutils"
+initpatches="inittab kexec iptables smartd"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done

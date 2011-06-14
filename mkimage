@@ -88,7 +88,7 @@ sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 sinfo "Preparing <mimetype,dir,package> SquashFS ordering"
 count=0 last= sqsort=`mktemp`
 for p in ${livecd}/tmp/packages/unlisted-files ${livecd}/tmp/packages/*=*; do
-    sed "s:^:${livecd}:" ${p} | file -hN --mime-type -F '' -f - \
+    sed "s:^:${livecd}:" ${p} | file -zhN --mime-type -F '' -f - \
         | sed -n "s:^${livecd}/\(.*\)/\([^/]*\) \(.*\)$:\3 \1 ${p##*/} \1/\2:p"
 done | sort | while read id1 id2 id3 file; do
     if [ "${id1},${id2},${id3}" != "${last}" ]; then

@@ -1,6 +1,7 @@
 # System
 =sys-apps/kexec-tools-2.0.1*
 =sys-apps/haveged-1.01*
+=media-gfx/splashutils-1.5.4.4*
 =app-emulation/virt-what-1.2*
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*

@@ -127,8 +127,6 @@
 # Statically linked binaries (and symlinks)
 # (other splashutils static binaries are substituted with dynamic,
 #  except for /sbin/fbcondecor_helper which is needed by FBCONDECOR)
-/sbin/fbcondecor_ctl.static
-/sbin/splash_util.static
 /sbin/fbtruetype.static
 /sbin/fbsplashctl
 /sbin/ldconfig

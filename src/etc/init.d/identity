@@ -70,8 +70,7 @@ start() {
         # Import splash functions (with an OpenRC compatibility hack)
         . /sbin/splash-functions.sh
         input_begin()   { splash svc_input_begin ${RC_SVCNAME}; }
-        input_end()     { splash svc_input_end ${RC_SVCNAME};   }
-        splash_silent() { splash_comm_send "set mode silent"; chvt ${SPLASH_TTY}; }
+        input_end()     { splash svc_input_end   ${RC_SVCNAME}; }
 
 
         echo
