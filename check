@@ -44,8 +44,8 @@ ${FIND} ! \( -type d -o -type f -o -type l \)
 ${FIND} -type l ! -xtype f ! -xtype d ! -path /dev/fd
 
 sinfo "Archives:"
-${FIND} \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
-           -o -name '*.lzma' -o -name '*.xz' \)
+${FIND} -type f  \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
+           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.jar' \)
 
 sinfo "Sources:"
 ${FIND} -name '*.h' -o \( -name '*.inc' ! -path '/usr/share/keymaps/*' \) \

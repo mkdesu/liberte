@@ -14,8 +14,9 @@
 /usr/share/control-center-[0-9]*/
 /usr/share/gdm/
 /usr/local/man
-/usr/local/share/doc/
-/usr/local/share/man/
+/usr/**/share/doc/
+/usr/**/share/man/
+/usr/**/share/info/
 
 # Portage directories
 /usr/portage/
@@ -58,6 +59,12 @@
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
+/usr/share/gnu-classpath-[0-9]*/
+/usr/gnu-classpath-[0-9]*/include/
+/usr/gnu-classpath-[0-9]*/bin/
+/usr/gnu-classpath-[0-9]*/share/classpath/tools.zip
+/usr/lib/jamvm/bin/
+/usr/lib/jamvm/lib/tools.jar
 
 # Static libraries and libtool files
 /lib/**.a

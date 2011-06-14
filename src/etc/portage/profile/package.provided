@@ -6,3 +6,6 @@ mail-client/mailx-0
 
 # mostly unneeded (ghostscript-gpl <- graphicsmagick, evince)
 media-fonts/urw-fonts-2.4.9
+
+# virtual/jre (gnu-classpath, unneeded)
+dev-java/sun-jre-bin-1.6.0

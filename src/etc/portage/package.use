@@ -51,6 +51,7 @@ media-video/gpac                -* aac mad ogg vorbis
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
+dev-libs/openssl                -gmp
 sys-apps/kexec-tools            -zlib -lzma
 sys-apps/busybox                -pam
 sys-apps/grep                   -pcre
@@ -68,6 +69,7 @@ media-libs/jpeg                 static-libs
 media-libs/libpng               static-libs
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
+dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
 app-office/abiword              plugins gnome
 gnome-extra/gucharmap           gnome

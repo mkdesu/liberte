@@ -9,6 +9,8 @@
   + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
   + All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
 
+  + Added small and fast Java runtime environment (JamVM)
+
   + Audio mixer channels are heuristically set up on boot
 
 

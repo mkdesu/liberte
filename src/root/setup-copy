@@ -5,6 +5,17 @@ sinfo() {
 }
 
 
+rezip() {
+    zip=$1
+    dir=${zip}.tmp
+
+    unzip -qd ${dir} ${zip}
+    rm ${zip}
+    (cd ${dir}; zip -qrm0 ../`basename ${zip}` .)
+    rmdir ${dir}
+}
+
+
 # Sanity check
 if [ ${PHASE} != copy ]; then
     echo "This is phase [${PHASE}], run $0 in phase [copy]."
@@ -43,7 +54,9 @@ ebuilds="app-portage/gentoolkit
          x11-libs/gtk+
          x11-misc/xdg-utils
          x11-proto/xcb-proto
-         app-misc/ca-certificates"
+         app-misc/ca-certificates
+         dev-java/gnu-classpath
+         dev-java/jamvm"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -89,6 +102,12 @@ sed -i 's:>=sci-visualization/gnuplot-[a-z0-9._-]\+::' ${ebuild_libqalculate}
 
 # debianutils are  only needed for update-ca-certificates
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
+
+# java-config wrappers are superfluous for minimal VMs (and require Python)
+sed -i 's:^\(inherit\>.*\) java-pkg-2\>:\1:' ${ebuild_gnuclasspath}
+
+# javac/javadoc dependencies are only for symlinks in /usr/bin
+sed -i 's:^\(inherit\>.*\) java-vm-2\>:\1:; s:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild \$${ebuild} manifest
@@ -271,6 +290,9 @@ sinfo "Uncompressing selected files"
 gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`
 
+rezip /usr/gnu-classpath-[0-9]*/share/classpath/glibj.zip
+rezip /usr/lib/jamvm/classes.zip
+
 
 # /lib/rc/plugins/splash.so can't be patched
 sinfo "Substituting dynamic executables for splashutils"
@@ -309,8 +331,9 @@ sinfo "Updating init scripts dependencies cache"
 rc-update -u
 
 
-sinfo "Setting dash as /bin/sh"
-ln -sf dash /bin/sh
+sinfo "Setting sh (dash) and java (jamvm) symlinks"
+ln -sf dash  /bin/sh
+ln -s  jamvm /usr/bin/java
 
 
 # Spaces in entries are not handled, but it doesn't matter here

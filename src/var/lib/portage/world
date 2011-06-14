@@ -78,6 +78,7 @@ app-crypt/steghide
 app-crypt/ccid
 app-crypt/tpm-tools
 sys-apps/haveged
+dev-java/jamvm
 
 # Network utilities
 net-firewall/iptables
