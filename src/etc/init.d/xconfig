@@ -72,6 +72,9 @@ start() {
             echo "${xorg_extra}" >> /root/xorg.conf.new
             mv /root/xorg.conf.new ${xorgrc}
 
+            # Bug #3319525 workaround
+            touch /mnt/hidden/rwroot/etc/X11
+
             # Turn off text cursor on vt3 (cf. xserverrc)
             echo -n "\033[?25l" > /dev/tty3
         else
