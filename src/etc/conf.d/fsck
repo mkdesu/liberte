@@ -10,4 +10,4 @@ fsck_args="-A -a"
 fsck_on_battery="YES"
 
 # Whether to trigger during shutdown as well as startup
-fsck_shutdown="YES"
+fsck_shutdown="NO"

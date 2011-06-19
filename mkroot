@@ -57,7 +57,8 @@ elif [ "$2" = clean ]; then
 
 
     sinfo "Creating pruned packages list"
-    for p in ${LIVECD}/copy/tmp/packages/*=*; do
+    pakdir=${LIVECD}/copy/tmp/transient/pkg
+    for p in ${pakdir}/*=*; do
         sort ${p} | while read f; do
             if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
                 echo "${f}" >> ${p}.pruned
@@ -72,22 +73,21 @@ elif [ "$2" = clean ]; then
         fi
     done
 
-    find ${LIVECD}/copy/tmp/packages -type f -name '*=*' -printf '%f\n' \
+    find ${pakdir} -type f -name '*=*' -printf '%f\n' \
         | tr = / | sort > ${LIVECD}/copy/boot/packages.lst
     chmod 644 ${LIVECD}/copy/boot/packages.lst
 
     # Skip files with spaces to prevents problems with SquashFS sorting
     sinfo "Creating unregistered files list"
     find ${LIVECD}/copy -xdev \( -type l -o -type f \) ! -name '* *'            \
-        ! -path "${LIVECD}/copy/tmp/packages/*" ! -path "${LIVECD}/copy/boot/*" \
+        ! -path "${pakdir}/*" ! -path "${LIVECD}/copy/boot/*" \
         ! -path "${LIVECD}/copy/dev/*" | sed "s:^${LIVECD}/copy::" | sort       \
-        > ${LIVECD}/copy/tmp/packages/all-files
-    cat ${LIVECD}/copy/tmp/packages/*=* | sort -u > ${LIVECD}/copy/tmp/packages/listed-files
+        > ${pakdir}/all-files
+    cat ${pakdir}/*=* | sort -u > ${pakdir}/listed-files
 
-    comm -13 ${LIVECD}/copy/tmp/packages/listed-files ${LIVECD}/copy/tmp/packages/all-files \
-        > ${LIVECD}/copy/tmp/packages/unlisted-files
-    rm ${LIVECD}/copy/tmp/packages/listed-files ${LIVECD}/copy/tmp/packages/all-files
-    chmod 644 ${LIVECD}/copy/tmp/packages/unlisted-files
+    comm -13  ${pakdir}/listed-files ${pakdir}/all-files > ${pakdir}/unlisted-files
+    rm        ${pakdir}/listed-files ${pakdir}/all-files
+    chmod 644                                              ${pakdir}/unlisted-files
 
 
     sinfo "Done."

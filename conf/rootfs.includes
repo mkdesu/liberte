@@ -33,5 +33,5 @@
 /var/tmp/nginx/client/
 /var/tmp/nginx/fastcgi/
 
-# Packages list (excluded during image creation)
-/tmp/packages/***
+# Transient directories (excluded during image creation)
+/tmp/transient/***
