@@ -19,6 +19,7 @@
 /var/cache/fontconfig/***
 
 # Pruned directories exceptions
+/usr/bin/rc-config
 /usr/share/consolefonts/*16*.psfu
 /usr/share/consolefonts/cp1250.psfu
 /usr/share/keymaps/include/***

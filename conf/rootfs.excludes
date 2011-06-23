@@ -44,10 +44,13 @@
 /usr/lib/**/include/
 /usr/lib/perl*/
 /usr/lib/icu/
+/usr/lib/gobject-introspection/
 /usr/share/aclocal/
 /usr/share/baselayout/
 /usr/share/awk/
 /usr/share/getopt/
+/usr/share/gir-[0-9]*/
+/usr/share/gobject-introspection-[0-9]*/
 /usr/share/gnuplot/
 /usr/share/i18n/
 /usr/share/icu/
@@ -75,7 +78,9 @@
 /usr/**/lib/**.la
 /usr/lib/tclConfig.sh
 
-# Pruned directories (see rootfs.includes)
+# Pruned files and directories (see rootfs.includes)
+/usr/bin/*-config
+/usr/games/bin/*-config
 /usr/share/consolefonts/**
 /usr/share/consoletrans/
 /usr/share/unimaps/
@@ -212,5 +217,6 @@
 
 # Individual unnecessary files
 /usr/bin/gdk*pixbuf*source
+/usr/bin/g-ir-*
 /usr/bin/glsl_compiler
 /usr/bin/gs
