@@ -107,6 +107,7 @@
 /root/**
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
+/lib/systemd/
 /etc/*-
 /etc/resolv.conf
 /etc/issue.logo
