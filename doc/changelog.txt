@@ -8,6 +8,7 @@
   + Kernel 2.6.38 with SquashFS XZ compression and NX support
   + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
   + All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
+  + OTFE partition now supports file permissions
 
   + Added small and fast Java runtime environment (JamVM)
 

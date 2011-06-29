@@ -42,10 +42,7 @@ boot=/mnt/boot
 otfefile=${boot}${OTFEFILE}
 
 start() {
-    # see the /usr/local/sbin/ps-mount script
-    # these flags are mirrored in /usr/local/sbin/otfe-resize
-    # (permissions: rwX------)
-    ntfsflags=noatime,noexec,nosuid,nodev,fmask=0177,dmask=077,uid=${luser},gid=${lgroup}
+    ntfsflags=noatime,nosuid,nodev,usermapping=/etc/ntfs-3g.map
 
 
     # Remount media root read-write (for non-loop/cd/dvd)
@@ -165,6 +162,16 @@ start() {
         if [ -e /dev/mapper/${OTFEVOLUME} ]; then
             ebegin Mounting encrypted storage: ${lmount}
             mount ${lmount}
+            eend $?
+        fi
+
+        # Reset file permissions
+        if mountpoint -q ${lmount}; then
+            ebegin Resetting file permissions on OTFE partition
+            find ${lmount} -xdev \( ! -user ${luser} -o ! -group ${lgroup} \) -print0 \
+                | xargs -0r chown -h ${luser}:${lgroup}
+            find ${lmount} -xdev -perm /7077 ! -type l -print0 | xargs -0r chmod go=,u-s
+            getfacl -npsR ${lmount} | sed -n 's/^# file: //p' | xargs -rd '\n' setfacl -b
             eend $?
         fi
 
