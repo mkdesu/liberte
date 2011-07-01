@@ -403,9 +403,11 @@ groupadd -f -r games
 groupadd -f -r plugdev
 groupadd -g 9000 legion || [ $? = 9 ]
 groupadd -g 9001 nofw   || [ $? = 9 ]
+groupadd -g 9002 cable  || [ $? = 9 ]
 
-useradd -u 2101 -g legion -c "Anonymous"      -d /home/anon                  anon || [ $? = 9 ]
-useradd -u 2102 -g nofw   -c "Non-firewalled" -d /home/nofw -s /sbin/nologin nofw || [ $? = 9 ]
+useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
+useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
+useradd -u 2103 -g cable  -c "Cables Communication" -d /dev/null  -s /sbin/nologin -G legion cable || [ $? = 9 ]
 
 usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
 

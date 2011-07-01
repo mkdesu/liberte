@@ -30,6 +30,16 @@ error() {
 }
 
 
+deliver() {
+    local dir="$1" msg="$2"
+    local grp=`stat -c %g "${dir}"`
+
+    chgrp "${grp}" "${msg}"
+    chmod 660      "${msg}"
+    "${mhdrop}" "${dir}" "${msg}"
+}
+
+
 # Sanity checks
 [ ${#msgid} = 40 ] || error "bad msgid"
 [ -s "${tsfile}" ] || error "bad username file"
@@ -103,7 +113,7 @@ fi
 
 
 # Deliver the reject message
-"${mhdrop}" ${inbox} "${msgdir}"/message.rej
+deliver ${inbox} "${msgdir}"/message.rej
 
 # Schedule message directory for removal
 mv -T "${msgdir}" "${msgdir}".del

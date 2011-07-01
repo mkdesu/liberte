@@ -342,6 +342,10 @@ chgrp cdrom     /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
 chmod u+s,o-rwx /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
 
 
+sinfo "Setting cables-related permissions"
+chmod 710 /home/anon{,/persist{,/security{,/ssl},/mail,/cables}}
+
+
 sinfo "Updating ld cache"
 eselect env update 2>/dev/null
 sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env

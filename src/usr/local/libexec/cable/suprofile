@@ -25,7 +25,7 @@ export https_proxy=${http_proxy}
 # Cable directories and settings
 # NOTE: CABLE_HOME ends with / (if non-empty)
 export CABLE_HOME="${0%"${0##*/}"}"
-export CABLE_MOUNT=${HOME}/persist
+export CABLE_MOUNT=/home/anon/persist
 export CABLE_CERTS=${CABLE_MOUNT}/security/ssl
 export CABLE_TOR=${CABLE_MOUNT}/security/tor
 export CABLE_QUEUES=${CABLE_MOUNT}/cables

@@ -36,6 +36,16 @@ getuserhost() {
 }
 
 
+deliver() {
+    local dir="$1" msg="$2"
+    local grp=`stat -c %g "${dir}"`
+
+    chgrp "${grp}" "${msg}"
+    chmod 660      "${msg}"
+    "${mhdrop}" "${dir}" "${msg}"
+}
+
+
 # Sanity checks
 [ ${#msgid} = 40 ] || error "bad msgid"
 
@@ -80,7 +90,7 @@ recv)
                 < ${rqueue}/"${msgid}"/message.ibx | sed 's/^Subject: /&[fail] /i' \
                 > ${rqueue}/"${msgid}"/message.hdr
 
-            "${mhdrop}" ${inbox} ${rqueue}/"${msgid}"/message.ibx
+            deliver ${inbox} ${rqueue}/"${msgid}"/message.ibx
 
             mv ${rqueue}/"${msgid}"/${cmd}.rdy ${rqueue}/"${msgid}"/${cmd}.ok
             rm ${rqueue}/"${msgid}"/message    ${rqueue}/"${msgid}"/message.out
@@ -104,7 +114,7 @@ ack)
                 echo "Verified message delivery to\n  ${username}@${hostname}") \
                 > ${queue}/"${msgid}"/message.ack
 
-            "${mhdrop}" ${inbox} ${queue}/"${msgid}"/message.ack
+            deliver ${inbox} ${queue}/"${msgid}"/message.ack
 
             mv ${queue}/"${msgid}"/${cmd}.rdy  ${queue}/"${msgid}"/${cmd}.ok
             rm ${queue}/"${msgid}"/message.out ${queue}/"${msgid}"/receipt.out \

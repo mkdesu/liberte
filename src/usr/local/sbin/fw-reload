@@ -2,6 +2,7 @@
 
 luser=anon
 nofw=nofw
+cable=cable
 
 # ReachableAddresses ports in /etc/tor/torrc
 torports=80,443
@@ -66,8 +67,9 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # Hidden service server access only for Tor
 iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor -d 127.0.0.1 --dport 80 -j LOGREJECT
 
-# Privoxy access only for main user and HTP
+# Privoxy access only for main user, HTP, and cables daemon
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 8118 -j LOGREJECT
 

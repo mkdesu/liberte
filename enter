@@ -37,7 +37,7 @@ else
     shift
 
     # NOTE: non-pruned files: /, /etc/portage/gnupg, /etc/privoxy, /var/lib/portage
-    #                         /home/anon/persist/security/pgp/*.gpg
+    #                         /home/anon/persist/security/pgp/*.{gpg,crt}
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
@@ -63,7 +63,7 @@ else
     ${RSYNC} --chmod=u=rwX,go=X    -i --delete \
           --exclude=/www/cable/\*/ -C ${SRC}/var/www ${LIVECD}/var
     ${RSYNC} --chmod=u=wX,g=sX,o=t -i --delete-excluded -C ${SRC}/var/www/cable/* ${LIVECD}/var/www/cable
-    chown -h --from=0 2101 ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
+    chown -h --from=0 2103 ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     if [ -e ${LIVECD}/tmp/nginx-ref ]; then
         chown -h --from=0:0 --reference=${LIVECD}/tmp/nginx-ref \
               ${LIVECD}/var/log/nginx ${LIVECD}/var/tmp/nginx   \
@@ -91,7 +91,13 @@ else
     # rwX------
     ${RSYNC} --chmod=u=rwX,go=   -i --delete \
           --exclude=/anon/persist/security/pgp/\*.gpg --exclude=/anon/persist/security/pgp/\*.crt \
-          -C ${SRC}/home/anon ${LIVECD}/home
+          --exclude=/anon/persist/cables/queue        --exclude=/anon/persist/cables/rqueue       \
+          --exclude=/anon/persist/mail/inbox          -C ${SRC}/home/anon ${LIVECD}/home
+    ${RSYNC} --chmod=ug=rwX,o=,Do+t -i --delete-excluded \
+        -C ${SRC}/home/anon/persist/cables/queue ${SRC}/home/anon/persist/cables/rqueue \
+        ${LIVECD}/home/anon/persist/cables
+    ${RSYNC} --chmod=ug=rwX,o=,Do+t -i --delete-excluded \
+        -C ${SRC}/home/anon/persist/mail/inbox   ${LIVECD}/home/anon/persist/mail
     chown -hR --from=0:0 2101:9000 ${LIVECD}/home/anon
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home

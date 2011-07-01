@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec sudo -n -u cable /usr/local/libexec/cable/send "$@"

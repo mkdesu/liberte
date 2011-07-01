@@ -2,7 +2,7 @@
 
 description="Starts cables communication daemon."
 
-luser=anon
+cuser=cable
 cableflag=/var/www/cable
 
 daemon=/usr/local/libexec/cable/cabled
@@ -21,15 +21,15 @@ start() {
         # service_stopped doesn't work, since nginx is "starting"
         if ! service_started nginx; then
             ebegin "Initializing cabled"
-            sudo -n -u ${luser} ${daemon} init
+            sudo -n -u ${cuser} ${daemon} init
             eend $?
         else
             ewarn "Skipping cabled init (nginx not inactive)"
         fi
 
-        # SSD -u sets up USER and HOME, and sanitized environment
+        # SSD -u sets up USER and HOME, and sanitizes environment
         ebegin "Starting cabled"
-        start-stop-daemon -S -q -u ${luser} -p ${pidfile} -bm -x ${daemon} --
+        start-stop-daemon -S -q -u ${cuser} -p ${pidfile} -bm -x ${daemon} --
         eend $?
     else
         ewarn "Skipping cabled startup"
@@ -39,7 +39,7 @@ start() {
 stop() {
     if [ -e ${pidfile}  -o  ! -e ${cableflag} ]; then
         ebegin "Stopping cabled"
-        start-stop-daemon -K -q -u ${luser} -p ${pidfile}
+        start-stop-daemon -K -q -u ${cuser} -p ${pidfile}
         eend $?
     fi
 }

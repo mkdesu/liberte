@@ -1,6 +1,6 @@
 [Common]
 use_ext_inc=0
-ext_inc_path=/usr/local/libexec/cable/recv
+ext_inc_path=
 autochk_newmail=1
 autochk_interval=1
 check_on_startup=1

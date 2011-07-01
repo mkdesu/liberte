@@ -68,7 +68,7 @@ echo ${fromaddr} | cut -d@ -f2 > ${tmpdir}/shostname
 # Remove Bcc: header and replace Date: with a UTC one:
 date=`date -uR`
 formail -f -I Bcc: -I "Date: ${date}" < ${tmpdir}/message \
-    | gzip -c9nT > ${tmpdir}/message.gz
+    | gzip -c9n > ${tmpdir}/message.gz
 mv ${tmpdir}/message.gz ${tmpdir}/message
 
 

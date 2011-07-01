@@ -34,17 +34,19 @@ eprompt() {
 }
 
 
-# Shared variables
+# Variables
 luser=anon
 lgroup=legion
+cuser=cable
+cgroup=cable
 lmount=/home/${luser}/persist
 boot=/mnt/boot
+live=/mnt/live
 otfefile=${boot}${OTFEFILE}
+ntfsflags=noatime,nosuid,nodev,usermapping=/etc/ntfs-3g.map
+
 
 start() {
-    ntfsflags=noatime,nosuid,nodev,usermapping=/etc/ntfs-3g.map
-
-
     # Remount media root read-write (for non-loop/cd/dvd)
     remount=1
     cdtype=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_TYPE=//p')
@@ -165,13 +167,32 @@ start() {
             eend $?
         fi
 
-        # Reset file permissions
+        # Verify directories and reset file permissions
+        # NOTE: service fails if this verification fails
         if mountpoint -q ${lmount}; then
-            ebegin Resetting file permissions on OTFE partition
-            find ${lmount} -xdev \( ! -user ${luser} -o ! -group ${lgroup} \) -print0 \
-                | xargs -0r chown -h ${luser}:${lgroup}
-            find ${lmount} -xdev -perm /7077 ! -type l -print0 | xargs -0r chmod go=,u-s
-            getfacl -npsR ${lmount} | sed -n 's/^# file: //p' | xargs -rd '\n' setfacl -b
+            ebegin Verifying persistence directories and permissions
+
+            # newlines in filename are converted to \012 by getfacl
+            getfacl -npsR ${lmount} | sed -n 's/^# file: //p' | xargs -rd '\n' setfacl -b --
+
+            # similar to cp -an, but without unnecessary inode changes
+            rsync -x -rlpgo --include='**/' --exclude='/**' ${live}${lmount}/ ${lmount}
+            rsync -x -rlpgo --ignore-existing               ${live}${lmount}/ ${lmount}
+
+            # ownership
+            find ${lmount} -xdev -path ${lmount}/cables -prune -o \
+                ! \( -user ${luser} -group ${lgroup} \) -print0   \
+                | xargs -0r chown -h ${luser}:${lgroup} --
+            find ${lmount}/cables -xdev -mindepth 2 ! \( -user ${cuser} -group ${cgroup} \) -print0 \
+                | xargs -0r chown -h ${cuser}:${cgroup} --
+
+            # permissions (sloppy w.r.t dirs, but rsync takes care of dirs that matter)
+            find ${lmount} -xdev -perm /6007 -type d -print0 | xargs -0r chmod ug-s,o-rwx --
+            find ${lmount} -xdev -path ${lmount}/security/ssl -prune -o \
+                -perm /7077 ! -type d ! -type l -print0 | xargs -0r chmod go=,u-s --
+            find ${lmount}/security/ssl ! -perm 640 ! -type d ! -type l -print0 \
+                | xargs -0r chmod 640 --
+
             eend $?
         fi
 

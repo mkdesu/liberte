@@ -29,8 +29,8 @@ luser=2101
 lgroup=9000
 
 # see /usr/local/sbin/ps-mount
-vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0137,dmask=067
-isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},dmode=0510
+vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0177,dmask=077
+isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},dmode=0500
 extflags=noatime,nosuid,nodev,acl,user_xattr
 
 
@@ -125,8 +125,7 @@ zipfile=${cdroot}/../${distname}.zip
 sinfo "Creating ISO image ${distname}.iso"
 isofile=${cdroot}/../${distname}.iso
 mkisofs -quiet -iso-level 2 -no-pad -J -sysid '' -V '' -A '' \
-    -r -dir-mode 0510 -new-dir-mode 0510                     \
-    -no-emul-boot -boot-load-size 4 -boot-info-table         \
+    -r -no-emul-boot -boot-load-size 4 -boot-info-table      \
     -c boot.cat -hide boot.cat -hide-joliet boot.cat         \
     -b liberte/boot/syslinux/isolinux.bin -o ${isofile}      \
     -hidden isolinux -hidden liberte -hide-joliet isolinux -hide-joliet liberte ${cdroot}

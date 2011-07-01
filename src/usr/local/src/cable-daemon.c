@@ -225,9 +225,9 @@ static int try_reg_watches(const char *mppath, const char *qpath, const char *rq
     /* unregister existing inotify watches */
     unreg_watches();
 
-    /* try to quickly open a fd */
-    if ((mpfd = open(mppath, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_NONBLOCK)) == -1)
-        flog(LOG_NOTICE, "failed to open %s, waiting...", mppath);
+    /* try to quickly open a fd (expect read access on qpath) */
+    if ((mpfd = open(qpath, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_NONBLOCK)) == -1)
+        flog(LOG_NOTICE, "failed to pin %s, waiting...", qpath);
 
     else if (! is_mountpoint(mppath))
         flog(LOG_NOTICE, "%s is not a mount point, waiting...", mppath);

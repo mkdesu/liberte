@@ -88,5 +88,8 @@ ${certdirtmp}/encrypt.pem: OK"
 
 
 # Commit new directories
+chmod 710 ${certdirtmp}   ${keysdirtmp}
+chmod 640 ${certdirtmp}/* ${keysdirtmp}/root.pem
+
 mv -T ${certdirtmp} ${certdir}
 mv -T ${keysdirtmp} ${keysdir}
