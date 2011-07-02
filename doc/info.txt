@@ -50,6 +50,7 @@ neon                    ssl, gnutls             gnutls          audacious-plugin
 rtmpdump                ssl, gnutls, polarssl   gnutls          mplayer
 wget                    ssl                     ssl             portage, libqalculate(forex)
 
+cyrus-sasl              ssl                     ssl             pidgin
 xchat                   ssl                     ssl
 pidgin                  gnutls, nss             gnutls
 

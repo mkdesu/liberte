@@ -190,7 +190,10 @@ start() {
             find ${lmount} -xdev -perm /6007 -type d -print0 | xargs -0r chmod ug-s,o-rwx --
             find ${lmount} -xdev -path ${lmount}/security/ssl -prune -o \
                 -perm /7077 ! -type d ! -type l -print0 | xargs -0r chmod go=,u-s --
-            find ${lmount}/security/ssl ! -perm 640 ! -type d ! -type l -print0 \
+
+            # cables certs permissions
+            find ${lmount}/security/ssl -xdev ! -perm 710 -type d -print0 | xargs -0r chmod 710 --
+            find ${lmount}/security/ssl -xdev ! -perm 640 ! -type d ! -type l -print0 \
                 | xargs -0r chmod 640 --
 
             eend $?

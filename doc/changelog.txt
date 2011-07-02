@@ -13,6 +13,7 @@
   + OTFE partition now supports file permissions, sanitized during boot
 
   + Added small and fast Java runtime environment (JamVM)
+  + Added SASL (plain) authentication support to XChat
 
   + Audio mixer channels are heuristically set up on boot
 

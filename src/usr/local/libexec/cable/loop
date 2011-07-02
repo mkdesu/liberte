@@ -27,7 +27,7 @@ lockmagick="$3"
 locktmout=30
 
 # Directories
-msgdir=${CABLE_QUEUES}/${qtype}/"${msgid}"
+msgdir=${CABLE_QUEUES}/${qtype}/"${dirid}"
 
 
 trap '[ $? = 0 ] || error failed' 0
@@ -39,22 +39,23 @@ error() {
 
 # Sanity checks
 [ ${#msgid} = 40 ] || error "bad msgid"
+[ -r "${msgdir}" ] || error "bad permissions"
 
 
 # .del actions: blocking lock (to let the renaming action finish)
 if [ "${dirid}" != "${msgid}" ]; then
     if [ ${qtype} = queue ]; then
 
-        if [ -e "${msgdir}".del ]; then
-            exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" ack "${msgid}"
+        if [ -e "${msgdir}" ]; then
+            exec flock -w ${locktmout} "${msgdir}"/ "${comm}" ack "${msgid}"
         else
             error ".del directory not found"
         fi
 
     else
 
-        if [ -e "${msgdir}".del ]; then
-            exec flock -w ${locktmout} "${msgdir}".del/ "${comm}" fin "${msgid}"
+        if [ -e "${msgdir}" ]; then
+            exec flock -w ${locktmout} "${msgdir}"/ "${comm}" fin "${msgid}"
         else
             error ".del directory not found"
         fi

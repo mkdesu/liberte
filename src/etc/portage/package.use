@@ -26,7 +26,7 @@ sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
 dev-lang/python                 ssl
-mail-client/claws-mail          -ssl gnutls -imap
+mail-client/claws-mail          -ssl  gnutls -imap
 net-misc/wget                   ssl
 net-libs/libsoup                ssl
 net-misc/curl                   ssl   gnutls -nss
@@ -35,8 +35,9 @@ media-video/rtmpdump            ssl   gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 net-irc/xchat                   ssl
-net-im/pidgin                         gnutls
-net-analyzer/netcat             -crypt
+net-im/pidgin                         gnutls sasl
+dev-libs/cyrus-sasl             ssl          -crypt
+net-analyzer/netcat                          -crypt
 
 # Multimedia
 # mplayer: faac, x264, xvid, twolame/toolame and (partly) mp3 are activated only for +encode
