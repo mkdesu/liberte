@@ -321,9 +321,18 @@ if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
 fi
 
 
-sinfo "Verifying PCI and USB lists"
+sinfo "Verifying PCI, USB, and SMART databases"
 LC_ALL=C awk --posix "! /${pciids_regexp}/                  { print; exit 1 }" /usr/share/misc/pci.ids
 LC_ALL=C awk --posix "! /${pciids_regexp}|${usbids_regexp}/ { print; exit 1 }" /usr/share/misc/usb.ids
+
+cpp -x c -fpreprocessed -std=c99 -nostdinc -undef -Wall -Werror -pedantic-errors \
+    -o /tmp/drivedb.h /usr/share/smartmontools/drivedb.h
+drivedbout=$(sed '/^ *$/d; /^#/d; s/ //g; s/\\"//g; s/"[^"]*"//g' /tmp/drivedb.h | tr -d '\n' | sed 's/{,,,,},//g' | wc -c)
+if [ "${drivedbout}" != 0 ]; then
+    sinfo "/usr/share/smartmontools/drivedb.h verification failed"
+    exit 1
+fi
+rm /tmp/drivedb.h
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
