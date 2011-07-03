@@ -126,6 +126,7 @@
 # (GeoIP is not used in Tor setup)
 /usr/share/tor/
 /usr/share/misc/*.ids.*
+/usr/share/smartmontools/*.h.*
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir

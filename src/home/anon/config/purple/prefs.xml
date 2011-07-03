@@ -367,7 +367,7 @@
 			<pref name='theme' type='string' value=''/>
 		</pref>
 		<pref name='conversations'>
-			<pref name='use_smooth_scrolling' type='bool' value='1'/>
+			<pref name='use_smooth_scrolling' type='bool' value='0'/>
 			<pref name='close_on_tabs' type='bool' value='1'/>
 			<pref name='send_bold' type='bool' value='0'/>
 			<pref name='send_italic' type='bool' value='0'/>

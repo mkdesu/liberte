@@ -1,4 +1,4 @@
-# URL http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5.9.1_for_2.6.38.4.diff.gz
+# URL http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5.9.2_for_2.6.38.8.diff.gz
 # URL http://dev.gentoo.org/~spock/projects/fbcondecor/archive/fbcondecor-0.9.6-2.6.38.patch
-b93a6298be5a906ab4d3cbacefd1343983a79f32f2cad5c4d78c82a7639f5694  /usr/local/portage/distfiles/unionfs-2.5.9.1_for_2.6.38.4.diff.gz
+249210962607d0c3d8af0d5c7896755d5ba615bb0f85ae5f39d3e4ff1a1ead1f  /usr/local/portage/distfiles/unionfs-2.5.9.2_for_2.6.38.8.diff.gz
 9c5694ef0a98d7faaffa1f3ace8832c283c071500b7f65bc2af508f18bc31dd1  /usr/local/portage/distfiles/fbcondecor-0.9.6-2.6.38.patch
