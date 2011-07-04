@@ -175,14 +175,14 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
     # Shouldn't contain any rebuilds
     sinfo "Listing updates"
-    emerge -qupvDN --with-bdeps y world
+    emerge -qupvDN --with-bdeps y @world
 
 else
     sinfo "Skipping full rebuild (use \"fresh\")"
     sinfo "Listing updates"
 
     updlist=`mktemp`
-    emerge -qupvDN --with-bdeps y --color y world | tee ${updlist}
+    emerge -qupvDN --with-bdeps y --color y @world | tee ${updlist}
 
     if [ -s ${updlist} ]; then
         echo -n "Press Enter to continue..."
@@ -194,7 +194,7 @@ fi
 
 
 sinfo "Compiling world"
-emerge -quDN --with-bdeps y world
+emerge -quDN --with-bdeps y @world
 
 
 # Some news are delayed until first emerge

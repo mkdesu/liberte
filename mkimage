@@ -106,7 +106,7 @@ sinfo "Creating SquashFS image"
 ${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
     -noappend -no-exports -no-progress -no-xattrs -comp xz -Xbcj x86 \
     -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
-    -sort ${sqsort} -e boot dev tmp/transient
+    -sort ${sqsort} -ef ${src}/conf/rootfs.ignore
 chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
 rm ${sqsort}
 

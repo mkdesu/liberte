@@ -122,8 +122,11 @@ sed -i 's:^\(inherit\>.*\) java-pkg-2\>:\1:' ${ebuild_gnuclasspath}
 sed -i 's:^\(inherit\>.*\) java-vm-2\>:\1:; s:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 
 for ebuild in ${!ebuild_*}; do
-    eval ebuild \$${ebuild} manifest
+    eval ebuild=\$${ebuild}
+    ebuild ${ebuild} manifest
+    echo liberte > /var/db/pkg/`echo ${ebuild%.ebuild} | cut -d/ -f5,7`/repository
 done
+rm -f /var/cache/edb/vdb_*.pickle
 
 # Packages wrongly rdepend on gettext instead of libintl (provided by glibc)
 echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
@@ -136,7 +139,7 @@ emerge -qc --with-bdeps n
 
 # This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"
-emerge -quDN world
+emerge -quDN @world
 
 
 sinfo "Copying gcc shared libs"
