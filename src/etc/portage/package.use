@@ -26,7 +26,7 @@ sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
 dev-lang/python                 ssl
-mail-client/claws-mail          -ssl  gnutls -imap
+mail-client/claws-mail          -ssl -gnutls -imap
 net-misc/wget                   ssl
 net-libs/libsoup                ssl
 net-misc/curl                   ssl   gnutls -nss
@@ -46,7 +46,7 @@ media-video/mplayer             mpg123 -mp3 libmpeg2 rtmp -rar
 media-video/mplayer             -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms
-media-video/gpac                -* aac mad ogg vorbis
+media-video/gpac                -* aac mad vorbis
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal
