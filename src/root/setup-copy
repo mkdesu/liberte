@@ -40,24 +40,18 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 #
 # python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, pidgin, mesa, gobject-introspection
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils
-# libtool: mpg123, opensc, libcanberra
 # cpio:    splashutils
-# gnuplot: libqalculate
 # debianutils: ca-certificates
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-portage/gentoolkit
          dev-libs/glib
-         dev-libs/opensc
          games-board/eboard
          gnome-base/libglade
          gnome-extra/gucharmap
          media-gfx/graphicsmagick
          media-gfx/splashutils
-         media-libs/libcanberra
          media-libs/mesa
-         media-sound/mpg123
          net-im/pidgin
-         sci-libs/libqalculate
          sys-apps/lm_sensors
          sys-apps/portage
          x11-libs/gtk+
@@ -105,13 +99,6 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
 # Perl is needed by mimeopen (File-MimeInfo), which is an optional dependency
 sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 
-# libltdl.* libraries are kept during libtool unmerge
-sed -i s:sys-devel/libtool:: ${ebuild_mpg123} ${ebuild_opensc}
-sed -i 's:>=sys-devel/libtool-[a-z0-9._-]\+::' ${ebuild_libcanberra}
-
-# Gnuplot is an overkill, and is superficially integrated
-sed -i 's:>=sci-visualization/gnuplot-[a-z0-9._-]\+::' ${ebuild_libqalculate}
-
 # debianutils are  only needed for update-ca-certificates
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 
@@ -146,25 +133,21 @@ sinfo "Copying gcc shared libs"
 rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
 ldconfig
 
+echo sys-devel/libtool-2.2.10 >> /etc/portage/profile/package.provided
+mv /usr/lib/libltdl.* /tmp/
+
 
 # Unmerge some packages that are listed in the system profile
 # No package can be emerged afterwards
 sinfo "Unmerging development packages"
-mv /usr/lib/libltdl.* /tmp/
 
 emerge -qC \
     sys-devel/make      \
-    sys-devel/autoconf  \
-    sys-devel/automake  \
     sys-devel/gnuconfig \
-    sys-devel/m4        \
     sys-devel/patch     \
     \
     sys-devel/gcc       \
     sys-devel/binutils  \
-    sys-devel/libtool   \
-    sys-devel/flex      \
-    sys-devel/bison     \
     \
     virtual/os-headers       \
     sys-kernel/linux-headers \
@@ -177,13 +160,15 @@ emerge -qC \
     \
     app-arch/cpio
 
-mv /tmp/libltdl.* /usr/lib/
 rm -rf /usr/share/{binutils-data,gcc-data}/
 rm -f /usr/lib/{?,}crt?.o
 
 
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
+
+# Take care of libtool libraries
+mv /tmp/libltdl.* /usr/lib/
 
 if [ -e /usr/bin/perl ]; then
     sinfo "Failed to discard Perl dependencies"

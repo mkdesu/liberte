@@ -7,5 +7,8 @@ mail-client/mailx-0
 # mostly unneeded (ghostscript-gpl <- graphicsmagick, evince)
 media-fonts/urw-fonts-2.4.9
 
+# Gnuplot is an overkill, and is superficially integrated (sci-libs/libqalculate)
+sci-visualization/gnuplot-3.7
+
 # virtual/jre (gnu-classpath, unneeded)
 dev-java/sun-jre-bin-1.6.0
