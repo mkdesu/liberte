@@ -61,6 +61,7 @@ x11-libs/cairo                  -glib
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
+media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu
 
 # Extra functionality
