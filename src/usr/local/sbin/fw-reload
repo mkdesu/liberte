@@ -40,11 +40,14 @@ iptables -A LOGREJECT -j REJECT --reject-with icmp-admin-prohibited
 
 # --- IP ---
 
-# Allow existing/related connections packets through (TCP + UDP-in + ICMP-in errors)
+# Allow existing/related connections packets through (TCP + UDP-in + GRE + ICMP-in errors)
 iptables -A INPUT  -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p udp  -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A INPUT  -p gre  -i ppp+ -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -p gre          -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p icmp --icmp-type destination-unreachable -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT  -p icmp --icmp-type time-exceeded           -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -88,6 +91,9 @@ iptables -A OUTPUT -o lo -j ACCEPT
 # DHCP and NTP client [disabled] communication
 iptables -A OUTPUT -p udp                     --sport bootpc --dport bootps -j ACCEPT
 # iptables -A OUTPUT -p udp                     --sport ntp    --dport ntp    -j ACCEPT
+
+# PPTP connections (root-initiated)
+iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn --dport 1723   -j ACCEPT
 
 # DNS use for Tor (usually not necessary) and NTP server [disabled, resolves as root]
 # NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)

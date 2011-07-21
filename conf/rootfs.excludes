@@ -209,6 +209,10 @@
 /usr/sbin/alsaconf
 # app-misc/ca-certificates: depends on run-parts
 /usr/sbin/update-ca-certificates
+# net-dialup/pptpclient: not needed by networkmanager-pptp
+/usr/sbin/pptp-command
+/usr/sbin/pptp_fe.pl
+/usr/sbin/pptpsetup
 
 # OpenSSH server
 /etc/ssh/sshd_config

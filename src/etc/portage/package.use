@@ -76,6 +76,7 @@ app-arch/p7zip                  rar
 app-office/abiword              plugins gnome
 gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
+net-misc/networkmanager-pptp    gnome
 media-gfx/graphicsmagick        imagemagick
 www-servers/nginx               aio
 

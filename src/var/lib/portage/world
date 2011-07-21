@@ -86,6 +86,7 @@ sys-apps/ethtool
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
 net-misc/networkmanager
+net-misc/networkmanager-pptp
 gnome-extra/nm-applet
 # net-misc/ntp
 net-misc/htpdate

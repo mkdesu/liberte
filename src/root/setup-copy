@@ -39,7 +39,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # NOTE: the below patches are intended for depclean
 #
 # python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, pidgin, mesa, gobject-introspection
-# perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils
+# perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils: ca-certificates
 sinfo "Patching copies of selected ebuilds"
@@ -51,6 +51,7 @@ ebuilds="app-portage/gentoolkit
          media-gfx/graphicsmagick
          media-gfx/splashutils
          media-libs/mesa
+         net-dialup/pptpclient
          net-im/pidgin
          sys-apps/lm_sensors
          sys-apps/portage
@@ -74,7 +75,9 @@ sed -i 's/\${python_dep}//' ${ebuild_portage}
 
 # Perl is not needed at all (x2)
 # Perl is only needed by sensors-detect and sensors-conf-convert
-sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_sensors}
+# Perl is not needed for pptpclient when used by networkmanager-pptp
+sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_sensors} \
+                         ${ebuild_pptpclient}
 
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
