@@ -14,6 +14,7 @@
 
   + Added small and fast Java runtime environment (JamVM)
   + Added SASL (plain) authentication support to XChat
+  + Added PPTP VPN support to NetworkManager
 
   + Audio mixer channels are heuristically set up on boot
 
