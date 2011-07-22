@@ -7,10 +7,6 @@ cgrouprel=/usr/local/sbin/cgroup-release
 
 vmflag=/etc/vmtype
 
-xorg_extra='Section "ServerFlags"
-    Option "DontZap"      "true"
-    Option "DontVTSwitch" "true"
-EndSection'
 xorgrc=/etc/X11/xorg.conf
 
 amixerrst=/usr/local/bin/reset-mixer
@@ -77,7 +73,6 @@ start() {
             fi
 
             if [ -e /root/xorg.conf.new ]; then
-                echo "${xorg_extra}" >> /root/xorg.conf.new
                 mv /root/xorg.conf.new ${xorgrc}
 
                 # Bug #3319525 workaround (doesn't always work)

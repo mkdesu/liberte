@@ -41,6 +41,9 @@ pcmanfm -d --desktop &
 # Launch automatic lid-autolock
 ${prefix}/lid-xlock & LIDXLOCK_PID=$!
 
+# Launch synaptics daemon (prevents accidental taps during keyboard activity)
+syndaemon -d -t -k -i 2 &
+
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &
 scim -d &

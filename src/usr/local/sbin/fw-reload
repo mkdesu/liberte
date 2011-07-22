@@ -46,8 +46,8 @@ iptables -A OUTPUT -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p udp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-iptables -A INPUT  -p gre  -i ppp+ -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
-iptables -A OUTPUT -p gre          -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT  -p gre  -m state --state ESTABLISHED,RELATED     -j ACCEPT
+iptables -A OUTPUT -p gre  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p icmp --icmp-type destination-unreachable -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT  -p icmp --icmp-type time-exceeded           -m state --state ESTABLISHED,RELATED -j ACCEPT
