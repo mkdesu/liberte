@@ -34,6 +34,8 @@ net-libs/neon                   ssl   gnutls
 media-video/rtmpdump            ssl   gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
+net-misc/openvpn                ssl
+dev-libs/pkcs11-helper               -gnutls -nss
 net-irc/xchat                   ssl
 net-im/pidgin                         gnutls sasl
 dev-libs/cyrus-sasl             ssl          -crypt
@@ -53,8 +55,10 @@ sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
 dev-libs/openssl                -gmp
+net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 sys-apps/busybox                -pam
+net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 x11-libs/cairo                  -glib
@@ -63,6 +67,7 @@ app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu
+media-gfx/splashutils           -truetype
 
 # Extra functionality
 sys-apps/busybox                static savedconfig
@@ -77,6 +82,8 @@ app-office/abiword              plugins gnome
 gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
 net-misc/networkmanager-pptp    gnome
+net-misc/networkmanager-openvpn gnome
+net-misc/networkmanager-vpnc    gnome
 media-gfx/graphicsmagick        imagemagick
 www-servers/nginx               aio
 

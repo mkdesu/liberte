@@ -43,6 +43,8 @@ aircrack-ng             ssl                     ssl
 
 networkmanager          gnutls, nss             gnutls
 wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
+net-misc/openvpn        ssl                     ssl             networkmanager-openvpn
+dev-libs/pkcs11-helper  !ssl, gnutls, nss       ssl             openvpn
 
 libsoup                 gnutls                  gnutls          midori
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader

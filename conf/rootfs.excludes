@@ -57,6 +57,7 @@
 /usr/share/lsof/
 /usr/share/ntp/
 /usr/share/openrc/
+/usr/share/openvpn/
 /usr/share/readline/
 /usr/share/splashutils/
 /usr/share/vala/
@@ -117,6 +118,7 @@
 /etc/sgml/
 /etc/ca-certificates/
 /etc/ca-certificates.conf
+/etc/splash/*.ttf
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
 /usr/sbin/libpng-*-update.sh
@@ -213,6 +215,8 @@
 /usr/sbin/pptp-command
 /usr/sbin/pptp_fe.pl
 /usr/sbin/pptpsetup
+# net-misc/vpnc: configuration format converter
+/usr/bin/pcf2vpnc
 
 # OpenSSH server
 /etc/ssh/sshd_config

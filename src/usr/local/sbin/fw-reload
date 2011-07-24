@@ -7,6 +7,10 @@ cable=cable
 # ReachableAddresses ports in /etc/tor/torrc
 torports=80,443
 
+# VPN TCP/UDP server ports (PPTP, OpenVPN, Cisco)
+vpntports=1723,openvpn,10000
+vpnuports=openvpn,isakmp,ipsec-nat-t,10000
+
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
@@ -40,7 +44,7 @@ iptables -A LOGREJECT -j REJECT --reject-with icmp-admin-prohibited
 
 # --- IP ---
 
-# Allow existing/related connections packets through (TCP + UDP-in + GRE + ICMP-in errors)
+# Allow existing/related connections packets through (TCP + UDP-in + GRE/ESP + ICMP-in errors)
 iptables -A INPUT  -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A OUTPUT -p tcp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 
@@ -48,6 +52,9 @@ iptables -A INPUT  -p udp  -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p gre  -m state --state ESTABLISHED,RELATED     -j ACCEPT
 iptables -A OUTPUT -p gre  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A INPUT  -p esp  -m state --state ESTABLISHED,RELATED     -j ACCEPT
+iptables -A OUTPUT -p esp  -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
 
 iptables -A INPUT  -p icmp --icmp-type destination-unreachable -m state --state ESTABLISHED,RELATED -j ACCEPT
 iptables -A INPUT  -p icmp --icmp-type time-exceeded           -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -92,8 +99,9 @@ iptables -A OUTPUT -o lo -j ACCEPT
 iptables -A OUTPUT -p udp                     --sport bootpc --dport bootps -j ACCEPT
 # iptables -A OUTPUT -p udp                     --sport ntp    --dport ntp    -j ACCEPT
 
-# PPTP connections (root-initiated)
-iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn --dport 1723   -j ACCEPT
+# VPN connections (root-initiated)
+iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT
+iptables -A OUTPUT -p udp -m owner --uid-owner root          -m multiport --dports ${vpnuports} -j ACCEPT
 
 # DNS use for Tor (usually not necessary) and NTP server [disabled, resolves as root]
 # NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)
