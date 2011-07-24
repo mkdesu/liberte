@@ -19,3 +19,6 @@
 # No real mail processing
 /usr/bin/procmail
 /usr/bin/lockfile
+
+# The PPP/PPTP daemon is invoked by NetworkManager daemon
+/usr/sbin/pppd

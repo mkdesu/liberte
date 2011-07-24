@@ -81,6 +81,7 @@
 
 # Pruned files and directories (see rootfs.includes)
 /usr/bin/*-config
+/usr/bin/*-config-[0-9]*
 /usr/games/bin/*-config
 /usr/share/consolefonts/**
 /usr/share/consoletrans/
@@ -183,15 +184,6 @@
 /usr/lib/claws-mail/tools/*.pl
 /usr/lib/claws-mail/tools/*.py
 /usr/lib/claws-mail/tools/tb2claws-mail
-# app-misc/mc: extfs extension-specific handlers
-/usr/share/mc/extfs/a
-/usr/share/mc/extfs/apt
-/usr/share/mc/extfs/deb*
-/usr/share/mc/extfs/dpkg
-/usr/share/mc/extfs/*fs
-/usr/share/mc/extfs/rpms
-/usr/share/mc/extfs/s3
-/usr/share/mc/extfs/uzip
 # dev-libs/libevent: marshaling code generator
 /usr/bin/event_rpcgen.py
 # x11-libs/gtksourceview: *.lang files development
