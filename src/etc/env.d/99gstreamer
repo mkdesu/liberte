@@ -1,0 +1,2 @@
+GST_REGISTRY="/var/cache/gstreamer/registry.bin"
+GST_REGISTRY_UPDATE="no"

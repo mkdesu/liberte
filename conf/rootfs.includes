@@ -15,8 +15,9 @@
 /usr/lib/*opensc*.la
 /usr/lib/*pkcs11*.la
 
-# Include fontconfig directory and its contents
+# Include fontconfig and gstreamer cache
 /var/cache/fontconfig/***
+/var/cache/gstreamer/***
 
 # Pruned directories exceptions
 /usr/bin/rc-config

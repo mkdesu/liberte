@@ -49,6 +49,9 @@ media-video/mplayer             -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms
 media-video/gpac                -* aac mad vorbis
+media-plugins/gst-plugins-meta  a52 dv dvd lame mpeg theora
+media-libs/libtheora            encode
+net-im/pidgin                   -gstreamer
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal

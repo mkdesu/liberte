@@ -46,7 +46,7 @@ wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 net-misc/openvpn        ssl                     ssl             networkmanager-openvpn
 dev-libs/pkcs11-helper  !ssl, gnutls, nss       ssl             openvpn
 
-libsoup                 gnutls                  gnutls          midori
+libsoup                 gnutls                  gnutls          midori, gst-plugins-soup
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader
 neon                    ssl, gnutls             gnutls          audacious-plugins
 rtmpdump                ssl, gnutls, polarssl   gnutls          mplayer

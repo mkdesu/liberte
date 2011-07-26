@@ -14,6 +14,7 @@
   + OTFE partition now supports file permissions, sanitized during boot
 
   + Added small and fast Java runtime environment (JamVM)
+  + Added embedded video/audio support to Midori
   + Added SASL (plain) authentication support to XChat
   + Added PPTP/OpenVPN/Cisco VPN support to NetworkManager
   + Added emelFM2 2-pane file manager

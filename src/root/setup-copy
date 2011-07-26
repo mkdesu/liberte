@@ -289,6 +289,12 @@ sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
     /usr/share/applications/mimeinfo.cache
 
 
+sinfo "Generating GStreamer cache"
+rm -rf /var/cache/gstreamer
+/usr/bin/gst-inspect-* 1>/dev/null
+chmod -R go=u,go-w /var/cache/gstreamer
+
+
 sinfo "Uncompressing selected files"
 gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`

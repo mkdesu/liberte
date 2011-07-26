@@ -112,8 +112,10 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
     eselect news purge
 
 
+    # m4 - workaround for #376119
     sinfo "Recompiling toolchain"
     oldgcc=`find /var/db/pkg/sys-devel -maxdepth 1 -type d -name 'gcc-[0-9]*'`
+    emerge -q1 m4
     emerge -q1 sys-devel/binutils
     emerge -q1 sys-devel/gcc
 
@@ -148,8 +150,8 @@ if [ "$1" = fresh  -o  ! -d /usr/src/linux-${kversion} ]; then
 
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
-    emerge -qepv system
-    emerge -qe   system
+    emerge -qepv @system
+    emerge -qe   @system
     rm -f ${protected}
     rebuild_locales
 

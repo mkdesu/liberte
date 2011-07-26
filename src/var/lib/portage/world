@@ -161,6 +161,18 @@ sci-calculators/qalculate-gtk
 www-client/midori
 app-text/fbreader
 net-irc/xchat
+
+# Plugins
+media-plugins/gst-plugins-gconf
+media-plugins/gst-plugins-meta
+media-plugins/gst-plugins-xvid
+media-plugins/gst-plugins-x264
+media-plugins/gst-plugins-vp8
+media-plugins/gst-plugins-speex
+media-plugins/gst-plugins-pango
+media-plugins/gst-plugins-soup
+media-plugins/gst-plugins-libmms
+media-plugins/gst-plugins-cdio
 x11-plugins/pidgin-otr
 x11-plugins/pidgin-libnotify
 
