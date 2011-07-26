@@ -209,6 +209,8 @@
 /usr/sbin/pptpsetup
 # net-misc/vpnc: configuration format converter
 /usr/bin/pcf2vpnc
+# media-libs/gst-plugins-base: input audio visualization
+/usr/bin/gst-visualise*
 
 # OpenSSH server
 /etc/ssh/sshd_config

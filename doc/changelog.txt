@@ -4,6 +4,7 @@
   + ISO image generation, useful for VMs and independent installs
   + Support for installing to ext2/3/4 filesystems
   + Directories are hidden on FAT (during install) and ISO (in Joliet layer)
+  + Added silent splash theme, which also disables logo in X server
 
   + Kernel 2.6.38 with SquashFS XZ compression and NX support
   + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE

@@ -291,7 +291,7 @@ sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
 
 sinfo "Generating GStreamer cache"
 rm -rf /var/cache/gstreamer
-/usr/bin/gst-inspect-* 1>/dev/null
+/usr/bin/gst-inspect* 1>/dev/null
 chmod -R go=u,go-w /var/cache/gstreamer
 
 
