@@ -124,6 +124,7 @@
 /usr/lib/cracklib_dict.*
 /usr/sbin/libpng-*-update.sh
 /var/lib/dbus/machine-id
+/usr/local/bin/uname
 /mnt/floppy/
 /mnt/cdrom/
 # (GeoIP is not used in Tor setup)

@@ -1,0 +1,41 @@
+#!/bin/sh
+
+bin=/usr/bin/uname
+
+
+case "$@" in
+    -a)
+        echo `$0 -s` `$0 -n` `$0 -r` `$0 -v` `$0 -m` `$0 -p` `$0 -i` `$0 -o`
+        ;;
+    -srm)
+        echo `$0 -s` `$0 -r` `$0 -m`
+        ;;
+    -s)
+        echo Linux
+        ;;
+    -n)
+        echo liberte
+        ;;
+    -r)
+        if [ -e /usr/src/linux  -a  -e /usr/share/eselect/modules/kernel.eselect ]; then
+            eselect kernel show | sed -n '\:/usr/src/linux-:s:.*/linux-::p'
+        else
+            exec ${bin} "$@"
+        fi
+        ;;
+    -v)
+        echo '#0' `date -u +%F`
+        ;;
+    -p)
+        echo unknown
+        ;;
+    -i)
+        echo unknown
+        ;;
+    -o)
+        echo GNU/Linux
+        ;;
+    *)
+        exec ${bin} "$@"
+        ;;
+esac

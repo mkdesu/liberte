@@ -31,4 +31,4 @@ export CABLE_TOR=${CABLE_MOUNT}/security/tor
 export CABLE_QUEUES=${CABLE_MOUNT}/cables
 export CABLE_INBOX=${CABLE_MOUNT}/mail/inbox
 export CABLE_PUB=/var/www
-export CABLE_REGEX='[a-z2-7]{32}@[a-z2-7]{16}\.onion'
+export CABLE_REGEX='[a-z2-7]{32}@([a-z2-7]{16}\.onion|[a-z2-7]{52}\.b32\.i2p)'
