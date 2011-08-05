@@ -122,14 +122,14 @@ rm -f /var/cache/edb/vdb_*.pickle
 echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
 
 
-# Unmerge non-runtime dependencies (and cleanup the kernel directory)
-sinfo "Unmerging build and temporary dependencies"
-emerge -qc --with-bdeps n
-
-
 # This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"
 emerge -quDN @world
+
+
+# Unmerge non-runtime dependencies (and cleanup the kernel directory)
+sinfo "Unmerging build and temporary dependencies"
+emerge -qc --with-bdeps n
 
 
 sinfo "Copying gcc shared libs"
