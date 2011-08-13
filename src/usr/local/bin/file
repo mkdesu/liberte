@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Workaround for /usr/portage/sys-libs/glibc/files/eblits/pkg_preinst.eblit,
+# which otherwise fails when uname is a script.
+if [ $# = 2  -a  x"$1" = x-L  -a  x"$2" = x/usr/local/bin/uname ]; then
+  exit
+fi
+
+exec /usr/bin/file "$@"

@@ -138,8 +138,8 @@ if [ ${devfs} = fat ]; then
         mkdir ${mntdir}/otfe
     fi
 
-    umount ${mntdir}
-    rmdir  ${mntdir}
+    umount -l ${mntdir}
+    rmdir     ${mntdir}
 
     if [ ${hassysdir} = 0 ]; then
         echo "Directory ${sysdir} not found or incorrect on ${dev}"

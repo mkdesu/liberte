@@ -125,6 +125,7 @@
 /usr/sbin/libpng-*-update.sh
 /var/lib/dbus/machine-id
 /usr/local/bin/uname
+/usr/local/bin/file
 /mnt/floppy/
 /mnt/cdrom/
 # (GeoIP is not used in Tor setup)
