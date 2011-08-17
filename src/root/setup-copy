@@ -38,7 +38,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # equery requires gentoolkit, so copy ebuilds early
 # NOTE: the below patches are intended for depclean
 #
-# python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, pidgin, mesa, gobject-introspection
+# python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa, gobject-introspection
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils: ca-certificates
@@ -48,6 +48,7 @@ ebuilds="app-portage/gentoolkit
          games-board/eboard
          gnome-base/libglade
          gnome-extra/gucharmap
+         media-gfx/exiv2
          media-gfx/graphicsmagick
          media-gfx/splashutils
          media-libs/mesa
@@ -81,11 +82,11 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
-# Python is not needed at all by gtk+, gucharmap and glib
+# Python is not needed at all by gtk+, gucharmap, glib and exiv2
 # Python is only needed by g-ir-{scanner,annotation-tool}
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
                                          ${ebuild_gtk} ${ebuild_gucharmap} ${ebuild_glib} \
-                                         ${ebuild_gobjectintrospection}
+                                         ${ebuild_exiv2} ${ebuild_gobjectintrospection}
 
 # Python is needed by dbus-python, which is a non-separated dependency in ebuild
 sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
