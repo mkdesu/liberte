@@ -318,7 +318,7 @@ ln -snf ../usr/sbin/splash_util    /sbin/splash_util.static
 
 
 sinfo "Removing invalid symlinks, dirs and files"
-find / -xdev -type l ! -xtype f ! -xtype d ! -xtype c -exec rm {} \;
+find / -xdev -type l ! -xtype f ! -xtype d ! -xtype c -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
 
 rm /etc/env.d/05binutils

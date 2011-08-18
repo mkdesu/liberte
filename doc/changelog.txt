@@ -6,7 +6,7 @@
   + Directories are hidden on FAT (during install) and ISO (in Joliet layer)
   + Added silent splash theme, which also disables logo in X server
 
-  + Kernel 2.6.38 with SquashFS XZ compression and NX support
+  + Kernel 2.6.39 with SquashFS XZ compression and NX support
   + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
   + All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
   + Xorg server 1.10, better touchpad support
@@ -15,7 +15,7 @@
   + OTFE partition now supports file permissions, sanitized during boot
 
   + Added small and fast Java runtime environment (JamVM)
-  + Added embedded video/audio support to Midori
+  + Added HTML5 video/audio support to Midori
   + Added SASL (plain) authentication support to XChat
   + Added PPTP/OpenVPN/Cisco VPN support to NetworkManager
   + Added emelFM2 2-pane file manager

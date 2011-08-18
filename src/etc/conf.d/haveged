@@ -1,0 +1,5 @@
+# Wakeup threshold in bits
+WATERMARK=1024
+
+# -r 0 is always added
+HAVEGED_OPTS="-w ${WATERMARK} -v 0"
