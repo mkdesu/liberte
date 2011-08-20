@@ -45,7 +45,8 @@ ${FIND} -type l ! -xtype f ! -xtype d ! -path /dev/fd
 
 sinfo "Archives:"
 ${FIND} -type f  \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
-           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.[jw]ar' \)
+           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.[jw]ar' \) \
+        ! -path '/opt/i2p/lib/*' ! -path '/opt/i2p/webapps/*'
 
 sinfo "Sources:"
 ${FIND} -name '*.h' -o \( -name '*.inc' ! -path '/usr/share/keymaps/*' \) \
