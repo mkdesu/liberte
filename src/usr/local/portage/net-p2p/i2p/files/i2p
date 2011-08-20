@@ -1,0 +1,25 @@
+#!/sbin/runscript
+# Copyright 1999-2011 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+depend() {
+	need net
+}
+
+start() {
+	PIDFILE=/var/run/i2p.pid
+	I2P=/opt/i2p
+	WRAPPER_CMD=/usr/bin/wrapper
+	WRAPPER_CONF="$I2P/wrapper.config"
+
+	ebegin "Starting I2P"
+	start-stop-daemon -S -q -u i2p -k 077 -p "${PIDFILE}" -bm -x $WRAPPER_CMD $WRAPPER_CONF wrapper.daemonize=FALSE
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping I2P"
+	/usr/bin/i2prouter stop
+	eend $?
+}

@@ -24,6 +24,7 @@
 /var/db/pkg/
 /usr/lib/pkgconfig/
 /usr/share/pkgconfig/
+/usr/share/*/package.env
 /var/lib/portage/
 /var/lib/gentoo/
 /var/lib/layman/
@@ -128,8 +129,13 @@
 /usr/local/bin/file
 /mnt/floppy/
 /mnt/cdrom/
-# (GeoIP is not used in Tor setup)
+# (GeoIP is not used in Tor/I2P setup)
 /usr/share/tor/
+/opt/i2p/geoip/
+/opt/i2p/eepsite/
+/opt/i2p/**systray*
+/opt/i2p/lib/BOB.jar
+/opt/i2p/lib/sam.jar
 /usr/share/misc/*.ids.*
 /usr/share/smartmontools/*.h.*
 /usr/share/fonts/*/fonts.dir

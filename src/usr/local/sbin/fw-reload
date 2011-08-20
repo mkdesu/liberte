@@ -14,6 +14,10 @@ vpnuports=openvpn,isakmp,ipsec-nat-t,10000
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
+# Ports used by I2P outbound connections
+i2ptports=http,https,8887,9000:31000
+i2puports=8887,9000:31000
+
 # LED blinking delay
 leddelay=500
 
@@ -74,8 +78,10 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # iptables -A OUTPUT -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
 # iptables -A OUTPUT -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
 
-# Hidden service server access only for Tor
-iptables -A OUTPUT -p tcp -m owner ! --uid-owner tor -d 127.0.0.1 --dport 80 -j LOGREJECT
+# Hidden service server access only for Tor and I2P
+iptables -A OUTPUT -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
+iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 80   -j LOGREJECT
 
 # Privoxy access only for main user, HTP, and cables daemon
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
@@ -88,6 +94,13 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dpo
 iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
 iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
+# I2P ports access only for main user, Privoxy and I2P (selective)
+# http://www.i2p2.de/faq.html#ports
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660            -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445                           -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --sports 7654,31000:31999 --dport 32000           -j ACCEPT
+iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660,7654,32000 -j LOGREJECT
+
 # Pass other loopback packets through
 iptables -A INPUT  -i lo -j ACCEPT
 iptables -A OUTPUT -o lo -j ACCEPT
@@ -96,26 +109,30 @@ iptables -A OUTPUT -o lo -j ACCEPT
 # --- External Communications ---
 
 # DHCP and NTP client [disabled] communication
-iptables -A OUTPUT -p udp                     --sport bootpc --dport bootps -j ACCEPT
-# iptables -A OUTPUT -p udp                     --sport ntp    --dport ntp    -j ACCEPT
+iptables -A OUTPUT -p udp                              --sport bootpc --dport bootps -j ACCEPT
+# iptables -A OUTPUT -p udp                              --sport ntp    --dport ntp    -j ACCEPT
+
+# DNS use for Tor (usually not necessary), NTP server [disabled, resolves as root],
+# non-firewalled user and I2P.
+# NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)
+for uid in tor i2p ${nofw}; do
+    iptables -A OUTPUT -p udp -m owner --uid-owner ${uid}        --dport domain -j ACCEPT
+    iptables -A OUTPUT -p tcp -m owner --uid-owner ${uid}  --syn --dport domain -j ACCEPT
+done
 
 # VPN connections (root-initiated)
 iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT
 iptables -A OUTPUT -p udp -m owner --uid-owner root          -m multiport --dports ${vpnuports} -j ACCEPT
 
-# DNS use for Tor (usually not necessary) and NTP server [disabled, resolves as root]
-# NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)
-iptables -A OUTPUT -p udp -m owner --uid-owner tor           --dport domain -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn --dport domain -j ACCEPT
-# iptables -A OUTPUT -p udp -m owner --uid-owner root          --dport domain -j ACCEPT
-# iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn --dport domain -j ACCEPT
-
 # Let Tor initiate connections to its ReachableAddresses ports
-iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn -m multiport --dports ${torports} -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn -m multiport --dports ${torports}  -j ACCEPT
 
-# DNS and HTTP(S) communication for non-firewalled user
-iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports domain,${hotspot} -j ACCEPT
+# HTTP(S) (including HotSpot ports) communication for non-firewalled user
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports ${hotspot}   -j ACCEPT
+
+# I2P user communication
+iptables -A OUTPUT -p tcp -m owner --uid-owner i2p     --syn -m multiport --dports ${i2ptports} -j ACCEPT
+iptables -A OUTPUT -p udp -m owner --uid-owner i2p           -m multiport --dports ${i2puports} -j ACCEPT
 
 
 # Log all other packets

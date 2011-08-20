@@ -4,6 +4,7 @@
 =app-emulation/virt-what-1.11*
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
+=dev-java/java-service-wrapper-3.3.3*
 
 # Applications
 =www-misc/fcgiwrap-1.0.3*

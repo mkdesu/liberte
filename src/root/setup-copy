@@ -42,9 +42,13 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils: ca-certificates
+# java:    jamvm
 sinfo "Patching copies of selected ebuilds"
-ebuilds="app-portage/gentoolkit
+ebuilds="app-misc/ca-certificates
+         app-portage/gentoolkit
+         dev-java/jamvm
          dev-libs/glib
+         dev-libs/gobject-introspection
          games-board/eboard
          gnome-base/libglade
          gnome-extra/gucharmap
@@ -58,11 +62,7 @@ ebuilds="app-portage/gentoolkit
          sys-apps/portage
          x11-libs/gtk+
          x11-misc/xdg-utils
-         x11-proto/xcb-proto
-         app-misc/ca-certificates
-         dev-libs/gobject-introspection
-         dev-java/gnu-classpath
-         dev-java/jamvm"
+         x11-proto/xcb-proto"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -106,9 +106,6 @@ sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 # debianutils are  only needed for update-ca-certificates
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 
-# java-config wrappers are superfluous for minimal VMs (and require Python)
-sed -i 's:^\(inherit\>.*\) java-pkg-2\>:\1:' ${ebuild_gnuclasspath}
-
 # javac/javadoc dependencies are only for symlinks in /usr/bin
 sed -i 's:^\(inherit\>.*\) java-vm-2\>:\1:; s:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 
@@ -121,6 +118,9 @@ rm -f /var/cache/edb/vdb_*.pickle
 
 # Packages wrongly rdepend on gettext instead of libintl (provided by glibc)
 echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
+
+# java-config wrappers are superfluous for minimal VMs (and require Python)
+echo dev-java/java-config-2.1.11 >> /etc/portage/profile/package.provided
 
 
 # This recompiles packages with TEMP flags in package.use
@@ -181,6 +181,11 @@ fi
 
 if [ -e /usr/bin/gettext ]; then
     sinfo "Failed to discard gettext dependencies"
+    false
+fi
+
+if [ -e /usr/bin/run-java-tool  -o  -e /usr/bin/java-config ]; then
+    sinfo "Failed to discard Java dependencies"
     false
 fi
 
@@ -308,6 +313,11 @@ rezip  /usr/lib/jamvm/classes.zip
 rezip  /usr/share/zlibrary/hyphenationPatterns.zip
 rezip  /usr/share/zlibrary/languagePatterns.zip
 regzip /usr/share/zlibrary/unicode.xml.gz
+
+rezip /usr/share/java-service-wrapper/lib/wrapper.jar
+for jar in /opt/i2p/lib/*.jar /opt/i2p/webapps/*.war; do
+    rezip ${jar}
+done
 
 
 # /lib/rc/plugins/splash.so can't be patched (fbsplashd)

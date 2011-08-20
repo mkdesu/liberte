@@ -95,6 +95,7 @@ gnome-extra/nm-applet
 net-misc/htpdate
 net-misc/tor
 net-misc/connect
+net-p2p/i2p
 net-proxy/tsocks
 net-proxy/privoxy
 www-servers/nginx
