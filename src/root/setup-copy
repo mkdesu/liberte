@@ -43,6 +43,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # cpio:    splashutils
 # debianutils: ca-certificates
 # java:    jamvm
+# xorg fonts: font-misc-meltho
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
          app-portage/gentoolkit
@@ -52,6 +53,7 @@ ebuilds="app-misc/ca-certificates
          games-board/eboard
          gnome-base/libglade
          gnome-extra/gucharmap
+         media-fonts/font-misc-meltho
          media-gfx/exiv2
          media-gfx/graphicsmagick
          media-gfx/splashutils
@@ -108,6 +110,9 @@ sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 
 # javac/javadoc dependencies are only for symlinks in /usr/bin
 sed -i 's:^\(inherit\>.*\) java-vm-2\>:\1:; s:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
+
+# xorg-2 brings dependency on encodings/mkfontdir/mkfontscale
+sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":' ${ebuild_fontmiscmeltho}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}
@@ -280,11 +285,23 @@ fi
 
 
 # Done here because cache may be recreated after "src" phase
-sinfo "Trimming icons cache"
+sinfo "Trimming icons directories and cache"
+for theme in /usr/share/icons/*/index.theme; do
+    find `dirname ${theme}` -maxdepth 1 \( -name '[5-9][0-9]x*' -o -name '[1-9][0-9][0-9]x*' \) -exec rm -r {} \;
+
+    awk '/^\[/ { x=1; if(match($0,/^\[([0-9]+)x/,ar) != 0 && ar[1]>48) x=42; } { if (x!=42) print; }' ${theme} \
+        | sed 's/,\([5-9][0-9]\|[1-9][0-9][0-9]\)x[^,]*//g; s/\(=16,22,32,48\),.*/\1/' > ${theme}.new
+    mv ${theme}.new ${theme}
+done
+
 find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
     -exec gtk-update-icon-cache -q -f -i    {} \;
-find /usr/share -mindepth 3 -maxdepth 3 -type d -name hicolor \
+find /usr/share -mindepth 3 -type d -name hicolor \
     -exec gtk-update-icon-cache -q -f -i -t {} \;
+
+
+sinfo "Regenerating fonts cache"
+fc-cache -fs
 
 
 # http://www.freedesktop.org/wiki/Specifications/mime-actions-spec

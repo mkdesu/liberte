@@ -85,12 +85,6 @@ good_msg "Looking for the media"
 tested=' '
 waitmsg=0
 
-# In absence of blockdev --setro/setrw/getro
-ro_flags=
-if [ ${param_cdroot_type} = ext3  -o  ${param_cdroot_type} = ext4 ]; then
-    ro_flags=noload,
-fi
-
 while true; do
     if [ ${waitmsg} = 1 ]; then
         warn_msg 'Waiting for the media ...'
@@ -108,19 +102,26 @@ while true; do
 
             # Skip if disk has at least one partition (heuristic)
             mediadevname=`basename ${mediadev}`
-            if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* >/dev/null 2>&1; then
+            if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* 1>/dev/null 2>&1; then
                 good_msg "Attempting to mount media: ${mediadev}"
 
-                if mount -r -t ${param_cdroot_type} -o ${ro_flags}${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
+                # Unless the media is already in ro mode, write-protect it during mount
+                mediaro=`blockdev --getro ${mediadev}` || mediaro=1
+                [ ${mediaro} == 1 ] || blockdev --setro ${mediadev}
+
+                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
                     # Check for the recognition file
                     if [ -e ${rwroot}${boot}${param_loop} ]; then
                         good_msg "Media found on ${mediadev}"
+
+                        [ ${mediaro} == 1 ] || blockdev --setrw ${mediadev}
                         break 2
                     else
                         umount ${rwroot}${boot}
                     fi
                 fi
 
+                [ ${mediaro} == 1 ] || blockdev --setrw ${mediadev}
                 waitmsg=1
             fi
         fi

@@ -57,9 +57,11 @@ net-im/pidgin                   -gstreamer
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
+sys-fs/ntfs3g                   -udev
 dev-libs/openssl                -gmp
 net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
+media-libs/freetype             -bzip2
 sys-apps/busybox                -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
