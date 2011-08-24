@@ -35,5 +35,14 @@
 /var/tmp/nginx/client/
 /var/tmp/nginx/fastcgi/
 
+# I2P
+/opt/i2p/wrapper.config
+/opt/i2p/lib/i2p.jar
+/opt/i2p/lib/i2ptunnel.jar
+/opt/i2p/lib/streaming.jar
+/opt/i2p/lib/mstreaming.jar
+/opt/i2p/lib/router.jar
+/opt/i2p/lib/commons-logging.jar
+
 # Transient directories (excluded during image creation)
 /tmp/transient/***

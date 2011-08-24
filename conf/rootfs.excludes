@@ -137,18 +137,14 @@
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
 
-# I2P
+# I2P (lib directory is pruned)
 /opt/i2p/geoip/
 /opt/i2p/eepsite/
 /opt/i2p/docs/
-/opt/i2p/[^w]*.config
-/opt/i2p/**i2psnark*
 /opt/i2p/webapps/
-/opt/i2p/lib/routerconsole.jar
-/opt/i2p/lib/desktopgui.jar
-/opt/i2p/lib/systray*.jar
-/opt/i2p/lib/BOB.jar
-/opt/i2p/lib/sam.jar
+/opt/i2p/lib/**
+/opt/i2p/*.config
+/opt/i2p/*i2psnark*
 
 # Statically linked binaries (and symlinks)
 # (other splashutils static binaries are substituted with dynamic,
