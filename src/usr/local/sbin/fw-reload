@@ -15,7 +15,7 @@ vpnuports=openvpn,isakmp,ipsec-nat-t,10000
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
 # Ports used by I2P outbound connections
-i2ptports=http,https,8887,9000:31000
+i2ptports=https,8887,9000:31000
 i2puports=8887,9000:31000
 
 # LED blinking delay
@@ -81,25 +81,26 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # Hidden service server access only for Tor and I2P
 iptables -A OUTPUT -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
-iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 80   -j LOGREJECT
+iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 80   -j LOGREJECT
 
-# Privoxy access only for main user, HTP, and cables daemon
+# Privoxy access only for main user, HTP, cables daemon and I2P (for reseeding)
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 8118 -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 8118 -j LOGREJECT
 
 # Tor access via SOCKS only for main user and Privoxy
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
-iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 --dport 9050 -j LOGREJECT
+iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
 # I2P ports access only for main user, Privoxy and I2P (selective)
-# http://www.i2p2.de/faq.html#ports
+# http://www.i2p2.de/faq.html#ports (7657 and 7654 are disabled in I2P config)
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660            -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445                           -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --sports 7654,31000:31999 --dport 32000           -j ACCEPT
-iptables -A OUTPUT -p tcp                                     -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660,7654,32000 -j LOGREJECT
+iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --dports 7654,4444,32000                          -j ACCEPT
+iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660,7654,32000 -j LOGREJECT
 
 # Pass other loopback packets through
 iptables -A INPUT  -i lo -j ACCEPT

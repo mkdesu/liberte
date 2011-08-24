@@ -129,18 +129,26 @@
 /usr/local/bin/file
 /mnt/floppy/
 /mnt/cdrom/
-# (GeoIP is not used in Tor/I2P setup)
+# (GeoIP is not used in Tor setup)
 /usr/share/tor/
-/opt/i2p/geoip/
-/opt/i2p/eepsite/
-/opt/i2p/**systray*
-/opt/i2p/lib/BOB.jar
-/opt/i2p/lib/sam.jar
 /usr/share/misc/*.ids.*
 /usr/share/smartmontools/*.h.*
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
+
+# I2P
+/opt/i2p/geoip/
+/opt/i2p/eepsite/
+/opt/i2p/docs/
+/opt/i2p/[^w]*.config
+/opt/i2p/**i2psnark*
+/opt/i2p/webapps/
+/opt/i2p/lib/routerconsole.jar
+/opt/i2p/lib/desktopgui.jar
+/opt/i2p/lib/systray*.jar
+/opt/i2p/lib/BOB.jar
+/opt/i2p/lib/sam.jar
 
 # Statically linked binaries (and symlinks)
 # (other splashutils static binaries are substituted with dynamic,

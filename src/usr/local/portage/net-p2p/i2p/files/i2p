@@ -14,7 +14,7 @@ start() {
 	WRAPPER_CONF="$I2P/wrapper.config"
 
 	ebegin "Starting I2P"
-	start-stop-daemon -S -q -u i2p -k 077 -p "${PIDFILE}" -bm -x $WRAPPER_CMD $WRAPPER_CONF wrapper.daemonize=FALSE
+	start-stop-daemon -S -q -u i2p -p "${PIDFILE}" -bm -x $WRAPPER_CMD $WRAPPER_CONF wrapper.daemonize=FALSE
 	eend $?
 }
 

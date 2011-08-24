@@ -6,8 +6,11 @@ consolefont=ter-i16n.psf
 xzmem=20
 protected="/etc/._cfg????_locale.gen"
 
+i2phosts=http://www.i2p2.de/hosts.txt
+
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
+i2phosts_regexp='^[[:alnum:].-]{1,64}.i2p=[[:alnum:]~-]{512}AAAA[[:blank:]]?$'
 
 
 sinfo() {
@@ -309,7 +312,7 @@ done
 
 
 # The piciids/usbids sites are notorious for various failures
-sinfo "Updating PCI, USB, and SMART databases"
+sinfo "Updating PCI, USB, SMART and I2P hosts databases"
 
 sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
 update-pciids -q     || echo "update-pciids failed (ignoring)"
@@ -324,8 +327,10 @@ if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     exit 1
 fi
 
+wget -nv -O /opt/i2p/hosts.txt ${i2phosts}
 
-sinfo "Verifying PCI, USB, and SMART databases"
+
+sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
 LC_ALL=C awk --posix "! /${pciids_regexp}/                  { print; exit 1 }" /usr/share/misc/pci.ids
 LC_ALL=C awk --posix "! /${pciids_regexp}|${usbids_regexp}/ { print; exit 1 }" /usr/share/misc/usb.ids
 
@@ -337,6 +342,8 @@ if [ "${drivedbout}" != 0 ]; then
     exit 1
 fi
 rm /tmp/drivedb.h
+
+LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.txt
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
@@ -435,8 +442,10 @@ useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
-touch             /tmp/nginx-ref
-chown nginx:nginx /tmp/nginx-ref
+for uid in i2p nginx; do
+    touch               /tmp/${uid}-ref
+    chown ${uid}:${uid} /tmp/${uid}-ref
+done
 
 
 sinfo "Initializing a secondary PGP keyring"

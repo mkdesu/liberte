@@ -1,0 +1,1 @@
+/opt/i2p/hosts.txt
