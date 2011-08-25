@@ -4,12 +4,12 @@ cableid=/usr/local/libexec/cable/cable-id
 cablesend=${HOME}/bin/wrappers/cable-send
 confdir=${XDG_CONFIG_HOME}/claws-mail
 
-username=${SECURITY_HOME}/ssl/certs/username
-hostname=${SECURITY_HOME}/tor/hidden_service/hostname
+# If neither Tor nor I2P address is selected, configure the Tor one
+if toraddress=`${cableid} tor 2>/dev/null`; then
+    i2paddress=`${cableid} i2p`
 
-if address=`${cableid} 2>/dev/null`; then
-    if ! grep -q "^address=${address}\$" ${confdir}/accountrc; then
-        sed -i "s/^\(address=\).*/\1${address}/" ${confdir}/accountrc
+    if ! grep -q "^address=\(${toraddress}\|${i2paddress}\)\$" ${confdir}/accountrc; then
+        sed -i "s/^\(address=\).*/\1${toraddress}/" ${confdir}/accountrc
     fi
 fi
 

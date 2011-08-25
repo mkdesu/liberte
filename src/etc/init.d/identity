@@ -6,12 +6,15 @@ luser=anon
 lmount=/home/${luser}/persist
 
 ltordir=${lmount}/security/tor/hidden_service
+li2pdir=${lmount}/security/i2p/eepsite
 certsdir=${lmount}/security/ssl/certs
 
-genhost=/usr/local/libexec/cable/gen-tor-hostname
+gentorhost=/usr/local/libexec/cable/gen-tor-hostname
+geni2phost=/usr/local/libexec/cable/gen-i2p-hostname
 genuser=/usr/local/libexec/cable/gen-cable-username
 
 gtordir=/var/lib/tor/hidden_service
+gi2pdir=/var/lib/i2p/router/eepsite
 cableflag=/var/www/cable
 
 depend() {
@@ -36,7 +39,7 @@ start() {
     # Create (small) Tor hidden service key + hostname, if they don't exist
     if [ ! -e ${ltordir} ]; then
         ebegin Initializing Tor hidden service directory
-        sudo -n -u ${luser} ${genhost}
+        sudo -n -u ${luser} ${gentorhost}
         eend $?
     fi
 
@@ -50,6 +53,27 @@ start() {
         ebegin Propagating Tor hidden service directory
         rsync -rlptHS --safe-links --chmod=u=rwX,go= ${ltordir}/ ${gtordir} \
             && chown -hR tor:tor ${gtordir}
+        eend $?
+    fi
+
+
+    # Create (small) I2P eepsite key + b32/b64 hostnames, if they don't exist
+    if [ ! -e ${li2pdir} ]; then
+        ebegin Initializing I2P eepsite directory
+        sudo -n -u ${luser} ${geni2phost}
+        eend $?
+    fi
+
+
+    # Propagate I2P eepsite key
+    if [ -e ${gi2pdir}/eepPriv.dat ]; then
+        ebegin Verifying existing I2P eepsite key
+        cmp -s ${li2pdir}/eepPriv.dat ${gi2pdir}/eepPriv.dat
+        eend $?
+    else
+        ebegin Propagating I2P eepsite key
+        rsync -lptHS --safe-links --chmod=u=rw,go= ${li2pdir}/eepPriv.dat ${gi2pdir} \
+            && chown -h i2p:i2p ${gi2pdir}/eepPriv.dat
         eend $?
     fi
 

@@ -1,4 +1,11 @@
 
+[Scroogle]
+name=Scroogle
+text=Google search proxy
+uri=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
+icon=
+token=sg
+
 [Wikipedia]
 name=Wikipedia
 text=The free encyclopedia

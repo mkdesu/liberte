@@ -14,9 +14,9 @@ vpnuports=openvpn,isakmp,ipsec-nat-t,10000
 # Ports used by HotSpot registration pages
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
-# Ports used by I2P outbound connections
-i2ptports=https,8887,9000:31000
-i2puports=8887,9000:31000
+# Ports used by I2P outbound connections (don't assume the default random ports)
+i2ptports=https,8887,9000:31000,1024:65535
+i2puports=8887,9000:31000,1024:65535
 
 # LED blinking delay
 leddelay=500
@@ -96,7 +96,7 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dpo
 iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
 # I2P ports access only for main user, Privoxy and I2P (selective)
-# http://www.i2p2.de/faq.html#ports (7657 and 7654 are disabled in I2P config)
+# http://www.i2p2.de/faq.html#ports (routerconsole=7657 is disabled in I2P config)
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660            -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445                           -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --dports 7654,4444,32000                          -j ACCEPT

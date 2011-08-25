@@ -9,12 +9,17 @@ error() {
     exit 1
 }
 
-hostname=${CABLE_TOR}/hidden_service/hostname
+torhost=${CABLE_TOR}/hidden_service/hostname
+i2phost=${CABLE_I2P}/eepsite/hostname
 username=${CABLE_CERTS}/certs/username
 
 
-if [ ! -e ${hostname} ]; then
-    error "host identity not initialized yet"
+if [ ! -e ${torhost} ]; then
+    error "Tor host identity not initialized yet"
+fi
+
+if [ ! -e ${i2phost} ]; then
+    error "I2P host identity not initialized yet"
 fi
 
 if [ ! -e ${username} ]; then
@@ -22,11 +27,25 @@ if [ ! -e ${username} ]; then
 fi
 
 
-hostname=`cat ${hostname} | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
+torhost=`cat ${torhost} | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
+i2phost=`cat ${i2phost} | tr -cd '[:alnum:].-' | tr '[:upper:]' '[:lower:]'`
 username=`cat ${username} | tr -cd a-z2-7`
 
-[ ${#hostname} != 0 ] || error "bad hostname"
+[ ${#torhost} != 0 ]  || error "bad Tor hostname"
+[ ${#i2phost} != 0 ]  || error "bad I2P hostname"
 [ ${#username} = 32 ] || error "bad username"
 
 
-echo "${username}"@"${hostname}"
+case "$1" in
+    tor)
+        echo "${username}"@"${torhost}"
+        ;;
+
+    i2p)
+        echo "${username}"@"${i2phost}"
+        ;;
+
+    *)
+        error "param: tor|i2p"
+        ;;
+esac

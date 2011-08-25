@@ -28,6 +28,7 @@ export CABLE_HOME="${0%"${0##*/}"}"
 export CABLE_MOUNT=/home/anon/persist
 export CABLE_CERTS=${CABLE_MOUNT}/security/ssl
 export CABLE_TOR=${CABLE_MOUNT}/security/tor
+export CABLE_I2P=${CABLE_MOUNT}/security/i2p
 export CABLE_QUEUES=${CABLE_MOUNT}/cables
 export CABLE_INBOX=${CABLE_MOUNT}/mail/inbox
 export CABLE_PUB=/var/www

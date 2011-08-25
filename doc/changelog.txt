@@ -11,6 +11,7 @@
   + All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
   + Xorg server 1.10, better touchpad support
 
+  + Added I2P, also supported as cables communication endpoint
   + Cables communication daemon runs under a designated user
   + OTFE partition now supports file permissions, sanitized during boot
 

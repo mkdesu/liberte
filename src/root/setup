@@ -10,7 +10,7 @@ i2phosts=http://www.i2p2.de/hosts.txt
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
-i2phosts_regexp='^[[:alnum:].-]{1,64}.i2p=[[:alnum:]~-]{512}AAAA[[:blank:]]?$'
+i2phosts_regexp='^[[:alnum:].-]{1,63}.i2p=[[:alnum:]~-]{512}AAAA[[:blank:]]?$'
 
 
 sinfo() {
@@ -265,6 +265,20 @@ strip -s /usr/local/sbin/udev-watchdog       \
          /usr/local/addons/initrd/init-kexec \
          /usr/lib/xchat/plugins/cap_sasl.so
 
+jflags="-target 1.5 -deprecation -Werror"
+jartmp=`mktemp -d`
+javac ${jflags} -classpath /opt/i2p/lib/i2p.jar -d ${jartmp} /usr/local/src/EepPriv.java
+cat <<EOF > ${jartmp}/manifest.mf
+Manifest-Version: 1.0
+Created-By: Liberté Linux ${VERSION}
+Main-Class: su.dee.i2p.EepPriv
+Class-Path: /opt/i2p/lib/i2p.jar
+EOF
+jar c0mf ${jartmp}/manifest.mf /usr/local/libexec/cable/eeppriv.jar -C ${jartmp} su
+rm -r ${jartmp}
+
+
+sinfo "Generating localization and timezone menus"
 # s/AD/Andorra/;...
 ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
 # s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...

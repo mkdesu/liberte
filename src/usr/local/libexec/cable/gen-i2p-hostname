@@ -1,0 +1,38 @@
+#!/bin/sh -e
+
+# This command can be run via "sudo -u anon"
+. "${0%"${0##*/}"}"suprofile
+
+
+i2pdir=${CABLE_I2P}/eepsite
+eeppriv=${CABLE_HOME}/eeppriv.jar
+
+i2pdirtmp=${i2pdir}.tmp
+
+
+# Fail if dir already exists
+if [ -e ${i2pdir} ]; then
+    echo ${i2pdir} already exists
+    exit 1
+fi
+
+
+# Create temporary directory (erase previous one, if exists)
+rm -rf ${i2pdirtmp}
+mkdir  ${i2pdirtmp}
+
+
+# Generate eepPriv.dat and b32/b64 hostnames the same way that I2P does
+# JamVM's SecureRandom uses /dev/urandom
+java -jar ${eeppriv} ${i2pdirtmp}
+
+
+# Sanity checks
+if [ ! -s ${i2pdirtmp}/eepPriv.dat -o ! -s ${i2pdirtmp}/hostname -o ! -s ${i2pdirtmp}/hostname.b64 ]; then
+    echo Failed to create eepsite key
+    exit 1
+fi
+
+
+# Commit new directory
+mv -T ${i2pdirtmp} ${i2pdir}
