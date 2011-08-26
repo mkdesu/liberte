@@ -5,7 +5,7 @@
 exec 1>/dev/null 2>&1
 
 # Use of auto.media is exclusive via file lock
-lock=/etc/.auto.lock
+lock=/etc/autofs/.auto.lock
 lockfd=20
 
 # Real work is done in forked process
@@ -14,7 +14,7 @@ if [ "$1" = fork ]; then
 
     # Files and scripts
     prefix=/mnt/media
-    mounts=/etc/auto.media
+    mounts=/etc/autofs/auto.media
     daemon=/etc/init.d/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)

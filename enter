@@ -41,19 +41,19 @@ else
 
     # Specify permissions completely, to be independent from ${SRC}/* chmods
     sinfo "Copying configuration files:"
-    ${RSYNC} --chmod=u=rwX,go=rX -i \
-          --exclude=/root/                \
-          --exclude=/home/anon/           \
-          --exclude=/home/nofw/           \
-          --exclude=/var/lib/i2p/         \
-          --exclude=/var/lib/portage/     \
-          --exclude=/etc/nginx/           \
-          --exclude=/var/www/             \
-          --exclude=/etc/privoxy/\*       \
-          --exclude=/var/run/lid-events   \
-          --exclude=/etc/sudoers          \
-          --exclude=/etc/sysctl.conf      \
-          --exclude=/etc/.auto.lock       \
+    ${RSYNC} --chmod=u=rwX,go=rX -i        \
+          --exclude=/root/                 \
+          --exclude=/home/anon/            \
+          --exclude=/home/nofw/            \
+          --exclude=/var/lib/i2p/          \
+          --exclude=/var/lib/portage/      \
+          --exclude=/etc/nginx/            \
+          --exclude=/var/www/              \
+          --exclude=/etc/privoxy/\*        \
+          --exclude=/var/run/lid-events    \
+          --exclude=/etc/sudoers           \
+          --exclude=/etc/sysctl.conf       \
+          --exclude=/etc/autofs/.auto.lock \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
@@ -82,9 +82,9 @@ else
     ${RSYNC} --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run
     chown -hR --from=0:0 :`grep video ${LIVECD}/etc/group | cut -d: -f3` ${LIVECD}/var/run/lid-events
 
-    ${RSYNC} --chmod=ug=r,o=     -i ${SRC}/etc/sudoers     ${LIVECD}/etc
-    ${RSYNC} --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf ${LIVECD}/etc
-    ${RSYNC} --chmod=u=rw,go=    -i ${SRC}/etc/.auto.lock  ${LIVECD}/etc
+    ${RSYNC} --chmod=ug=r,o=     -i ${SRC}/etc/sudoers           ${LIVECD}/etc
+    ${RSYNC} --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf       ${LIVECD}/etc
+    ${RSYNC} --chmod=u=rw,go=    -i ${SRC}/etc/autofs/.auto.lock ${LIVECD}/etc/autofs
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons
     ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
