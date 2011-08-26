@@ -43,7 +43,7 @@ lmount=/home/${luser}/persist
 boot=/mnt/boot
 live=/mnt/live
 otfefile=${boot}${OTFEFILE}
-ntfsflags=noatime,nosuid,nodev,usermapping=/etc/ntfs-3g.map
+ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
 
 
 start() {

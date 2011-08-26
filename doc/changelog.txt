@@ -14,6 +14,7 @@
   + Added I2P, also supported as cables communication endpoint
   + Cables communication daemon runs under a designated user
   + OTFE partition now supports file permissions, sanitized during boot
+  + OTFE partition now uses NTFS compression for all data
 
   + Added small and fast Java runtime environment (JamVM)
   + Added HTML5 video/audio support to Midori

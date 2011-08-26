@@ -6,12 +6,17 @@
 =app-admin/paxtest-0.9.9*
 =dev-java/java-service-wrapper-3.3.3*
 
+# Network
+=net-misc/networkmanager-0.8.4*
+=gnome-extra/nm-applet-0.8.4*
+<net-misc/networkmanager-openvpn-0.8.5
+<net-misc/networkmanager-pptp-0.8.5
+<net-misc/networkmanager-vpnc-0.8.5
+
 # Applications
 =www-misc/fcgiwrap-1.0.3*
 =app-text/fbreader-0.12.10*
 =dev-libs/liblinebreak-2.0*
-<net-misc/networkmanager-pptp-0.8.1
-<net-misc/networkmanager-vpnc-0.8.1
 =media-plugins/gst-plugins-vp8-0.10.21*
 
 # Firmware

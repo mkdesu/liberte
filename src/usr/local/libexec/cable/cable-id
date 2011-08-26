@@ -45,7 +45,12 @@ case "$1" in
         echo "${username}"@"${i2phost}"
         ;;
 
+    test)
+        echo http://"${torhost}"/"${username}"/request/ver
+        echo http://"${i2phost}"/"${username}"/request/ver
+        ;;
+
     *)
-        error "param: tor|i2p"
+        error "param: tor|i2p|test"
         ;;
 esac

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+exec 1>/dev/null 2>&1
+
+iface=$1
+action=$2
+
+case ${action} in
+*up)
+        # I2P appears to be able to cope with changing IPs and interfaces.
+        # However, laptop mode might be necessary for better anonymity.
+        if ! /etc/init.d/i2p -q status; then
+            logger -p 6 -t nm.dispatch "Starting I2P service (${iface})"
+            /etc/init.d/i2p -q start
+        # else
+        #     logger -p 6 -t nm.dispatch "Restarting I2P service (${iface})"
+        #     /etc/init.d/i2p -q restart
+        fi
+        ;;
+esac

@@ -23,8 +23,8 @@ if [ "$1" = fork ]; then
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
     opts_vfat=${opts_common},flush,iocharset=iso8859-1,utf8,showexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
-    opts_ntfs=${opts_common},uid=${luser},gid=${lgroup},fmask=0177,dmask=077
-    opts_ntfs_ro=${opts_common},ro,uid=${luser},gid=${lgroup},fmask=0377,dmask=0277
+    opts_ntfs=${opts_common},compression,uid=${luser},gid=${lgroup},fmask=0177,dmask=077
+    opts_ntfs_ro=${opts_common},ro,compression,uid=${luser},gid=${lgroup},fmask=0377,dmask=0277
     opts_iso9660=${opts_common},ro,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},mode=0400,dmode=0500
     opts_udf=${opts_common},ro,iocharset=iso8859-1,uid=${luser},gid=${lgroup},umask=0377
     opts_ext2=${opts_common},acl,user_xattr

@@ -3,7 +3,7 @@
 # $Header: $
 
 # Based on the ebuild from zugaina overlay:
-# http://gentoo-overlays.zugaina.org/zugaina/portage/net-p2p/i2p/files/i2p
+# http://gentoo-overlays.zugaina.org/zugaina/portage/net-p2p/i2p/
 
 EAPI="4"
 
@@ -48,7 +48,7 @@ src_install() {
 	sed -i 's:^\(WRAPPER_CMD=\).*:\1/usr/bin/wrapper:'  i2prouter
 
 	sed -i 's:^#\?PIDDIR=.*:PIDDIR="/var/run/":g'       i2prouter
-	sed -i 's:[%$]SYSTEM_java_io_tmpdir:/var/lib/i2p:g' eepget i2prouter *.config
+	sed -i 's:[%$]SYSTEM_java_io_tmpdir:/var/run/i2p:g' i2prouter *.config
 
 # 	Install to package root
 	exeinto /opt/i2p
@@ -74,9 +74,9 @@ src_install() {
 
 	doinitd "${FILESDIR}"/i2p
 
-	keepdir         /var/lib/i2p
-	fperms  750     /var/lib/i2p
-	fowners i2p:i2p /var/lib/i2p
+	keepdir         /var/lib/i2p /var/run/i2p /var/log/i2p
+	fperms  750     /var/lib/i2p /var/run/i2p /var/log/i2p
+	fowners i2p:i2p /var/lib/i2p /var/run/i2p /var/log/i2p
 }
 
 pkg_postinst() {

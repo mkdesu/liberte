@@ -56,6 +56,7 @@
 /usr/share/i18n/
 /usr/share/icu/
 /usr/share/lsof/
+/usr/share/NetworkManager/
 /usr/share/ntp/
 /usr/share/openrc/
 /usr/share/openvpn/
@@ -123,7 +124,6 @@
 /etc/splash/*.ttf
 /var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
-/usr/sbin/libpng-*-update.sh
 /var/lib/dbus/machine-id
 /usr/local/bin/uname
 /usr/local/bin/file
@@ -136,6 +136,7 @@
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
+/usr/share/themes/Murrine/xfwm4/
 
 # I2P (lib directory is pruned)
 /opt/i2p/geoip/
