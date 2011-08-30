@@ -80,6 +80,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
     # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
+    #            x11-drivers/xf86-video-virtualbox app-emulation/virtualbox-guest-additions
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
@@ -319,10 +320,14 @@ if [ -e /usr/share/fonts/default ]; then
 fi
 
 
-sinfo "Configuring Mesa"
-for mfam in `eselect mesa list | sed -n 's/^\([^[:blank:]]\+\).*/\1/p'`; do
-    eselect mesa set ${mfam} classic
+# http://www.x.org/wiki/GalliumStatus
+sinfo "Configuring Mesa, OpenGL and XvMC"
+for mfam in r300 r600; do
+    eselect mesa set ${mfam} gallium
 done
+eselect mesa   set --auto
+eselect opengl set xorg-x11
+eselect xvmc   set xorg-x11
 
 
 # The piciids/usbids sites are notorious for various failures
@@ -341,7 +346,12 @@ if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     exit 1
 fi
 
-wget -nv -O /opt/i2p/hosts.txt ${i2phosts}
+if wget -nv -O /opt/i2p/hosts.txt.new ${i2phosts}; then
+    mv /opt/i2p/hosts.txt{.new,}
+else
+    echo "I2P hosts.txt update failed (ignoring)"
+    rm -f /opt/i2p/hosts.txt.new
+fi
 
 
 sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
@@ -382,7 +392,7 @@ svcsysinit="udev"
 svcboot="consolefont microcode_ctl irqbalance haveged kexec
          metalog iptables consolekit alsasound fbcondecor
          lockdown"
-svcdefault="liberte identity cabled persist xconfig
+svcdefault="liberte identity cabled persist xconfig vmconfig
             acpid laptop_mode gpm smartd bluetooth
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
@@ -420,14 +430,15 @@ chmod 664       /var/run/utmp
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
-# "wheel"   group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
-# "users"   group: some apps require for DBUS communication
-# "plugdev" group: changing NetworkManager settings via DBUS
-# "audio"   group: ALSA/OSS devices access
-# "video"   group: V4L2 devices access (webcam - mplayer tv://)
-# "cdrom"   group: raw CD devices access (cd playing + cd/dvd writing)
-# "lp"      group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
-# "games"   group: prevent games complaining about not keeping scores
+# "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
+# "users"     group: some apps require for DBUS communication
+# "plugdev"   group: changing NetworkManager settings via DBUS
+# "audio"     group: ALSA/OSS devices access
+# "video"     group: V4L2 devices access (webcam - mplayer tv://)
+# "cdrom"     group: raw CD devices access (cd playing + cd/dvd writing)
+# "lp"        group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
+# "games"     group: prevent games complaining about not keeping scores
+# "vboxguest" group: VirtualBox seamless mode, auto-resize and clipboard
 sinfo "Setting up users"
 sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
 
@@ -450,7 +461,7 @@ useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon               
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 useradd -u 2103 -g cable  -c "Cables Communication" -d /dev/null  -s /sbin/nologin -G legion cable || [ $? = 9 ]
 
-usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games anon
+usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games,vboxguest anon
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]

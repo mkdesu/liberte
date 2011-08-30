@@ -85,11 +85,11 @@ sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 
 
 # Unreferenced files have default priority 0 (which is the top priority)
-sinfo "Preparing <mimetype,dir,package> SquashFS ordering"
+sinfo "Preparing <mimetype,package,dir> SquashFS ordering"
 count=0 last= sqsort=`mktemp`
 for p in ${livecd}/tmp/transient/pkg/unlisted-files ${livecd}/tmp/transient/pkg/*=*; do
     sed "s:^:${livecd}:" ${p} | file -zhN --mime-type -F '' -f - \
-        | sed -n "s:^${livecd}/\(.*\)/\([^/]*\) \(.*\)$:\3 \1 ${p##*/} \1/\2:p"
+        | sed -n "s:^${livecd}/\(.*\)/\([^/]*\) \(.*\)$:\3 ${p##*/} \1 \1/\2:p"
 done | sort | while read id1 id2 id3 file; do
     if [ "${id1},${id2},${id3}" != "${last}" ]; then
         count=$((count-1))

@@ -1,0 +1,41 @@
+#!/sbin/runscript
+
+description="Configures the system as a guest in virtual machine."
+
+vmflag=/etc/vmtype
+
+depend() {
+    # don't bother autofs with SIGHUPs from ps-mount
+    before autofs
+
+    # user's X wallpaper depends on vmflag availability
+    before xdm
+}
+
+start() {
+    # VM flag is used for X wallpaper
+    if [ ! -e ${vmflag} ]; then
+        ebegin Detecting virtualization state
+        virt-what > ${vmflag}
+        eend $?
+    fi
+
+
+    if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then
+        ebegin Adding VirtualBox shares to media automounts
+        eindent
+
+        # It seems that automount ignores lines with incorrect DEVNAMEs, so it's pointless
+        # to sanitize ID_FS_LABEL (although manual mount could work). Since VirtualBox
+        # disallows spaces in share names, problems are unlikely. Shares are dynamic, but
+        # VirtualBox doesn't provide events (otherwise ps-mount would suffice), so shares
+        # initialization happens only here.
+        for vbshare in $(VBoxControl -nologo sharedfolder list | sed -n 's/^[[:digit:]]\+ - //p'); do
+            einfo /mnt/media/"${vbshare}"
+            ACTION=add ID_FS_TYPE=vboxsf DEVNAME="${vbshare}" ID_FS_LABEL=VBox-"${vbshare}" ps-mount
+        done
+
+        eoutdent
+        eend $?
+    fi
+}

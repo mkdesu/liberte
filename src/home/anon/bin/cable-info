@@ -1,0 +1,39 @@
+#!/bin/sh -e
+
+cableid=/usr/local/libexec/cable/cable-id
+title="Cables Communication Identity"
+
+if username=`${cableid} user 2>/dev/null`; then
+    torhost=`${cableid} tor | sed 's/\.onion$//'`
+    i2phost=`${cableid} i2p | sed 's/\.b32\.i2p$//'`
+else
+    message="<big><b>${title}</b></big>
+
+Cables communication addresses have not been configured.
+
+This is typically a result of disabled persistence: booting from an ISO image in a virtual machine, booting from an actual CD, or write-protecting the boot media.
+
+In order to enable persistence, install Liberté Linux to a writable media, such as a USB stick or an SD card."
+
+    exec zenity --error --title="${title}" --text="${message}"
+fi
+
+splitre='s@\([[:alnum:]]\{4\}\)\([[:alnum:]]\{4\}\)\?@<span foreground="red">\1</span><span foreground="blue">\2</span>@g'
+username=`echo "${username}" | sed "${splitre}"`
+torhost=`echo "${torhost}" | sed "${splitre}"`.onion
+i2phost=`echo "${i2phost}" | sed "${splitre}"`.b32.i2p
+
+message="<big><b>${title}</b></big>
+
+You can use the following addresses for cables communication via Claws-Mail:
+
+<b>Username</b>: <big><tt>${username}</tt></big>
+
+<b>Tor hostname</b>: <big><tt>@${torhost}</tt></big>
+<b>I2P hostname</b>: <big><tt>@${i2phost}</tt></big>
+
+Your address is the username concatenated with one of the hostnames (including ‘<tt>@</tt>’). Always check the username of incoming messages — its authenticity is guaranteed by the cables communication protocol. When manually reading addresses, keep in mind that only digits <tt>2</tt>–<tt>7</tt> are used, the rest are letters.
+
+You can set either address in Claws-Mail account settings. Upon startup, Claws-Mail will reset the account to Tor-based address if the configured address is not one of the above."
+
+exec zenity --info --title="${title}" --text="${message}"

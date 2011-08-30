@@ -37,12 +37,16 @@ username=`cat ${username} | tr -cd a-z2-7`
 
 
 case "$1" in
+    user)
+        echo "${username}"
+        ;;
+
     tor)
-        echo "${username}"@"${torhost}"
+        echo "${torhost}"
         ;;
 
     i2p)
-        echo "${username}"@"${i2phost}"
+        echo "${i2phost}"
         ;;
 
     test)
@@ -51,6 +55,6 @@ case "$1" in
         ;;
 
     *)
-        error "param: tor|i2p|test"
+        error "param: user|tor|i2p|test"
         ;;
 esac

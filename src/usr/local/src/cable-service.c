@@ -29,6 +29,7 @@
 
 #define MSGID_LENGTH         40
 #define TOR_HOSTNAME_LENGTH  16
+#define I2P_HOSTNAME_LENGTH  52
 #define USERNAME_LENGTH      32
 #define ACKHASH_LENGTH      128
 
@@ -47,7 +48,7 @@ static void retstatus(const char *status) {
 }
 
 
-/* lower-case hexadecimal */
+/* lowercase hexadecimal */
 static int vfyhex(int sz, const char *s) {
     if (strlen(s) != sz)
         return 0;
@@ -60,7 +61,7 @@ static int vfyhex(int sz, const char *s) {
 }
 
 
-/* lower-case Base-32 encoding (a-z, 2-7) */
+/* lowercase Base-32 encoding (a-z, 2-7) */
 static int vfybase32(int sz, const char *s) {
     if (strlen(s) != sz)
         return 0;
@@ -73,10 +74,10 @@ static int vfybase32(int sz, const char *s) {
 }
 
 
-/* lower case hostnames - currently, only .onion addresses are recognized */
+/* lowercase hostnames: recognizes .onion and .b32.i2p addresses */
 static int vfyhost(char *s) {
     int  result = 0;
-    char *dot   = strrchr(s, '.');
+    char *dot   = strchr(s, '.');
 
     if (dot) {
         *dot = '\0';
@@ -84,6 +85,10 @@ static int vfyhost(char *s) {
         /* Tor .onion hostnames */
         if (!strcmp("onion", dot+1))
             result = vfybase32(TOR_HOSTNAME_LENGTH, s);
+
+        /* I2P .b32.i2p hostnames */
+        else if (!strcmp("b32.i2p", dot+1))
+            result = vfybase32(I2P_HOSTNAME_LENGTH, s);
 
         *dot = '.';
     }
@@ -299,10 +304,11 @@ int main() {
        rcp/<msgid>
        ack/<msgid>/<ackhash>
 
-       msgid:    MSGID_LENGTH        xdigits
-       ackhash:  ACKHASH_LENGTH      xdigits
-       hostname: TOR_HOSTNAME_LENGTH base-32 chars + ".onion"
-       username: USERNAME_LENGTH     base-32 chars
+       msgid:    MSGID_LENGTH        lowercase xdigits
+       ackhash:  ACKHASH_LENGTH      lowercase xdigits
+       hostname: TOR_HOSTNAME_LENGTH lowercase base-32 chars + ".onion"
+                 I2P_HOSTNAME_LENGTH lowercase base-32 chars + ".b32.i2p"
+       username: USERNAME_LENGTH     lowercase base-32 chars
     */
     if (!strcmp("ver", cmd)) {
         if (msgid)

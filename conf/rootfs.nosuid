@@ -15,6 +15,7 @@
 /bin/mount
 /bin/umount
 /usr/bin/fusermount
+/sbin/mount.vboxsf
 
 # No real mail processing
 /usr/bin/procmail

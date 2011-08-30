@@ -4,17 +4,17 @@ luser=anon
 nofw=nofw
 cable=cable
 
-# ReachableAddresses ports in /etc/tor/torrc
+# ReachableAddresses ports in /etc/tor/torrc [uid=tor]
 torports=80,443
 
-# VPN TCP/UDP server ports (PPTP, OpenVPN, Cisco)
-vpntports=1723,openvpn,10000
+# VPN TCP/UDP server ports (PPTP, OpenVPN, Cisco) [uid=root]
+vpntports=https,1723,openvpn,10000
 vpnuports=openvpn,isakmp,ipsec-nat-t,10000
 
-# Ports used by HotSpot registration pages
+# Ports used by HotSpot registration pages [uid=nofw]
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
-# Ports used by I2P outbound connections (don't assume the default random ports)
+# Ports used by I2P outbound connections (don't assume the default random ports) [uid=i2p]
 i2ptports=https,8887,9000:31000,1024:65535
 i2puports=8887,9000:31000,1024:65535
 

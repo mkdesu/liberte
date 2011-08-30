@@ -5,11 +5,13 @@ cablesend=${HOME}/bin/wrappers/cable-send
 confdir=${XDG_CONFIG_HOME}/claws-mail
 
 # If neither Tor nor I2P address is selected, configure the Tor one
-if toraddress=`${cableid} tor 2>/dev/null`; then
-    i2paddress=`${cableid} i2p`
+if username=`${cableid} user 2>/dev/null`; then
+    torhost=`${cableid} tor`
+    i2phost=`${cableid} i2p`
 
-    if ! grep -q "^address=\(${toraddress}\|${i2paddress}\)\$" ${confdir}/accountrc; then
-        sed -i "s/^\(address=\).*/\1${toraddress}/" ${confdir}/accountrc
+    if ! grep -q "^address=${username}@\(${torhost}\|${i2phost}\)\$" ${confdir}/accountrc; then
+        echo "Resetting account address to ${username}@${torhost}"
+        sed -i "s/^\(address=\).*/\1${username}@${torhost}/" ${confdir}/accountrc
     fi
 fi
 

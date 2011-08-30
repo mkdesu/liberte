@@ -16,10 +16,9 @@ media-video/mplayer             -opengl
 media-libs/jasper               -opengl
 
 # Drivers
-# (vmware segfaults "Xorg -configure", fbdev conflicts with vesa)
-x11-base/xorg-drivers           -video_cards_vmware -video_cards_fbdev
-x11-libs/libdrm                 -video_cards_vmware
-media-libs/mesa                 -gallium -video_cards_vmware
+# (fbdev conflicts with vesa, mesa's vmware is gallium-only)
+x11-base/xorg-drivers           -video_cards_fbdev
+media-libs/mesa                 -video_cards_vmware
 media-video/mplayer             -video_cards_*
 sys-fs/udev                     extras
 sys-fs/ntfsprogs                minimal -crypt
@@ -49,7 +48,7 @@ media-video/mplayer             -x264 -faac -xvid -twolame -toolame
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms
 media-video/gpac                -* aac mad vorbis
-media-plugins/gst-plugins-meta  a52 dv dvd lame mpeg theora
+media-plugins/gst-plugins-meta  dv lame theora -flac -wavpack
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 

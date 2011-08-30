@@ -18,7 +18,7 @@ if [ "$1" = fork ]; then
     daemon=/etc/init.d/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)
-    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf "
+    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf vboxsf "
     luser=anon
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
@@ -30,6 +30,7 @@ if [ "$1" = fork ]; then
     opts_ext2=${opts_common},acl,user_xattr
     opts_ext3=${opts_ext2}
     opts_ext4=${opts_ext2}
+    opts_vboxsf=nosuid,nodev,noexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
     opts_auto=${opts_vfat}
 
     # Checking whether device is in fstab (except root fs), or is mounted
@@ -142,7 +143,7 @@ if [ "$1" = fork ]; then
     # (also update autokeys for reload_autofs)
     add_entry() {
         case "${ID_FS_TYPE}" in
-            auto|ext2|ext3|ext4|vfat|iso9660|udf)
+            auto|ext2|ext3|ext4|vfat|iso9660|udf|vboxsf)
                 eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
                 ;;
             msdos)

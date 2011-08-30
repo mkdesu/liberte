@@ -34,7 +34,8 @@ done
 
 
 # Specify required filesystem modules (no autoloading on mount)
-eval force_load=\"loop squashfs unionfs \${force_load_"${param_cdroot_type}"}\"
+# Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
+eval force_load=\"loop squashfs unionfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
 
 
 # Handle uvesafb

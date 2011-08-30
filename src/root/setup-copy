@@ -41,9 +41,10 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa, gobject-introspection
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
-# debianutils: ca-certificates
-# java:    jamvm
-# xorg fonts: font-misc-meltho
+# debianutils:     ca-certificates
+# java:            jamvm
+# xorg fonts:      font-misc-meltho
+# gst-plugins-bad: gst-plugins-vp8
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
          app-portage/gentoolkit
@@ -58,6 +59,7 @@ ebuilds="app-misc/ca-certificates
          media-gfx/graphicsmagick
          media-gfx/splashutils
          media-libs/mesa
+         media-plugins/gst-plugins-vp8
          net-dialup/pptpclient
          net-im/pidgin
          sys-apps/lm_sensors
@@ -114,6 +116,10 @@ sed -i 's:^\(inherit\>.*\) java-vm-2\>:\1:; s:\<dev-java/gjdoc\>::; s:\<dev-java
 # xorg-2 brings dependency on encodings/mkfontdir/mkfontscale
 sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":' ${ebuild_fontmiscmeltho}
 
+# only libgstbasevideo is needed from gst-plugins-bad
+sed -i 's:>=media-libs/gst-plugins-bad-[^[:blank:]"]*::' ${ebuild_gstpluginsvp8}
+sed -i '\:/usr/lib/libgstbasevideo\>:d' /var/db/pkg/media-libs/gst-plugins-bad-*/CONTENTS
+
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}
     ebuild ${ebuild} manifest
@@ -126,6 +132,11 @@ echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
 
 # java-config wrappers are superfluous for minimal VMs (and require Python)
 echo dev-java/java-config-2.1.11 >> /etc/portage/profile/package.provided
+
+# virtualbox-guest-additions unnecessarily depends on xf86-video-virtualbox
+equery which app-emulation/virtualbox-guest-additions \
+    | sed 's:^.*/virtualbox-guest-additions:x11-drivers/xf86-video-virtualbox:; s:\.ebuild$::' \
+    >> /etc/portage/profile/package.provided
 
 
 # This recompiles packages with TEMP flags in package.use
@@ -143,7 +154,7 @@ rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
 ldconfig
 
 echo sys-devel/libtool-2.2.10 >> /etc/portage/profile/package.provided
-mv /usr/lib/libltdl.* /tmp/
+sed -i '\:/usr/lib/libltdl\>:d' /var/db/pkg/sys-devel/libtool-*/CONTENTS
 
 
 # Unmerge some packages that are listed in the system profile
@@ -176,8 +187,6 @@ rm -f /usr/lib/{?,}crt?.o
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
 
-# Take care of libtool libraries
-mv /tmp/libltdl.* /usr/lib/
 
 if [ -e /usr/bin/perl ]; then
     sinfo "Failed to discard Perl dependencies"
@@ -211,6 +220,11 @@ if [ -e /etc/gtk-2.0/gdk-pixbuf.loaders ]; then
     sinfo "Removing deprecated gdk-pixbuf.loaders"
     rm /etc/gtk-2.0/gdk-pixbuf.loaders
 fi
+
+
+sinfo "Fixing Murrine themes for GTK-2"
+sed -i 's/_ratio\>/_shade/; /\<\(scrollbar_color\|gradients\)\>[[:blank:]]*=/d' \
+    /usr/share/themes/{Murr*,NOX}/gtk-2.0/gtkrc
 
 
 # Any problem will cause a fatal error
@@ -312,8 +326,10 @@ sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
     /usr/share/applications/mimeinfo.cache
 
 
-sinfo "Generating GStreamer cache"
+# QuickTime (MP4) prevents HTML5 <video> from working
+sinfo "Generating GStreamer cache and filtering problematic plugins"
 rm -rf /var/cache/gstreamer
+rm /usr/lib/gstreamer-0.10/libgstqtdemux.*
 /usr/bin/gst-inspect* 1>/dev/null
 chmod -R go=u,go-w /var/cache/gstreamer
 

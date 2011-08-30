@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+# Use virt-what instead of the segfaulting supplied binary
+# in xf86-input-vmmouse
+
+vm=`/usr/sbin/virt-what 2>/dev/null`
+
+case "${vm}" in
+    vmware)
+        ;;
+    *)
+        exit 1
+esac

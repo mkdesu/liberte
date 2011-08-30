@@ -21,6 +21,9 @@
 
 # Pruned directories exceptions
 /usr/bin/rc-config
+/usr/lib/mesa/r[36]00g_dri.*
+/usr/lib/dri/r[36]00g_dri.*
+/usr/lib/egl/pipe_r[36]00.*
 /usr/share/consolefonts/*16*.psfu
 /usr/share/consolefonts/cp1250.psfu
 /usr/share/keymaps/include/***

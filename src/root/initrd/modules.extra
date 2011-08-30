@@ -17,8 +17,8 @@ usbhid
 
 # USB storage devices
 usb-storage
-uhci-hcd
 ehci-hcd
+uhci-hcd
 ohci-hcd
 
 # Virtio storage (e.g., QEMU)

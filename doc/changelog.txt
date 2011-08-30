@@ -1,28 +1,31 @@
 2011-XX-XX
   + 2011.2 release
 
-  + ISO image generation, useful for VMs and independent installs
-  + Support for installing to ext2/3/4 filesystems
-  + Directories are hidden on FAT (during install) and ISO (in Joliet layer)
-  + Added silent splash theme, which also disables logo in X server
+  * ISO image generation, useful for VMs and independent installs
+  * Support for installing to ext2/3/4 filesystems
+  * Directories are hidden on FAT (during install) and ISO (in Joliet layer)
+  * Added silent splash theme, which also disables logo in X server
 
-  + Kernel 2.6.39 with SquashFS XZ compression and NX support
-  + Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
-  + All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
-  + Xorg server 1.10, better touchpad support
+  * Kernel 2.6.39 with SquashFS XZ compression and NX support
+  * Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
+  * All RAM is wiped on shutdown/reboot, regardless of 3GiB address space limit
+  * Xorg server 1.10, better touchpad support
+  * Better integration as VirtualBox (including clipboard), VMWare, QEMU guest
+  * VirtualBox shares are now supported as automount directories
 
-  + Added I2P, also supported as cables communication endpoint
-  + Cables communication daemon runs under a designated user
-  + OTFE partition now supports file permissions, sanitized during boot
-  + OTFE partition now uses NTFS compression for all data
+  * Added I2P, also supported as cables communication transport
+  * Cables communication daemon runs under a designated user
+  * Added cables communication identity information applet
+  * OTFE partition now supports file permissions, sanitized during boot
+  * OTFE partition now uses NTFS compression for all data
 
-  + Added small and fast Java runtime environment (JamVM)
-  + Added HTML5 video/audio support to Midori
-  + Added SASL (plain) authentication support to XChat
-  + Added PPTP/OpenVPN/Cisco VPN support to NetworkManager
-  + Added emelFM2 2-pane file manager
+  * Added small and fast Java runtime environment (JamVM)
+  * Added HTML5 video/audio support to Midori
+  * Added SASL (plain) authentication support to XChat
+  * Added PPTP/OpenVPN/Cisco VPN support to NetworkManager
+  * Added emelFM2 2-pane file manager
 
-  + Audio mixer channels are heuristically set up on boot
+  * Audio mixer channels are heuristically set up on boot
 
 
 2011-05-29

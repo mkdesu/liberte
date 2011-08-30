@@ -5,7 +5,6 @@ description="Sets up cgroups, configures X server and sound."
 cgroupmnt=/sys/fs/cgroup
 cgrouprel=/usr/local/sbin/cgroup-release
 
-vmflag=/etc/vmtype
 silentflag=/etc/splash/silent/active
 
 xorgrc=/etc/X11/xorg.conf
@@ -14,7 +13,10 @@ amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
 
 depend() {
+    # need cgroup mount
     need   localmount
+
+    # X server is configured here
     before xdm
 }
 
@@ -26,13 +28,6 @@ start() {
         echo 1            > ${cgroupmnt}/notify_on_release
         mkdir -m 3770 ${cgroupmnt}/user
         chgrp users   ${cgroupmnt}/user
-        eend $?
-    fi
-
-    # VM flag is used for X wallpaper
-    if [ ! -e ${vmflag} ]; then
-        ebegin Detecting virtualization state
-        virt-what > ${vmflag}
         eend $?
     fi
 

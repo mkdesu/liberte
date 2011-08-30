@@ -19,20 +19,21 @@ sset() {
     fi
 }
 
-sset Master         80% mute
-sset Capture        80% nocap
+sset Master               80% mute
+sset Capture              80% nocap
 
-sset PCM            80% unmute
-sset Speaker        80% unmute
-sset Headphone      80% unmute
+sset PCM                  80% unmute
+sset Speaker              80% unmute
+sset Headphone            80% unmute
 
-sset Front         100% unmute
-sset 'Mic Boost'   100% unmute
-sset 'Mic Boost',1 100% unmute
+sset Front               100% unmute
+sset 'Mic Boost'         100% unmute
+sset 'Mic Boost',1       100% unmute
+sset 'Mic Boost (+20dB)' 100% unmute
 
-sset Beep            0% mute
+sset Beep                  0% mute
 
-sset Digital        0dB
-sset Mic            cap mute
+sset Digital              0dB
+sset Mic                  cap mute
 
 echo "Adjusted ${count} mixer controls (muted Master, disabled Capture)"

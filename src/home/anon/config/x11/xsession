@@ -50,6 +50,11 @@ parcellite &
 scim -d &
 nm-applet &
 
+# Launch shared clipboard service on VirtualBox [--clipboard/display/seamless]
+if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then
+    VBoxClient --clipboard &
+fi
+
 # Wait for WM exit
 wait ${WM_PID}
 
