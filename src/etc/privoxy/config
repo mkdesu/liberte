@@ -11,6 +11,7 @@ actionsfile     match-all.action        # Actions that are applied to all sites 
 # actionsfile     user.action             # User customizations
 
 # filterfile      default.filter          # Main filters file
+filterfile      user.filter             # User filters file
 
 logfile         privoxy.log
 
@@ -24,6 +25,7 @@ forward-socks5  /                       127.0.0.1:9050  .
 forward-socks5  check.torproject.org    127.0.0.1:9050  .
 forward-socks5  torcheck.xenobite.eu    127.0.0.1:9050  .
 forward-socks5  .onion                  127.0.0.1:9050  .
+forward-socks5  .exit                   127.0.0.1:9050  .
 
 forward         .i2p                    127.0.0.1:4444
 forward         .i2p:443                127.0.0.1:4445

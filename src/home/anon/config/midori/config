@@ -13,14 +13,14 @@ preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
 enable-scripts=false
 enable-plugins=false
-enable-html5-database=true
+enable-html5-database=false
 accept-cookies=MIDORI_ACCEPT_COOKIES_SESSION
 maximum-cookie-age=3
 maximum-history-age=1
 http-proxy=127.0.0.1:8118
 identify-as=MIDORI_IDENT_CUSTOM
-user-agent=Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3
-preferred-languages=en-US,en
+user-agent=Mozilla/5.0 (Windows NT 6.1; rv:5.0) Gecko/20100101 Firefox/5.0
+preferred-languages=en-us,en;q=0.5
 
 [extensions]
 libcookie-manager.so=true

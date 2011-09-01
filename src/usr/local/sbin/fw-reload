@@ -14,9 +14,8 @@ vpnuports=openvpn,isakmp,ipsec-nat-t,10000
 # Ports used by HotSpot registration pages [uid=nofw]
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
-# Ports used by I2P outbound connections (don't assume the default random ports) [uid=i2p]
+# Ports used by I2P outbound connections (via Tor; don't assume the default random ports) [uid=i2p]
 i2ptports=https,8887,9000:31000,1024:65535
-i2puports=8887,9000:31000,1024:65535
 
 # LED blinking delay
 leddelay=500
@@ -27,9 +26,17 @@ iptables -P INPUT   DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT  DROP
 
+iptables -t nat -P PREROUTING  ACCEPT
+iptables -t nat -P INPUT       ACCEPT
+iptables -t nat -P OUTPUT      ACCEPT
+iptables -t nat -P POSTROUTING ACCEPT
+
 # Flush all rules
 iptables -F
 iptables -X
+
+iptables -t nat -F
+iptables -t nat -X
 
 # Define custom chains
 iptables -N LOGDROP
@@ -37,9 +44,9 @@ iptables -N LOGREJECT
 
 
 # --- Packet dropping ---
-# iptables -A LOGDROP -j LOG      --log-prefix "fw-drop: " --log-level debug --log-uid
-iptables -A LOGDROP -j LED      --led-trigger-id drop    --led-delay ${leddelay}
-iptables -A LOGDROP -j DROP
+# iptables -A LOGDROP   -j LOG      --log-prefix "fw-drop: " --log-level debug --log-uid
+iptables -A LOGDROP   -j LED    --led-trigger-id drop    --led-delay ${leddelay}
+iptables -A LOGDROP   -j DROP
 
 iptables -A LOGREJECT -j LOG    --log-prefix "fw-deny: " --log-level debug --log-uid
 iptables -A LOGREJECT -j LED    --led-trigger-id drop    --led-delay ${leddelay}
@@ -74,33 +81,37 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # NOTE: owner match doesn't work with the INPUT chain
 
 # NTP server [disabled] modification permission to ntpd user only (or root in pre-DNS phase)
-# iptables -A OUTPUT -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp -j ACCEPT
-# iptables -A OUTPUT -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
-# iptables -A OUTPUT -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
+# iptables -A OUTPUT -o lo -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp -j ACCEPT
+# iptables -A OUTPUT -o lo -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
+# iptables -A OUTPUT -o lo -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
 
 # Hidden service server access only for Tor and I2P
-iptables -A OUTPUT -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
-iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 80   -j LOGREJECT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 80   -j LOGREJECT
 
 # Privoxy access only for main user, HTP, cables daemon and I2P (for reseeding)
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 8118 -j LOGREJECT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 8118 -j LOGREJECT
 
 # Tor access via SOCKS only for main user and Privoxy
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
-iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 --dport 9050 -j LOGREJECT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 9050 -j LOGREJECT
+
+# Tor access via transparent proxy only for I2P (redirected from an external interface)
+iptables -A OUTPUT ! -o lo -p tcp -m owner --uid-owner i2p    --syn -d 127.0.0.1 --dport 9040 -j ACCEPT
+iptables -A OUTPUT         -p tcp                             --syn -d 127.0.0.1 --dport 9040 -j LOGREJECT
 
 # I2P ports access only for main user, Privoxy and I2P (selective)
 # http://www.i2p2.de/faq.html#ports (routerconsole=7657 is disabled in I2P config)
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660            -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445                           -j ACCEPT
-iptables -A OUTPUT -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --dports 7654,4444,32000                          -j ACCEPT
-iptables -A OUTPUT -p tcp                               --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660,7654,32000 -j LOGREJECT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660            -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445                           -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 -m multiport --dports 7654,4444,32000                          -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 -m multiport --dports 7657,4444,4445,6668,7659,7660,7654,32000 -j LOGREJECT
 
 # Pass other loopback packets through
 iptables -A INPUT  -i lo -j ACCEPT
@@ -113,13 +124,10 @@ iptables -A OUTPUT -o lo -j ACCEPT
 iptables -A OUTPUT -p udp                              --sport bootpc --dport bootps -j ACCEPT
 # iptables -A OUTPUT -p udp                              --sport ntp    --dport ntp    -j ACCEPT
 
-# DNS use for Tor (usually not necessary), NTP server [disabled, resolves as root],
-# non-firewalled user and I2P.
+# DNS use for NTP server [disabled, resolves as root] and non-firewalled user.
 # NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)
-for uid in tor i2p ${nofw}; do
-    iptables -A OUTPUT -p udp -m owner --uid-owner ${uid}        --dport domain -j ACCEPT
-    iptables -A OUTPUT -p tcp -m owner --uid-owner ${uid}  --syn --dport domain -j ACCEPT
-done
+iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn --dport domain -j ACCEPT
 
 # VPN connections (root-initiated)
 iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT
@@ -131,10 +139,9 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn -m multiport --dpor
 # HTTP(S) (including HotSpot ports) communication for non-firewalled user
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports ${hotspot}   -j ACCEPT
 
-# I2P user communication
-iptables -A OUTPUT -p tcp -m owner --uid-owner i2p     --syn -m multiport --dports ${i2ptports} -j ACCEPT
-iptables -A OUTPUT -p udp -m owner --uid-owner i2p           -m multiport --dports ${i2puports} -j ACCEPT
-
+# I2P user communication via Tor's transparent proxy
+# https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy
+iptables -t nat -A OUTPUT ! -o lo -p tcp -m owner --uid-owner i2p --syn -m multiport --dports ${i2ptports} -j REDIRECT --to-ports 9040
 
 # Log all other packets
 iptables -A INPUT   -j LOGDROP

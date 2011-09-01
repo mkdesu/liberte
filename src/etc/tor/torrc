@@ -9,6 +9,10 @@ Log notice syslog
 SocksListenAddress 127.0.0.1
 SocksPort          9050
 
+# Transparent proxy connections
+TransListenAddress 127.0.0.1
+TransPort          9040
+
 ## The directory for keeping all the keys/etc.
 DataDirectory      /var/lib/tor/data
 

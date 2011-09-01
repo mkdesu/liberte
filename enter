@@ -49,7 +49,6 @@ else
           --exclude=/var/lib/portage/      \
           --exclude=/etc/nginx/            \
           --exclude=/var/www/              \
-          --exclude=/etc/privoxy/\*        \
           --exclude=/var/run/lid-events    \
           --exclude=/etc/sudoers           \
           --exclude=/etc/sysctl.conf       \
@@ -73,10 +72,8 @@ else
               ${LIVECD}/var/www/cable/certs ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     fi
 
-    ${RSYNC} --chmod=ug=rwX,o=   -i                   -C ${SRC}/etc/privoxy/*     ${LIVECD}/etc/privoxy
-    if [ -e ${LIVECD}/etc/privoxy/default.filter ]; then
-        chown -h --from=0:0 --reference=${LIVECD}/etc/privoxy/default.filter \
-            ${LIVECD}/etc/privoxy/config ${LIVECD}/etc/privoxy/match-all.action
+    if [ -e ${LIVECD}/var/log/privoxy ]; then
+        chown -hR --from=`stat -c %u:%g ${LIVECD}/var/log/privoxy` 0:0 ${LIVECD}/etc/privoxy
     fi
 
     ${RSYNC} --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run

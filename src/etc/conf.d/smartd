@@ -1,3 +1,6 @@
+# Gather drives info before they go into standby
+rc_before="lockdown"
+
 # -q never: don't fail if no SMART-capable devices
 # -i [s]: check interval (low, but have -n standby in smartd.conf)
 SMARTD_OPTS="-q never -i 300"

@@ -371,7 +371,8 @@ LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.t
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
-sinfo "Refreshing trusted CA certificates list"
+sinfo "Removing bad CAs and refreshing trusted certificates list"
+sed -i '/\<DigiNotar_Root_CA\>/d' /etc/ca-certificates.conf
 update-ca-certificates --fresh
 
 
@@ -380,7 +381,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab kexec iptables smartd"
+initpatches="inittab kexec iptables"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done

@@ -1,0 +1,15 @@
+# perl -e '$s = "s@a@b@i; print $s . "\n"'
+
+CLIENT-HEADER-FILTER: hide-tor-exit-notation Removes the Tor exit node notation in Host and Referer headers.
+
+s@^((?:Referer|Host):\s*(?:https?://)?[^/]*)\.[^./]*?\.exit(/|\s|$)@$1$2@i
+
+
+CLIENT-HEADER-FILTER: tweak-accept Make Accept header look like in Firefox.
+
+s@^(Accept:\s*).*$@$1text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8@i
+
+
+CLIENT-HEADER-FILTER: tweak-accept-encoding Add deflate to the list of accepted encodings.
+
+s@^(Accept-Encoding:\s*gzip)$@$1, deflate@i

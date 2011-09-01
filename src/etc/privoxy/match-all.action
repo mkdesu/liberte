@@ -10,10 +10,14 @@
 +change-x-forwarded-for{block} \
 +hide-from-header{block} \
 +hide-referer{forge} \
-+hide-user-agent{Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3} \
-+hide-accept-language{en-US,en} \
++hide-user-agent{Mozilla/5.0 (Windows NT 6.1; rv:5.0) Gecko/20100101 Firefox/5.0} \
++hide-accept-language{en-us,en;q=0.5} \
 +overwrite-last-modified{randomize} \
 +session-cookies-only \
 +set-image-blocker{pattern} \
++client-header-filter{hide-tor-exit-notation} \
++client-header-filter{tweak-accept} \
++client-header-filter{tweak-accept-encoding} \
++add-header{Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7} \
 }
 / # Match all URLs
