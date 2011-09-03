@@ -1,6 +1,6 @@
 #!/sbin/runscript
 
-description="Arms boot media removal watchdog and suspends disk drives."
+description="Arms boot media removal watchdog."
 
 boot=/mnt/boot
 
@@ -10,11 +10,6 @@ pidfile=/var/run/poweroff-watchdog.pid
 depend() {
     # power-off watchdog needs kexec
     use kexec
-
-    # Gather drives info before they go into standby
-    # (otherwise smartd wakes them up)
-    # NOTE: not reliable, smartd disabled
-    after smartd
 
     # no point in shutting down the power-off watchdog
     keyword -stop
@@ -38,30 +33,6 @@ start() {
         eend $?
     else
         ewarn Skipping boot media removal watchdog
-    fi
-
-
-    # Put ATA/SCSI drives into standby
-    # /dev/disk/by-path should contain only physical devices
-    if [ -e /dev/disk/by-path ]; then
-        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b  \
-                                      -exec udevadm info -q path -n {} \;`
-        for devpath in ${hdevs}; do
-            dev=/dev/`udevadm info -q name -p ${devpath}`
-
-            if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
-                ebegin Enabled acoustic settings: ${dev}
-                eend 0
-            fi
-
-            # Ignore boot media (desirable if it is a disk)
-            if [ "${cddevpath#${devpath}}" = "${cddevpath}" ]; then
-                if hdparm -y ${dev} 1>/dev/null 2>&1; then
-                    ebegin Enabled standby mode: ${dev}
-                    eend 0
-                fi
-            fi
-        done
     fi
 }
 

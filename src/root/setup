@@ -422,11 +422,10 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 svcsysinit="udev"
-svcboot="consolefont microcode_ctl irqbalance haveged kexec
-         metalog iptables consolekit alsasound fbcondecor
-         lockdown"
-svcdefault="liberte identity cabled persist xconfig vmconfig
-            acpid laptop_mode gpm bluetooth
+svcboot="consolefont microcode_ctl irqbalance haveged kexec metalog
+         iptables consolekit alsasound fbcondecor lockdown"
+svcdefault="liberte identity cabled persist xconfig vmconfig spindown
+            acpid smartd laptop_mode gpm bluetooth
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
 delsvcboot="urandom swap bootmisc"

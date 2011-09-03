@@ -3,8 +3,8 @@
 description="Sets up OTFE virtual partition."
 
 depend() {
-    # start after power management is enabled
-    after laptop_mode
+    # start after power management is enabled and drives were probed
+    after laptop_mode smartd
 
     # use entropy for encrypted storage, if available
     use entropy
