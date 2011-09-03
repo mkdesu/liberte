@@ -7,6 +7,8 @@ xzmem=20
 protected="/etc/._cfg????_locale.gen"
 
 i2phosts=http://www.i2p2.de/hosts.txt
+i2pnetdb=http://i2pdb.tin0.de/latest.zip
+maxnetdb=200
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
@@ -346,6 +348,7 @@ if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
     exit 1
 fi
 
+# zzz @ #i2p-dev: hosts.txt in the source tree is the same or newer
 if wget -nv -O /opt/i2p/hosts.txt.new ${i2phosts}; then
     mv /opt/i2p/hosts.txt{.new,}
 else
@@ -368,6 +371,35 @@ fi
 rm /tmp/drivedb.h
 
 LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.txt
+
+
+sinfo "Creating initial netDb for I2P"
+netdbdir=`mktemp -d`
+if wget -N -nv -P /usr/local/portage/distfiles ${i2pnetdb}; then
+    unzip -qnjd ${netdbdir} /usr/local/portage/distfiles/latest.zip
+
+    LC_ALL=C find ${netdbdir} -regextype posix-egrep -mindepth 1 \
+        \( ! -type f -o ! -regex "${netdbdir}/routerInfo-[[:alnum:]~-]{43}=\.dat" \) -delete
+    chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
+
+    # Erase non-NTCP+OR/OfR-capable routerInfos, see http://zzz.i2p.to/topics/280
+    java -cp /opt/i2p/lib/i2p.jar net.i2p.data.RouterInfo ${netdbdir}/routerInfo-*=.dat \
+        | LC_ALL=C sed -nr 's/^[[:blank:]]+//; /^(Hash: [[:alnum:]~-]{43}=|TransportStyle: NTCP|\[caps\] = \[(OR|OfR)\])$/p' \
+        | tr '\n' , | sed -r 's/,(Hash:|$)/\n\1/g' | sed -r '/,TransportStyle:.*,\[caps\]/d' \
+        | sed -r "s@^Hash: ([^,]*).*@${netdbdir}/routerInfo-\1.dat@" | xargs rm -f --
+
+    find ${netdbdir} -type f | shuf | tail -n +$((maxnetdb+1)) | xargs rm -f --
+    rm -rf         /var/lib/i2p/router/netDb
+    mv ${netdbdir} /var/lib/i2p/router/netDb
+
+    netdbsel=$(find /var/lib/i2p/router/netDb -type f | wc -l)
+    echo Selected ${netdbsel} NTCP+OR/OfR-capable routerInfos
+elif [ -e /var/lib/i2p/router/netDb ]; then
+    echo "I2P netDb update failed (ignoring)"
+else
+    echo "Could not retrieve I2P netDb"
+    exit 1
+fi
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
@@ -394,7 +426,7 @@ svcboot="consolefont microcode_ctl irqbalance haveged kexec
          metalog iptables consolekit alsasound fbcondecor
          lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig
-            acpid laptop_mode gpm smartd bluetooth
+            acpid laptop_mode gpm bluetooth
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
 delsvcboot="urandom swap bootmisc"

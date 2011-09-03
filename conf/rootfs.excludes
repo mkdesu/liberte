@@ -246,3 +246,4 @@
 /usr/bin/orcc
 /usr/bin/orc-bugreport
 /usr/sbin/vboxguest-service
+/usr/sbin/smartd

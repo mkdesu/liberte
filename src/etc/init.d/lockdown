@@ -11,6 +11,11 @@ depend() {
     # power-off watchdog needs kexec
     use kexec
 
+    # Gather drives info before they go into standby
+    # (otherwise smartd wakes them up)
+    # NOTE: not reliable, smartd disabled
+    after smartd
+
     # no point in shutting down the power-off watchdog
     keyword -stop
 }

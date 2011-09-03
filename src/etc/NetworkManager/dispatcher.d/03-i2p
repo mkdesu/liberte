@@ -6,15 +6,23 @@ iface=$1
 action=$2
 
 case ${action} in
-*up)
-        # I2P isn't very good with changing IPs/interfaces jumping clock.
-        # Also, laptop mode might be necessary for better anonymity.
+*up|vpn-down)
+        # I2P isn't very good with changing IPs/interfaces.
         if ! /etc/init.d/i2p -q status; then
             logger -p 6 -t nm.dispatch "Starting I2P service (${iface})"
             /etc/init.d/i2p -q start
         else
             logger -p 6 -t nm.dispatch "Restarting I2P service (${iface})"
             /etc/init.d/i2p -q restart
+        fi
+        ;;
+
+down)
+        # I2P hogs the CPU when it is unable to connect to peers
+        # NOTE: might be problematic with 2+ NICs
+        if /etc/init.d/i2p -q status; then
+            logger -p 6 -t nm.dispatch "Stopping I2P service (${iface})"
+            /etc/init.d/i2p -q stop
         fi
         ;;
 esac

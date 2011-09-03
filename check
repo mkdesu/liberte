@@ -74,9 +74,10 @@ ${FIND} -name '.*' ! \( -path '/home/anon/*' -o -path '/root/*' \) \
 
 sinfo "Cache, backup, and temp:"
 ${FIND} -name '*.cache'
-${FIND} -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' \
-        -o -name '*;*' -o -name '*.orig' \
-        -o \( -path '*/tmp/*' ! -path '*/tmp/transient/*' \)
+${FIND} \( -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' \
+           -o -name '*;*' -o -name '*.orig' \
+           -o \( -path '*/tmp/*' ! -path '*/tmp/transient/*' \) \) \
+        ! -name 'routerInfo-*.dat'
 
 sinfo "Logs:"
 ${FIND} -name '*.log*' -o -type f \( -path '/var/run/*' -o -path '/var/log/*' \)

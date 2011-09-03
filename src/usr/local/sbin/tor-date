@@ -24,6 +24,7 @@ while [ ${#w} -lt ${conctimeout} ]; do
         break;
     fi
 
+    # inotifywait -q -t 5 -e close_write -e moved_to --format %w%f ${tordir} | grep -q "^${consensus}"'$'
     sleep 1
     w=${w}X
 done

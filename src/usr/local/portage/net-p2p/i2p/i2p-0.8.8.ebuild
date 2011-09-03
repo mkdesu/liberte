@@ -37,6 +37,10 @@ src_unpack() {
 }
 
 src_compile() {
+	# Make I2P router ignore internal clock offset due to internal / external clock jumps conflict
+	sed -i 's/\<return _offset;/return 0;/'                    core/java/src/net/i2p/util/Clock.java
+	sed -i 's/\<return offset + systemNow;/return systemNow;/' router/java/src/net/i2p/router/RouterClock.java
+
 	eant pkg
 }
 

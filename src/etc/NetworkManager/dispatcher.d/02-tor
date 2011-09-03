@@ -6,7 +6,7 @@ iface=$1
 action=$2
 
 case ${action} in
-*up)
+*up|vpn-down)
         if ! /etc/init.d/tor -q status; then
             logger -p 6 -t nm.dispatch "Starting Tor service (${iface})"
             /etc/init.d/tor -q start

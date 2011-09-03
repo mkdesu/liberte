@@ -1,4 +1,4 @@
-# perl -e '$s = "s@a@b@i; print $s . "\n"'
+# Testing filters: perl -e '$s = "..."; $s =~ s@...@...@i; print $s . "\n"'
 
 CLIENT-HEADER-FILTER: hide-tor-exit-notation Removes the Tor exit node notation in Host and Referer headers.
 

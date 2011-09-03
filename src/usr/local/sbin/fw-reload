@@ -90,11 +90,10 @@ iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
 iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 80   -j LOGREJECT
 
-# Privoxy access only for main user, HTP, cables daemon and I2P (for reseeding)
+# Privoxy access only for main user, HTP and cables daemon
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 8118 -j LOGREJECT
 
 # Tor access via SOCKS only for main user and Privoxy
