@@ -33,7 +33,7 @@ pkg_setup() {
 
 src_unpack() {
 	unpack "i2psource_${PV}.tar.bz2"
-	cp "${DISTDIR}/jetty-${JETTY_V}.tgz" -P "${S}/apps/jetty"
+	cp "${DISTDIR}/jetty-${JETTY_V}.tgz" -P "${S}/apps/jetty" || die
 }
 
 src_compile() {
@@ -44,7 +44,7 @@ src_compile() {
 	# sed -i 's/\<return offset + systemNow;/return systemNow;/' router/java/src/net/i2p/router/RouterClock.java
 	# sed -i 's/\( CLOCK_FUDGE_FACTOR =\) 1\*\(.*\);/\1 90*\2;/' router/java/src/net/i2p/router/Router.java
 
-	eant pkg
+	eant pkg || die
 }
 
 src_install() {
@@ -62,8 +62,8 @@ src_install() {
 	insinto /opt/i2p
 
 # 	Install files
-	doins ${S}/apps/i2psnark/jetty-i2psnark.xml ${S}/pkg-temp/blocklist.txt ${S}/apps/i2psnark/launch-i2psnark ${S}/pkg-temp/hosts.txt *.config
-	doexe eepget i2prouter ${S}/apps/i2psnark/launch-i2psnark runplain.sh
+	doins ${S}/apps/i2psnark/jetty-i2psnark.xml ${S}/pkg-temp/blocklist.txt ${S}/apps/i2psnark/launch-i2psnark ${S}/pkg-temp/hosts.txt *.config || die
+	doexe eepget i2prouter ${S}/apps/i2psnark/launch-i2psnark runplain.sh || die
 	dodoc history.txt LICENSE.txt INSTALL-headless.txt
 	doman man/*
 
@@ -74,7 +74,7 @@ src_install() {
 # 	Install files to package lib
 	insinto /opt/i2p/lib
 	exeinto /opt/i2p/lib
-	find lib/ -maxdepth 1 -type f ! -name '*.dll' ! -name wrapper.jar ! -name jbigi.jar -print0 | xargs -0 doins
+	find lib/ -maxdepth 1 -type f ! -name '*.dll' ! -name wrapper.jar ! -name jbigi.jar -print0 | xargs -0 doins || die
 
 	dosym "${D}"/opt/i2p/i2prouter /usr/bin/i2prouter
 	dosym "${D}"/opt/i2p/eepget    /usr/bin/eepget

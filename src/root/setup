@@ -403,9 +403,9 @@ fi
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
-sinfo "Removing bad CAs and refreshing trusted certificates list"
-sed -i '/\<DigiNotar_Root_CA\>/d' /etc/ca-certificates.conf
-update-ca-certificates --fresh
+sinfo "Refreshing trusted certificates list"
+find -L /etc/ssl/certs -maxdepth 1 -type l -delete
+update-ca-certificates -f
 
 
 sinfo "Generating /etc/issue"
@@ -499,7 +499,7 @@ useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
-for uid in i2p nginx; do
+for uid in i2p nginx htp; do
     touch               /tmp/${uid}-ref
     chown ${uid}:${uid} /tmp/${uid}-ref
 done

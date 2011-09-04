@@ -8,15 +8,12 @@ action=$2
 case ${action} in
 *up)
         # htpdate doesn't bind itself to interfaces, it resolves
-        # hostnames every time it sends a HEAD request
+        # hostnames every time it sends a HEAD request.
+        # The custom version sets the time once the network
+        # is available, and uses adjtime afterwards.
         if ! /etc/init.d/htpdate -q status; then
             logger -p 6 -t nm.dispatch "Starting HTP service (${iface})"
             /etc/init.d/htpdate -q start
-        # However, htpdate can be started when there is no connection to
-        # the sites; time difference might be too big for adjtime then
-        else
-            logger -p 6 -t nm.dispatch "Restarting HTP service (${iface})"
-            /etc/init.d/htpdate -q restart
         fi
         ;;
 esac

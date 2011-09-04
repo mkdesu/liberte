@@ -107,7 +107,7 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
 # Perl is needed by mimeopen (File-MimeInfo), which is an optional dependency
 sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
 
-# debianutils are  only needed for update-ca-certificates
+# debianutils are only needed for update-ca-certificates
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 
 # javac/javadoc dependencies are only for symlinks in /usr/bin
