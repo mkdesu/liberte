@@ -73,7 +73,7 @@ ${FIND} -name '.*' ! \( -path '/home/anon/*' -o -path '/root/*' \) \
         ! -path '/usr/share/gnumeric/*.category'
 
 sinfo "Cache, backup, and temp:"
-${FIND} -name '*.cache'
+${FIND} -name '*.cache' -o -name '*.loaders' -o -name '*.immodules'
 ${FIND} \( -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' \
            -o -name '*;*' -o -name '*.orig' \
            -o \( -path '*/tmp/*' ! -path '*/tmp/transient/*' \) \) \

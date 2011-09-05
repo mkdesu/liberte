@@ -211,6 +211,7 @@ for mod in `find /usr/lib/GraphicsMagick* -name '*.so'`; do
 done
 
 
+# Not necessary anymore?
 if [ -e /etc/gtk-2.0/gtk.immodules ]; then
     sinfo "Fixing gtk.immodules"
     mv /etc/gtk-2.0/gtk.immodules /etc/gtk-2.0/`portageq envvar CHOST`/
@@ -318,11 +319,16 @@ sinfo "Regenerating fonts cache"
 fc-cache -fs
 
 
+sinfo "Regenerating MIME and desktop DBs"
+update-mime-database       /usr/share/mime
+update-desktop-database -q /usr/share/applications
+
+
 # http://www.freedesktop.org/wiki/Specifications/mime-actions-spec
 sinfo "Modifying MIME actions ordering preferences"
 sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
         s/\<epdfview.desktop;evince.desktop;/evince.desktop;epdfview.desktop;/ ;
-        s/\<gnome-mplayer.desktop;audacious2.desktop;/audacious2.desktop;gnome-mplayer.desktop;/' \
+        s/\<gnome-mplayer.desktop;audacious.desktop;/audacious.desktop;gnome-mplayer.desktop;/' \
     /usr/share/applications/mimeinfo.cache
 
 

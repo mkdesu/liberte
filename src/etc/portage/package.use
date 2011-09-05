@@ -17,8 +17,10 @@ media-libs/jasper               -opengl
 
 # Drivers
 # (fbdev conflicts with vesa, mesa's vmware is gallium-only)
+# [temporarily disable gallium until r600 can be enabled w/o r300 due to llvm dependency]
+# [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
 x11-base/xorg-drivers           -video_cards_fbdev
-media-libs/mesa                 -video_cards_vmware
+media-libs/mesa                 -video_cards_vmware shared-dricore -gallium -egl -llvm
 media-video/mplayer             -video_cards_*
 sys-fs/udev                     extras
 sys-fs/ntfsprogs                minimal -crypt
@@ -28,6 +30,7 @@ dev-lang/python                 ssl
 mail-client/claws-mail          -ssl -gnutls -imap
 net-misc/wget                   ssl
 net-libs/libsoup                ssl
+net-libs/glib-networking        ssl
 net-misc/curl                   ssl   gnutls -nss
 net-libs/neon                   ssl   gnutls
 media-video/rtmpdump            ssl   gnutls
@@ -73,6 +76,7 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu
 media-gfx/splashutils           -truetype
+net-libs/glib-networking        -gnome -libproxy
 
 # Extra functionality
 sys-apps/busybox                static savedconfig

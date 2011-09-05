@@ -293,7 +293,7 @@ awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/
 
 
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/mplayer /usr/bin/audacious2 /usr/bin/jamvm
+paxctl -m /usr/bin/mplayer /usr/bin/audacious /usr/bin/jamvm
 
 
 sinfo "Configuring fontconfig"
@@ -324,9 +324,9 @@ fi
 
 # http://www.x.org/wiki/GalliumStatus
 sinfo "Configuring Mesa, OpenGL and XvMC"
-for mfam in r300 r600; do
-    eselect mesa set ${mfam} gallium
-done
+# for mfam in r300 r600; do
+#     eselect mesa set ${mfam} gallium
+# done
 eselect mesa   set --auto
 eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11
