@@ -424,7 +424,7 @@ sinfo "Configuring start-up services"
 svcsysinit="udev"
 svcboot="consolefont microcode_ctl irqbalance haveged kexec metalog
          iptables consolekit alsasound fbcondecor lockdown"
-svcdefault="liberte identity cabled persist xconfig vmconfig spindown
+svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm bluetooth
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"

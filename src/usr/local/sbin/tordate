@@ -1,0 +1,97 @@
+#!/bin/sh -e
+
+# This script is executed with root privileges,
+# so be careful with externally supplied files.
+export LC_ALL=C
+
+inotifytimeout=60
+
+tordir=/var/lib/tor/data
+consensus=${tordir}/cached-consensus
+descriptors=${tordir}/cached-descriptors
+
+htpdir=/var/run/htpdate
+htpflag=${htpdir}/timeset.flag
+
+tag=tordate
+datere='[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
+
+
+# Delegate time setting to other daemons if Tor connections work
+if [ -e ${descriptors} ]; then
+    logger -p 6 -t ${tag} "Tor has already opened a circuit"
+else
+
+    # Wait for the consensus file, which contains a valid time interval
+    while :; do
+        if grep -qs "^valid-until ${datere}"'$' ${consensus}; then
+            break;
+        fi
+
+        inotifywait -q -t ${inotifytimeout} -e close_write -e moved_to --format %w%f ${tordir} || :
+    done
+
+
+    # Get various date points in Tor's format, and do some sanity checks
+    vstart=`sed -n "/^valid-after \(${datere}\)"'$/s//\1/p; t q; b n; :q q; :n' ${consensus}`
+    vend=`sed -n "/^valid-until \(${datere}\)"'$/s//\1/p; t q; b n; :q q; :n' ${consensus}`
+    vendchk=`date -ud "${vstart} -0300" +'%F %T'`
+
+    if [ x"${vend}" != x"${vendchk}" ]; then
+        logger -p 3 -t ${tag} "Unexpected valid-until: [${vend}] is not [${vendchk}]"
+    else
+
+        # Check whether current time is in (conservative) range
+        curdate=`date -u +'%F %T'`
+        vendcons=`date -ud "${vstart} -0230" +'%F %T'`
+
+        order="${vstart}
+${curdate}
+${vendcons}"
+        ordersrt=`echo "${order}" | sort`
+
+        if [ "${order}" = "${ordersrt}" ]; then
+            logger -p 6 -t ${tag} "Current time is in valid Tor range"
+        else
+
+            # Estimate time to the middle of the range
+            vmid=`date -ud "${vstart} -0130" +'%F %T'`
+            logger -p 6 -t ${tag} "Setting time to middle of valid Tor range: [${vmid}]"
+            date -us "${vmid}" 1>/dev/null
+
+
+            # Tor is unreliable with picking a circuit after time change
+            if /etc/init.d/tor -q status; then
+                logger -p 6 -t ${tag} "Restarting Tor service"
+                /etc/init.d/tor restart
+            fi
+
+        fi
+
+    fi
+
+fi
+
+
+# At the cost of a miniscule race condition probability, do not restart I2P
+# when tordate service is run again for some reason.
+if [ -e ${htpflag} ]; then
+    logger -p 6 -t ${tag} "HTP has already set the time"
+else
+
+    # Wait for the HTP flag file, which indicates that correct time has been set
+    while :; do
+        if [ -e ${htpflag} ]; then
+            break;
+        fi
+
+        inotifywait -q -t ${inotifytimeout} -e create --format %w%f ${htpdir} || :
+    done
+
+    # I2P is unreliable with correcting internal clock after time change
+    if /etc/init.d/i2p -q status; then
+        logger -p 6 -t ${tag} "Restarting I2P service"
+        /etc/init.d/i2p restart
+    fi
+
+fi

@@ -10,13 +10,11 @@ case ${action} in
         if ! /etc/init.d/tor -q status; then
             logger -p 6 -t nm.dispatch "Starting Tor service (${iface})"
             /etc/init.d/tor -q start
-            tor-date &
         else
             # SIGHUP doesn't refresh sockets, and Tor doesn't handle
             # changing IPs/interfaces well
             logger -p 6 -t nm.dispatch "Restarting Tor service (${iface})"
             /etc/init.d/tor -q restart
-            tor-date &
         fi
         ;;
 esac

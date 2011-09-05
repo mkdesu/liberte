@@ -18,6 +18,7 @@
   * Added cables communication identity information applet
   * OTFE partition now supports file permissions, sanitized during boot
   * OTFE partition now uses NTFS compression for all data
+  * HTP time daemon has been hardened and extended to aid I2P service
 
   * Added small and fast Java runtime environment (JamVM)
   * Added HTML5 video/audio support to Midori

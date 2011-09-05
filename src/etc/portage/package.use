@@ -51,6 +51,7 @@ media-video/gpac                -* aac mad vorbis
 media-plugins/gst-plugins-meta  dv lame theora -flac -wavpack
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
+dev-java/gnu-classpath          gstreamer
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal
