@@ -293,7 +293,7 @@ awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/
 
 
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/mplayer /usr/bin/audacious /usr/bin/jamvm
+paxctl -m /usr/bin/mplayer /usr/bin/jamvm
 
 
 sinfo "Configuring fontconfig"
