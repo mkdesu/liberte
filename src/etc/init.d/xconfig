@@ -77,9 +77,6 @@ start() {
             if [ -e /root/xorg.conf.new ]; then
                 mv /root/xorg.conf.new ${xorgrc}
 
-                # Bug #3319525 workaround (doesn't always work)
-                touch /mnt/hidden/rwroot/etc/X11
-
                 # Turn off text cursor on vt3 (cf. xserverrc)
                 echo -n "\033[?25l" > /dev/tty3
             else
