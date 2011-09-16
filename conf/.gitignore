@@ -1,0 +1,3 @@
+# A newline-separated list of case-insensitive grep -E regexps
+# for verifying build environment anonymization.
+conf/checkregexps
