@@ -74,6 +74,7 @@ net-misc/ssh-askpass-fullscreen
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
+x11-misc/fpm2
 dev-libs/engine_pkcs11
 # app-crypt/steghide (masked, #319679)
 app-crypt/ccid
