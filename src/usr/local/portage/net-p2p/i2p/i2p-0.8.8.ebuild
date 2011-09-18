@@ -39,10 +39,10 @@ src_unpack() {
 src_compile() {
 	# Make I2P router ignore internal clock offset due to internal / external clock jumps conflict
 	# Fudge factor of 90 minutes corresponds to Tor's approximate time possible error
-	sed -i 's/\<return _offset;/return 0;/'                    core/java/src/net/i2p/util/Clock.java
-	sed -i 's/\<return _alreadyChanged;/return true;/'         core/java/src/net/i2p/util/Clock.java
-	sed -i 's/\<return offset + systemNow;/return systemNow;/' router/java/src/net/i2p/router/RouterClock.java
-	sed -i 's/\( CLOCK_FUDGE_FACTOR =\) 1\*\(.*\);/\1 90*\2;/' router/java/src/net/i2p/router/Router.java
+	# sed -i 's/\<return _offset;/return 0;/'                    core/java/src/net/i2p/util/Clock.java
+	# sed -i 's/\<return _alreadyChanged;/return true;/'         core/java/src/net/i2p/util/Clock.java
+	# sed -i 's/\<return offset + systemNow;/return systemNow;/' router/java/src/net/i2p/router/RouterClock.java
+	# sed -i 's/\( CLOCK_FUDGE_FACTOR =\) 1\*\(.*\);/\1 90*\2;/' router/java/src/net/i2p/router/Router.java
 
 	eant pkg || die
 }

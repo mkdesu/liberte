@@ -112,9 +112,9 @@ start() {
     fi
 
 
-    if get_bootparam 'noi2p'; then
-        ewarn Disabling I2P
-        chmod a-x ${i2pnmplugin}
+    if get_bootparam 'i2p'; then
+        ewarn Enabling I2P
+        chmod a+x ${i2pnmplugin}
         eend $?
     fi
 
