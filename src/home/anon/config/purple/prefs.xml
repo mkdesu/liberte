@@ -27,10 +27,10 @@
 			</pref>
 		</pref>
 		<pref name='savedstatus'>
-			<pref name='default' type='int' value='1302369884'/>
+			<pref name='default' type='int' value='1316459477'/>
 			<pref name='startup' type='int' value='1302370198'/>
 			<pref name='startup_current_status' type='bool' value='1'/>
-			<pref name='idleaway' type='int' value='1302369914'/>
+			<pref name='idleaway' type='int' value='1316460232'/>
 			<pref name='isidleaway' type='bool' value='0'/>
 		</pref>
 		<pref name='conversations'>
@@ -59,6 +59,7 @@
 			<pref name='ports_range_use' type='bool' value='0'/>
 			<pref name='ports_range_start' type='int' value='1024'/>
 			<pref name='ports_range_end' type='int' value='2048'/>
+			<pref name='turn_port_tcp' type='int' value='3478'/>
 		</pref>
 		<pref name='proxy'>
 			<pref name='type' type='string' value='socks5'/>
@@ -360,7 +361,7 @@
 			<pref name='list_visible' type='bool' value='1'/>
 			<pref name='list_maximized' type='bool' value='0'/>
 			<pref name='sort_type' type='string' value='alphabetical'/>
-			<pref name='x' type='int' value='305'/>
+			<pref name='x' type='int' value='397'/>
 			<pref name='y' type='int' value='0'/>
 			<pref name='width' type='int' value='493'/>
 			<pref name='height' type='int' value='549'/>
@@ -384,7 +385,7 @@
 			<pref name='font_face' type='string' value=''/>
 			<pref name='font_size' type='int' value='3'/>
 			<pref name='tabs' type='bool' value='1'/>
-			<pref name='tab_side' type='int' value='2'/>
+			<pref name='tab_side' type='int' value='0'/>
 			<pref name='scrollback_lines' type='int' value='4000'/>
 			<pref name='chat'>
 				<pref name='entry_height' type='int' value='54'/>
@@ -395,10 +396,10 @@
 				<pref name='height' type='int' value='390'/>
 			</pref>
 			<pref name='im'>
-				<pref name='x' type='int' value='220'/>
-				<pref name='y' type='int' value='328'/>
+				<pref name='x' type='int' value='51'/>
+				<pref name='y' type='int' value='0'/>
 				<pref name='width' type='int' value='878'/>
-				<pref name='height' type='int' value='778'/>
+				<pref name='height' type='int' value='549'/>
 				<pref name='animate_buddy_icons' type='bool' value='1'/>
 				<pref name='entry_height' type='int' value='54'/>
 				<pref name='show_buddy_icons' type='bool' value='1'/>
@@ -408,6 +409,8 @@
 			<pref name='toolbar'>
 				<pref name='wide' type='bool' value='0'/>
 			</pref>
+			<pref name='resize_custom_smileys' type='bool' value='1'/>
+			<pref name='custom_smileys_size' type='int' value='96'/>
 		</pref>
 		<pref name='pounces'>
 			<pref name='default_actions'>

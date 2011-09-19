@@ -72,16 +72,19 @@ playlist_manager_height=0
 output_path=/usr/lib/audacious/Output/alsa.so
 iface_path=/usr/lib/audacious/General/gtkui.so
 filesel_path=/home/anon
+leading_zero=TRUE
+advance_on_delete=FALSE
+open_to_temporary=FALSE
 chardet_detector=
 chardet_fallback=
-cover_name_include=
+cover_name_include=album,folder
 [gtkui]
 save_window_position=TRUE
 player_visible=TRUE
 vis_position=0
-player_x=462
-player_y=313
-player_width=490
+player_x=136
+player_y=206
+player_width=547
 player_height=230
 multi_column_view=FALSE
 playlist_visible=TRUE
@@ -90,6 +93,12 @@ menu_visible=TRUE
 statusbar_visible=TRUE
 playlist_width=0
 playlist_height=0
+playlist_columns=number title artist album queued length
+show_song_titles=TRUE
+playlist_headers=TRUE
+custom_playlist_colors=FALSE
+always_on_top=FALSE
+autoscroll=TRUE
 [alsa-gapless]
 pcm=default
 mixer=default
@@ -189,6 +198,7 @@ inc_spc_reverb=FALSE
 [compressor]
 target=0.5
 range=0.5
+center=0.5
 [crossfade]
 length=3
 [ladspa]

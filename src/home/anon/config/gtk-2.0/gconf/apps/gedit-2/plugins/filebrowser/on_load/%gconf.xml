@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <gconf>
 	<entry name="virtual_root" mtime="1283878072" type="string">
-		<stringvalue>file:///home/anon/persist/desktop</stringvalue>
+		<stringvalue>file:///home/anon</stringvalue>
 	</entry>
 	<entry name="root" mtime="1283878072" type="string">
 		<stringvalue>file:///</stringvalue>
