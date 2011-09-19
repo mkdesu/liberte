@@ -74,7 +74,7 @@ gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
-app-text/ghostscript-gpl        -djvu
+app-text/ghostscript-gpl        -djvu -idn
 media-gfx/splashutils           -truetype
 net-libs/glib-networking        -gnome -libproxy
 
