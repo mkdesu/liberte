@@ -26,5 +26,5 @@
  	fi
 +	fi
  
- 	load_image
- 	eend $?
+ 	if [ "`/sbin/runlevel|/bin/cut -c 3`" = "6" ] && [ -f /nokexec ]; then
+ 		einfo "Not using kexec during reboot"
