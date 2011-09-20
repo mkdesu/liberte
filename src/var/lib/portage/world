@@ -175,6 +175,7 @@ media-plugins/gst-plugins-vp8
 media-plugins/gst-plugins-speex
 media-plugins/gst-plugins-pango
 media-plugins/gst-plugins-soup
+net-irc/xchat-otr
 x11-plugins/pidgin-otr
 x11-plugins/pidgin-libnotify
 

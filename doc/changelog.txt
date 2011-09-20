@@ -22,7 +22,7 @@
 
   * Added small and fast Java runtime environment (JamVM)
   * Added HTML5 video/audio support to Midori
-  * Added SASL (plain) authentication support to XChat
+  * Added SASL (plain) authentication and OTR encryption support to XChat
   * Added PPTP/OpenVPN/Cisco VPN support to NetworkManager
   * Added emelFM2 2-pane file manager
 
