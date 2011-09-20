@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="disable-embedded-scaling" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-embedding" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-midi" mtime="1316486048" type="bool" value="true"/>
+	<entry name="disable-dvx" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-wmp" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-real" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-qt" mtime="1316486048" type="bool" value="false"/>
+	<entry name="extraopts" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="mplayer-dvd-device" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="show-subtitles" mtime="1316486048" type="bool" value="true"/>
+	<entry name="subtitle-margin" mtime="1316486048" type="int" value="0"/>
+	<entry name="subtitle-shadow" mtime="1316486048" type="bool" value="false"/>
+	<entry name="subtitle-outline" mtime="1316486048" type="bool" value="false"/>
+	<entry name="subtitle-color" mtime="1316486048" type="string">
+		<stringvalue>ffffff00</stringvalue>
+	</entry>
+	<entry name="subtitle-codepage" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="subtitle-scale" mtime="1316486048" type="float" value="1"/>
+	<entry name="subtitle-font" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="metadata-codepage" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="verbose" mtime="1316486048" type="int" value="0"/>
+	<entry name="resize-on-new-media" mtime="1316486048" type="bool" value="true"/>
+	<entry name="keep-on-top" mtime="1316486048" type="bool" value="false"/>
+	<entry name="remember-loc" mtime="1316486048" type="bool" value="false"/>
+	<entry name="bring-to-front" mtime="1316486048" type="bool" value="false"/>
+	<entry name="replace-and-play" mtime="1316486048" type="bool" value="false"/>
+	<entry name="single-instance" mtime="1316486048" type="bool" value="false"/>
+	<entry name="vertical" mtime="1316486048" type="bool" value="false"/>
+	<entry name="show-status-icon" mtime="1316486048" type="bool" value="true"/>
+	<entry name="show-notification" mtime="1316486048" type="bool" value="true"/>
+	<entry name="mouse-wheel-changes-volume" mtime="1316486048" type="bool" value="false"/>
+	<entry name="use-xscrnsaver" mtime="1316486048" type="bool" value="false"/>
+	<entry name="use-defaultpl" mtime="1316486048" type="bool" value="false"/>
+	<entry name="use-mediakeys" mtime="1316486048" type="bool" value="true"/>
+	<entry name="show-details" mtime="1316486048" type="bool" value="false"/>
+	<entry name="show-playlist" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-animation" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-pause-on-click" mtime="1316486048" type="bool" value="true"/>
+	<entry name="disable-framedrop" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-deinterlace" mtime="1316486048" type="bool" value="true"/>
+	<entry name="disable-embeddedfonts" mtime="1316486048" type="bool" value="false"/>
+	<entry name="disable-ass" mtime="1316486048" type="bool" value="false"/>
+	<entry name="force-cache" mtime="1316486048" type="bool" value="false"/>
+	<entry name="volume-gain" mtime="1316486048" type="int" value="0"/>
+	<entry name="remember-softvol" mtime="1316486048" type="bool" value="false"/>
+	<entry name="softvol" mtime="1316486048" type="bool" value="false"/>
+	<entry name="pp-level" mtime="1316486048" type="int" value="0"/>
+	<entry name="osd-level" mtime="1316486048" type="int" value="0"/>
+	<entry name="alsa-mixer" mtime="1316486048" type="string">
+		<stringvalue></stringvalue>
+	</entry>
+	<entry name="plugin-video-cache-size" mtime="1316486048" type="int" value="2048"/>
+	<entry name="plugin-audio-cache-size" mtime="1316486048" type="int" value="128"/>
+	<entry name="cache-size" mtime="1316486048" type="int" value="2000"/>
+	<entry name="use-hw-audio" mtime="1316486048" type="bool" value="false"/>
+	<entry name="audio-channels" mtime="1316486048" type="int" value="2"/>
+	<entry name="audio-device-name" mtime="1316486048" type="string">
+		<stringvalue>Default</stringvalue>
+	</entry>
+	<entry name="last-dir" mtime="1316485841" type="string">
+		<stringvalue>file:///home/anon</stringvalue>
+	</entry>
+</gconf>
