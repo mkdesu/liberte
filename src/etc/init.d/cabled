@@ -9,9 +9,6 @@ daemon=/usr/local/libexec/cable/cabled
 pidfile=/var/run/cabled.pid
 
 depend() {
-    # need identity setup
-    need identity
-
     # initialization in cabled is done before nginx is up
     before nginx
 }
