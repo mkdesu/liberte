@@ -333,9 +333,8 @@ sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
 
 
 # QuickTime (MP4) prevents HTML5 <video> from working
-sinfo "Generating GStreamer cache and filtering problematic plugins"
+sinfo "Generating GStreamer cache"
 rm -rf /var/cache/gstreamer
-rm /usr/lib/gstreamer-0.10/libgstqtdemux.*
 /usr/bin/gst-inspect* 1>/dev/null
 chmod -R go=u,go-w /var/cache/gstreamer
 
