@@ -27,6 +27,7 @@
   * Added emelFM2 2-pane file manager
 
   * Audio mixer channels are heuristically set up on boot
+  * Selected Tor-friendly IRC networks for XChat
 
 
 2011-05-29
