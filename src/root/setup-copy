@@ -38,7 +38,8 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # equery requires gentoolkit, so copy ebuilds early
 # NOTE: the below patches are intended for depclean
 #
-# python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa, gobject-introspection
+# python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa,
+#          gobject-introspection, openbox
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils:     ca-certificates
@@ -66,7 +67,8 @@ ebuilds="app-misc/ca-certificates
          sys-apps/portage
          x11-libs/gtk+
          x11-misc/xdg-utils
-         x11-proto/xcb-proto"
+         x11-proto/xcb-proto
+         x11-wm/openbox"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -94,6 +96,9 @@ sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
 
 # Python is needed by dbus-python, which is a non-separated dependency in ebuild
 sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
+
+# Python is only needed for openbox-xdg-autostart
+sed -i 's:\<dev-python/pyxdg\>::' ${ebuild_openbox}
 
 # Python support in libxml2 is only needed in development tools
 sed -i 's:\(dev-libs/libxml2\)\[python\]:\1:' ${ebuild_mesa}
