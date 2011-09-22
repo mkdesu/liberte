@@ -3,7 +3,7 @@
 # $Header: $
 
 # Based on the ebuild from zugaina overlay:
-# http://gentoo-overlays.zugaina.org/zugaina/portage/net-p2p/i2p/
+# http://gpo.zugaina.org/net-p2p/i2p
 
 EAPI="4"
 

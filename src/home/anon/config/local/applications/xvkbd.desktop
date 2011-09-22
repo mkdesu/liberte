@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=xvkbd
-GenericName=Virtual Keyboard
-Comment=Virtual keyboard for X window system
-Exec=xvkbd
-Terminal=false
-Type=Application
-Categories=Utility;Accessibility;
-Icon=preferences-desktop-keyboard-shortcuts
