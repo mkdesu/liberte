@@ -48,7 +48,7 @@ syndaemon -d -t -k -i 2 &
 # Launch clipboard, SCIM and WICD daemons (use tray -> after panel)
 parcellite &
 scim -d &
-nm-applet &
+nm-applet --sm-disable &
 
 # Launch shared clipboard service on VirtualBox [--clipboard/display/seamless]
 if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then
