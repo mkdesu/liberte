@@ -107,7 +107,7 @@ while true; do
                 good_msg "Attempting to mount media: ${mediadev}"
 
                 # Unless the media is already in ro mode, write-protect it during mount
-                mediaro=`blockdev --getro ${mediadev}` || mediaro=1
+                mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
                 [ ${mediaro} == 1 ] || blockdev --setro ${mediadev}
 
                 if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
