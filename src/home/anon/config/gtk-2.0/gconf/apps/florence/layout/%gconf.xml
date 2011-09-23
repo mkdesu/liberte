@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="extensions" mtime="1316745804" type="string">
+		<stringvalue>actionkys:standardnm</stringvalue>
+	</entry>
+	<entry name="style" mtime="1316745159" type="string">
+		<stringvalue>/usr/share/florence/styles/hard</stringvalue>
+	</entry>
+</gconf>

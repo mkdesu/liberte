@@ -49,6 +49,8 @@
 /usr/share/aclocal/
 /usr/share/baselayout/
 /usr/share/awk/
+/usr/share/florence/**.rnc
+/usr/share/florence/svg11/
 /usr/share/getopt/
 /usr/share/gir-[0-9]*/
 /usr/share/gobject-introspection-[0-9]*/

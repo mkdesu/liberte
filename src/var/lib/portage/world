@@ -136,7 +136,7 @@ app-text/tree
 lxde-base/lxterminal
 x11-terms/sakura
 x11-misc/parcellite
-x11-misc/xvkbd
+app-accessibility/florence
 app-arch/xarchiver
 app-misc/emelfm2
 app-cdr/xcdroast
