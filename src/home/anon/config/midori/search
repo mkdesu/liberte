@@ -6,6 +6,13 @@ uri=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
 icon=
 token=sg
 
+[DuckDuckGo]
+name=DuckDuckGo
+text=DuckDuckGo Tor hidden service
+uri=http://3g2upl4pq6kufc4m.onion/?q=%s
+icon=
+token=dd
+
 [Wikipedia]
 name=Wikipedia
 text=The free encyclopedia
