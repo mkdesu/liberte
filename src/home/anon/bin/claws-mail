@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-cableid=/usr/local/libexec/cable/cable-id
+cableid=/usr/libexec/cable/cable-id
 cablesend=${HOME}/bin/wrappers/cable-send
 confdir=${XDG_CONFIG_HOME}/claws-mail
 

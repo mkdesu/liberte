@@ -24,4 +24,4 @@ anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-random
 anon	liberte = NOPASSWD:         /usr/local/sbin/slay nofw
 anon	liberte = (nofw)  NOPASSWD: /usr/local/sbin/unsafe-browser ""
 
-anon	liberte = (cable) NOPASSWD: /usr/local/libexec/cable/send ""
+anon	liberte = (cable) NOPASSWD: /usr/libexec/cable/send ""

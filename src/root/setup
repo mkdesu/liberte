@@ -244,11 +244,7 @@ mkdir -p /usr/lib/xchat/plugins
 cflags="-std=c99 -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
 gcc  ${cflags} -o /usr/local/sbin/udev-watchdog      /usr/local/src/udev-watchdog.c -ludev
 gcc  ${cflags} -o /usr/local/sbin/slay               /usr/local/src/slay.c
-gcc  ${cflags} -o /usr/local/bin/hex2base32          /usr/local/src/hex2base32.c
 gcc  ${cflags} -o /usr/local/bin/log-limit           /usr/local/src/log-limit.c
-gcc  ${cflags} -o /usr/local/libexec/cable/service   /usr/local/src/cable-service.c
-gcc  ${cflags} -o /usr/local/libexec/cable/daemon    /usr/local/src/cable-daemon.c  -lrt
-gcc  ${cflags} -o /usr/local/libexec/cable/mhdrop    /usr/local/src/cable-mhdrop.c
 gcc  ${cflags} -o /usr/lib/xchat/plugins/cap_sasl.so /usr/local/src/cap_sasl.c -shared -fPIC \
      -D _GNU_SOURCE -I /usr/include/glib-2.0 -I /usr/lib/glib-2.0/include -Wl,--export-dynamic
                
@@ -259,26 +255,10 @@ klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.
 
 strip -s /usr/local/sbin/udev-watchdog       \
          /usr/local/sbin/slay                \
-         /usr/local/bin/hex2base32           \
          /usr/local/bin/log-limit            \
-         /usr/local/libexec/cable/service    \
-         /usr/local/libexec/cable/daemon     \
-         /usr/local/libexec/cable/mhdrop     \
          /usr/local/addons/initrd/memwipe    \
          /usr/local/addons/initrd/init-kexec \
          /usr/lib/xchat/plugins/cap_sasl.so
-
-jflags="-target 1.5 -deprecation -Werror"
-jartmp=`mktemp -d`
-javac ${jflags} -classpath /opt/i2p/lib/i2p.jar -d ${jartmp} /usr/local/src/EepPriv.java
-cat <<EOF > ${jartmp}/manifest.mf
-Manifest-Version: 1.0
-Created-By: Liberté Linux ${VERSION}
-Main-Class: su.dee.i2p.EepPriv
-Class-Path: /opt/i2p/lib/i2p.jar
-EOF
-jar c0mf ${jartmp}/manifest.mf /usr/local/libexec/cable/eeppriv.jar -C ${jartmp} su
-rm -r ${jartmp}
 
 
 sinfo "Generating localization and timezone menus"
@@ -490,10 +470,6 @@ groupadd -g 9001 nofw   || [ $? = 9 ]
 
 useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
-
-# TODO: remove the following lines once cables is an external package
-groupadd -g 9002 cable  || [ $? = 9 ]
-useradd -u 2103 -g cable  -c "Cables Communication" -d /dev/null  -s /sbin/nologin cable || [ $? = 9 ]
 
 usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games,vboxguest anon
 usermod -G legion                                                   cable

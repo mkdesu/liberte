@@ -99,10 +99,7 @@ net-misc/connect
 net-p2p/i2p
 net-proxy/tsocks
 net-proxy/privoxy
-www-servers/nginx
-www-servers/spawn-fcgi
-www-misc/fcgiwrap
-mail-filter/procmail
+net-mail/cables
 
 # Peripheral utilities
 sys-apps/irqbalance

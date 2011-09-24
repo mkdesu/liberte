@@ -48,7 +48,6 @@ else
           --exclude=/var/lib/i2p/          \
           --exclude=/var/lib/portage/      \
           --exclude=/etc/nginx/            \
-          --exclude=/var/www/              \
           --exclude=/var/run/lid-events    \
           --exclude=/var/run/htpdate       \
           --exclude=/etc/sudoers           \
@@ -61,17 +60,10 @@ else
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
 
-    ${RSYNC} --chmod=u=rwX,go=X    -i --delete \
-          --exclude=/www/cable/\*/ -C ${SRC}/var/www ${LIVECD}/var
-    ${RSYNC} --chmod=u=wX,g=sX,o=t -i --delete-excluded -C ${SRC}/var/www/cable/* ${LIVECD}/var/www/cable
-    # TODO: remove the following line once cables is an external package
-    chown -h --from=0 2103 ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     if [ -e ${LIVECD}/tmp/nginx-ref ]; then
         chown -h --from=0:0 --reference=${LIVECD}/tmp/nginx-ref \
               ${LIVECD}/var/log/nginx ${LIVECD}/var/tmp/nginx   \
               ${LIVECD}/var/tmp/nginx/client ${LIVECD}/var/tmp/nginx/fastcgi
-        chgrp -h            --reference=${LIVECD}/tmp/nginx-ref \
-              ${LIVECD}/var/www/cable/certs ${LIVECD}/var/www/cable/queue ${LIVECD}/var/www/cable/rqueue
     fi
 
     if [ -e ${LIVECD}/var/log/privoxy ]; then

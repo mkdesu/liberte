@@ -9,9 +9,9 @@ ltordir=${lmount}/security/tor/hidden_service
 li2pdir=${lmount}/security/i2p/eepsite
 certsdir=${lmount}/security/ssl/certs
 
-gentorhost=/usr/local/libexec/cable/gen-tor-hostname
-geni2phost=/usr/local/libexec/cable/gen-i2p-hostname
-genuser=/usr/local/libexec/cable/gen-cable-username
+gentorhost=/usr/libexec/cable/gen-tor-hostname
+geni2phost=/usr/libexec/cable/gen-i2p-hostname
+genuser=/usr/libexec/cable/gen-cable-username
 
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite
