@@ -107,7 +107,7 @@ start() {
         username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
         rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem ${cableflag}/certs \
             && mv -T ${cableflag} /var/www/"${username}" \
-            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" /etc/nginx/nginx.conf
+            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" /etc/nginx/nginx-cable.conf
         eend $?
     fi
 
