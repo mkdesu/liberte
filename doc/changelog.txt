@@ -13,12 +13,15 @@
   * Better integration as VirtualBox (including clipboard), VMWare, QEMU guest
   * VirtualBox shares are now supported as automount directories
 
-  * Added I2P, also supported as cables communication transport
-  * Cables communication daemon runs under a designated user
-  * Added cables communication identity information applet
+  * Optional I2P support via gentoo=i2p kernel argument
+  * HTP time daemon has been hardened and extended to aid I2P service
   * OTFE partition now supports file permissions, sanitized during boot
   * OTFE partition now uses NTFS compression for all data
-  * HTP time daemon has been hardened and extended to aid I2P service
+
+  * Cables communication is now a separate project
+  * Cables communication daemon runs under a designated user
+  * Cables communication supports I2P as source and destination addresses
+  * Added cables communication identity information applet
 
   * Added small and fast Java runtime environment (JamVM)
   * Added HTML5 video/audio support to Midori

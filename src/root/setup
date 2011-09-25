@@ -8,7 +8,7 @@ protected="/etc/._cfg????_locale.gen"
 
 i2phosts=http://www.i2p2.de/hosts.txt
 i2pnetdb=http://i2pdb.tin0.de/latest.zip
-maxnetdb=200
+maxnetdb=100
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
 usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
