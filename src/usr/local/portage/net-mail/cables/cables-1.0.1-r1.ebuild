@@ -63,17 +63,23 @@ src_install() {
 
 	dobin    bin/*                    || die
 
-	insinto  /usr/libexec
-	doins -r cable                    || die
+	exeinto  /usr/libexec/cable
+	insinto  /usr/libexec/cable
+	doexe    cable/*                  || die
+	doins    cable/{suprofile,extensions.cnf,eeppriv.jar} || die
 
+	# no mime types, so no need to inherit fdo-mime
 	insinto  /usr/share/applications
 	doins    share/cable-info.desktop || die
 
-	keepdir       /var/www/cable/certs /var/www/cable/queue /var/www/cable/rqueue
-	fperms  3310  /var/www/cable/certs /var/www/cable/queue /var/www/cable/rqueue || die
-	fperms   711  /var/www             /var/www/cable                             || die
-	fowners      :nginx /var/www/cable/certs                                      || die "failed to change ownership"
-	fowners cable:nginx /var/www/cable/queue /var/www/cable/rqueue                || die "failed to change ownership"
+	# /var/www(/cable)        drwx--x--x root  root
+	# /var/www/cable/certs    d-wx--s--T root  nginx
+	# /var/www/cable/(r)queue d-wx--s--T cable nginx
+	keepdir       /var/www/cable/{certs,{,r}queue}
+	fperms  3310  /var/www/cable/{certs,{,r}queue} || die
+	fperms   711  /var/www{,/cable}                || die
+	fowners      :nginx /var/www/cable/certs       || die "failed to change ownership"
+	fowners cable:nginx /var/www/cable/{,r}queue   || die "failed to change ownership"
 }
 
 pkg_postinst() {
