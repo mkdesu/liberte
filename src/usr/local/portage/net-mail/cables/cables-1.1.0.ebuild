@@ -16,7 +16,7 @@ I2P_PV=0.8.8
 I2P_MY_P=i2pupdate_${I2P_PV}
 
 # In the actual ebuild the GitHub URI should be replaced with a tagged download
-SRC_URI="https://github.com/mkdesu/cables/tarball/v1.0.1 -> ${P}.tar.gz
+SRC_URI="https://github.com/mkdesu/cables/tarball/v1.1.0 -> ${P}.tar.gz
          http://mirror.i2p2.de/${I2P_MY_P}.zip
          http://launchpad.net/i2p/trunk/${I2P_PV}/+download/${I2P_MY_P}.zip"
 
@@ -53,33 +53,25 @@ src_compile() {
 }
 
 src_install() {
-	doinitd  init/cabled              || die
-	doconfd  conf/spawn-fcgi.cable    || die
+	# no mime types, so no need to inherit fdo-mime
+	emake DESTDIR="${D}" install                     || die "make install failed"
+
+	doinitd  "${D}"/usr/share/cable/cabled           || die
+	doconfd  "${D}"/usr/share/cable/spawn-fcgi.cable || die
 	dosym    spawn-fcgi /etc/init.d/spawn-fcgi.cable || die
 
 	insinto  /etc/nginx
-	doins    conf/nginx-cable.conf    || die
-	fperms   600 ${INSDESTTREE}/nginx-cable.conf || die
-
-	dobin    bin/*                    || die
-
-	exeinto  /usr/libexec/cable
-	insinto  /usr/libexec/cable
-	doexe    cable/*                  || die
-	doins    cable/{suprofile,extensions.cnf,eeppriv.jar} || die
-
-	# no mime types, so no need to inherit fdo-mime
-	insinto  /usr/share/applications
-	doins    share/cable-info.desktop || die
+	doins    "${D}"/usr/share/cable/nginx-cable.conf || die
+	fperms   600 ${INSDESTTREE}/nginx-cable.conf     || die
 
 	# /var/www(/cable)        drwx--x--x root  root
 	# /var/www/cable/certs    d-wx--s--T root  nginx
 	# /var/www/cable/(r)queue d-wx--s--T cable nginx
 	keepdir       /var/www/cable/{certs,{,r}queue}
-	fperms  3310  /var/www/cable/{certs,{,r}queue} || die
-	fperms   711  /var/www{,/cable}                || die
-	fowners      :nginx /var/www/cable/certs       || die "failed to change ownership"
-	fowners cable:nginx /var/www/cable/{,r}queue   || die "failed to change ownership"
+	fperms  3310  /var/www/cable/{certs,{,r}queue}   || die
+	fperms   711  /var/www{,/cable}                  || die
+	fowners      :nginx /var/www/cable/certs         || die "failed to change ownership"
+	fowners cable:nginx /var/www/cable/{,r}queue     || die "failed to change ownership"
 }
 
 pkg_postinst() {
@@ -98,11 +90,11 @@ pkg_postinst() {
 	elog "must be writable by 'cable' (create them if they don't exist)."
 	elog ""
 	elog "Generate cables certificates and Tor/I2P keypairs for the user"
-	elog "    /usr/libexec/cable/gen-cable-username (run as normal user)"
+	elog "    gen-cable-username"
 	elog "        copy CABLE_CERTS/certs/*.pem to CABLE_PUB/cable/certs (group-readable)"
-	elog "    /usr/libexec/cable/gen-tor-hostname   (run as normal user)"
+	elog "    gen-tor-hostname"
 	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by tor)"
-	elog "    /usr/libexec/cable/gen-i2p-hostname   (run as normal user)"
+	elog "    gen-i2p-hostname"
 	elog "        copy CABLE_I2P/eepsite to /var/lib/i2p/router (readable only by i2p)"
 	elog ""
 	elog "Once a cables username has been generated for the user:"

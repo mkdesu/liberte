@@ -141,6 +141,9 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     env-update
     source /etc/profile
 
+    # strictly necessary only for gcc upgrades
+    emerge -q1 sys-devel/libtool
+
     emerge -q1 sys-libs/glibc
     rm -f ${protected}
 

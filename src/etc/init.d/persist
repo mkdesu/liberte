@@ -5,7 +5,7 @@ description="Restores and saves user configuration."
 luser=anon
 lmount=/home/${luser}/persist
 live=/mnt/live
-persist=/usr/local/libexec/suexec/persistence
+persist=persistence
 
 depend() {
     # need OTFE mount
