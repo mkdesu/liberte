@@ -2,12 +2,12 @@ Repositories and mirrors
 ========================
 
 stage3 and portage snapshots
-  + http://mirrors.kernel.org/gentoo
+  + http://distfiles.gentoo.org
   [mkroot]
 
 webrsync and portage packages
-  + http://mirrors.kernel.org/gentoo
   + http://distfiles.gentoo.org
+  + http://mirrors.kernel.org/gentoo
   [/etc/make.conf]
 
 rsync
@@ -24,7 +24,7 @@ NTP [disabled]
   + [0-3].pool.ntp.org
 
 HTP
-  + {google,yahoo,msn,facebook}.com
+  + {google,msn,yahoo,facebook,myspace}.com
 
 
 
