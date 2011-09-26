@@ -1,9 +1,13 @@
 #!/bin/bash -e
 
+export KBUILD_BUILD_VERSION=0
+export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
+
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
 consolefont=ter-i16n.psf
 xzmem=20
+
 protected="/etc/._cfg????_locale.gen"
 
 i2phosts=http://www.i2p2.de/hosts.txt
@@ -180,6 +184,10 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
         echo "${orphans}"
         exit 1
     fi
+
+
+    sinfo "Generating kernel include files"
+    make -s -C /usr/src/linux prepare
 
 
     sinfo "Marking tree as ready for incremental builds"
@@ -506,8 +514,6 @@ ln -sf iwconfig.wrapper /sbin/iwconfig
 
 sinfo "Compiling kernel"
 makeopts=`portageq envvar MAKEOPTS`
-export KBUILD_BUILD_VERSION=0
-export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
 rm -f /usr/src/linux/include/generated/compile.h
 
 make -s ${makeopts} -C /usr/src/linux 2>/dev/null
