@@ -64,6 +64,8 @@ src_install() {
 	doins    "${D}"/usr/share/cable/nginx-cable.conf || die
 	fperms   600 ${INSDESTTREE}/nginx-cable.conf     || die
 
+	rm -r    "${D}"/usr/share/cable
+
 	# /var/www(/cable)        drwx--x--x root  root
 	# /var/www/cable/certs    d-wx--s--T root  nginx
 	# /var/www/cable/(r)queue d-wx--s--T cable nginx
@@ -103,6 +105,15 @@ pkg_postinst() {
 	elog "    /etc/nginx/nginx-cable.conf"
 	elog "        replace each occurrence of CABLE with <username>"
 	elog "        uncomment the 'allow' line"
+	elog ""
+	elog "Configure Tor and I2P to forward HTTP connections to nginx:"
+	elog "    /etc/tor/torrc"
+	elog "        HiddenServiceDir  /var/lib/tor/hidden_service/"
+	elog "        HiddenServicePort 80 127.0.0.1:80"
+	elog "    /var/lib/i2p/router/i2ptunnel.config"
+	elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
+	elog "        tunnel.X.targetHost=127.0.0.1"
+	elog "        tunnel.X.targetPort=80"
 	elog ""
 	elog "Finally, the user should configure the email client to run"
 	elog "    sudo -nu cable /usr/libexec/cable/send"
