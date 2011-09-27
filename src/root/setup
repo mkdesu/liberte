@@ -186,8 +186,11 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     fi
 
 
-    sinfo "Generating kernel include files"
-    make -s -C /usr/src/linux prepare
+    # "make prepare" suffices for xf86-input-virtualbox, but not for xf86-video-virtualbox
+    sinfo "Compiling kernel"
+    makeopts=`portageq envvar MAKEOPTS`
+    make -s ${makeopts} -C /usr/src/linux 2>/dev/null
+    make -s ${makeopts} -C /usr/src/linux modules_install
 
 
     sinfo "Marking tree as ready for incremental builds"
@@ -511,6 +514,7 @@ sinfo "Installing wrappers"
 mv -n /sbin/iwconfig{,.orig}
 ln -sf /usr/local/libexec/iwconfig.wrapper       /sbin/iwconfig
 ln -sf /usr/local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
+
 
 sinfo "Compiling kernel"
 makeopts=`portageq envvar MAKEOPTS`
