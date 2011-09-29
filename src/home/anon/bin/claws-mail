@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-cableid=/usr/libexec/cable/cable-id
-cablesend=${HOME}/bin/wrappers/cable-send
+cableid=cable-id
+cablesend=/usr/bin/cable-send
 confdir=${XDG_CONFIG_HOME}/claws-mail
 
 # If neither Tor nor I2P address is selected, configure the Tor one
@@ -15,7 +15,7 @@ if username=`${cableid} user 2>/dev/null`; then
     fi
 fi
 
-# the path has changed
+# the path has changed twice
 if ! grep -q "^mail_command=${cablesend}\$" ${confdir}/accountrc; then
     sed -i "s:^\(mail_command=\).*:\1${cablesend}:" ${confdir}/accountrc
 fi

@@ -16,7 +16,7 @@ I2P_PV=0.8.8
 I2P_MY_P=i2pupdate_${I2P_PV}
 
 # In the actual ebuild the GitHub URI should be replaced with a tagged download
-SRC_URI="https://github.com/mkdesu/cables/tarball/v1.1.0 -> ${P}.tar.gz
+SRC_URI="https://github.com/mkdesu/cables/tarball/v${PV} -> ${P}.tar.gz
          http://mirror.i2p2.de/${I2P_MY_P}.zip
          http://launchpad.net/i2p/trunk/${I2P_PV}/+download/${I2P_MY_P}.zip"
 
@@ -115,9 +115,8 @@ pkg_postinst() {
 	elog "        tunnel.X.targetHost=127.0.0.1"
 	elog "        tunnel.X.targetPort=80"
 	elog ""
-	elog "Finally, the user should configure the email client to run"
-	elog "    sudo -nu cable /usr/libexec/cable/send"
+	elog "Finally, the user should configure the email client to run /usr/bin/cable-send"
 	elog "as a pipe for sending messages from addresses shown by"
 	elog "    cable-info (or see CABLE_CERTS/certs/username, CABLE_{TOR,I2P}/*/hostname)"
-	elog "Edit /etc/sudoers to avoid the password prompt on sudo."
+	elog "See comments in /usr/bin/cable-send for /etc/sudoers entry suggestion."
 }
