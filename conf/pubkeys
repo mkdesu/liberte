@@ -18,8 +18,8 @@ gentoo:   AE54 54F9 67B5 6AB0 9AE1  6064 0838 C26E 239C 75C4
 # HKPS CA certificate signatures
 # http://zimmermann.mayfirst.org/
 
-# Jamie McClelland <jamie@mayfirst.org> [expired]
-mayfirst: 4322 A68D 5010 CF2F 2218  8A17 9EAF 3762 76CC 057D
+# Jamie McClelland <jm@mayfirst.org>
+mayfirst: 1CB5 7C59 F2F4 2470 238F  53AB BB0B 7EE1 5F2E 4935
 
 # Daniel Kahn Gillmor <dkg@fifthhorseman.net>
 mayfirst: 0EE5 BE97 9282 D80B 9F75  40F1 CCD2 ED94 D217 39E9
