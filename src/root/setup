@@ -11,7 +11,8 @@ xzmem=20
 protected="/etc/._cfg????_locale.gen"
 
 i2phosts=http://www.i2p2.de/hosts.txt
-i2pnetdb=http://i2pdb.tin0.de/latest.zip
+i2pnetdb=http://netdb.i2p2.de/
+i2prire='routerInfo-[[:alnum:]~-]{43}=\.dat'
 maxnetdb=100
 
 pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
@@ -369,11 +370,24 @@ LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.t
 
 sinfo "Creating initial netDb for I2P"
 netdbdir=`mktemp -d`
-if wget -N -nv -P /usr/local/portage/distfiles ${i2pnetdb}; then
-    unzip -qnjd ${netdbdir} /usr/local/portage/distfiles/latest.zip
+
+# Aim at retrieving ~2000 routerInfos (in overlapping portions of 100)
+curl -sSfg ${i2pnetdb}{,,}{,,,,,,,,,} | sed 's/>/>\n/g' \
+    | LC_ALL=C sed -nr "s@^.*\<href=\"(${i2prire})\".*\$@\1@p" \
+    | sort -u | shuf -o ${netdbdir}/names
+
+if [ ! -s ${netdbdir}/names ]; then
+    if [ -e /var/lib/i2p/router/netDb ]; then
+        echo "I2P netDb update failed (ignoring)"
+    else
+        echo "Could not retrieve I2P netDb list"
+        exit 1
+    fi
+else
+    curl -sf -o ${netdbdir}/#1 ${i2pnetdb}`cat ${netdbdir}/names | tr '\n' , | sed 's/^/{/; s/,$/}/'` || :
 
     LC_ALL=C find ${netdbdir} -regextype posix-egrep -mindepth 1 \
-        \( ! -type f -o ! -regex "${netdbdir}/routerInfo-[[:alnum:]~-]{43}=\.dat" \) -delete
+        \( ! -type f -o ! -regex "${netdbdir}/${i2prire}" \) -delete
     chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
 
     # Erase non-NTCP+OR/OfR-capable routerInfos, see http://zzz.i2p.to/topics/280
@@ -388,11 +402,6 @@ if wget -N -nv -P /usr/local/portage/distfiles ${i2pnetdb}; then
 
     netdbsel=$(find /var/lib/i2p/router/netDb -type f | wc -l)
     echo Selected ${netdbsel} NTCP+OR/OfR-capable routerInfos
-elif [ -e /var/lib/i2p/router/netDb ]; then
-    echo "I2P netDb update failed (ignoring)"
-else
-    echo "Could not retrieve I2P netDb"
-    exit 1
 fi
 
 
