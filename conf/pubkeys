@@ -13,13 +13,3 @@ gentoo:   13EB BDBE DE7A 1277 5DFD  B1BA BB57 2E0E 2D18 2910
 
 # Gentoo Portage Snapshot Signing Key (Automated Signing Key)
 gentoo:   AE54 54F9 67B5 6AB0 9AE1  6064 0838 C26E 239C 75C4
-
-
-# HKPS CA certificate signatures
-# http://zimmermann.mayfirst.org/
-
-# Jamie McClelland <jm@mayfirst.org>
-mayfirst: 1CB5 7C59 F2F4 2470 238F  53AB BB0B 7EE1 5F2E 4935
-
-# Daniel Kahn Gillmor <dkg@fifthhorseman.net>
-mayfirst: 0EE5 BE97 9282 D80B 9F75  40F1 CCD2 ED94 D217 39E9

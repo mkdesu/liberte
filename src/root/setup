@@ -480,7 +480,6 @@ sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
 pwconv
 pwck -qr
 
-groupdel smmsp || [ $? = 6 ]
 grpck -r
 grpconv
 
@@ -508,12 +507,10 @@ done
 
 
 sinfo "Initializing a secondary PGP keyring"
-sudo -n -u anon touch     /home/anon/persist/security/pgp/liberte.gpg
-sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/liberte.gpg
-sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp \
-    --primary-keyring liberte.gpg --import /usr/local/addons/keys/liberte-*.asc
-sudo -n -u anon cp -p /usr/local/addons/keys/mfpl.crt /home/anon/persist/security/pgp
-sudo -n -u anon chmod 600 /home/anon/persist/security/pgp/mfpl.crt
+sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp --no-default-keyring \
+    --keyring liberte.gpg --import /usr/local/addons/keys/liberte-*.asc
+install -p -o anon -g legion -m 600 -t /home/anon/persist/security/pgp \
+    /usr/local/addons/keys/mfpl.crt
 
 # clear pam_mktemp's append-only attribute to allow later livecd directory removal
 chattr -f -a /tmp/.private || true

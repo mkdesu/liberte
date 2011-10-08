@@ -27,8 +27,6 @@ portage=${MIRROR}/snapshots/portage-latest.tar.bz2
 gpg_wwwserver='https://zimmermann.mayfirst.org/pks/lookup?op=get&search=0x${fpr}'
 gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/conf/pubkeys`
 
-mfpl=https://support.mayfirst.org/raw-attachment/wiki/mfpl_certificate_authority/mfpl.crt
-
 
 # Copying and pruning
 if [ "$2" = copy ]; then
@@ -121,13 +119,9 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
 
 
-    sinfo "Downloading HKPS CA certificate"
-    wget -N -q  -P ${LIVECD}/mirror/keys --no-check-certificate ${mfpl}
-    wget -N -nv -P ${LIVECD}/mirror/keys --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
-        ${mfpl}.jamie.asc ${mfpl}.dkg.asc
-
-
     sinfo "Fetching PGP public keys and verifying fingerprints"
+    cp ${FROM}/conf/certs/mfpl.crt ${LIVECD}/mirror/keys
+
     for key in ${gpg_keys}; do
         org=`echo ${key} | cut -d: -f1`
         fpr=`echo ${key} | cut -d: -f2`
@@ -139,9 +133,11 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         fi
 
         if type gpg 1>/dev/null 2>&1; then
-            gpg -q --homedir ${LIVECD}/mirror/gnupg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
+            gpg -q --homedir ${LIVECD}/mirror/gnupg --no-default-keyring \
+                --keyring ${org}.gpg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
 
-            fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --fingerprint --with-colons 0x${fpr} | grep '^fpr:' | cut -d: -f 10`
+            fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --keyring ${org}.gpg \
+                      --fingerprint --with-colons 0x${fpr} | sed -n '/^fpr:/p' | cut -d: -f10`
             if [ ${fpr} != "${fpr2}" ]; then
                 echo "Fingerprint mismatch: [${fpr}] != [${fpr2}]"
                 exit 1
@@ -153,21 +149,25 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     if type gpg 1>/dev/null 2>&1; then
+        sinfo "Verifying keyrings"
+        for keyring in `echo "${gpg_keys}" | cut -d: -f1 | sort -u`; do
+            keyids=`gpg -q -k --homedir ${LIVECD}/mirror/gnupg --keyring ${keyring}.gpg \
+                        --fingerprint --with-colons | sed -n '/^fpr:/p' | cut -d: -f10 | sort`
+            expids=`echo "${gpg_keys}" | sed -n "/^${keyring}:/p" | cut -d: -f2 | sort`
+
+            if [ "${keyids}" != "${expids}" ]; then
+                echo "Unexpected public keys in keyring ${keyring}.gpg"
+                exit 1
+            fi
+        done
+
+
         sinfo "Verifying stage3 and portage PGP signatures"
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
             --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always        \
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
             --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2.gpgsig \
                      ${LIVECD}/mirror/portage/portage-latest.tar.bz2
-
-
-        sinfo "Verifying HKPS CA certificate"
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-            --verify ${LIVECD}/mirror/keys/mfpl.crt.jamie.asc        \
-                     ${LIVECD}/mirror/keys/mfpl.crt
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always \
-            --verify ${LIVECD}/mirror/keys/mfpl.crt.dkg.asc          \
-                     ${LIVECD}/mirror/keys/mfpl.crt
     else
         sinfo "*** No GnuPG, skipping stage3, portage and HKPS CA certificate verification"
     fi
