@@ -9,7 +9,7 @@ depend() {
 }
 
 checkconfig() {
-	if [[ -z ${SERVERS} ]] ; then
+	if [ -z "${SERVERS}" ] ; then
 		eerror "You need to set at least one http server to use in /etc/conf.d/htpdate"
 		return 1
 	fi
