@@ -59,6 +59,7 @@ sys-fs/inotify-tools
 sys-fs/ntfs3g
 sys-fs/ntfsprogs
 sys-fs/dosfstools
+sys-fs/udftools
 net-fs/autofs
 
 # System / security utilities
