@@ -13,7 +13,6 @@
 <net-misc/networkmanager-vpnc-0.8.5
 
 # Applications
-=www-misc/fcgiwrap-1.0.3*
 =media-plugins/gst-plugins-vp8-0.10.22*
 =x11-misc/fpm2-0.79*
 =net-irc/xchat-otr-0.3*
