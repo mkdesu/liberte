@@ -208,12 +208,14 @@ start() {
 stop() {
     # Unmount the persistent fs
     if mountpoint -q ${lmount}; then
-
         ebegin Unmounting ${lmount}
         umount ${lmount}
         eend $?
+    fi
 
 
+    # Detach encrypted volume
+    if cryptsetup status ${OTFEVOLUME} 1>/dev/null 2>&1; then
         ebegin Detaching encrypted storage
         cryptsetup luksClose ${OTFEVOLUME}
         losetup -d `losetup -j ${otfefile} | cut -d: -f1`
