@@ -368,6 +368,13 @@ rm /tmp/drivedb.h
 LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.txt
 
 
+if [ ! -e /var/lib/tor/data ]; then
+    sinfo "Initializing Tor data directory"
+    mkdir -m 700  /var/lib/tor/data
+    chown tor:tor /var/lib/tor/data
+fi
+
+
 sinfo "Creating initial netDb for I2P"
 netdbdir=`mktemp -d`
 

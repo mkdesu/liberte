@@ -2,6 +2,9 @@
 
 # This script is executed with root privileges,
 # so be careful with externally supplied files.
+
+# ${tordir} and ${htpdir} must exist!
+
 export LC_ALL=C
 
 inotifytimeout=60
@@ -32,10 +35,11 @@ else
         inotifywait -qq -t ${inotifytimeout} -e close_write -e moved_to ${tordir} || :
     done
 
-    # Use unverified consensus if necessary (when time is far off into future)
-    if [ ! -e ${consensus} ]; then
-        logger -p 4 -t ${tag} "Using unverified Tor consensus (clock far off into future?)"
-        consensus=${uvconsensus}
+    # Use unverified consensus if possible (when time is far off into future, or when
+    # it wasn't removed yet), but work with a hardlink to prevent removal in-process
+    if [ ! -e ${consensus} ]  &&  ln ${uvconsensus} ${uvconsensus}.bak 2>/dev/null; then
+        logger -p 6 -t ${tag} "Using unverified Tor consensus"
+        consensus=${uvconsensus}.bak
     fi
 
 
@@ -44,7 +48,9 @@ else
     vend=`sed -n "/^valid-until \(${datere}\)"'$/s//\1/p; t q; b n; :q q; :n' ${consensus}`
     vendchk=`date -ud "${vstart} -0300" +'%F %T'`
 
-    if [ x"${vend}" != x"${vendchk}" ]; then
+    rm -f ${uvconsensus}.bak
+
+    if [ x"${vstart}" = x  -o  x"${vend}" = x  -o  x"${vend}" != x"${vendchk}" ]; then
         logger -p 3 -t ${tag} "Unexpected valid-until: [${vend}] is not [${vendchk}]"
     else
 
