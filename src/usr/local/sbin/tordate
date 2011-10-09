@@ -27,11 +27,7 @@ if [ -e ${descriptors} ]; then
 else
 
     # Wait for the consensus file, which contains a valid time interval
-    while :; do
-        if grep -qs "^valid-until ${datere}"'$' ${consensus} ${uvconsensus}; then
-            break;
-        fi
-
+    while ! grep -qs "^valid-until ${datere}"'$' ${consensus} ${uvconsensus}; do
         inotifywait -qq -t ${inotifytimeout} -e close_write -e moved_to ${tordir} || :
     done
 
@@ -40,6 +36,10 @@ else
     if [ ! -e ${consensus} ]  &&  ln ${uvconsensus} ${uvconsensus}.bak 2>/dev/null; then
         logger -p 6 -t ${tag} "Using unverified Tor consensus"
         consensus=${uvconsensus}.bak
+    else
+        while ! grep -qs "^valid-until ${datere}"'$' ${consensus}; do
+            inotifywait -qq -t ${inotifytimeout} -e close_write -e moved_to ${tordir} || :
+        done
     fi
 
 
@@ -93,11 +93,7 @@ if [ -e ${htpflag} ]; then
 else
 
     # Wait for the HTP flag file, which indicates that correct time has been set
-    while :; do
-        if [ -e ${htpflag} ]; then
-            break;
-        fi
-
+    while [ ! -e ${htpflag} ]; do
         inotifywait -qq -t ${inotifytimeout} -e create ${htpdir} || :
     done
 
