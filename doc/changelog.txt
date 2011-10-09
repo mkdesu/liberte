@@ -12,6 +12,7 @@
   * Xorg server 1.10, better touchpad support
   * Better integration as VirtualBox (including clipboard), VMWare, QEMU guest
   * VirtualBox shares are now supported as automount directories
+  * HFS and HFS+ filesystems are now supported as read-only automounts
 
   * Optional I2P support via gentoo=i2p kernel argument
   * HTP time daemon has been hardened and extended to aid I2P service

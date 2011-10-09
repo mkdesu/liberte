@@ -18,7 +18,7 @@ if [ "$1" = fork ]; then
     daemon=/etc/init.d/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)
-    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf vboxsf "
+    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf hfs hfsplus vboxsf "
     luser=anon
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
@@ -26,10 +26,12 @@ if [ "$1" = fork ]; then
     opts_ntfs=${opts_common},compression,uid=${luser},gid=${lgroup},fmask=0177,dmask=077
     opts_ntfs_ro=${opts_common},ro,compression,uid=${luser},gid=${lgroup},fmask=0377,dmask=0277
     opts_iso9660=${opts_common},ro,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},mode=0400,dmode=0500
-    opts_udf=${opts_common},ro,iocharset=iso8859-1,uid=${luser},gid=${lgroup},umask=0377
+    opts_udf=${opts_common},ro,iocharset=iso8859-1,uid=${luser},gid=${lgroup},umask=0277
     opts_ext2=${opts_common},acl,user_xattr
     opts_ext3=${opts_ext2}
     opts_ext4=${opts_ext2}
+    opts_hfs=ro,uid=${luser},gid=${lgroup},file_umask=0377,dir_umask=0277
+    opts_hfsplus=ro,uid=${luser},gid=${lgroup},umask=0277
     opts_vboxsf=nosuid,nodev,noexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
     opts_auto=${opts_vfat}
 
@@ -143,7 +145,7 @@ if [ "$1" = fork ]; then
     # (also update autokeys for reload_autofs)
     add_entry() {
         case "${ID_FS_TYPE}" in
-            auto|ext2|ext3|ext4|vfat|iso9660|udf|vboxsf)
+            auto|ext2|ext3|ext4|vfat|iso9660|udf|hfs|hfsplus|vboxsf)
                 eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
                 ;;
             msdos)
