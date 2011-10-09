@@ -30,8 +30,8 @@ if [ "$1" = fork ]; then
     opts_ext2=${opts_common},acl,user_xattr
     opts_ext3=${opts_ext2}
     opts_ext4=${opts_ext2}
-    opts_hfs=ro,uid=${luser},gid=${lgroup},file_umask=0377,dir_umask=0277
-    opts_hfsplus=ro,uid=${luser},gid=${lgroup},umask=0277
+    opts_hfs=${opts_common},ro,uid=${luser},gid=${lgroup},file_umask=0377,dir_umask=0277
+    opts_hfsplus=${opts_common},ro,uid=${luser},gid=${lgroup},umask=0277
     opts_vboxsf=nosuid,nodev,noexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
     opts_auto=${opts_vfat}
 
