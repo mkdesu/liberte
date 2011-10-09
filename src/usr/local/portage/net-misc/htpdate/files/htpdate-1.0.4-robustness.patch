@@ -1,6 +1,6 @@
---- htpdate.c	2011-09-04 04:25:46.000000000 +0300
-+++ htpdate.c	2011-09-04 18:33:44.182742000 +0300
-@@ -30,6 +30,15 @@
+--- htpdate.c	2008-10-13 19:04:08.000000000 +0000
++++ htpdate.c	2011-10-09 04:00:59.000000000 +0000
+@@ -30,6 +30,17 @@
  	http://www.gnu.org/copyleft/gpl.html
  */
  
@@ -8,6 +8,8 @@
 +	Modifications by mk@dee.su:
 +
 +	+ Set the time once able to do so, even if not in first poll cycle
++	+ Ignore 503 proxy responses (Forwarding failed)
++	+ Better error handling during communication
 +	+ Buffer overflow prevention when copying Date: header contents
 +	+ Added -T <tagfile> option to specify output file with initial time step
 +	+ Fixed umask setting
@@ -16,7 +18,15 @@
  /* Needed to avoid implicit warnings from strptime */
  #define _GNU_SOURCE
  
-@@ -240,7 +249,8 @@
+@@ -144,6 +155,7 @@
+ static long getHTTPdate( char *host, char *port, char *proxy, char *proxyport, char *httpversion, int ipversion, int when ) {
+ 	int					server_s;
+ 	int					rc;
++	int					success = 0;
+ 	struct addrinfo		hints, *res, *res0;
+ 	struct tm			tm;
+ 	struct timeval		timevalue = {LONG_MAX, 0};
+@@ -240,7 +252,8 @@
  	/* Receive data from the web server
  	   The return code from recv() is the number of bytes received
  	*/
@@ -26,18 +36,35 @@
  
  		/* Assuming that network delay (server->htpdate) is neglectable,
  		   the received web server time "should" match the local time.
-@@ -261,8 +271,8 @@
+@@ -261,13 +274,16 @@
  			timeofday.tv_usec - when;
  
  		/* Look for the line that contains Date: */
 -		if ( (pdate = strstr(buffer, "Date: ")) != NULL ) {
 -			strncpy(remote_time, pdate + 11, 24);
-+		if ( (pdate = strstr(buffer, "\nDate: ")) != NULL  &&  buffer+BUFFERSIZE - pdate > 12 + 24 ) {
++		if ( strstr(buffer, " 503 Forwarding failure") != NULL ) {
++			printlog( 1, "Ignoring proxy response" );
++		} else if ( (pdate = strstr(buffer, "\nDate: ")) != NULL  &&  buffer+BUFFERSIZE - pdate > 12 + 24 ) {
 +			strncpy(remote_time, pdate + 12, 24);
  
  			if ( strptime( remote_time, "%d %b %Y %T", &tm) != NULL) {
  				/* Web server timestamps are without daylight saving */
-@@ -387,7 +397,7 @@
+ 				tm.tm_isdst = 0;
+ 				timevalue.tv_sec = mktime(&tm);
++				success = 1;
+ 			} else {
+ 				printlog( 1, "%s unknown time format", host );
+ 			}
+@@ -289,7 +305,7 @@
+ 	/* Return the time delta between web server time (timevalue)
+ 	   and system time (timeofday)
+ 	*/
+-	return( timevalue.tv_sec - timeofday.tv_sec + gmtoffset );
++	return success ? ( timevalue.tv_sec - timeofday.tv_sec + gmtoffset ) : LONG_MAX;
+ 			
+ }
+ 
+@@ -387,7 +403,7 @@
  	puts("htpdate version "VERSION"\n\
  Usage: htpdate [-046abdhlqstxD] [-i pid file] [-m minpoll] [-M maxpoll]\n\
           [-p precision] [-P <proxyserver>[:port]] [-u user[:group]]\n\
@@ -46,7 +73,7 @@
    -0    HTTP/1.0 request\n\
    -4    Force IPv4 name resolution only\n\
    -6    Force IPv6 name resolution only\n\
-@@ -405,6 +415,7 @@
+@@ -405,6 +421,7 @@
    -q    query only, don't make time changes (default)\n\
    -s    set time\n\
    -t    turn off sanity time check\n\
@@ -54,7 +81,7 @@
    -u    run daemon as user\n\
    -x    adjust kernel clock\n\
    host  web server hostname or ip address (maximum of 16)\n\
-@@ -448,7 +459,7 @@
+@@ -448,7 +465,7 @@
  	signal(SIGHUP, SIG_IGN);
  
  	/* Change the file mode mask */
@@ -63,7 +90,7 @@
  
  	/* Change the current working directory */
  	if ( chdir("/") < 0 ) {
-@@ -480,8 +491,25 @@
+@@ -480,8 +497,25 @@
  }
  
  
@@ -89,7 +116,7 @@
  	char				*port;
  	char				*httpversion = DEFAULT_HTTP_VERSION;
  	char				*pidfile = DEFAULT_PID_FILE;
-@@ -500,6 +528,7 @@
+@@ -500,6 +534,7 @@
  	int					maxsleep = DEFAULT_MAX_SLEEP;
  	int					sleeptime = minsleep;
  	int					sw_uid = 0, sw_gid = 0;
@@ -97,7 +124,7 @@
  	time_t				starttime = 0;
  
  	struct passwd		*pw;
-@@ -510,7 +539,7 @@
+@@ -510,7 +545,7 @@
  
  
  	/* Parse the command line switches and arguments */
@@ -106,7 +133,7 @@
  	switch( param ) {
  
  		case '0':			/* HTTP/1.0 */
-@@ -604,6 +633,9 @@
+@@ -604,6 +639,9 @@
  			proxyport = DEFAULT_PROXY_PORT;
  			splithostport( &proxy, &proxyport );
  			break;
@@ -116,7 +143,7 @@
  		case '?':
  			return 1;
  		default:
-@@ -758,7 +790,7 @@
+@@ -758,7 +796,7 @@
  		}
  
  		/* Do I really need to change the time?  */
@@ -125,7 +152,7 @@
  			/* If a precision was specified and the time offset is small
  			   (< +-1 second), adjust the time with the value of precision
  			*/
-@@ -768,10 +800,21 @@
+@@ -768,10 +806,21 @@
  			/* Correct the clock, if not in "adjtimex" mode */
  			if ( setclock( timeavg, setmode ) < 0 )
  					printlog( 1, "Time change failed" );
@@ -147,7 +174,7 @@
  			if ( daemonize ) {
  				if ( starttime ) {
  					/* Calculate systematic clock drift */
-@@ -814,11 +857,6 @@
+@@ -814,11 +863,6 @@
  			exit(1);
  	}
  
