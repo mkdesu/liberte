@@ -8,6 +8,7 @@ inotifytimeout=60
 
 tordir=/var/lib/tor/data
 consensus=${tordir}/cached-consensus
+uvconsensus=${tordir}/unverified-consensus
 descriptors=${tordir}/cached-descriptors
 
 htpdir=/var/run/htpdate
@@ -24,12 +25,18 @@ else
 
     # Wait for the consensus file, which contains a valid time interval
     while :; do
-        if grep -qs "^valid-until ${datere}"'$' ${consensus}; then
+        if grep -qs "^valid-until ${datere}"'$' ${consensus} ${uvconsensus}; then
             break;
         fi
 
-        inotifywait -q -t ${inotifytimeout} -e close_write -e moved_to --format %w%f ${tordir} || :
+        inotifywait -qq -t ${inotifytimeout} -e close_write -e moved_to ${tordir} || :
     done
+
+    # Use unverified consensus if necessary (when time is far off into future)
+    if [ ! -e ${consensus} ]; then
+        logger -p 4 -t ${tag} "Using unverified Tor consensus (clock far off into future?)"
+        consensus=${uvconsensus}
+    fi
 
 
     # Get various date points in Tor's format, and do some sanity checks
@@ -63,7 +70,7 @@ ${vendcons}"
             # Tor is unreliable with picking a circuit after time change
             if /etc/init.d/tor -q status; then
                 logger -p 6 -t ${tag} "Restarting Tor service"
-                /etc/init.d/tor restart
+                /etc/init.d/tor -q restart
             fi
 
         fi
@@ -85,13 +92,13 @@ else
             break;
         fi
 
-        inotifywait -q -t ${inotifytimeout} -e create --format %w%f ${htpdir} || :
+        inotifywait -qq -t ${inotifytimeout} -e create ${htpdir} || :
     done
 
     # I2P is unreliable with correcting internal clock after time change
     if /etc/init.d/i2p -q status; then
         logger -p 6 -t ${tag} "Restarting I2P service"
-        /etc/init.d/i2p restart
+        /etc/init.d/i2p -q restart
     fi
 
 fi
