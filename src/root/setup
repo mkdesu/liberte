@@ -525,8 +525,8 @@ chattr -f -a /tmp/.private || true
 
 sinfo "Installing wrappers"
 mv -n /sbin/iwconfig{,.orig}
-ln -sf /usr/local/libexec/iwconfig.wrapper       /sbin/iwconfig
-ln -sf /usr/local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
+ln -sf ../usr/local/libexec/iwconfig.wrapper   /sbin/iwconfig
+ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
 
 
 sinfo "Compiling kernel"

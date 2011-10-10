@@ -411,8 +411,8 @@ rc-update -u
 
 
 sinfo "Setting sh (dash) and java (jamvm) symlinks"
-ln -sf dash  /bin/sh
-ln -s  jamvm /usr/bin/java
+ln -sf dash                          /bin/sh
+ln -s  ../local/libexec/java.wrapper /usr/bin/java
 
 
 # Spaces in entries are not handled, but it doesn't matter here
