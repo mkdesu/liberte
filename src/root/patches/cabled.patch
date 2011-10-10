@@ -1,0 +1,19 @@
+--- /etc/init.d/cabled	2011-10-08 04:18:11.000000000 +0000
++++ /etc/init.d/cabled.new	2011-10-10 20:24:57.000000000 +0000
+@@ -2,6 +2,7 @@
+ 
+ description="Starts cables communication daemon."
+ 
++lgroup=legion
+ cuser=cable
+ cableflag=/var/www/cable
+ 
+@@ -18,7 +19,7 @@
+         # service_stopped doesn't work, since nginx is "starting"
+         if ! service_started nginx; then
+             ebegin "Initializing cabled"
+-            sudo -n -u ${cuser} ${daemon} init
++            sudo -n -u ${cuser} -g ${lgroup} ${daemon} init
+             eend $?
+         else
+             ewarn "Skipping cabled init (nginx not inactive)"

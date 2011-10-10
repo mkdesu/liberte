@@ -423,7 +423,7 @@ sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab kexec iptables"
+initpatches="inittab kexec iptables cabled"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
