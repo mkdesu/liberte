@@ -1,5 +1,7 @@
 
 [keyring]
 display-name=Wireless Passwords
+ctime=0
+mtime=0
 lock-on-idle=false
-lock-timeout=0
+lock-after=false

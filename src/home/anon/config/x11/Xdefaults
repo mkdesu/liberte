@@ -4,3 +4,6 @@
 ! Use x11-themes/xcursor-neutral cursor theme
 Xcursor.theme: Neutral_Plus
 !Xcursor.size: 48
+
+! For the rare apps that need X fonts (e.g., GraphicsMagick)
+*font: fixed
