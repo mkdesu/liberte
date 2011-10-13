@@ -265,13 +265,11 @@ gcc  ${cflags} -o /usr/lib/xchat/plugins/cap_sasl.so /usr/local/src/cap_sasl.c -
                
 cflags="-Wall `portageq envvar CFLAGS`"
 mkdir -p /usr/local/addons/initrd
-klcc ${cflags} -o /usr/local/addons/initrd/memwipe    /usr/local/src/memwipe.c
 klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.c
 
 strip -s /usr/local/sbin/udev-watchdog       \
          /usr/local/sbin/slay                \
          /usr/local/bin/log-limit            \
-         /usr/local/addons/initrd/memwipe    \
          /usr/local/addons/initrd/init-kexec \
          /usr/lib/xchat/plugins/cap_sasl.so
 

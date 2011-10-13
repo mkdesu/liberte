@@ -1,7 +1,7 @@
 /*
  * Supported kernel parameters:
  *
- *   - halt  : power-off after memory wipe
+ *   - halt  : power-off
  *
  *   - alert : take special precautions against cold-boot attacks
  *             [unused at present]
@@ -13,7 +13,6 @@
 #include <signal.h>
 #include <termios.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <sys/mount.h>
 #include <sys/reboot.h>
 #include <sys/ioctl.h>
@@ -22,12 +21,10 @@
 /* Move cursor to top left and clear screen */
 #define ANSI_CLS "\033[H\033[2J"
 
-#define MEMWIPE  "/memwipe"
-
 /* Maximum length of /proc/sys/... path */
 #define MAX_PATH 64
 
-#define DELAY_MS 250
+#define DELAY_MS 0
 
 
 static void cocoon() {
@@ -99,9 +96,7 @@ static void sysctl(const char *key, const char *value) {
 
 
 int main(int argc, char **argv) {
-    int   halt = 0, alert = 0, status;
-    pid_t pid;
-    char  *empty[] = { 0 };
+    int   halt = 0, alert = 0;
 
 
     /* Clear screen if the terminal supports it */
@@ -122,7 +117,7 @@ int main(int argc, char **argv) {
     }
 
 
-    printf("Wiping RAM (halt=%d, alert=%d)...\n", halt, alert);
+    printf("Intermediate kernel (halt=%d, alert=%d)\n", halt, alert);
 
 
     /* Set VM-related kernel parameters via procfs */
@@ -140,36 +135,6 @@ int main(int argc, char **argv) {
 
         if (umount("/proc"))
             fprintf(stderr, "Failed to unmount /proc\n");
-    }
-
-
-    /* Wipe memory via helper process */
-    pid = vfork();
-
-    if (pid == -1)
-        fprintf(stderr, "Failed to vfork memory wiper\n");
-
-    /* In child thread */
-    else if (pid == 0) {
-        execve(MEMWIPE, empty, empty);
-
-        fprintf(stderr, "Failed to run memory wiper\n");
-        _exit(1);
-    }
-
-    /* Continuing in parent thread */
-    else {
-        if (waitpid(pid, &status, 0) != pid)
-            fprintf(stderr, "Failed to wait on child process\n");
-
-        else if (WIFSIGNALED(status))
-            fprintf(stderr, "Memory wiping process killed\n");
-
-        else if (!WIFEXITED(status))
-            fprintf(stderr, "Memory wiper didn't exit and wasn't killed\n");
-
-        else if (WEXITSTATUS(status))
-            fprintf(stderr, "Memory wiper didn't run or didn't exit cleanly\n");
     }
 
 

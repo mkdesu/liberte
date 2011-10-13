@@ -3,6 +3,10 @@ KNAME=usr/local/boot/kernel-kexec.zi
 INITRD=/usr/local/boot/initrd-kexec.xz
 
 ROOTPART=none
-KPARAM="quiet"
+
+# memtest=1: 0x00 once
+# memtest=2: 0x00, 0xff, 0x00
+# memtest=3: 0x00, 0xff, 0x55, 0x00
+KPARAM="quiet memtest=2"
 
 LOAD_DURING_SHUTDOWN=both

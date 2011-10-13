@@ -1,7 +1,5 @@
 # Custom klibc-based executables
 file  init     /usr/local/addons/initrd/init-kexec 0755 0 0
-file  memwipe  /usr/local/addons/initrd/memwipe    0755 0 0
 
 # Mount points
 dir   proc     0755 0 0
-dir   sys      0755 0 0
