@@ -6,8 +6,6 @@
 =dev-java/java-service-wrapper-3.3.3*
 
 # Network
-=net-misc/networkmanager-0.8.4*
-=gnome-extra/nm-applet-0.8.4*
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
@@ -21,6 +19,7 @@
 sys-kernel/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
+net-wireless/iwl5000-ucode
 net-wireless/iwl5150-ucode
 net-wireless/iwl6000-ucode
 net-wireless/iwl6050-ucode
