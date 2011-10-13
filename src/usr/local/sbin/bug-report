@@ -1,0 +1,112 @@
+#!/bin/sh -e
+
+if [ "`id -u`" != 0 ]; then
+    echo "Please run this program as root:"
+    echo "Logout immediately after boot and press Alt-F2."
+    exit 1
+fi
+
+
+# Save files in a temporary directory
+rep="`pwd`/bug-report.tar.xz"
+dir=`mktemp -d`
+cd "${dir}"
+
+
+# Allow errors from now on
+set +e
+exec 2> errors
+
+
+# Load modules for x86info / lsmsr
+modprobe cpuid
+modprobe msr
+
+
+# Build the report
+echo Architecture ...
+x86info -a                           > 01-x86
+lsmsr -a -V 4                        > 01-msr
+cp /proc/cpuinfo                       02-cpu
+cpufreq-info                         > 02-cpu-freq
+
+echo System ...
+biosdecode                           > 03-bios
+dmidecode                            > 03-dmi
+vpddecode                            > 03-vpd
+sensors                              > 03-sensor
+
+# Apparently, only lspci -xxxx encodes serial numbers
+echo Hardware ...
+lsmod                                > 04-mod
+lspci -vvvxxxDnn -A linux-sysfs      > 05-pci
+lsusb -v                             > 05-usb
+lsscsi -dgpLv                        > 06-scsi-dev
+lsscsi -HLv                          > 06-scsi-host
+lsscsi -HLtv                         > 06-scsi-top
+lspcmcia                             > 07-pcmcia
+pkcs11-tool -Lv                      > 07-pcsc
+
+echo Network ...
+ifconfig -a -v                       > 08-net-eth
+(iwconfig; echo; iwpriv)             > 08-net-wifi
+hciconfig -a                         > 08-net-hci
+route -vne                           > 08-net-route
+
+echo Sound ...
+alsa-info --no-dialog --with-aplay --with-amixer --with-alsactl --with-devices \
+          --with-dmesg --no-upload --output 09-alsa 1>/dev/null
+
+echo Disks ...
+lsblk -t                             > 10-blk
+cp /proc/mounts                        10-mnt
+
+for dev in `smartctl --scan | cut -d' ' -f1`; do
+    smartctl -ax "${dev}"            > 11-smart-`basename "${dev}"`
+done
+
+echo System logs ...
+cp /var/log/rc.log                     12-rc.log
+dmesg -r                             > 13-dmesg
+for log in /var/log/everything/*; do
+    cp "${log}"                        14-"`basename "${log}"`"
+done
+
+echo X System logs ...
+cp /etc/X11/xorg.conf                  15-xorg.conf
+cp /var/log/Xorg.0.log                 15-xorg.log
+cp /var/log/Xorg.0.log.old             15-xorg-prev.log
+cp /tmp/.private/anon/xsession.log     16-xsession.log
+cp /tmp/.private/anon/xsession.log.old 16-xsession-prev.log
+
+echo I2P logs ...
+cp /var/log/i2p/wrapper.log            17-i2p-wrapper.log
+cp /var/log/i2p/wrapper.log.1          17-i2p-wrapper-prev.log
+cp /var/log/i2p/router-0.log           17-i2p-router.log
+cp /var/log/i2p/router-1.log           17-i2p-router-next.log
+
+
+# Make errors fatal again
+set -e
+exec 2>&1
+
+
+# Sanitize hardware-identifying info
+echo Sanitizing ...
+sed -ri 's/\<(Serial Number:?[[:blank:]]+)[^[:blank:]].+/\1[SN REMOVED]/ig' *
+sed -ri 's/\<((iSerial[[:blank:]]+[[:digit:]]+|SerialNumber:)[[:blank:]]+)[^[:blank:]:]+$/\1[SN REMOVED]/i' *
+
+sed -ri 's/\<version:?[[:blank:]]+[[:digit:].]+\>/&/; t; s/\<(0|127|255)\.(0|255)\.(0|255)\./ipMaGiK&/g; s/\<([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}\>/[IP REMOVED]/ig; s/ipMaGiK//g' *
+sed -ri 's/\<([[:xdigit:]]{2}:){5,}[[:xdigit:]]{2}\>/[MAC REMOVED]/ig' *
+sed -ri "s/\<(domain name) '[^']*'/\1 '[DN REMOVED]'/ig" *
+
+sed -rn 's/^.*\<ESSID:"([^"]+)".*$/\1/p' 08-net-wifi | while read net; do
+    sed -i "s^\<${net}\>^[ESSID REMOVED]^g" *
+done
+
+# Create an  archive in the original directory
+cd - 1>/dev/null
+tar -cJf "${rep}" --mode 600 -C "${dir}" .
+rm -r "${dir}"
+
+echo "Created ${rep}"

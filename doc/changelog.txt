@@ -5,6 +5,7 @@
   * Support for installing to ext2/3/4 filesystems
   * Directories are hidden on FAT (during install) and ISO (in Joliet layer)
   * Added silent splash theme, which also disables logo in X server
+  * Added configuration-gathering tool for bug reporting
 
   * Kernel 2.6.39 with SquashFS XZ compression and NX support
   * Requirements bumped to PentiumIII+ (implies MMX, SSE) with PAE
