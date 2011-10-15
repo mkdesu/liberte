@@ -153,6 +153,11 @@ if [ "$1" = fork ]; then
                 ;;
             ntfs)
                 type="${ID_FS_TYPE}-3g,${opts_ntfs}"
+
+                # Possibly make mount point read-only for NTFS (e.g., hibernated Windows)
+                if ! ntfs-3g.probe -w "${DEVNAME}"; then
+                    type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
+                fi
                 ;;
             *)
                 # Fallback, shouldn't happen
@@ -164,30 +169,25 @@ if [ "$1" = fork ]; then
         fixlabel
         echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
         autokeys="${autokeys}${ID_FS_LABEL} "
-
-        # Make a read-only twin for NTFS (for hibernated Windows)
-        # "ntfs-3g.probe -w" is unusable here, since it causes "change" actions
-        if [ ${ID_FS_TYPE} = ntfs ]; then
-            ID_FS_LABEL="${ID_FS_LABEL}-readonly"
-            type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
-
-            fixlabel
-            echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
-            autokeys="${autokeys}${ID_FS_LABEL} "
-        fi
     }
 
-    # Unmount and remove existing auto.media entry (or entries, if NTFS)
+    # Unmount and remove existing auto.media entry (or entries)
     # (also update autokeys for fixlabel after ACTION=change, and for reload_autofs)
     remove_entry() {
         # Unmount mount points, not devices (since there can be several per device)
         local keys=`awk '!/^#/ && $3 == ":'"${DEVNAME}"'" { print $1 }' ${mounts}`
         local key
+        local kl="$1"
 
         for key in ${keys}; do
             # NOTE: lazy unmount
-            umount -l ${prefix}/${key} 2>/dev/null || true
+            umount -l ${prefix}/"${key}" 2>/dev/null || true
             autokeys="${autokeys/ ${key} / }"
+
+            if [ "${kl}" = keeplabel ]; then
+                ID_FS_LABEL="${key}"
+                kl=
+            fi
         done
 
         # Remove entries (will be removed from dir after autofs reload)
@@ -210,23 +210,13 @@ if [ "$1" = fork ]; then
                 reload_autofs
             fi
         fi
-    # For "change" action, a line is replaced
-    elif [ "${ACTION}" = change ]; then
-        if [ -z "${autodevs/* ${DEVNAME} */}" ]; then
-            remove_entry
-            updated_autofs=1
-        fi
-
-        if [ -n "${ID_FS_TYPE}" ]; then
-            # Add an entry only if not still mounted
-            fscheck=`fstab_check`
-            if [ "${fscheck}" != mtab ]; then
-                add_entry
-                updated_autofs=1
-            fi
-        fi
-
-        if [ "${updated_autofs}" = 1 ]; then
+    # For "change" action (non-fuse-generated), a line is replaced,
+    # but label is not changed
+    elif [ "${ACTION}" = change -a "${DISK_MEDIA_CHANGE}" = 1 ]; then
+        # Update if present in autofs, and is a filesystem
+        if [ -z "${autodevs/* ${DEVNAME} */}" -a -n "${ID_FS_TYPE}" ]; then
+            remove_entry keeplabel
+            add_entry
             reload_autofs
         fi
     # For "remove" action, the line corresponding to the device is removed

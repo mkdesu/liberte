@@ -3,5 +3,5 @@ ENV{ID_FS_USAGE}=="filesystem|crypto", KERNEL!="loop[0-9]*", RUN+="/usr/local/sb
 ACTION=="change", SUBSYSTEM=="block",  KERNEL!="loop[0-9]*", RUN+="/usr/local/sbin/ps-mount"
 
 # Permanent autofs entries for floppies and IDE cdroms
-ACTION=="add", KERNEL=="fd[0-9]",                      RUN+="/usr/local/sbin/ps-mount"
-ACTION=="add", ENV{ID_CDROM}=="1", ENV{ID_BUS}=="ata", RUN+="/usr/local/sbin/ps-mount"
+ACTION=="add", KERNEL=="fd[0-9]",  RUN+="/usr/local/sbin/ps-mount"
+ACTION=="add", ENV{ID_CDROM}=="1", RUN+="/usr/local/sbin/ps-mount"
