@@ -1,2 +1,5 @@
 # Python 3
 >=dev-lang/python-3
+
+# GTK 3
+>=x11-libs/gtk+-3

@@ -33,7 +33,7 @@ else
 
     # Use unverified consensus if possible (when time is far off into future, or when
     # it wasn't removed yet), but work with a hardlink to prevent removal in-process
-    if [ ! -e ${consensus} ]  &&  ln ${uvconsensus} ${uvconsensus}.bak 2>/dev/null; then
+    if [ ! -e ${consensus} ]  &&  ln -fT ${uvconsensus} ${uvconsensus}.bak 2>/dev/null; then
         logger -p 6 -t ${tag} "Using unverified Tor consensus"
         consensus=${uvconsensus}.bak
     else

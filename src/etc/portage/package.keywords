@@ -11,7 +11,6 @@
 <net-misc/networkmanager-vpnc-0.8.5
 
 # Applications
-=media-plugins/gst-plugins-vp8-0.10.22*
 =x11-misc/fpm2-0.79*
 =net-irc/xchat-otr-0.3*
 

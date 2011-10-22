@@ -377,7 +377,7 @@ sinfo "Creating initial netDb for I2P"
 netdbdir=`mktemp -d`
 
 # Aim at retrieving ~2000 routerInfos (in overlapping portions of 100)
-curl -sSfg ${i2pnetdb}{,,}{,,,,,,,,,} | sed 's/>/>\n/g' \
+curl -sSfg ${i2pnetdb}{,,,}{,,,,,,,,,} | sed 's/>/>\n/g' \
     | LC_ALL=C sed -nr "s@^.*\<href=\"(${i2prire})\".*\$@\1@p" \
     | sort -u | shuf -o ${netdbdir}/names
 
