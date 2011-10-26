@@ -3,3 +3,4 @@
 
 # GTK 3
 >=x11-libs/gtk+-3
+>=media-video/gnome-mplayer-1.0.4
