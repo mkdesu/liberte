@@ -40,6 +40,9 @@ net-irc/xchat                   ssl
 net-im/pidgin                         gnutls sasl
 dev-libs/cyrus-sasl             ssl          -crypt
 net-analyzer/netcat                          -crypt
+net-libs/libproxy               -gnome -networkmanager
+net-libs/glib-networking        -gnome libproxy
+
 
 # Multimedia
 media-video/totem               -youtube nsplugin
@@ -71,7 +74,6 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
 media-gfx/splashutils           -truetype
-net-libs/glib-networking        -gnome -libproxy
 
 # Extra functionality
 sys-apps/busybox                static savedconfig
