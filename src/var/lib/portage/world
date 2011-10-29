@@ -142,8 +142,7 @@ app-cdr/xcdroast
 # app-cdr/graveman
 app-cdr/isomaster
 media-sound/audacious
-media-video/gnome-mplayer
-media-video/x264-encoder
+media-video/totem
 media-gfx/gpicview
 media-gfx/geeqie
 media-gfx/fbida
@@ -167,13 +166,14 @@ app-text/fbreader
 net-irc/xchat
 
 # Plugins
-media-plugins/gst-plugins-gconf
 media-plugins/gst-plugins-meta
-media-plugins/gst-plugins-x264
-media-plugins/gst-plugins-vp8
+media-plugins/gst-plugins-cdio
+media-plugins/gst-plugins-jpeg
+media-plugins/gst-plugins-libpng
 media-plugins/gst-plugins-speex
-media-plugins/gst-plugins-pango
-media-plugins/gst-plugins-soup
+media-plugins/gst-plugins-x264
+media-plugins/gst-plugins-ximagesrc
+media-plugins/gst-plugins-xvid
 net-irc/xchat-otr
 x11-plugins/pidgin-otr
 x11-plugins/pidgin-libnotify

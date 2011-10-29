@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<gconf>
+	<entry name="autoload_subtitles" mtime="1319813975" type="bool" value="true"/>
+	<entry name="open_path" mtime="1319813735" type="string">
+		<stringvalue>file:///home/anon</stringvalue>
+	</entry>
+	<entry name="subtitle_encoding" mtime="1319813724" type="string">
+		<stringvalue>UTF-8</stringvalue>
+	</entry>
+	<entry name="visual_quality" mtime="1319813724" type="int" value="0"/>
+	<entry name="visual" mtime="1319752621" type="string">
+		<stringvalue>GOOM: what a GOOM!</stringvalue>
+	</entry>
+	<entry name="show_vfx" mtime="1319813724" type="bool" value="true"/>
+	<entry name="audio_output_type" mtime="1319752621" type="int" value="0"/>
+	<entry name="debug" mtime="1319813724" type="bool" value="false"/>
+</gconf>

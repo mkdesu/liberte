@@ -230,6 +230,8 @@
 /usr/bin/pcf2vpnc
 # media-libs/gst-plugins-base: input audio visualization
 /usr/bin/gst-visualise*
+# media-video/totem: bug reporting
+/usr/libexec/totem/totem-bugreport.py
 
 # OpenSSH server
 /etc/ssh/sshd_config
@@ -245,6 +247,7 @@
 /usr/bin/gs
 /usr/bin/vpxdec
 /usr/bin/vpxenc
+/usr/bin/luac
 /usr/bin/orcc
 /usr/bin/orc-bugreport
 /usr/sbin/vboxguest-service

@@ -47,10 +47,9 @@ openvpn                 ssl                     ssl             networkmanager-o
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup(midori, gst-plugins-soup)
-libsoup                 gnutls                  gnutls          midori, gst-plugins-soup
-curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader
+libsoup                 gnutls                  gnutls          midori, gst-plugins-soup, totem-pl-parser
+curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi
 neon                    ssl, gnutls             gnutls          audacious-plugins
-rtmpdump                ssl, gnutls, polarssl   gnutls          mplayer
 wget                    ssl                     ssl             portage, libqalculate(forex)
 
 cyrus-sasl              ssl                     ssl             pidgin

@@ -39,7 +39,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # NOTE: the below patches are intended for depclean
 #
 # python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa,
-#          gobject-introspection, openbox
+#          gobject-introspection, openbox, totem
 # perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils:     ca-certificates
@@ -61,6 +61,7 @@ ebuilds="app-misc/ca-certificates
          media-gfx/splashutils
          media-libs/mesa
          media-plugins/gst-plugins-vp8
+         media-video/totem
          net-dialup/pptpclient
          net-im/pidgin
          sys-apps/lm_sensors
@@ -80,7 +81,7 @@ done
 # (allows depclean after python unmerge + shadow copy)
 sed -i 's/\${python_dep}//' ${ebuild_portage}
 
-# Perl is not needed at all (x2)
+# Perl is not needed at all by gentoolkit and eboard
 # Perl is only needed by sensors-detect and sensors-conf-convert
 # Perl is not needed for pptpclient when used by networkmanager-pptp
 sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_sensors} \
@@ -88,11 +89,12 @@ sed -i s:dev-lang/perl:: ${ebuild_gentoolkit} ${ebuild_eboard} ${ebuild_lm_senso
 
 # Python is only (possibly) needed during libxcb build
 # Python is only needed by libglade-convert
-# Python is not needed at all by gtk+, gucharmap, glib and exiv2
+# Python is not needed at all by gtk+, gucharmap, glib, exiv2 and totem
 # Python is only needed by g-ir-{scanner,annotation-tool}
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
                                          ${ebuild_gtk} ${ebuild_gucharmap} ${ebuild_glib} \
-                                         ${ebuild_exiv2} ${ebuild_gobjectintrospection}
+                                         ${ebuild_exiv2} ${ebuild_gobjectintrospection} \
+                                         ${ebuild_totem}
 
 # Python is needed by dbus-python, which is a non-separated dependency in ebuild
 sed -i 's:\<dev-python/dbus-python\>::' ${ebuild_pidgin}
@@ -333,7 +335,7 @@ update-desktop-database -q /usr/share/applications
 sinfo "Modifying MIME actions ordering preferences"
 sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
         s/\<epdfview.desktop;evince.desktop;/evince.desktop;epdfview.desktop;/ ;
-        s/\<gnome-mplayer.desktop;audacious.desktop;/audacious.desktop;gnome-mplayer.desktop;/' \
+        s/\<totem.desktop;audacious.desktop;/audacious.desktop;totem.desktop;/' \
     /usr/share/applications/mimeinfo.cache
 
 
