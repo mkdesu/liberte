@@ -19,6 +19,7 @@ fi
 FROM=`dirname $0`
 LIVECD=$1
 
+# MIRROR=http://mirrors.kernel.org/gentoo
 MIRROR=http://distfiles.gentoo.org
 stage3base=${MIRROR}/releases/x86/autobuilds
 portage=${MIRROR}/snapshots/portage-latest.tar.bz2
