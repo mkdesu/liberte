@@ -75,9 +75,9 @@ filesel_path=/home/anon
 leading_zero=TRUE
 advance_on_delete=FALSE
 open_to_temporary=FALSE
+cover_name_include=album,folder
 chardet_detector=
 chardet_fallback=
-cover_name_include=album,folder
 [gtkui]
 save_window_position=TRUE
 player_visible=TRUE
