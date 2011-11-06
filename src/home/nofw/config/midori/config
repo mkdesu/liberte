@@ -5,7 +5,8 @@ spell-checking-languages=en-us,en;q=0.5
 enable-java-applet=false
 last-window-width=798
 last-window-height=549
-show-bookmarkbar=false
+toolbar-style=MIDORI_TOOLBAR_SMALL_ICONS
+toolbar-items=TabNew,Back,Forward,Next,ReloadStop,BookmarkAdd,Location,Search,Trash,CompactMenu,
 homepage=file:///home/nofw/info/warning.html
 text-editor=gedit %U
 location-entry-search=http://www.google.com/search?q=%s
