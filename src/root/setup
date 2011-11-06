@@ -10,8 +10,8 @@ xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
 
-i2phosts=http://www.i2p2.de/hosts.txt
-i2pnetdb=http://netdb.i2p2.de/
+i2phosts=https://www.i2p2.de/hosts.txt
+i2pnetdb=https://netdb.i2p2.de/
 i2prire='routerInfo-[[:alnum:]~-]{43}=\.dat'
 maxrifetch=2000
 maxnetdb=100
