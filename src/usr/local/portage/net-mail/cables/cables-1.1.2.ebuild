@@ -15,7 +15,7 @@ MY_P_PF=mkdesu-cables
 I2P_PV=0.8.8
 I2P_MY_P=i2pupdate_${I2P_PV}
 
-# In the actual ebuild the GitHub URI should be replaced with a tagged download
+# GitHub URI can refer to a tagged download or the master branch
 SRC_URI="https://github.com/mkdesu/cables/tarball/v${PV} -> ${P}.tar.gz
          http://mirror.i2p2.de/${I2P_MY_P}.zip
          http://launchpad.net/i2p/trunk/${I2P_PV}/+download/${I2P_MY_P}.zip"
@@ -37,7 +37,7 @@ RDEPEND="www-servers/nginx[http,pcre,nginx_modules_http_access,nginx_modules_htt
 
 pkg_setup() {
 	enewgroup cable
-	enewuser  cable -1 -1 -1 cable -c "Cables Communication"
+	enewuser  cable -1 -1 -1 cable
 }
 
 src_unpack() {
