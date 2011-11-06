@@ -12,6 +12,7 @@ certsdir=${lmount}/security/ssl/certs
 gentorhost=gen-tor-hostname
 geni2phost=gen-i2p-hostname
 genuser=gen-cable-username
+certdate=2011-11-01
 
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite
@@ -94,7 +95,13 @@ start() {
         echo
 
         input_begin
-        sudo -n -u ${luser} ${genuser}
+
+        # Temporarily fix the date while generating certificates, otherwise
+        # the certificates might be generated with an invalid (future) date
+        curdate=`date -u +'%F %T'`
+        date -us "${certdate}" 1>/dev/null && \
+            sudo -n -u ${luser} ${genuser} && \
+            date -us "${curdate} `date -u +-%H%M`" 1>/dev/null
 
         eend $?
         input_end
