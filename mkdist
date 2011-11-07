@@ -15,18 +15,15 @@ fi
 # Variables
 SRC=`dirname $0`
 DIST=$1/dist
-# SVN=https://liberte.svn.sourceforge.net/svnroot/liberte/tags
 
 version=`cat ${SRC}/conf/version`
 distname=liberte-${version}
 
 
-sinfo "Building source distribution ${distname}-src.tar.bz2"
-rm -rf ${DIST}/${distname}-src
-svn export -q ${SRC} ${DIST}/${distname}-src
-chmod -R go=u-w ${DIST}/${distname}-src
-tar -C ${DIST} -p --owner root --group root -cjf ${DIST}/${distname}-src.tar.bz2 ${distname}-src
-rm -r ${DIST}/${distname}-src
+sinfo "Creating source distribution ${distname}-src.tar.bz2"
+cd ${SRC}
+git -c tar.umask=022 archive --format=tar --prefix=${distname}/ master \
+    | bzip2 > ${DIST}/${distname}-src.tar.bz2
 
 
 sinfo "Done."
