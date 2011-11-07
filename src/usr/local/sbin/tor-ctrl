@@ -1,0 +1,29 @@
+#!/bin/sh -e
+
+export LC_ALL=C
+
+ctrlhost=127.0.0.1
+ctrlport=9051
+cookie=/var/lib/tor/data/control_auth_cookie
+
+case "$1" in
+    newnym)
+        cmd="SIGNAL NEWNYM"
+        ;;
+
+    *)
+        echo "Format: tor-ctrl newnym"
+        exit 1
+        ;;
+esac
+
+if [ ! -r ${cookie} ]; then
+    echo "Auth cookie does not exist or insufficient permissions"
+    exit 1
+fi
+
+auth=`od -t x1 -v -w32 ${cookie} | cut -s -d' ' -f 2- --output-delimiter=`
+
+echo -n ${BASH:+-e} AUTHENTICATE "${auth}\r\n${cmd}\r\nQUIT\r\n" \
+    | nc -n -q 30 -w 30 ${ctrlhost} ${ctrlport} 2>&1 \
+    | sed -n '/^250 /b n; p; q 1; :n'

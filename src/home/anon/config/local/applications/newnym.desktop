@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Switch Tor Identity
+Comment=Establish new Tor identity by switching to clean circuits
+Exec=newnym
+Terminal=false
+Type=Application
+Categories=GTK;Network;Security;
+Icon=security-medium

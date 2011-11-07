@@ -85,6 +85,7 @@ sys-apps/haveged
 dev-java/jamvm
 
 # Network utilities
+net-analyzer/netcat
 net-firewall/iptables
 sys-apps/ethtool
 net-wireless/madwifi-ng-tools
@@ -314,4 +315,3 @@ x11-themes/claws-mail-themes
 # (can be removed in release)
 app-admin/paxtest
 dev-util/strace
-net-analyzer/netcat

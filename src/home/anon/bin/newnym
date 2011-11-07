@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if sudo -n -u tor /usr/local/sbin/tor-ctrl newnym; then
+    exec notify-send -u normal   -i security-high 'Established new Tor identity' 'Switched to clean circuits; new application requests will not share any circuits with old ones. DNS cache has been cleared as well.'
+else
+    exec notify-send -u critical -i security-low  'Failed to establish new Tor identity' 'Tor is probably not running; check user-level logs.'
+fi

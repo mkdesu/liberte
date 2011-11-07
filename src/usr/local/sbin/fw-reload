@@ -101,6 +101,10 @@ iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner privoxy  --syn -d 127.0.0.1 --dport 9050 -j ACCEPT
 iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 9050 -j LOGREJECT
 
+# Tor control port access only for Tor user
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 9051 -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 9051 -j LOGREJECT
+
 # Tor access via transparent proxy only for I2P (redirected from an external interface)
 iptables -A OUTPUT ! -o lo -p tcp -m owner --uid-owner i2p    --syn -d 127.0.0.1 --dport 9040 -j ACCEPT
 iptables -A OUTPUT         -p tcp                             --syn -d 127.0.0.1 --dport 9040 -j LOGREJECT

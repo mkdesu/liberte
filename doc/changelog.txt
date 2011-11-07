@@ -1,4 +1,4 @@
-2011-XX-XX
+2011-11-07
   + 2011.2 release
 
   * ISO image generation, useful for VMs and independent installs
@@ -19,6 +19,7 @@
   * HTP time daemon has been hardened and extended to aid I2P service
   * OTFE partition now supports file permissions, sanitized during boot
   * OTFE partition now uses NTFS compression for all data
+  * Added an applet for switching Tor identity (NEWNYM)
 
   * Cables communication is now a separate project
   * Cables communication daemon runs under a designated user

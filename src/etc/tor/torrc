@@ -1,31 +1,36 @@
 ## Default user the server will run as
 User tor
 
-PIDFile            /var/run/tor/tor.pid
+PIDFile              /var/run/tor/tor.pid
 Log notice syslog
-#Log notice file   /var/log/tor/tor.log
+#Log notice file     /var/log/tor/tor.log
 
 ## "SocksPort 0" for server-only setup
-SocksListenAddress 127.0.0.1
-SocksPort          9050
+SocksListenAddress   127.0.0.1
+SocksPort            9050
 
-# Transparent proxy connections
-TransListenAddress 127.0.0.1
-TransPort          9040
+## control_auth_cookie in data directory
+ControlListenAddress 127.0.0.1
+ControlPort          9051
+CookieAuthentication 1
+
+## Transparent proxy connections
+TransListenAddress   127.0.0.1
+TransPort            9040
 
 ## The directory for keeping all the keys/etc.
-DataDirectory      /var/lib/tor/data
+DataDirectory        /var/lib/tor/data
 
 ## Hidden service on local port 80
-HiddenServiceDir   /var/lib/tor/hidden_service/
-HiddenServicePort  80 127.0.0.1:80
+HiddenServiceDir     /var/lib/tor/hidden_service/
+HiddenServicePort    80 127.0.0.1:80
 
 ## Easy operation behind firewalls, also disguise
 ## connections somewhat.
-ReachableAddresses *:80, *:443
+ReachableAddresses   *:80, *:443
 
 ## Reject resolved DNS connections
-SafeSocks 1
+SafeSocks            1
 
 # Do not relay. From Tor FAQ:
 #   Three different research papers describe ways to identify the relays in a
@@ -35,4 +40,4 @@ SafeSocks 1
 #   if we're trying to encourage more clients to turn on relay functionality
 #   too (whether as bridge relays or as normal relays), then we need to
 #   understand this threat better and learn how to mitigate it.
-ClientOnly         1
+ClientOnly           1
