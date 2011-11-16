@@ -80,6 +80,7 @@ sys-apps/busybox                static savedconfig
 virtual/jpeg                    static-libs
 media-libs/jpeg                 static-libs
 media-libs/libpng               static-libs
+sys-devel/gcc                   cxx
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 dev-java/gnu-classpath          xml
