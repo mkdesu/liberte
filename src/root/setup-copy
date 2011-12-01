@@ -400,7 +400,7 @@ chmod u+s,o-rwx /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
 
 
 sinfo "Setting cables-related permissions"
-chmod 710 /home/anon{,/persist{,/security{,/ssl},/mail,/cables}}
+chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
 
 
 sinfo "Updating ld cache"

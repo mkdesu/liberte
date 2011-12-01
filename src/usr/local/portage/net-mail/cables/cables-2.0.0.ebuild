@@ -93,7 +93,7 @@ pkg_postinst() {
 	elog ""
 	elog "Generate cables certificates and Tor/I2P keypairs for the user"
 	elog "    gen-cable-username"
-	elog "        copy CABLE_CERTS/certs/*.pem to CABLE_PUB/cable/certs (group-readable)"
+	elog "        copy CABLE_CERTS/certs/*.{pem,sig} to CABLE_PUB/cable/certs (group-readable)"
 	elog "    gen-tor-hostname"
 	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by tor)"
 	elog "    gen-i2p-hostname"

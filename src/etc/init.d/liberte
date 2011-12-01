@@ -188,12 +188,12 @@ start() {
 
             # permissions (sloppy w.r.t dirs, but rsync takes care of dirs that matter)
             find ${lmount} -xdev -perm /6007 -type d -print0 | xargs -0r chmod ug-s,o-rwx --
-            find ${lmount} -xdev -path ${lmount}/security/ssl -prune -o \
+            find ${lmount} -xdev -path ${lmount}/security/cable -prune -o \
                 -perm /7077 ! -type d ! -type l -print0 | xargs -0r chmod go=,u-s --
 
             # cables certs permissions
-            find ${lmount}/security/ssl -xdev ! -perm 710 -type d -print0 | xargs -0r chmod 710 --
-            find ${lmount}/security/ssl -xdev ! -perm 640 ! -type d ! -type l -print0 \
+            find ${lmount}/security/cable -xdev ! -perm 710 -type d -print0 | xargs -0r chmod 710 --
+            find ${lmount}/security/cable -xdev ! -perm 640 ! -type d ! -type l -print0 \
                 | xargs -0r chmod 640 --
 
             eend $?
