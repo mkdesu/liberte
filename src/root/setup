@@ -303,7 +303,7 @@ for fconf in \
     57-dejavu-sans-mono.conf \
     57-dejavu-serif.conf \
     65-khmer.conf \
-    65-ttf-thai-tlwg.conf \
+    64-ttf-thai-tlwg.conf \
     70-no-bitmaps.conf
 do
     if [ ! -f /etc/fonts/conf.d/${fconf} ]; then
