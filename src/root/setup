@@ -2,6 +2,8 @@
 
 export KBUILD_BUILD_VERSION=0
 export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
+export KBUILD_BUILD_USER=liberte
+export KBUILD_BUILD_HOST=dee.su
 
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
@@ -93,8 +95,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     rm -rf /usr/src/linux-${kversion} /lib/modules
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
 
-    spatch ${HOME}/patches/kernel-info.patch -p0
-
 
     sinfo "Cloning kernel to ${kversion}-kexec"
     rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec
@@ -110,8 +110,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
 
     sinfo "Applying kernel patches"
-    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-3.0-rc2.patch      -d /usr/src/linux -p1
-    spatch /usr/local/portage/distfiles/unionfs-2.5.10_for_2.6.39.4.diff.gz -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-3.0-rc2.patch   -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/unionfs-2.5.10_for_3.0.4.diff.gz -d /usr/src/linux -p1
 
 
     # Filter locales before remerging libc
