@@ -1,3 +1,9 @@
+2011-XX-XX
+  + 2011.3 release
+
+  * Kernel 3.0.4
+  * Cables communication now maintains repudiability
+
 2011-11-07
   + 2011.2 release
 
