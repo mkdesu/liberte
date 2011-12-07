@@ -1,5 +1,5 @@
---- /etc/init.d/cabled	2011-10-08 04:18:11.000000000 +0000
-+++ /etc/init.d/cabled.new	2011-10-10 20:24:57.000000000 +0000
+--- /etc/init.d/cabled	2011-12-07 12:36:03.000000000 +0000
++++ /etc/init.d/cabled.new	2011-12-07 12:36:52.000000000 +0000
 @@ -2,6 +2,7 @@
  
  description="Starts cables communication daemon."
@@ -17,3 +17,12 @@
              eend $?
          else
              ewarn "Skipping cabled init (nginx not inactive)"
+@@ -26,7 +27,7 @@
+ 
+         # SSD -u sets up USER and HOME, and sanitizes environment
+         ebegin "Starting cabled"
+-        start-stop-daemon -S -q -c ${cuser} -p ${pidfile} -bm -x ${daemon} --
++        start-stop-daemon -S -q -u ${cuser} -p ${pidfile} -bm -x ${daemon} --
+         eend $?
+     else
+         ewarn "Skipping cabled startup"
