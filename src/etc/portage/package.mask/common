@@ -3,3 +3,9 @@
 
 # GTK 3
 >=x11-libs/gtk+-3
+
+>=media-sound/audacious-3
+>=media-plugins/audacious-plugins-3
+
+# Version must match x11-drivers/xf86-input-virtualbox
+>=app-emulation/virtualbox-guest-additions-4.0.13
