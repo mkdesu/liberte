@@ -23,6 +23,7 @@ user-agent=Mozilla/5.0 (Windows NT 6.1; rv:5.0) Gecko/20100101 Firefox/5.0
 preferred-languages=en-us,en;q=0.5
 
 [extensions]
+libaddons.so=true
 libcookie-manager.so=true
 libshortcuts.so=true
 libstatusbar-features.so=true
