@@ -1,0 +1,233 @@
+#!/bin/sh -e
+
+# Requirements: parted, e2fsprogs, librsvg[tools]
+#               open-ovf, ovftool, vmware-{vdiskmanager,mount}
+#
+# http://dmtf.org/standards/vman
+# http://gitorious.org/open-ovf
+# http://blogs.vmware.com/vapp/2009/11/virtual-hardware-in-ovf-part-1.html
+
+sinfo() {
+    echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
+}
+
+
+# Must have root directory as an argument
+if [ -z "$1" ]; then
+    echo "$0 <livecd root>"
+    exit 1
+fi
+
+
+# Origin paths
+src=`dirname $0`
+distroot=$1/dist
+cdroot=${distroot}/cdroot
+vmstage=${distroot}/vmstage
+
+# Versioning and naming
+version=`cat ${src}/conf/version`
+distname=liberte-${version}
+
+# Derived paths
+logosvg=${src}/src/home/anon/config/images/liberte-logo-nofont.svg
+syslinux=${cdroot}/liberte/boot/syslinux/syslinux-x86.tbz
+
+ovfpath=${vmstage}/${distname}.ovf
+diskpath=${vmstage}/${distname}.vmdk
+logopath=${vmstage}/${distname}.png
+ovapath=${distroot}/${distname}.ova
+
+# Descriptions
+volume="Liberté Linux"
+pname="Liberte Linux"
+purl="http://dee.su/liberte"
+pdesc="${pname}: Mission-critical stealth communication."
+pclass=su.dee.liberte
+
+# VM parameters
+ramsize=256
+disksize=512
+diskformat="http://www.vmware.com/interfaces/specifications/vmdk.html#sparse"
+nettype=NAT
+logowidth=128
+
+# Internal names
+vhwname=hw0
+diskid=disk0
+netid=net0
+iconid=icon0
+
+# Common mkovf parameters
+param="-f ${ovfpath} --encoding=UTF-8"
+
+
+# Safety checks
+if [ ! -e ${cdroot} ]; then
+    echo "cdroot does not exist yet"
+    exit 1
+fi
+
+
+# Prepare a staging directory
+rm -rf ${vmstage}
+mkdir  ${vmstage}
+
+
+sinfo "Initializing virtual disk"
+rm -f ${diskpath}
+vmware-vdiskmanager -c -q -a lsilogic -t 0 -s ${disksize}MB ${diskpath}
+
+
+sinfo "Mounting virtual disk image"
+mkdir ${vmstage}/vdisk
+vmware-mount -f ${diskpath} ${vmstage}/vdisk
+
+
+sinfo "Partitioning and installing MBR"
+parted -s ${vmstage}/vdisk/flat                     \
+          mklabel msdos                             \
+          mkpart  primary ext2 32KiB ${disksize}MiB \
+          set     1       boot on
+
+loop=`losetup -f`
+losetup ${loop} ${vmstage}/vdisk/flat
+
+tar -xjf ${syslinux} -C ${vmstage} altmbr_c.bin
+printf '\001' | cat ${vmstage}/altmbr_c.bin - > ${loop}
+
+losetup -d ${loop}
+
+
+sinfo "Creating filesystem"
+losetup -o 32768 ${loop} ${vmstage}/vdisk/flat
+
+mke2fs -q -m0 -T largefile -L "${volume}" -O ^resize_inode,^dir_index,sparse_super \
+       -F ${loop}
+tune2fs -c 0 -i 0 ${loop}
+
+
+sinfo "Mounting filesystem"
+mkdir ${vmstage}/vpart
+mount -t ext2 -o noatime ${loop} ${vmstage}/vpart
+
+
+sinfo "Copying live image"
+rsync -aHS ${cdroot}/liberte ${vmstage}/vpart
+
+
+sinfo "Installing boot manager"
+${cdroot}/liberte/setup.sh ${loop}
+sed -i 's/^\(DEFAULT[[:blank:]]\+\)liberte\+\>/\1nokms/' \
+       ${vmstage}/vpart/liberte/boot/syslinux/ext/extlinux.conf
+
+
+sinfo "Unmounting filesystem"
+umount ${vmstage}/vpart
+losetup -d ${loop}
+
+
+sinfo "Unmounting virtual disk image"
+vmware-mount -d ${vmstage}/vdisk
+
+
+sinfo "Verifying virtual partition"
+vmware-mount ${diskpath} 1 ${vmstage}/vpart
+test -e ${vmstage}/vpart/liberte/boot/syslinux/ext/ldlinux.sys
+vmware-mount -d ${vmstage}/vpart
+
+
+sinfo "Rasterizing logo"
+rsvg-convert -a -w ${logowidth} -f png -o ${logopath} ${logosvg}
+
+
+sinfo "Creating OVF envelope"
+mkovf --init   ${param}
+mkovf --lang   ${param} -l "en-GB"
+
+
+# Reference external files
+mkovf --efile  ${param} -i ${diskid} -n `basename ${diskpath}` -c identity
+mkovf --efile  ${param} -i ${iconid} -n `basename ${logopath}` -c identity
+
+
+# Create disks section (-r references --efile -i above)
+mkovf --disk   ${param} -i ${diskid} -r ${diskid} -u "MegaBytes" \
+               -c ${disksize} -m "Virtual Disks" -F "${diskformat}"
+
+# Create networks section
+mkovf --net    ${param} -i ${netid} -e ${nettype} -m "Virtual Networks" \
+               -d "NAT Network"
+
+
+# Define a virtual system
+mkovf --vs     ${param} -i "${distname}" -m "Virtual Appliance"
+
+# Add Guest OS
+mkovf --os     ${param} -d "Linux 2.6.x" -m "Guest Operating System"
+
+# Add virtual hardware section
+mkovf --virthw ${param} -p vmx-6 --instanceID=1 -n ${vhwname} \
+               -m "Virtual Hardware Requirements"
+
+# Allocate CPUs
+mkovf --resource ${param} --elementName="Processors" \
+                 -i 1 -k 3 -d "Number of Virtual CPUs" -k 3 -g 1
+
+# Allocate RAM
+mkovf --resource ${param} --elementName="Memory" -u "MegaBytes" \
+                 -i 2 -k 4 -d "Memory Size" -g ${ramsize}
+
+# Allocate NIC (-n references --net -e above)
+mkovf --resource ${param} --elementName="Network Adapter" -t True \
+                 -i 3 -k 10 -d "Ethernet Adapter" -b E1000 -n ${nettype}
+
+# Allocate SCSI controller
+mkovf --resource ${param} --elementName="SCSI" \
+                 -i 4 -k 6 -d "SCSI Controller" -b lsilogic -a 0
+
+# Allocate disk
+mkovf --resource ${param} --elementName="Hard Disk" \
+                 -i 5 -k 17 -d "Hard Disk" -j 4 -p 0 -r ovf://disk/${diskid}
+
+# Allocate USB controller (optional)
+mkovf --resource ${param} --elementName="USB" \
+                 -i 6 -k 23 -d "USB Controller" -b vmware.usb.ehci -y False
+
+# Allocate sound adapter
+mkovf --resource ${param} --elementName="Sound" \
+                 -i 7 -k 35 -d "Sound Card" -b ensoniq1371 -y False
+
+mkovf --resource ${param} --elementName="Sound" \
+                 -i 8 -k 1  -d "Sound Card" -b vmware.soundcard.ensoniq1371 -y False
+
+
+# Create informative sections
+mkovf --annotate ${param} -m "Annotation" -a "${pdesc}"
+
+mkovf --product  ${param} -m "Product Information" -p "${pname}" -v ${version} \
+                 -r "${purl}" -c ${pclass} -n ${pclass}.1
+
+mkovf --icon     ${param} -t image/png -w ${logowidth} -n ${iconid} -s ${pclass} \
+                 --instance=${pclass}.1
+
+
+# Post-process unicode names ("mkovf --os" ignores --encoding)
+# Add missing OS id ("mkovf --os" doesn't provide a switch)
+# -y is not handled correctly
+sinfo "Fixing OVF envelope"
+sed -i 's/Liberte/Liberté/g ;
+        s/<OperatingSystemSection\>/& ovf:id="99"/g ;
+        s/\<Item ovf:required="true"/Item ovf:required="false"/g' \
+    ${ovfpath}
+
+
+sinfo "Validating OVF and creating OVA bundle"
+ovftool -o -q --schemaValidate --skipManifestCheck --skipManifestGeneration \
+        ${ovfpath} ${ovapath}
+chmod --reference=${ovfpath} ${ovapath}
+
+rm -r ${vmstage}
+
+
+sinfo "Done."
