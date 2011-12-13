@@ -3,3 +3,6 @@ ata
 
 # This includes CDROM support
 scsi
+
+# Fusion MPT (e.g., for newer VMWare LSI Logic SCSI controller)
+message/fusion

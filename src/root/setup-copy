@@ -183,9 +183,7 @@ emerge -qC \
     virtual/man         \
     sys-apps/man        \
     sys-apps/man-pages  \
-    sys-apps/texinfo    \
-    \
-    app-arch/cpio
+    sys-apps/texinfo
 
 rm -rf /usr/share/{binutils-data,gcc-data}/
 rm -f /usr/lib/{?,}crt?.o

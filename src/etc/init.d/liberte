@@ -98,6 +98,7 @@ start() {
             # FAT has no sparse files, so insufficient space will fail here
             ebegin "Initializing ${otfesize} MiB encrypted storage (${OTFESIZE} of free space)"
             if [ -n "${otfesize}"  -a  -e ${otfefile}.tag ]  &&  truncate -s ${otfesize}M ${otfefile}; then
+                chmod -f 600 ${otfefile}
                 loop=`losetup -f ${otfefile} --show`
                 eend $?
 

@@ -39,3 +39,4 @@ midori -c ${XDG_CONFIG_HOME}/midori
 
 # Reinitialize home directory
 rsync -aHAXS -x --delete-excluded ${refdir}/ ${HOME}
+rm -rf --one-file-system /tmp/.private/${USER}
