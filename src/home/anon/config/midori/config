@@ -2,6 +2,7 @@
 [settings]
 default-encoding=UTF-8
 spell-checking-languages=en-us,en;q=0.5
+enable-site-specific-quirks=true
 enable-java-applet=false
 last-window-width=798
 last-window-height=549
@@ -15,12 +16,14 @@ open-tabs-in-the-background=true
 enable-scripts=false
 enable-plugins=false
 enable-html5-database=true
-maximum-cookie-age=7
+maximum-cookie-age=1
 maximum-history-age=1
 http-proxy=127.0.0.1:8118
+maximum-cache-size=20
 identify-as=MIDORI_IDENT_CUSTOM
 user-agent=Mozilla/5.0 (Windows NT 6.1; rv:5.0) Gecko/20100101 Firefox/5.0
 preferred-languages=en-us,en;q=0.5
+strip-referer=true
 
 [extensions]
 libaddons.so=true
