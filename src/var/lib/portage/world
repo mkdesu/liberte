@@ -163,6 +163,7 @@ mail-client/claws-mail-notification
 mail-client/claws-mail-acpi-notifier
 mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
+mail-client/claws-mail-fancy
 app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/midori

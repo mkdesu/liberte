@@ -20,4 +20,5 @@ if ! grep -q "^mail_command=${cablesend}\$" ${confdir}/accountrc; then
     sed -i "s:^\(mail_command=\).*:\1${cablesend}:" ${confdir}/accountrc
 fi
 
-exec /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"
+# Run via torify for users who want additional "regular" accounts
+exec torify /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"

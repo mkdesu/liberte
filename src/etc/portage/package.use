@@ -26,7 +26,8 @@ sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
 dev-lang/python                 ssl
-mail-client/claws-mail          -ssl -gnutls -imap
+mail-client/claws-mail                gnutls
+net-libs/libetpan               -ssl  gnutls
 net-misc/wget                   ssl
 net-libs/libsoup                ssl
 net-libs/glib-networking        ssl

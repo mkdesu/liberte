@@ -4,6 +4,9 @@
   * Kernel 3.0.4
   * Cables communication now maintains repudiability
 
+  * Better support for regular mailboxes in Claws-Mail
+
+
 2011-11-07
   + 2011.2 release
 
