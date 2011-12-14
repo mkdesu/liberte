@@ -140,11 +140,6 @@ echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
 # java-config wrappers are superfluous for minimal VMs (and require Python)
 echo dev-java/java-config-2.1.11 >> /etc/portage/profile/package.provided
 
-# virtualbox-guest-additions unnecessarily depends on xf86-video-virtualbox
-equery which app-emulation/virtualbox-guest-additions \
-    | sed 's:^.*/virtualbox-guest-additions:x11-drivers/xf86-video-virtualbox:; s:\.ebuild$::' \
-    >> /etc/portage/profile/package.provided
-
 
 # This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"

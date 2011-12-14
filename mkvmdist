@@ -96,7 +96,7 @@ losetup ${loop} ${vmstage}/vdisk/flat
 tar -xjf ${syslinux} -C ${vmstage} altmbr_c.bin
 printf '\001' | cat ${vmstage}/altmbr_c.bin - > ${loop}
 
-losetup -d ${loop}
+while ! losetup -d ${loop}; do sleep 1; done
 
 
 sinfo "Creating filesystem"
@@ -124,7 +124,7 @@ sed -i 's/^\(DEFAULT[[:blank:]]\+\)liberte\+\>/\1nokms/' \
 
 sinfo "Unmounting filesystem"
 umount ${vmstage}/vpart
-losetup -d ${loop}
+while ! losetup -d ${loop}; do sleep 1; done
 
 
 sinfo "Unmounting virtual disk image"

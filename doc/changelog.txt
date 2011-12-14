@@ -3,6 +3,7 @@
 
   * Kernel 3.0.4
   * Cables communication now maintains repudiability
+  * Added Open Virtualization bundle (OVA)
 
   * Better support for regular mailboxes in Claws-Mail
 

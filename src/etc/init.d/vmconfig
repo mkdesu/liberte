@@ -31,7 +31,7 @@ start() {
         # VirtualBox doesn't provide events (otherwise ps-mount would suffice), so shares
         # initialization happens only here.
         for vbshare in $(VBoxControl -nologo sharedfolder list | sed -n 's/^[[:digit:]]\+ - //p'); do
-            einfo /mnt/media/"${vbshare}"
+            einfo /mnt/media/VBox-"${vbshare}"
             ACTION=add ID_FS_TYPE=vboxsf DEVNAME="${vbshare}" ID_FS_LABEL=VBox-"${vbshare}" ps-mount
         done
 
