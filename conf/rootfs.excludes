@@ -91,6 +91,7 @@
 /usr/lib/mesa/*g_dri.*
 /usr/lib/dri/*g_dri.*
 /usr/lib/egl/pipe_*.*
+/usr/lib/VBoxOGL*.so
 /usr/share/consolefonts/**
 /usr/share/consoletrans/
 /usr/share/unimaps/

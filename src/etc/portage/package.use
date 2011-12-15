@@ -16,11 +16,12 @@ dev-db/sqlite                   -readline
 media-libs/jasper               -opengl
 
 # Drivers
-# (fbdev conflicts with vesa, mesa's vmware is gallium-only)
+# (fbdev conflicts with vesa, mesa's vmware is gallium-only, vbox dri conflicts w/ mprotect)
 # [temporarily disable gallium until r600 can be enabled w/o r300 due to llvm dependency]
 # [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
 x11-base/xorg-drivers           -video_cards_fbdev
 media-libs/mesa                 -video_cards_vmware shared-dricore -gallium -egl -llvm
+x11-drivers/xf86-video-virtualbox  -dri
 sys-fs/udev                     extras
 sys-fs/ntfsprogs                minimal -crypt
 
