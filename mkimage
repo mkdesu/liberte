@@ -55,6 +55,13 @@ if [ "${mksqversion}" != ${mksqver} ]; then
 fi
 
 
+if [ -e ${cdroot}/liberte/boot/packages.lst ]; then
+    sinfo "Listing package changes"
+    diff -U 0 ${cdroot}/liberte/boot/packages.lst ${livecd}/boot/packages.lst \
+        | tail -n +3 | sed '/^@@/d'
+fi
+
+
 sinfo "Copying USB /boot"
 mkdir -p -m 755 ${cdroot} ${cdroot}/liberte ${cdroot}/isolinux
 rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
