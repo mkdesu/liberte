@@ -36,6 +36,7 @@ net-wireless/iwl6005-ucode
 net-wireless/iwl6030-ucode
 net-wireless/iwl6050-ucode
 net-wireless/rtl8192se-firmware
+net-wireless/carl9170-firmware
 net-wireless/rt61-firmware
 net-wireless/rt73-firmware
 net-wireless/atmel-firmware

@@ -5,7 +5,7 @@
 # Based on the ebuild from zugaina overlay:
 # http://gpo.zugaina.org/app-accessibility/florence
 
-EAPI=2
+EAPI=4
 
 inherit gnome2
 
