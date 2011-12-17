@@ -129,7 +129,8 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         keyid=`echo -n ${fpr} | tail -c 8`
 
         if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
-            eval wget -nv --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
+            eval wget -nv --retry-connrefused                   \
+                --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
                 -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
         fi
 
