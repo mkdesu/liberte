@@ -185,6 +185,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
         cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
                ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+        rm     ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
     else
         sinfo "*** No GNU tar, skipping stage3 files list verification"
     fi
