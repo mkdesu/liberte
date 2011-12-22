@@ -18,7 +18,7 @@ if [ "$1" = fork ]; then
     daemon=/etc/init.d/autofs
 
     # Mount options (permissions: rw-r----- / rwx--x---)
-    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf hfs hfsplus vboxsf "
+    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf hfs hfsplus vmhgfs vboxsf "
     luser=anon
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
@@ -32,6 +32,7 @@ if [ "$1" = fork ]; then
     opts_ext4=${opts_ext2}
     opts_hfs=${opts_common},uid=${luser},gid=${lgroup},file_umask=0177,dir_umask=077
     opts_hfsplus=${opts_common},ro,uid=${luser},gid=${lgroup},umask=0277
+    opts_vmhgfs=${opts_common},uid=${luser},gid=${lgroup},fmask=0177,dmask=077
     opts_vboxsf=nosuid,nodev,noexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
     opts_auto=${opts_vfat}
 
@@ -145,7 +146,7 @@ if [ "$1" = fork ]; then
     # (also update autokeys for reload_autofs)
     add_entry() {
         case "${ID_FS_TYPE}" in
-            auto|ext2|ext3|ext4|vfat|iso9660|udf|hfs|hfsplus|vboxsf)
+            auto|ext2|ext3|ext4|vfat|iso9660|udf|hfs|hfsplus|vmhgfs|vboxsf)
                 eval type=${ID_FS_TYPE},\${opts_${ID_FS_TYPE}}
                 ;;
             msdos)

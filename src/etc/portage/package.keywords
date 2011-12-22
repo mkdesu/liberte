@@ -10,6 +10,10 @@
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
 
+# Guest virtualization
+app-emulation/open-vm-tools
+app-emulation/open-vm-tools-kmod
+
 # Applications
 =x11-misc/fpm2-0.79*
 =net-irc/xchat-otr-0.3*

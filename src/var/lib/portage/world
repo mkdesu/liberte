@@ -131,10 +131,12 @@ media-tv/v4l-utils
 net-print/ink
 
 # Virtualization
+app-emulation/open-vm-tools
 app-emulation/virtualbox-guest-additions
 
 # Text utilities
 app-text/tree
+sys-apps/less
 
 # Applications
 lxde-base/lxterminal

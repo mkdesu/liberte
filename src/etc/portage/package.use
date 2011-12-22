@@ -7,7 +7,8 @@ app-text/ghostscript-gpl        -X
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
-dev-lang/python                 -ncurses -readline
+# Disabled: workaround for Gentoo bug #395623
+# dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
 dev-lang/lua                    -readline
 dev-libs/libxml2                -readline
@@ -21,7 +22,8 @@ media-libs/jasper               -opengl
 # [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
 x11-base/xorg-drivers           -video_cards_fbdev
 media-libs/mesa                 -video_cards_vmware shared-dricore -gallium -egl -llvm
-x11-drivers/xf86-video-virtualbox  -dri
+x11-drivers/xf86-video-virtualbox -dri
+app-emulation/open-vm-tools     -X
 sys-fs/udev                     extras
 sys-fs/ntfsprogs                minimal -crypt
 

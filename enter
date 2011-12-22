@@ -17,7 +17,7 @@ SRC=`dirname $0`/src
 RSYNC="rsync -rlptOHS"
 
 version=`cat ${SRC}/../conf/version`
-environment="VERSION=${version} LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
+environment="LVERSION=${version} LOGNAME=root USER=root HOME=/root HOSTNAME=liberte"
 for env in LANG TERM RSYNC_PROXY http_proxy https_proxy ftp_proxy no_proxy; do
     if printenv ${env} 1>/dev/null; then
         environment="${environment} ${env}=`printenv ${env}`"

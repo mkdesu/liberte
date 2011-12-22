@@ -21,6 +21,21 @@ start() {
     fi
 
 
+    if vmware-hgfsclient 1>/dev/null 2>&1; then
+        ebegin Adding VMware shares to media automounts
+        eindent
+
+        # See VirtualBox comment below
+        for vmshare in $(vmware-hgfsclient); do
+            einfo /mnt/media/VMware-"${vmshare}"
+            ACTION=add ID_FS_TYPE=vmhgfs DEVNAME=".host:/${vmshare}" ID_FS_LABEL=VMware-"${vmshare}" ps-mount
+        done
+
+        eoutdent
+        eend $?
+    fi
+
+
     if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then
         ebegin Adding VirtualBox shares to media automounts
         eindent

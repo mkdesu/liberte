@@ -5,6 +5,7 @@
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)
 
+  * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
 
 

@@ -86,11 +86,30 @@ if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
 fi
 
 
+sinfo "Applying temporary portage patches"
+ovt=/usr/portage/app-emulation/open-vm-tools-kmod
+ovtv=open-vm-tools-kmod-2011.11.20.535097
+rsync -t --chmod=u=rwX,go=rX ${HOME}/patches/portage/vmci-driver.patch ${ovt}/files/
+chown -R --from=root:root portage:portage ${ovt}/files
+if [ ! -e ${ovt}/${ovtv}-r1.ebuild ]; then
+    cp -a ${ovt}/${ovtv}{,-r1}.ebuild
+    sed -i 's:src_prepare() {:&\n\tepatch "${FILESDIR}"/vmci-driver.patch:' \
+        ${ovt}/${ovtv}-r1.ebuild
+fi
+ebuild ${ovt}/${ovtv}-r1.ebuild manifest
+
+vvb=/usr/portage/x11-drivers/xf86-video-virtualbox
+vvbv=xf86-video-virtualbox-4.1.4
+spatch ${HOME}/patches/portage/xf86-video-virtualbox-3-localconfig.patch -p0
+chown --from=root:portage portage:portage ${vvb}/files/xf86-video-virtualbox-3-localconfig
+ebuild ${vvb}/${vvbv}.ebuild manifest
+
+
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
     # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
-    #            app-emulation/virtualbox-guest-additions
+    #            app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
@@ -246,6 +265,10 @@ revdep-rebuild -qi
 rm -f ${protected}
 etc-update
 rebuild_locales
+
+
+sinfo "Listing GLSAs"
+glsa-check -lq
 
 
 if [ ! -e /var/cache/eix ]; then
@@ -422,7 +445,7 @@ update-ca-certificates -f
 
 
 sinfo "Generating /etc/issue"
-sed "s@VERSION@${VERSION}@" ${HOME}/config/issue > /etc/issue
+sed "s@VERSION@${LVERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
@@ -483,6 +506,7 @@ chmod 664       /var/run/utmp
 # "cdrom"     group: raw CD devices access (cd playing + cd/dvd writing)
 # "lp"        group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
 # "games"     group: prevent games complaining about not keeping scores
+# "vmware"    group: VMware's drag-n-drop feature for file exchange (when enabled)
 # "vboxguest" group: VirtualBox seamless mode, auto-resize and clipboard
 sinfo "Setting up users"
 sed -i 's/^#\?\(ENCRYPT_METHOD\) .*/\1 SHA256/' /etc/login.defs
@@ -503,8 +527,8 @@ groupadd -g 9001 nofw   || [ $? = 9 ]
 useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 
-usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games,vboxguest anon
-usermod -G legion                                                   cable
+usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games,vmware,vboxguest anon
+usermod -G legion                                                          cable
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
@@ -630,7 +654,7 @@ gunzip /boot/syslinux/${consolefont}.gz
 cat ${HOME}/config/syslinux.cfg \
     | sed "/^##/d ;
            s@PREFIX@/liberte@ ;
-           s@VERSION@${VERSION}@ ;
+           s@VERSION@${LVERSION}@ ;
            s@CONSOLEFONT@${consolefont}@" \
     | iconv -f UTF-8 -t CP437 \
     > /boot/syslinux/syslinux.cfg

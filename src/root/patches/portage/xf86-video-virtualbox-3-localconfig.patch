@@ -1,0 +1,9 @@
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/files/xf86-video-virtualbox-3-localconfig	2009-11-19 16:54:12.000000000 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/files/xf86-video-virtualbox-3-localconfig.new	2011-12-21 16:40:44.000000000 +0000
+@@ -28,3 +28,6 @@
+ 
+ TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.release =
+ TEMPLATE_VBOXGUESTR3XORGMOD_LDFLAGS = $(TEMPLATE_VBOXGUESTR3DLL_LDFLAGS)
++
++# fix hardened builds
++TEMPLATE_VBOXGUESTR3EXE_LDFLAGS += -Wl,-z,lazy
