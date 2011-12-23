@@ -7,8 +7,7 @@ app-text/ghostscript-gpl        -X
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
-# Disabled: workaround for Gentoo bug #395623
-# dev-lang/python                 -ncurses -readline
+dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
 dev-lang/lua                    -readline
 dev-libs/libxml2                -readline
