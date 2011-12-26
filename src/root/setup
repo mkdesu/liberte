@@ -643,7 +643,7 @@ sinfo "Generating SYSLINUX configuration"
 rm    -f /boot/boot
 mkdir -p /boot/syslinux
 syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
-cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,isolinux.bin} /boot/syslinux/
+cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,poweroff.com,isolinux.bin} /boot/syslinux/
 tar cpjf /boot/syslinux/syslinux-x86.tbz \
     -C /sbin extlinux -C /usr/share/syslinux altmbr_c.bin \
     -C /usr/bin syslinux mtools mcopy mmove mattrib
