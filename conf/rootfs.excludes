@@ -134,6 +134,7 @@
 /var/lib/dbus/machine-id
 /usr/local/bin/uname
 /usr/local/bin/file
+/usr/local/bin/x86_64-*
 /mnt/floppy/
 /mnt/cdrom/
 # (GeoIP is not used in Tor setup)

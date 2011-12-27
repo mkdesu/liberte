@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Emulate x86_64 generic CPU (no corresponding -march switch)
+exec gcc -m64 -march=nocona -mno-sse3 "$@"

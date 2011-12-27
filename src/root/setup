@@ -115,11 +115,13 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
 
 
-    sinfo "Cloning kernel to ${kversion}-kexec"
+    sinfo "Cloning kernel to ${kversion}-kexec{,-64}"
     rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec
+    rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec-64
 
-    cp ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config
-    cp ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config
+    cp ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config
+    cp ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config
+    cp ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config
 
 
     sinfo "Downloading kernel patches"
@@ -567,10 +569,14 @@ rm /lib/modules/*/{build,source}
 cp -a /usr/src/linux/arch/x86/boot/bzImage /boot/kernel-x86.zi
 
 
-sinfo "Compiling kexec kernel"
-rm -f /usr/src/linux-kexec/include/generated/compile.h
+sinfo "Compiling kexec kernels"
+rm -f /usr/src/linux-kexec{,-64}/include/generated/compile.h
+
 make -s ${makeopts} -C /usr/src/linux-kexec 2>/dev/null
-cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec.zi
+make -s ${makeopts} -C /usr/src/linux-kexec-64 ARCH=x86_64 CROSS_COMPILE=x86_64- 2>/dev/null
+
+cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage    /usr/local/boot/kernel-kexec.zi
+cp -a /usr/src/linux-kexec-64/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec-64.zi
 
 
 sinfo "Creating initramfs image"
@@ -626,11 +632,12 @@ xz -t -M ${xzmem}MiB /usr/local/boot/initrd-kexec.xz
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}.config       /usr/src/linux/.config       || true
+diff ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config          || true
 
 
 sinfo "Kexec kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}-kexec.config /usr/src/linux-kexec/.config || true
+diff ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config    || true
+diff ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config || true
 
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then

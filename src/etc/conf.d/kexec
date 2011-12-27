@@ -2,6 +2,12 @@ BOOTPART=/
 KNAME=usr/local/boot/kernel-kexec.zi
 INITRD=/usr/local/boot/initrd-kexec.xz
 
+# Use 64-bit KEXEC kernel on supporting CPUs,
+# so that memtest is not limited to LOWMEM
+if grep -q '^flags\>.*\<lm\>' /proc/cpuinfo; then
+    KNAME=usr/local/boot/kernel-kexec-64.zi
+fi
+
 ROOTPART=none
 
 # memtest=1: 0x00 once

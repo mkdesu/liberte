@@ -91,9 +91,10 @@ sinfo "Build environment:"
 if [ -e ${SRC}/conf/checkregexps ]; then
     regexps=`cat ${SRC}/conf/checkregexps | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
 
-    chroot ${LIVECD}/../src grep   -iE "${regexps}"         \
-        /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin \
-        /usr/src/linux-kexec/arch/x86/boot/compressed/vmlinux.bin
+    chroot ${LIVECD}/../src grep   -iE "${regexps}"               \
+        /usr/src/linux/arch/x86/boot/compressed/vmlinux.bin       \
+        /usr/src/linux-kexec/arch/x86/boot/compressed/vmlinux.bin \
+        /usr/src/linux-kexec-64/arch/x86/boot/compressed/vmlinux.bin
 
     chroot ${LIVECD}        xzgrep -iE "${regexps}" \
         /boot/initrd-x86.xz                         \
