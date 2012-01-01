@@ -4,12 +4,21 @@ description="Configures the system as a guest in virtual machine."
 
 vmflag=/etc/vmtype
 
+cleanlabel() {
+    local label="$1"
+    echo "${label}" | tr '\000-\011\013-\047' _
+}
+
+
 depend() {
     # don't bother autofs with SIGHUPs from ps-mount
     before autofs
 
     # user's X wallpaper depends on vmflag availability
     before xdm
+
+    # this is a one-time setup (also, removal won't work correctly with spaces/quotes in DEVNAME)
+    keyword -stop
 }
 
 start() {
@@ -25,10 +34,10 @@ start() {
         ebegin Adding VMware shares to media automounts
         eindent
 
-        # See VirtualBox comment below
-        for vmshare in $(vmware-hgfsclient); do
+        # ID_FS_LABEL is quoted when in ps-mount
+        vmware-hgfsclient | while read vmshare; do
             einfo /mnt/media/VMware-"${vmshare}"
-            ACTION=add ID_FS_TYPE=vmhgfs DEVNAME=".host:/${vmshare}" ID_FS_LABEL=VMware-"${vmshare}" ps-mount
+            ACTION=add ID_FS_TYPE=vmhgfs DEVNAME=".host:/\"${vmshare}\"" ID_FS_LABEL=VMware-"$(cleanlabel "${vmshare}")" ps-mount
         done
 
         eoutdent
@@ -40,14 +49,10 @@ start() {
         ebegin Adding VirtualBox shares to media automounts
         eindent
 
-        # It seems that automount ignores lines with incorrect DEVNAMEs, so it's pointless
-        # to sanitize ID_FS_LABEL (although manual mount could work). Since VirtualBox
-        # disallows spaces in share names, problems are unlikely. Shares are dynamic, but
-        # VirtualBox doesn't provide events (otherwise ps-mount would suffice), so shares
-        # initialization happens only here.
-        for vbshare in $(VBoxControl -nologo sharedfolder list | sed -n 's/^[[:digit:]]\+ - //p'); do
+        # ID_FS_LABEL is quoted when in ps-mount
+        VBoxControl -nologo sharedfolder list | sed -n 's/^[[:digit:]]\+ - //p' | while read vbshare; do
             einfo /mnt/media/VBox-"${vbshare}"
-            ACTION=add ID_FS_TYPE=vboxsf DEVNAME="${vbshare}" ID_FS_LABEL=VBox-"${vbshare}" ps-mount
+            ACTION=add ID_FS_TYPE=vboxsf DEVNAME="\"${vbshare}\"" ID_FS_LABEL=VBox-"$(cleanlabel "${vbshare}")" ps-mount
         done
 
         eoutdent

@@ -91,8 +91,8 @@ if [ "$1" = fork ]; then
     fi
 
     # Get current autofs devices and keys (space-separated)
-    autodevs=`awk '!/^#/ { printf " " substr($3, 2) }' ${mounts}; echo -n ' '`
-    autokeys=`awk '!/^#/ && $1 != "" { printf " " $1 }' ${mounts}; echo -n ' '`
+    autodevs=`awk '/^[^#]/ { printf " " substr($3, 2) }' ${mounts}; echo -n ' '`
+    autokeys=`awk '/^[^#]/ { printf " " substr($1,2,length($1)-2) }' ${mounts}; echo -n ' '`
 
     # Fixing volume label in case of collision
     fixlabel() {
@@ -118,9 +118,9 @@ if [ "$1" = fork ]; then
 
             # Wait up to 2s for changes to take effect
             local count=0
-            expected=`echo "${autokeys}" | sed 's/^ //; s/ $//' | tr ' ' '\n' | sort`
+            expected=`echo "${autokeys}" | tr ' ' '\n' | sed '/^$/d' | sort`
             while [ ${count} -lt 8 ]; do
-                actual=`find ${prefix} -mindepth 1 -maxdepth 1 -type d | sed "s:^${prefix}/::" | sort`
+                actual=`find ${prefix} -mindepth 1 -maxdepth 1 -printf '%f\n' | sort`
 
                 if [ "${actual}" = "${expected}" ]; then
                     count=100
@@ -168,7 +168,7 @@ if [ "$1" = fork ]; then
         esac
 
         fixlabel
-        echo "${ID_FS_LABEL} -fstype=${type} :${DEVNAME}" >> ${mounts}
+        echo "\"${ID_FS_LABEL}\" -fstype=${type} :${DEVNAME}" >> ${mounts}
         autokeys="${autokeys}${ID_FS_LABEL} "
     }
 
@@ -176,7 +176,7 @@ if [ "$1" = fork ]; then
     # (also update autokeys for fixlabel after ACTION=change, and for reload_autofs)
     remove_entry() {
         # Unmount mount points, not devices (since there can be several per device)
-        local keys=`awk '!/^#/ && $3 == ":'"${DEVNAME}"'" { print $1 }' ${mounts}`
+        local keys=`awk '/^[^#]/ && $3 == ":'"${DEVNAME}"'" { print substr($1,2,length($1)-2) }' ${mounts}`
         local key
         local kl="$1"
 

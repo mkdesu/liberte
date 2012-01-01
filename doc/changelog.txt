@@ -2,6 +2,9 @@
   + 2011.3 release
 
   * Kernel 3.0.4
+  * Fixed memory wiping in KEXEC kernel
+  * Fixed multilingual disk labels support for automount
+
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)
 

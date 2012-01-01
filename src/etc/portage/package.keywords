@@ -34,8 +34,8 @@ net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
 
-# Handling of "--"
-=app-arch/pigz-2.1.6*
+# Handling of "--" and non-.gz suffixes
+=app-arch/pigz-2.1.7*
 
 # Linux3 support
 =app-laptop/laptop-mode-tools-1.55*
