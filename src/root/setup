@@ -463,7 +463,7 @@ svcsysinit="udev"
 svcboot="consolefont microcode_ctl irqbalance haveged kexec metalog
          iptables consolekit alsasound fbcondecor lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
-            acpid smartd laptop_mode gpm bluetooth
+            acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
 delsvcboot="urandom swap bootmisc"
@@ -502,11 +502,12 @@ chmod 664       /var/run/utmp
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
 # "users"     group: some apps require for DBUS communication
-# "plugdev"   group: changing NetworkManager settings via DBUS
+# "plugdev"   group: changing NetworkManager (and ModemManager) settings via DBUS
 # "audio"     group: ALSA/OSS devices access
 # "video"     group: V4L2 devices access (webcam - mplayer tv://)
 # "cdrom"     group: raw CD devices access (cd playing + cd/dvd writing)
 # "lp"        group: printing subsystem access (CUPS; DBUS comm. with bluetoothd)
+# "uucp"      group: access to rfcomm (e.g., obexftp)
 # "games"     group: prevent games complaining about not keeping scores
 # "vmware"    group: VMware's drag-n-drop feature for file exchange (when enabled)
 # "vboxguest" group: VirtualBox seamless mode, auto-resize and clipboard
@@ -529,8 +530,8 @@ groupadd -g 9001 nofw   || [ $? = 9 ]
 useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 
-usermod -G wheel,users,plugdev,audio,video,cdrom,lp,games,vmware,vboxguest anon
-usermod -G legion                                                          cable
+usermod -G wheel,users,plugdev,audio,video,cdrom,lp,uucp,games,vmware,vboxguest anon
+usermod -G legion                                                               cable
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]

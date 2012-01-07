@@ -54,6 +54,7 @@ else
           --exclude=/etc/sudoers           \
           --exclude=/etc/sysctl.conf       \
           --exclude=/etc/autofs/.auto.lock \
+          --exclude=/etc/polkit-1          \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
@@ -82,7 +83,14 @@ else
 
     ${RSYNC} --chmod=ug=r,o=     -i ${SRC}/etc/sudoers           ${LIVECD}/etc
     ${RSYNC} --chmod=u=rw,g=r,o= -i ${SRC}/etc/sysctl.conf       ${LIVECD}/etc
-    ${RSYNC} --chmod=u=rw,go=    -i ${SRC}/etc/autofs/.auto.lock ${LIVECD}/etc/autofs
+
+    if [ -e ${LIVECD}/etc/autofs ]; then
+        ${RSYNC} --chmod=u=rw,go=    -i ${SRC}/etc/autofs/.auto.lock ${LIVECD}/etc/autofs
+    fi
+    if [ -e ${LIVECD}/etc/polkit-1/localauthority ]; then
+        ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C \
+            ${SRC}/etc/polkit-1/localauthority/* ${LIVECD}/etc/polkit-1/localauthority
+    fi
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons
     ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons

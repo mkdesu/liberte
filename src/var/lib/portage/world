@@ -77,6 +77,7 @@ sys-apps/paxctl
 app-misc/vlock
 x11-misc/alock
 net-misc/ssh-askpass-fullscreen
+lxde-base/lxpolkit
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
@@ -122,6 +123,7 @@ sys-fs/lsscsi
 sys-apps/usbutils
 sys-apps/pcmciautils
 net-wireless/bluez
+sys-fs/obexfs
 dev-libs/opensc
 sys-apps/usb_modeswitch
 sys-power/acpid

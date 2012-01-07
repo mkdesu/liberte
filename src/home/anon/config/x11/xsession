@@ -48,10 +48,14 @@ ${prefix}/lid-xlock & LIDXLOCK_PID=$!
 # Launch synaptics daemon (prevents accidental taps during keyboard activity)
 syndaemon -d -t -k -i 2 &
 
-# Launch clipboard, SCIM and NetworkManager daemons (use tray -> after panel)
+# Launch clipboard, SCIM, NetworkManager and Bluetooth applets (use tray -> after panel)
 parcellite &
 scim -d &
 nm-applet --sm-disable &
+bluetooth-applet &
+
+# Launch LXPolKit (GTK+ authenticating dialog for PolKit)
+/usr/libexec/lxpolkit &
 
 # Launch shared clipboard service on VirtualBox [--clipboard/display/seamless]
 if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then

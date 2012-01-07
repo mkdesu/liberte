@@ -4,12 +4,14 @@
   * Kernel 3.0.4
   * Fixed memory wiping in KEXEC kernel
   * Fixed multilingual disk labels support for automount
+  * Fixed 3G support for modems with PIN unlocking
 
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)
 
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
+  * Better Bluetooth support
 
 
 2011-11-07
