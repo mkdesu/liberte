@@ -3,23 +3,28 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+description="Starts I2P service."
+
+pidfile=/var/run/i2p.pid
+i2puser=i2p
+
+wrapper=/usr/bin/wrapper
+wrapper_cfg=/opt/i2p/wrapper.config
+
+
 depend() {
 	need net
 }
 
 start() {
-	PIDFILE=/var/run/i2p.pid
-	I2P=/opt/i2p
-	WRAPPER_CMD=/usr/bin/wrapper
-	WRAPPER_CONF="$I2P/wrapper.config"
-
 	ebegin "Starting I2P"
-	start-stop-daemon -S -q -u i2p -p "${PIDFILE}" -bm -x $WRAPPER_CMD $WRAPPER_CONF wrapper.daemonize=FALSE
+	start-stop-daemon -S -q -u ${i2puser} -p ${pidfile} -bm -x ${wrapper} -- \
+		${wrapper_cfg} wrapper.daemonize=FALSE
 	eend $?
 }
 
 stop() {
 	ebegin "Stopping I2P"
-	/usr/bin/i2prouter stop
+	start-stop-daemon -K -q -u ${i2puser} -p ${pidfile}
 	eend $?
 }
