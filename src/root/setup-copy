@@ -40,7 +40,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 #
 # python:  portage, xcb-proto, libglade, gtk+, gucharmap, glib, exiv2, pidgin, mesa,
 #          gobject-introspection, openbox, totem
-# perl:    gentoolkit, lm_sensors, graphicsmagick, eboard, xdg-utils, pptpclient
+# perl:    gentoolkit, lm_sensors, obexftp, graphicsmagick, eboard, xdg-utils, pptpclient
 # cpio:    splashutils
 # debianutils:     ca-certificates
 # java:            jamvm
@@ -48,6 +48,7 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 # gst-plugins-bad: gst-plugins-vp8
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
+         app-mobilephone/obexftp
          app-portage/gentoolkit
          dev-java/jamvm
          dev-libs/glib
@@ -109,7 +110,8 @@ sed -i 's:\(dev-libs/libxml2\)\[python\]:\1:' ${ebuild_mesa}
 sed -i s:app-arch/cpio:: ${ebuild_splashutils}
 
 # perl-module.eclass: disable unnecessary dev-lang/perl[-build] dependency
-sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_graphicsmagick}
+# NOTE: fixed in media-gfx/graphicsmagick-1.3.13
+sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp} ${ebuild_graphicsmagick}
 
 # Perl is needed by mimeopen (File-MimeInfo), which is an optional dependency
 sed -i 's:\<dev-perl/File-MimeInfo\>::' ${ebuild_xdgutils}
@@ -204,14 +206,15 @@ if [ -e /usr/bin/run-java-tool  -o  -e /usr/bin/java-config ]; then
 fi
 
 
+# NOTE: fixed in media-gfx/graphicsmagick-1.3.13
 sinfo "Fixing .la files"
-rm /usr/lib/libGraphicsMagick*.la /usr/lib/libsox.la
+rm /usr/lib/libGraphicsMagick*.la
 for mod in `find /usr/lib/GraphicsMagick* -name '*.so'`; do
     echo dlname=\'${mod##*/}\' > ${mod%.so}.la
 done
 
 
-# Not necessary anymore?
+# NOTE: apparently, not necessary anymore
 if [ -e /etc/gtk-2.0/gtk.immodules ]; then
     sinfo "Fixing gtk.immodules"
     mv /etc/gtk-2.0/gtk.immodules /etc/gtk-2.0/`portageq envvar CHOST`/
