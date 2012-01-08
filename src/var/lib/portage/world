@@ -139,6 +139,9 @@ app-emulation/virtualbox-guest-additions
 # Text utilities
 app-text/tree
 sys-apps/less
+app-editors/nano
+app-editors/hexedit
+app-editors/e3
 
 # Applications
 lxde-base/lxterminal
@@ -159,7 +162,6 @@ media-gfx/graphicsmagick
 media-sound/sox
 media-sound/vorbis-tools
 app-editors/gedit
-app-editors/nano
 app-text/epdfview
 app-text/evince
 app-office/abiword
