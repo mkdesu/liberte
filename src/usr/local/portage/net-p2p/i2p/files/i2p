@@ -9,7 +9,7 @@ pidfile=/var/run/i2p.pid
 i2puser=i2p
 
 # cf. wrapper.jvm_exit.timeout
-timeout=30
+timeout=65
 
 wrapper=/usr/bin/wrapper
 wrapper_cfg=/opt/i2p/wrapper.config
