@@ -8,6 +8,9 @@ description="Starts I2P service."
 pidfile=/var/run/i2p.pid
 i2puser=i2p
 
+# cf. wrapper.jvm_exit.timeout
+timeout=30
+
 wrapper=/usr/bin/wrapper
 wrapper_cfg=/opt/i2p/wrapper.config
 
@@ -25,6 +28,6 @@ start() {
 
 stop() {
 	ebegin "Stopping I2P"
-	start-stop-daemon -K -q -u ${i2puser} -p ${pidfile}
+	start-stop-daemon -K -q -u ${i2puser} -p ${pidfile} -R ${timeout}
 	eend $?
 }

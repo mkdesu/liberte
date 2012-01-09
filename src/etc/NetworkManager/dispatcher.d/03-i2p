@@ -13,7 +13,7 @@ case ${action} in
             /etc/init.d/i2p -q start
         else
             logger -p 6 -t nm.dispatch "Restarting I2P service (${iface})"
-            /etc/init.d/i2p -q restart
+            /etc/init.d/i2p -qs restart
         fi
         ;;
 
@@ -22,7 +22,7 @@ down)
         # NOTE: might be problematic with 2+ NICs
         if /etc/init.d/i2p -q status; then
             logger -p 6 -t nm.dispatch "Stopping I2P service (${iface})"
-            /etc/init.d/i2p -q stop
+            /etc/init.d/i2p -qs stop
         fi
         ;;
 esac

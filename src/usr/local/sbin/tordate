@@ -76,7 +76,7 @@ ${vendcons}"
             # Tor is unreliable with picking a circuit after time change
             if /etc/init.d/tor -q status; then
                 logger -p 6 -t ${tag} "Restarting Tor service"
-                /etc/init.d/tor -q restart
+                /etc/init.d/tor -qs restart
             fi
 
         fi
@@ -100,7 +100,7 @@ else
     # I2P is unreliable with correcting internal clock after time change
     if /etc/init.d/i2p -q status; then
         logger -p 6 -t ${tag} "Restarting I2P service"
-        /etc/init.d/i2p -q restart
+        /etc/init.d/i2p -qs restart
     fi
 
 fi
