@@ -1,11 +1,4 @@
 
-[Scroogle]
-name=Scroogle
-text=Google search proxy
-uri=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
-icon=
-token=sg
-
 [DuckDuckGo]
 name=DuckDuckGo
 text=DuckDuckGo Tor hidden service
@@ -13,10 +6,24 @@ uri=http://3g2upl4pq6kufc4m.onion/html/?q=%s
 icon=
 token=dd
 
+[Scroogle]
+name=Scroogle
+text=Google search proxy
+uri=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
+icon=
+token=sg
+
+[Ixquick]
+name=Ixquick
+text=Ixquick private search engine
+uri=https://ixquick.com/do/search?query=%s
+icon=
+token=ix
+
 [Wikipedia]
 name=Wikipedia
 text=The free encyclopedia
-uri=http://en.wikipedia.org/wiki/Special:Search/%s
+uri=https://en.wikipedia.org/wiki/Special:Search/%s
 icon=
 token=wp
 

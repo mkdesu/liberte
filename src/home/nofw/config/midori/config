@@ -10,7 +10,7 @@ toolbar-style=MIDORI_TOOLBAR_SMALL_ICONS
 toolbar-items=TabNew,Back,Forward,Next,ReloadStop,BookmarkAdd,Location,Search,Trash,CompactMenu,
 homepage=file:///home/nofw/info/warning.html
 text-editor=gedit %U
-location-entry-search=http://www.google.com/search?q=%s
+location-entry-search=https://duckduckgo.com/html/?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
 enable-scripts=false

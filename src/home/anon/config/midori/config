@@ -10,7 +10,7 @@ toolbar-style=MIDORI_TOOLBAR_SMALL_ICONS
 toolbar-items=TabNew,Back,Forward,Next,ReloadStop,BookmarkAdd,Location,Search,Trash,CompactMenu,
 homepage=file:///home/anon/info/browser.html
 text-editor=gedit %U
-location-entry-search=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
+location-entry-search=http://3g2upl4pq6kufc4m.onion/html/?q=%s
 preferred-encoding=MIDORI_ENCODING_UNICODE
 open-tabs-in-the-background=true
 enable-scripts=false
