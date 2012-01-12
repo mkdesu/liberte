@@ -26,7 +26,7 @@ task toolbar|||/
 	persist|gtk-harddisk|OTFE partition|~/persist
 	boot|gtk-cdrom|Boot media|/mnt/boot
 home|gtk-home|Home directory|~
-media|gtk-floppy|/mnt/media|/mnt/media
+media|gtk-floppy|/media|/media
 trash||transient trash directory|~/config/local/Trash/files
 >
 # open bookmark in other pane on middle-button click

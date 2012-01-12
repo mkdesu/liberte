@@ -1,4 +1,4 @@
 # Low timeout in order to allow for fast removable media
 # extraction. Possibly somewhat problematic with CDs.
 # (now a bit higher, since vfat is mounted with "flush")
-/mnt/media	/etc/autofs/auto.media	--ghost --timeout=60
+/media	/etc/autofs/auto.media	--ghost --timeout=60

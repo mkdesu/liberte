@@ -36,7 +36,7 @@ start() {
 
         # ID_FS_LABEL is quoted when in ps-mount
         vmware-hgfsclient | while read vmshare; do
-            einfo /mnt/media/VMware-"${vmshare}"
+            einfo /media/VMware-"${vmshare}"
             ACTION=add ID_FS_TYPE=vmhgfs DEVNAME=".host:/\"${vmshare}\"" ID_FS_LABEL=VMware-"$(cleanlabel "${vmshare}")" ps-mount
         done
 
@@ -51,7 +51,7 @@ start() {
 
         # ID_FS_LABEL is quoted when in ps-mount
         VBoxControl -nologo sharedfolder list | sed -n 's/^[[:digit:]]\+ - //p' | while read vbshare; do
-            einfo /mnt/media/VBox-"${vbshare}"
+            einfo /media/VBox-"${vbshare}"
             ACTION=add ID_FS_TYPE=vboxsf DEVNAME="\"${vbshare}\"" ID_FS_LABEL=VBox-"$(cleanlabel "${vbshare}")" ps-mount
         done
 

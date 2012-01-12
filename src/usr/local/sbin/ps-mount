@@ -13,7 +13,7 @@ if [ "$1" = fork ]; then
     shift
 
     # Files and scripts
-    prefix=/mnt/media
+    prefix=/media
     mounts=/etc/autofs/auto.media
     daemon=/etc/init.d/autofs
 
@@ -130,7 +130,7 @@ if [ "$1" = fork ]; then
                 fi
             done
 
-            # Changes weren't reflected in /mnt/media
+            # Changes weren't reflected in /media
             if [ ${count} != 100 ]; then
                 logger -p 4 -t auto.media "autofs reloading failed, restarting service"
 
