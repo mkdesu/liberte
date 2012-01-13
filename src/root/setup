@@ -647,12 +647,15 @@ if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then
 fi
 
 
+# serial_cs: necessary firmware included by kernel automatically
+# b43:                net-wireless/b43-firmware
+# atmel,at76c50x-usb: net-wireless/atmel-firmware
 sinfo "Unknown missing firmwares:"
 for fw in $(strings -a -n 10 $(find /lib/modules -name '*.ko' \
-    ! -name serial_cs.ko ! -name iwlagn.ko ! -name b43.ko ! -name atmel.ko \
-    ! -name at76c50x-usb.ko ) | sed -n 's/^firmware=//p'| sort -u); do
-    if [ ! -e /lib/firmware/${fw} ] \
-        && ! grep -q "^# X ${fw}\$" /etc/portage/savedconfig/sys-kernel/linux-firmware; then
+    ! -name serial_cs.ko ! -name b43.ko ! -name atmel.ko ! -name at76c50x-usb.ko) \
+    | sed -n 's/^firmware=//p' | sort -u); do
+    if [ ! -e /lib/firmware/${fw} ]  &&  ! grep -q "^${fw}\$" \
+        /etc/portage/savedconfig/sys-kernel/linux-firmware; then
         echo ${fw}
     fi
 done

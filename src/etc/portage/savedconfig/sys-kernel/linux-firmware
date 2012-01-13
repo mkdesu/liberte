@@ -1,5 +1,12 @@
 # --- Wireless ---
 
+# IWLAGN
+iwlwifi-100-5.ucode
+# (missing)
+iwlwifi-105-5.ucode
+iwlwifi-2000-5.ucode
+iwlwifi-2030-5.ucode
+
 # RTL8192{CE,CU,SE,DE}
 rtlwifi/rtl8192cfw.bin
 rtlwifi/rtl8192cufw.bin
@@ -16,12 +23,13 @@ rt2870.bin
 # HERMES
 agere_ap_fw.bin
 agere_sta_fw.bin
-# X prism_ap_fw.bin
-# X prism_sta_fw.bin
-# X sd8688.bin
-# X sd8688_helper.bin
-# X symbol_sp24t_prim_fw
-# X symbol_sp24t_sec_fw
+# (missing)
+prism_ap_fw.bin
+prism_sta_fw.bin
+sd8688.bin
+sd8688_helper.bin
+symbol_sp24t_prim_fw
+symbol_sp24t_sec_fw
 
 
 # --- Bluetooth ---
@@ -31,21 +39,26 @@ ath3k-1.fw
 
 # BT_MRVL_SDIO
 mrvl/sd8787_uapsta.bin
-# X sd8688.bin
-# X sd8688_helper.bin
+# (missing)
+sd8688.bin
+sd8688_helper.bin
 
 # BT_HCIBFUSB
-# X bfubase.frm
+# (missing)
+bfubase.frm
 
 # BT_HCIBT3C
-# X BT3CPCC.bin
+# (missing)
+BT3CPCC.bin
+
 
 # --- WiMAX ---
 
 # WIMAX_I2400M_USB
 i2400m-fw-usb-1.5.sbcf
 i6050-fw-usb-1.5.sbcf
-# X i2400m-fw-sdio-1.3.sbcf
+# (missing)
+i2400m-fw-sdio-1.3.sbcf
 
 
 # --- Gigabit Ethernet ---
