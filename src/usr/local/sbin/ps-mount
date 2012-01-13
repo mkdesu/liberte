@@ -192,7 +192,7 @@ if [ "$1" = fork ]; then
         done
 
         # Remove entries (will be removed from dir after autofs reload)
-        sed -i "\& :${DEVNAME}"'$&d' ${mounts}
+        sed -i "\&^[^#].* :${DEVNAME}"'$&d' ${mounts}
     }
 
     # For "add" action, a line is added only for non-existing (in autofs or mounted) device

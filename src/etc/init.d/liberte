@@ -42,6 +42,7 @@ cgroup=cable
 lmount=/home/${luser}/persist
 boot=/mnt/boot
 live=/mnt/live
+autos=/etc/autofs/auto.media
 otfefile=${boot}${OTFEFILE}
 ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
 
@@ -61,6 +62,16 @@ start() {
         eend ${remount}
         ;;
     esac
+
+
+    cdlabel=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_LABEL=//p')
+    if [ -n "${cdlabel}" ]; then
+        # Can result in duplicate autofs entries if label is later changed
+        # to that of other media, and this service is then restarted
+        ebegin "Creating ${boot} -> /media/${cdlabel} alias"
+        sed -i "s@^[^#].*\( [^ ]* :${boot}\$\)@\"${cdlabel}\"\1@" ${autos}
+        eend $?
+    fi
 
 
     # Proceed with OTFE attachment only if remount-rw succeeded
