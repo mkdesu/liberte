@@ -35,7 +35,6 @@ net-wireless/iwl6000-ucode
 net-wireless/iwl6005-ucode
 net-wireless/iwl6030-ucode
 net-wireless/iwl6050-ucode
-net-wireless/rtl8192se-firmware
 net-wireless/carl9170-firmware
 net-wireless/rt61-firmware
 net-wireless/rt73-firmware
@@ -44,6 +43,7 @@ net-wireless/zd1201-firmware
 net-wireless/zd1211-firmware
 net-wireless/prism54-firmware
 net-wireless/bluez-firmware
+sys-kernel/linux-firmware
 
 # Disk utilities
 sys-apps/hdparm

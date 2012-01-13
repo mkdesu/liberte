@@ -5,6 +5,7 @@
   * Fixed memory wiping in KEXEC kernel
   * Fixed multilingual disk labels support for automount
   * Fixed 3G support for modems with PIN unlocking
+  * More extensive firmware support
 
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)

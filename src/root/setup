@@ -75,7 +75,7 @@ fi
 sinfo "Setting a hardened profile"
 hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/' | grep -v /selinux`
 eselect profile set ${hardened}
-rm -f /etc/portage/savedconfig/sys-apps/busybox-*
+rm -f /etc/portage/savedconfig/*/*-[0-9]*
 
 
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
@@ -645,6 +645,17 @@ if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then
     sinfo "BusyBox config differences:"
     diff /etc/portage/savedconfig/sys-apps/busybox{,-*} || true
 fi
+
+
+sinfo "Unknown missing firmwares:"
+for fw in $(strings -a -n 10 $(find /lib/modules -name '*.ko' \
+    ! -name serial_cs.ko ! -name iwlagn.ko ! -name b43.ko ! -name atmel.ko \
+    ! -name at76c50x-usb.ko ) | sed -n 's/^firmware=//p'| sort -u); do
+    if [ ! -e /lib/firmware/${fw} ] \
+        && ! grep -q "^# X ${fw}\$" /etc/portage/savedconfig/sys-kernel/linux-firmware; then
+        echo ${fw}
+    fi
+done
 
 
 sinfo "Generating SYSLINUX configuration"

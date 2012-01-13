@@ -80,6 +80,7 @@ media-gfx/splashutils           -truetype
 
 # Extra functionality
 sys-apps/busybox                static savedconfig
+sys-kernel/linux-firmware       savedconfig
 virtual/jpeg                    static-libs
 media-libs/jpeg                 static-libs
 media-libs/libpng               static-libs
