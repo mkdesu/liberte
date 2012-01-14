@@ -20,10 +20,12 @@ start() {
     cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null)
 
 
-    # Lock root account's password
-    ebegin Disabling root password
-    usermod -L root
-    eend $?
+    # Lock root account's password, unless gentoo=root was given
+    if ! get_bootparam 'root'; then
+        ebegin Disabling root password
+        usermod -L root
+        eend $?
+    fi
 
 
     # Arm the poweroff watchdog
