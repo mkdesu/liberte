@@ -1,42 +1,70 @@
 #!/bin/sh
 
+cldir=/usr/local/share/customize-locale
+locdef=${XDG_CONFIG_HOME}/shell/locale
+
+
+update_var() {
+    local var="$1" value="$2"
+
+    echo "Configuring locale setting: ${var}=${value}"
+    sed -i "s&^export ${var}=.*&export ${var}=${value}&" ${locdef}
+
+    if ! grep -q "^export ${var}=${value}\$" ${locdef}; then
+        echo "export ${var}=${value}" >> ${locdef}
+    fi
+}
+
+
 # Choose language
-newloc=`cat /etc/locale.menu | xargs -n 10000 -x \
+newloc=`cat ${cldir}/locale.menu | xargs -n 10000 -x \
     zenity --list --width=570 --height=450 --window-icon=question \
-    --title="UI language chooser (1/2)" \
+    --title="UI language chooser (1/3)" \
     --text="<big><b>Select your user interface language.</b></big>\n\
-It will become active on next login.\n\n\
+Click <i>Cancel</i> to skip.\n\
+UI language will become active on next login.\n\n\
 <i>Note that depending on the application you use, \
 the language locale may be exposed via network.</i>" \
     --column="Country" --column="Language" --column="Locale" \
     --print-column=3 --hide-column=3`
 
+
 # Choose timezone
 extratz='Worldwide UTC "Universal Coordinated Time"'
-newtz=`(echo "${extratz}"; cat /etc/timezone.menu) | xargs -n 10000 -x \
+newtz=`(echo "${extratz}"; cat ${cldir}/timezone.menu) | xargs -n 10000 -x \
     zenity --list --width=750 --height=450 --window-icon=question \
-    --title="Time zone chooser (2/2)" \
+    --title="Time zone chooser (2/3)" \
     --text="<big><b>Select your time zone.</b></big>\n\
-It will become active on next login.\n\n\
+Click <i>Cancel</i> to skip.\n\
+Time zone will become active on next login.\n\n\
 <i>Note that depending on the application you use, \
 the time zone may be exposed via network.</i>" \
     --column="Country" --column="Time Zone" --column="Comment" \
     --print-column=2`
 
-if [ -n "${newloc}" ]; then
-    echo "Configuring locale: LANG=${newloc}"
-    sed -i "s:^export LANG=.*:export LANG=${newloc}:" ${XDG_CONFIG_HOME}/shell/locale
 
-    if ! grep -q LANG=${newloc} ${XDG_CONFIG_HOME}/shell/locale; then
-        echo "export LANG=${newloc}" >> ${XDG_CONFIG_HOME}/shell/locale
-    fi
+# Choose keyboard layout
+newkbd=`cat ${cldir}/keyboard.menu | xargs -n 10000 -x \
+    zenity --list --width=570 --height=450 --window-icon=question \
+    --title="Keyboard layout chooser (3/3)" \
+    --text="<big><b>Select your keyboard layout.</b></big>\n\
+Click <i>Cancel</i> to skip.\n\
+Keyboard layout will become active on next login.\n\n\
+<i>Make sure to pick layout with Latin alphabet support. \
+Choose <b>English (US)</b> if unsure, or skip this dialog.</i>" \
+    --column="Association" --column="Layout ID" --column="Layout" \
+    --print-column=2 --hide-column=2`
+
+
+if [ -n "${newloc}" ]; then
+    update_var LANG "${newloc}"
 fi
 
 if [ -n "${newtz}" ]; then
-    echo "Configuring timezone: TZ=:${newtz}"
-    sed -i "s@^export TZ=.*@export TZ=:${newtz}@" ${XDG_CONFIG_HOME}/shell/locale
+    update_var TZ   ":${newtz}"
+fi
 
-    if ! grep -q TZ=:${newtz} ${XDG_CONFIG_HOME}/shell/locale; then
-        echo "export TZ=:${newtz}" >> ${XDG_CONFIG_HOME}/shell/locale
-    fi
+if [ -n "${newkbd}" ]; then
+    update_var X11_KBD_LAYOUT  "`echo "${newkbd}" | cut -d. -f1`"
+    update_var X11_KBD_VARIANT "`echo "${newkbd}" | cut -d. -f2`"
 fi

@@ -1,2 +1,4 @@
 export LANG=en_GB.UTF-8
 export TZ=:UTC
+export X11_KBD_LAYOUT=us
+export X11_KBD_VARIANT=

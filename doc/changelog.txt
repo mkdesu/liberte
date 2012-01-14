@@ -1,5 +1,5 @@
-2011-XX-XX
-  + 2011.3 release
+2012-XX-XX
+  + 2012.1 release
 
   * Kernel 3.0.4
   * Fixed memory wiping in KEXEC kernel
@@ -13,6 +13,8 @@
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
   * Better Bluetooth support
+
+  * Added keyboard layout configuration via locale customization applet
 
 
 2011-11-07
