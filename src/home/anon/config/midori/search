@@ -6,12 +6,12 @@ uri=http://3g2upl4pq6kufc4m.onion/html/?q=%s
 icon=
 token=dd
 
-[Scroogle]
-name=Scroogle
-text=Google search proxy
-uri=https://ssl.scroogle.org/cgi-bin/nbbwssl.cgi?Gw=%s
+[Ixquick via Google]
+name=Ixquick via Google
+text=Ixquick private search engine, results via Google
+uri=https://startpage.com/do/search?query=%s
 icon=
-token=sg
+token=ig
 
 [Ixquick]
 name=Ixquick
