@@ -669,7 +669,7 @@ fi
 # atmel,at76c50x-usb: net-wireless/atmel-firmware
 sinfo "Unknown missing firmwares:"
 for fw in $(strings -a -n 10 $(find /lib/modules -name '*.ko' \
-    ! -name serial_cs.ko ! -name b43.ko ! -name atmel.ko ! -name at76c50x-usb.ko) \
+    ! -name serial_cs.ko ! -name 'b43*.ko' ! -name atmel.ko ! -name at76c50x-usb.ko) \
     | sed -n 's/^firmware=//p' | sort -u); do
     if [ ! -e /lib/firmware/${fw} ]  &&  ! grep -q "^${fw}\$" \
         /etc/portage/savedconfig/sys-kernel/linux-firmware; then
