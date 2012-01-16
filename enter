@@ -45,6 +45,7 @@ else
           --exclude=/root/                 \
           --exclude=/home/anon/            \
           --exclude=/home/nofw/            \
+          --exclude=/mnt/restrict/         \
           --exclude=/var/lib/i2p/          \
           --exclude=/var/lib/portage/      \
           --exclude=/usr/local/portage/    \
@@ -59,6 +60,7 @@ else
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
+    ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/restrict      ${LIVECD}/mnt
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
     ${RSYNC} --chmod=u=rwX,go=rX -i --delete --exclude=/portage/distfiles -C ${SRC}/usr/local/portage ${LIVECD}/usr/local

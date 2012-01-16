@@ -70,7 +70,9 @@ start() {
             # Work around Xorg autodetection / fallback bug
             if grep -q 'Number of created screens does not match number of detected devices' /var/log/Xorg.0.log \
                 && grep -q '"vesa"' /root/xorg.conf.new; then
-                rm /root/xorg.conf.new /usr/lib/xorg/modules/drivers/vesa_drv.so
+                # Work around inability to remove a file on read-only filesystem
+                mount -r -B /usr/lib/xorg/modules/drivers/dummy_drv.so /usr/lib/xorg/modules/drivers/vesa_drv.so
+                rm /root/xorg.conf.new
                 HOME=/root Xorg -configure 2>/dev/null
             fi
 

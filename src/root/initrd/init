@@ -3,10 +3,30 @@
 # Default variables
 export PATH="/sbin:/bin"
 
-union=/union
-rwroot=/rwroot
-boot=/mnt/boot
-live=/mnt/live
+# Bootstrap procedure (in /stage):
+# mount /rwroot
+# mount /boot
+# mount /live   (from squashfs in /boot)
+# move  /boot   -> /live/mnt/boot
+# bind  /live   -> /live/mnt/live
+# move  /rwroot -> /live/mnt/restrict/rwroot
+# mount /union  (from /live/mnt/restrict/rwroot + /live)
+# move  /union  -> /live/mnt/restrict/union
+# bind  /live/mnt/restrict/union/{etc,var,tmp,home,root} -> /live/{...}
+# switch_root to /live
+stage=/stage
+
+sboot=${stage}/boot
+slive=${stage}/live
+srwroot=${stage}/rwroot
+sunion=${stage}/union
+
+mboot=${slive}/mnt/boot
+mlive=${slive}/mnt/live
+mrwroot=${slive}/mnt/restrict/rwroot
+munion=${slive}/mnt/restrict/union
+
+mbinds="/etc /var /tmp /root /home"
 
 
 # External scripts
@@ -19,9 +39,9 @@ live=/mnt/live
 mount -t proc  proc  /proc
 mount -t sysfs sysfs /sys
 
-mount -t tmpfs -o mode=755 tmpfs ${union}
-cp -a ${rwroot}/* ${union}
-mount -o move ${union} ${rwroot}
+# Mount rwroot tmpfs directory
+mount -t tmpfs -o mode=755 tmpfs ${srwroot}
+mkdir -m 755 ${srwroot}/etc
 
 
 # Parse kernel options
@@ -38,7 +58,7 @@ done
 eval force_load=\"loop squashfs unionfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
 
 
-# Handle uvesafb
+# Handle uvesafb, and propagate options to rwroot
 if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
     vesa_mode=${param_video#uvesafb:}
     vesa_mode=${vesa_mode%%,*}
@@ -48,7 +68,7 @@ if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
 else
     echo "blacklist uvesafb"
 fi > /etc/modprobe.d/framebuffer.conf
-cp -a /etc/modprobe.d ${rwroot}/etc
+cp -a /etc/modprobe.d ${srwroot}/etc
 
 
 quiet_kmsg
@@ -110,15 +130,15 @@ while true; do
                 mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
                 [ ${mediaro} == 1 ] || blockdev --setro ${mediadev}
 
-                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${rwroot}${boot} >/dev/null 2>&1; then
+                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${sboot} >/dev/null 2>&1; then
                     # Check for the recognition file
-                    if [ -e ${rwroot}${boot}${param_loop} ]; then
+                    if [ -e ${sboot}${param_loop} ]; then
                         good_msg "Media found on ${mediadev}"
 
                         [ ${mediaro} == 1 ] || blockdev --setrw ${mediadev}
                         break 2
                     else
-                        umount ${rwroot}${boot}
+                        umount ${sboot}
                     fi
                 fi
 
@@ -138,41 +158,57 @@ test_success "find media to mount"
 if [ -n "${param_loop}" ]; then
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
-    mount -r -t squashfs -o loop ${rwroot}${boot}${param_loop} ${rwroot}${live}
+    mount -r -t squashfs -o loop ${sboot}${param_loop} ${slive}
     test_success 'mount compressed filesystem'
 
-    echo "${mediadev} ${boot} ${param_cdroot_type} ro,${param_cdroot_flags} 0 1" > /etc/fstab.extra
-    echo "${boot}${param_loop} ${live} squashfs ro,loop 0 2"                    >> /etc/fstab.extra
-else
-    mount -o move ${rwroot}${boot} ${rwroot}${live}
+    # Move boot mountpoint under live
+    mount -o move ${sboot} ${mboot}
 
-    echo "${mediadev} ${live} ${param_cdroot_type} ro,${param_cdroot_flags} 0 2" > /etc/fstab.extra
+    echo "${mediadev} ${mboot#${slive}} ${param_cdroot_type} ro,${param_cdroot_flags} 0 1" > /etc/fstab.extra
+    echo "${mboot#${slive}}${param_loop} / squashfs ro,loop 0 2"                          >> /etc/fstab.extra
+else
+    # Treat boot mountpoint as live mountpoint
+    mount -o move ${sboot} ${slive}
+
+    echo "${mediadev} / ${param_cdroot_type} ro,${param_cdroot_flags} 0 2" > /etc/fstab.extra
 fi
 
+# Bind extra live mountpoint under live
+mount -r -o bind ${slive}   ${mlive}
 
+# Move rwroot mountpoint under live
+mount -o move    ${srwroot} ${mrwroot}
+
+
+# Using ${slive} instead of ${mlive} hangs unionfs on ${slive}${sub} access
 good_msg "Creating union mount"
-mount -t unionfs -o dirs=${rwroot}=rw:${rwroot}${live}=ro unionfs ${union}
+mount -t unionfs -o dirs=${mrwroot}=rw:${mlive}=ro unionfs ${sunion}
 test_success 'create union mount'
 
-# Move rwroot submounts to union (will be then adjusted after switch_root)
-for mnt in $(cut -d' ' -f2 /proc/mounts | sed -n "s:^${rwroot}/:/:p"); do
-    mount -o move ${rwroot}${mnt} ${union}${mnt}
-done
+# Move union mountpoint under live
+mount -o move ${sunion} ${munion}
 
-# Move the rwroot mount to a hidden directory on union
-# (rw layer directly accessible only by root)
-mount -o move ${rwroot} ${union}/mnt/hidden${rwroot}
+
+# Bind rw union subtrees under live
+for sub in ${mbinds}; do
+    mount -r -o bind ${munion}${sub} ${slive}${sub}
+    mount -o remount,rw,nosuid,nodev ${slive}${sub}
+done
 
 
 # Add useful lines to /etc/fstab
-cat /etc/fstab.extra >> ${union}/etc/fstab
+cat /etc/fstab.extra >> ${slive}/etc/fstab
+
+
+# Run debug shell again if requested
+rundebugshell
 
 
 verbose_kmsg
 good_msg 'Booting (initramfs)'
-if [ ! -e ${union}/dev/console  -o  ! -e ${union}/dev/null ]; then
+if [ ! -e ${slive}/dev/console  -o  ! -e ${slive}/dev/null ]; then
     bad_msg 'Real /dev is missing files required to boot (console and null)'
-elif [ -e /etc/init.splash      -a  ! -e ${union}/dev/tty1 ]; then
+elif [ -e /etc/init.splash      -a  ! -e ${slive}/dev/tty1 ]; then
     bad_msg 'Real /dev is missing tty1, which is required for splash'
 fi
 
@@ -184,8 +220,8 @@ umount /sys  || bad_msg 'Failed to unmount /sys'
 umount /proc || bad_msg 'Failed to unmount /proc'
 
 
-cd ${union}
-exec switch_root -c /dev/console ${union} /sbin/init
+cd ${slive}
+exec switch_root -c /dev/console ${slive} /sbin/init
 
 
 # If we get here, something bad has happened

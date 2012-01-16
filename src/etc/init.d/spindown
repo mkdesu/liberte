@@ -13,7 +13,6 @@ depend() {
 }
 
 start() {
-    # No mountpoint if there is no loop (direct mount on /mnt/live)
     # (copied from lockdown)
     cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null)
 

@@ -48,35 +48,34 @@ ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
 
 
 start() {
-    # Remount media root read-write (for non-loop/cd/dvd)
-    remount=1
-    cdtype=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_TYPE=//p')
-    case "${cdtype}" in
-    ''|unionfs|iso9660|udf)
-        ewarn Skipping boot media read-write remount
-        ;;
-    *)
-        ebegin Remounting ${boot} read-write
-        mount -o remount,rw ${boot}
-        remount=$?
-        eend ${remount}
-        ;;
-    esac
+    # Determine boot device and its label
+    mediadev=/dev/block/`mountpoint -d ${boot}`
+    medialabel=`udevadm info -q property -p ${mediadev} 2>/dev/null | sed -n 's/^ID_FS_LABEL=//p'`
 
-
-    cdlabel=$(udevadm info -q property -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null | sed -n 's/^ID_FS_LABEL=//p')
-    if [ -n "${cdlabel}" ]; then
+    if [ -n "${medialabel}" ]; then
         # Can result in duplicate autofs entries if label is later changed
         # to that of other media, and this service is then restarted
-        ebegin "Creating ${boot} -> /media/${cdlabel} alias"
-        sed -i "s@^[^#].*\( [^ ]* :${boot}\$\)@\"${cdlabel}\"\1@" ${autos}
+        ebegin "Creating ${boot} -> /media/${medialabel} alias"
+        sed -i "s@^[^#].*\( [^ ]* :${boot}\$\)@\"${medialabel}\"\1@" ${autos}
         eend $?
+    fi
+
+
+    # Remount media root read-write (for non-loop/cd/dvd)
+    mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
+    if [ ${mediaro} = 0 ]; then
+        ebegin Remounting ${boot} read-write
+        mount -o remount,rw ${boot}
+        mediaro=$?
+        eend ${mediaro}
+    else
+        ewarn Boot media is read-only, not remounting
     fi
 
 
     # Proceed with OTFE attachment only if remount-rw succeeded
     # (a read-only persist directory is more problematic than tmpfs)
-    if [ ${remount} = 0 ]; then
+    if [ ${mediaro} = 0 ]; then
         # Import splash functions (with an OpenRC compatibility hack)
         . /sbin/splash-functions.sh
         input_begin()   { splash svc_input_begin ${RC_SVCNAME}; }

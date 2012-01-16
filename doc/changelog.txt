@@ -6,6 +6,7 @@
   * Fixed multilingual disk labels support for automount
   * Fixed 3G support for modems with PIN unlocking
   * More extensive firmware support
+  * Better filesystem security (read-only root fs)
 
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)

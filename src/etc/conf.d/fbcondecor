@@ -1,7 +1,3 @@
-# Start somewhat earlier in boot runlevel
-rc_use="!localmount modules mtab"
-rc_before="localmount lvm"
-
 # If tty list is not provided, rc_tty_number is used
 FBCONDECOR_TTYS="1 2 4"
 

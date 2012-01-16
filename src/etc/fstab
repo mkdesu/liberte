@@ -4,5 +4,5 @@
 # Control groups (mount just the cpu subsystem)
 cgroup   /sys/fs/cgroup   cgroup   cpu,nosuid,nodev,noexec  0 0
 
-# /mnt/boot and /mnt/live entries are added below by initramfs
+# /mnt/boot and / entries are added below by initramfs
 # Persistence mount is added below by /etc/init.d/liberte
