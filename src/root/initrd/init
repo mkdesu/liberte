@@ -10,7 +10,7 @@ export PATH="/sbin:/bin"
 # move  /boot   -> /live/mnt/boot
 # bind  /live   -> /live/mnt/live
 # move  /rwroot -> /live/mnt/restrict/rwroot
-# mount /union  (from /live/mnt/restrict/rwroot + /live)
+# mount /union  (from /live/mnt/restrict/rwroot + /live/mnt/live)
 # move  /union  -> /live/mnt/restrict/union
 # bind  /live/mnt/restrict/union/{etc,var,tmp,home,root} -> /live/{...}
 # switch_root to /live
@@ -191,8 +191,8 @@ mount -o move ${sunion} ${munion}
 
 # Bind rw union subtrees under live
 for sub in ${mbinds}; do
-    mount -r -o bind ${munion}${sub} ${slive}${sub}
-    mount -o remount,rw,nosuid,nodev ${slive}${sub}
+    mount -o bind ${munion}${sub} ${slive}${sub}
+    mount -o remount,nosuid,nodev ${slive}${sub}
 done
 
 

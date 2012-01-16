@@ -49,7 +49,7 @@ pkcs11-tool -Lv                      > 07-pcsc
 
 echo Network ...
 ifconfig -a -v                       > 08-net-eth
-(iwconfig; echo; iwpriv)             > 08-net-wifi
+(iwconfig; iwpriv)                   > 08-net-wifi
 hciconfig -a                         > 08-net-hci
 route -vne                           > 08-net-route
 
@@ -68,7 +68,7 @@ for dev in `find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b -exec readlin
     # NOTE: may hang on USB key
     # sdparm -a    "${dev}"            > 11-scsi-`basename "${dev}"`
 done
-for dev in `smartctl --scan | cut -d' ' -f1`; do
+for dev in `smartctl --scan | grep -v '^#' | cut -d' ' -f1`; do
     smartctl -ax "${dev}"            > 11-smart-`basename "${dev}"`
 done
 
@@ -117,7 +117,7 @@ sed -i 's/^[^#][^[:blank:]]*/[LABEL REMOVED]/' 10-autos
 
 # Create an  archive in the original directory
 cd - 1>/dev/null
-find "${dir}" -printf '%P\n' | tar -cJf "${rep}" --mode 600 -C "${dir}" -T -
+find "${dir}" ! -size 0c -printf '%P\n' | tar -cJf "${rep}" --mode 600 -C "${dir}" -T -
 rm -r "${dir}"
 
 echo "Created ${rep}"
