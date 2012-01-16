@@ -87,6 +87,7 @@ media-libs/libpng               static-libs
 sys-devel/gcc                   cxx
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
+media-libs/libquvi-scripts      offensive
 dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
 app-office/abiword              plugins gnome
