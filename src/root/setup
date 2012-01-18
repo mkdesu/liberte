@@ -571,9 +571,6 @@ chattr -f -a /tmp/.private || true
 
 
 sinfo "Installing wrappers"
-mv -n /sbin/iwconfig{,.orig}
-ln -sf ../usr/local/libexec/iwconfig.wrapper   /sbin/iwconfig
-find /sbin -maxdepth 1 -type l -lname iwconfig -exec ln -sf iwconfig.orig {} \;
 ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
 
 
