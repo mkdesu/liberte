@@ -27,3 +27,4 @@ anon	liberte = (nofw)  NOPASSWD: /usr/local/sbin/unsafe-browser ""
 anon	liberte = (cable) NOPASSWD: /usr/libexec/cable/send ""
 
 anon	liberte = (tor)   NOPASSWD: /usr/local/sbin/tor-ctrl newnym
+anon	liberte = (tor)   NOPASSWD: /usr/local/sbin/tor-ctrl status

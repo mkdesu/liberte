@@ -1,22 +1,36 @@
 #!/bin/sh -e
 
+# This script runs as user "tor"
+# Check both exit status and expected output
+
 export LC_ALL=C
 
 ctrlhost=127.0.0.1
 ctrlport=9051
 cookie=/var/lib/tor/data/control_auth_cookie
 
+
+# https://gitweb.torproject.org/torspec.git/blob/HEAD:/control-spec.txt
 case "$1" in
     newnym)
         cmd="SIGNAL NEWNYM"
+        expected=
+        ;;
+
+    status)
+        keyword="status/circuit-established"
+        cmd="GETINFO ${keyword}"
+        expected="${keyword}=1"
         ;;
 
     *)
-        echo "Format: tor-ctrl newnym"
+        echo "Format: tor-ctrl newnym|status"
         exit 1
         ;;
 esac
 
+
+# Get cookie in hex format
 if [ ! -r ${cookie} ]; then
     echo "Auth cookie does not exist or insufficient permissions"
     exit 1
@@ -24,6 +38,17 @@ fi
 
 auth=`od -t x1 -v -w32 ${cookie} | cut -s -d' ' -f 2- --output-delimiter=`
 
-echo -n ${BASH:+-e} AUTHENTICATE "${auth}\r\n${cmd}\r\nQUIT\r\n" \
-    | nc -n -q 30 -w 30 ${ctrlhost} ${ctrlport} 2>&1 \
-    | sed -n '/^250 /b n; p; q 1; :n'
+
+# Single-line values are prefixed with "250-keyword="
+# Last sed fails the script if $? != 0
+output=`(
+    echo AUTHENTICATE "${auth}"
+    echo ${cmd}
+    echo QUIT
+)   | sed 's/$/\r/'                                      \
+    | nc -n -q 30 -w 30 ${ctrlhost} ${ctrlport} 2>&1     \
+    | sed 's/\r$//; /^250 \(OK\|closing connection\)$/d' \
+    | sed -n 's/^250-//p; t; p; q 1'`
+
+# Check against the expected result
+[ "${expected}" = "${output}" ]

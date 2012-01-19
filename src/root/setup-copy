@@ -44,7 +44,6 @@ ebuilds="app-misc/ca-certificates
          dev-libs/gobject-introspection
          gnome-base/libglade
          gnome-base/librsvg
-         gnome-extra/gucharmap
          media-fonts/font-misc-meltho
          media-gfx/exiv2
          media-gfx/graphicsmagick
@@ -71,7 +70,7 @@ done
 sed -i 's/\${python_dep}//' ${ebuild_portage}
 
 # Python
-# gucharmap, exiv2, totem: not needed                  (#398957, #398959, #398949)
+# exiv2, totem: not needed                             (#398959, #398949)
 # libxcb:                  needed at build-time        (#398953)
 # libglade:                libglade-convert            (#398955)
 # librsvg:                 rsvg                        (#398951)
@@ -79,9 +78,9 @@ sed -i 's/\${python_dep}//' ${ebuild_portage}
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
 # openbox:                 openbox-xdg-autostart
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade}          \
-                                         ${ebuild_gtk} ${ebuild_gucharmap}              \
-                                         ${ebuild_exiv2} ${ebuild_gobjectintrospection} \
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
+                                         ${ebuild_gtk} ${ebuild_exiv2}         \
+                                         ${ebuild_gobjectintrospection}        \
                                          ${ebuild_totem} ${ebuild_librsvg}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}

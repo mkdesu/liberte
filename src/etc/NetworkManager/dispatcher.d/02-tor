@@ -7,12 +7,21 @@ action=$2
 
 case ${action} in
 *up|vpn-down)
+        # SIGHUP doesn't refresh sockets, and Tor doesn't handle
+        # changing IPs/interfaces well
         if ! /etc/init.d/tor -q status; then
             logger -p 6 -t nm.dispatch "Starting Tor service (${iface})"
             /etc/init.d/tor -q start
         else
-            # SIGHUP doesn't refresh sockets, and Tor doesn't handle
-            # changing IPs/interfaces well
+            logger -p 6 -t nm.dispatch "Restarting Tor service (${iface})"
+            /etc/init.d/tor -qs restart
+        fi
+        ;;
+
+down)
+        # Restart Tor so it's aware of circuit not being valid anymore
+        # (but don't stop, to avoid races and problems with 2+ NICs)
+        if /etc/init.d/tor -q status; then
             logger -p 6 -t nm.dispatch "Restarting Tor service (${iface})"
             /etc/init.d/tor -qs restart
         fi

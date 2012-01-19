@@ -3,6 +3,20 @@
 nofw=nofw
 
 
+# Exit if Tor has established a circuit.
+# Don't prevent knowledgeable users from launching
+# Unsafe Browser directly via sudo (the alternative is
+# giving user nofw access to sudo).
+if sudo -n -u tor /usr/local/sbin/tor-ctrl status; then
+    exec zenity --warning --title="Tor is running" \
+                --text='<big><b>Tor reports that it has successfully established a circuit.</b></big>
+
+Unsafe Browser is a non-Torified browser that is intended for cases where web setup is necessary in order to initiate an Internet connection (such as captive portals for Wi-Fi hotspots registration). Connections are made in the clear, and are <b>not</b> Torified.
+
+<span foreground="red"><b>Please run a regular browser.</b></span>'
+fi
+
+
 xhost +si:localuser:${nofw}
 
 

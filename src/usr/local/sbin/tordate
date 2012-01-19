@@ -44,8 +44,8 @@ else
 
 
     # Get various date points in Tor's format, and do some sanity checks
-    vstart=`sed -n "/^valid-after \(${datere}\)"'$/s//\1/p; t q; b n; :q q; :n' ${consensus}`
-    vend=`sed -n "/^valid-until \(${datere}\)"'$/s//\1/p; t q; b n; :q q; :n' ${consensus}`
+    vstart=`sed -n "/^valid-after \(${datere}\)"'$/s//\1/p; t q; b; :q q' ${consensus}`
+    vend=`sed -n "/^valid-until \(${datere}\)"'$/s//\1/p; t q; b; :q q' ${consensus}`
     vendchk=`date -ud "${vstart} -0300" +'%F %T'`
 
     rm -f ${uvconsensus}.bak
