@@ -78,9 +78,9 @@ elif [ "$2" = clean ]; then
 
     # Skip files with spaces to prevents problems with SquashFS sorting
     sinfo "Creating unregistered files list"
-    find ${LIVECD}/copy -xdev \( -type l -o -type f \) ! -name '* *'            \
-        ! -path "${pakdir}/*" ! -path "${LIVECD}/copy/boot/*" \
-        ! -path "${LIVECD}/copy/dev/*" | sed "s:^${LIVECD}/copy::" | sort       \
+    find ${LIVECD}/copy -xdev \( -type l -o -type f \) ! -name '* *' \
+        ! -path "${pakdir}/*" ! -path "${LIVECD}/copy/boot/*"        \
+        ! -path "${LIVECD}/copy/dev/*" -printf '/%P\n' | sort        \
         > ${pakdir}/all-files
     cat ${pakdir}/*=* | sort -u > ${pakdir}/listed-files
 

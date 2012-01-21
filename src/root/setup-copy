@@ -390,7 +390,7 @@ ln -s  ../local/libexec/java.wrapper /usr/bin/java
 sinfo "Saving current packages list in /tmp/transient/pkg"
 pakdir=/tmp/transient/pkg
 mkdir -p ${pakdir}
-for p in `find /var/db/pkg/ -mindepth 2 -maxdepth 2 -type d -printf '%P\n'`; do
+for p in `find /var/db/pkg -mindepth 2 -maxdepth 2 -type d -printf '%P\n'`; do
     sed -n 's/^\(obj\|sym\) \([^ ]\+\).*$/\2/p' /var/db/pkg/${p}/CONTENTS > ${pakdir}/${p//\//=}
 done
 
