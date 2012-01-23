@@ -42,6 +42,7 @@ dev-libs/pkcs11-helper               -gnutls -nss
 net-irc/xchat                   ssl
 net-im/pidgin                         gnutls sasl
 dev-libs/cyrus-sasl             ssl          -crypt
+dev-libs/libevent               -ssl
 net-analyzer/netcat                          -crypt
 net-libs/libproxy               -gnome -networkmanager
 net-libs/glib-networking        -gnome libproxy
@@ -71,6 +72,7 @@ net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 x11-libs/cairo                  -glib
+x11-misc/xdg-utils              -perl
 gnome-extra/zenity              -compat
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
