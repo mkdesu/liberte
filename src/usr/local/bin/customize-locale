@@ -1,10 +1,10 @@
 #!/bin/sh
 
 cldir=/usr/local/share/customize-locale
-locdef=${XDG_CONFIG_HOME}/shell/locale
+locdef="${XDG_CONFIG_HOME}"/shell/locale
 
 
-if [ ! -e ${locdef} ]  &&  ! touch ${locdef} 2>/dev/null; then
+if [ ! -e "${locdef}" ]  &&  ! touch "${locdef}" 2>/dev/null; then
     echo "Could not create ${locdef}"
     exit 1
 fi
@@ -14,10 +14,10 @@ update_var() {
     local var="$1" value="$2"
 
     echo "Configuring locale setting: ${var}=${value}"
-    sed -i "s&^export ${var}=.*&export ${var}=${value}&" ${locdef}
+    sed -i "s&^export ${var}=.*&export ${var}=${value}&" "${locdef}"
 
-    if ! grep -q "^export ${var}=${value}\$" ${locdef}; then
-        echo "export ${var}=${value}" >> ${locdef}
+    if ! grep -q "^export ${var}=${value}\$" "${locdef}"; then
+        echo "export ${var}=${value}" >> "${locdef}"
     fi
 }
 
