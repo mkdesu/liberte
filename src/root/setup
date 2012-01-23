@@ -1,26 +1,14 @@
 #!/bin/bash -e
 
-export KBUILD_BUILD_VERSION=0
-export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
-export KBUILD_BUILD_USER=liberte
-export KBUILD_BUILD_HOST=dee.su
+helpdir=${HOME}/helpers
 
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
-consolefont=ter-i16n.psf
 xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
 
 i2phosts=https://www.i2p2.de/hosts.txt
-i2pnetdb=https://netdb.i2p2.de/
-i2prire='routerInfo-[[:alnum:]~-]{43}=\.dat'
-maxrifetch=2000
-maxnetdb=100
-
-pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
-usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
-i2phosts_regexp='^[[:alnum:].-]{1,63}.i2p=[[:alnum:]~-]{512}AAAA[[:blank:]]?$'
 
 
 sinfo() {
@@ -75,6 +63,8 @@ fi
 sinfo "Setting a hardened profile"
 hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/' | grep -v /selinux`
 eselect profile set ${hardened}
+
+echo ">sys-kernel/hardened-sources-${hsversion}" > /etc/portage/package.mask/kernel
 rm -f /etc/portage/savedconfig/*/*-[0-9]*
 
 
@@ -211,9 +201,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     # "make prepare" suffices for xf86-input-virtualbox, but not for xf86-video-virtualbox
     sinfo "Compiling kernel"
-    makeopts=`portageq envvar MAKEOPTS`
-    make -s ${makeopts} -C /usr/src/linux 2>/dev/null
-    make -s ${makeopts} -C /usr/src/linux modules_install
+    ${helpdir}/gen-kernel main
 
 
     sinfo "Marking tree as ready for incremental builds"
@@ -301,31 +289,7 @@ strip -s /usr/local/sbin/udev-watchdog       \
 
 
 sinfo "Generating localization, timezone and keyboard layout menus"
-cldir=/usr/local/share/customize-locale
-mkdir -p ${cldir}
-
-# s/AD/Andorra/;...
-ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' /usr/share/zoneinfo/iso3166.tab`
-# s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...
-lcrep=`awk '/^[[:blank:]]*title\y/ { match(FILENAME, /(.*\/)?(.*)/, a); match($0, /^[[:blank:]]*title[[:blank:]]+(.*)/, b); printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); nextfile }' /usr/share/i18n/locales/*`
-
-# "Spain" "__ca_ES@valencia" ca_ES.UTF-8@valencia (+ lcrep)
-awk '/UTF-8/ && !/^iw_IL/ && !/^pap_AN/ { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a); printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); print $1 }' /usr/share/i18n/SUPPORTED \
-    | sed "${ccrep}${lcrep}" | LC_ALL=C sort | tr '\n' ' ' > ${cldir}/locale.menu
-# "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"
-awk -F '\t' '!/^#/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' /usr/share/zoneinfo/zone.tab \
-    | sed "${ccrep}"         | LC_ALL=C sort | tr '\n' ' ' > ${cldir}/timezone.menu
-
-ccrepext="${ccrep}"'s/^ARA\>/"Arabic"/;s/^BRAI\>/"Braille"/;s/^EPO\>/"Esperanto"/;s/^LATAM\>/"Latin America"/;s/^MAO\>/"New Zealand"/;s:^NEC_VNDR/JP\>:"Japan":;'
-
-# "Switzerland" ch "German (Switzerland)"
-# "Switzerland" ch.fr "French (Switzerland)"
-(   sed '1,/^! layout$/d; /^! /q' /usr/share/X11/xkb/rules/xorg.lst \
-        | sed -nr 's/^[[:blank:]]*([^!][^[:blank:]]*)[[:blank:]]+(.*)/\1 \1. "\2"/p';
-    sed '1,/^! variant$/d; /^! /q' /usr/share/X11/xkb/rules/xorg.lst \
-        | sed -nr 's/^[[:blank:]]*([^!][^[:blank:]]*)[[:blank:]]+([^[:blank:]]+):[[:blank:]]+(.*)/\2 \2.\1 "\3"/p' ) \
-    | awk '{ $1 = toupper($1); print; }' \
-    | sed "${ccrepext}"      | LC_ALL=C sort | tr '\n' ' ' > ${cldir}/keyboard.menu
+${helpdir}/gen-locale-menu
 
 
 # midori, totem, gst-plugin-scanner: ffmpeg, ffmpegscale, postproc GStreamer plugins
@@ -334,6 +298,7 @@ paxctl -m /usr/bin/midori /usr/bin/totem* /usr/libexec/gstreamer*/gst-plugin-sca
           /usr/bin/mpg123 /usr/bin/jamvm
 
 
+# No sub-pixel rendering, since LCD / cable type is unknown
 sinfo "Configuring fontconfig"
 for fconf in \
     10-no-sub-pixel.conf \
@@ -396,19 +361,7 @@ fi
 
 
 sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
-LC_ALL=C awk --posix "! /${pciids_regexp}/                  { print; exit 1 }" /usr/share/misc/pci.ids
-LC_ALL=C awk --posix "! /${pciids_regexp}|${usbids_regexp}/ { print; exit 1 }" /usr/share/misc/usb.ids
-
-cpp -x c -fpreprocessed -std=c99 -nostdinc -undef -Wall -Werror -pedantic-errors \
-    -o /tmp/drivedb.h /usr/share/smartmontools/drivedb.h
-drivedbout=$(sed '/^ *$/d; /^#/d; s/ //g; s/\\"//g; s/"[^"]*"//g' /tmp/drivedb.h | tr -d '\n' | sed 's/{,,,,},//g' | wc -c)
-if [ "${drivedbout}" != 0 ]; then
-    sinfo "/usr/share/smartmontools/drivedb.h verification failed"
-    exit 1
-fi
-rm /tmp/drivedb.h
-
-LC_ALL=C awk --posix "! /${i2phosts_regexp}/ { print; exit 1 }" /opt/i2p/hosts.txt
+${helpdir}/vfy-databases
 
 
 if [ ! -e /var/lib/tor/data ]; then
@@ -419,42 +372,7 @@ fi
 
 
 sinfo "Creating initial netDb for I2P"
-netdbdir=`mktemp -d`
-
-# Aim at retrieving ~2000 routerInfos (in overlapping portions of 100)
-curl -sSfg ${i2pnetdb}{,,,}{,,,,,,,,,} | sed 's/>/>\n/g' \
-    | LC_ALL=C sed -nr "s@^.*\<href=\"(${i2prire})\".*\$@\1@p" \
-    | sort -u | shuf -n ${maxrifetch} -o ${netdbdir}/names
-
-if [ ! -s ${netdbdir}/names ]; then
-    if [ -e /var/lib/i2p/router/netDb ]; then
-        echo "I2P netDb update failed (ignoring)"
-    else
-        echo "Could not retrieve I2P netDb list"
-        exit 1
-    fi
-else
-    echo "Retrieving `cat ${netdbdir}/names | wc -l` routerInfos"
-    curl -sf -o ${netdbdir}/#1 ${i2pnetdb}`cat ${netdbdir}/names | tr '\n' , | sed 's/^/{/; s/,$/}/'` || :
-
-    LC_ALL=C find ${netdbdir} -regextype posix-egrep -mindepth 1 \
-        \( ! -type f -o ! -regex "${netdbdir}/${i2prire}" \) -delete
-    chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
-
-    # Erase non-NTCP+OR/OfR-capable routerInfos, see http://zzz.i2p.to/topics/280
-    java -cp /opt/i2p/lib/i2p.jar net.i2p.data.RouterInfo ${netdbdir}/routerInfo-*=.dat \
-        | LC_ALL=C sed -nr 's/^[[:blank:]]+//; /^(Hash: [[:alnum:]~-]{43}=|TransportStyle: NTCP|\[caps\] = \[(OR|OfR)\])$/p' \
-        | tr '\n' , | sed -r 's/,(Hash:|$)/\n\1/g' | sed -r '/,TransportStyle:.*,\[caps\]/d' \
-        | sed -r "s@^Hash: ([^,]*).*@${netdbdir}/routerInfo-\1.dat@" | xargs rm -f --
-
-    netdborig=$(find ${netdbdir} -type f | wc -l)
-    find ${netdbdir} -type f | shuf | tail -n +$((maxnetdb+1)) | xargs rm -f --
-    rm -rf         /var/lib/i2p/router/netDb
-    mv ${netdbdir} /var/lib/i2p/router/netDb
-
-    netdbsel=$(find /var/lib/i2p/router/netDb -type f | wc -l)
-    echo "Selected ${netdbsel} (out of ${netdborig}) NTCP+OR/OfR-capable routerInfos"
-fi
+${helpdir}/gen-netdb
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
@@ -567,68 +485,19 @@ install -p -o anon -g legion -m 600 -t /home/anon/persist/security/pgp \
     /usr/local/addons/keys/mfpl.crt
 
 # clear pam_mktemp's append-only attribute to allow later livecd directory removal
-chattr -f -a /tmp/.private || true
+chattr -f -a /tmp/.private || :
 
 
 sinfo "Installing wrappers"
 ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
 
 
-sinfo "Compiling kernel"
-makeopts=`portageq envvar MAKEOPTS`
-rm -f /usr/src/linux/include/generated/compile.h
-
-make -s ${makeopts} -C /usr/src/linux 2>/dev/null
-make -s ${makeopts} -C /usr/src/linux modules_install
-rm /lib/modules/*/{build,source}
-cp -a /usr/src/linux/arch/x86/boot/bzImage /boot/kernel-x86.zi
-
-
-sinfo "Compiling kexec kernels"
-rm -f /usr/src/linux-kexec{,-64}/include/generated/compile.h
-
-make -s ${makeopts} -C /usr/src/linux-kexec 2>/dev/null
-make -s ${makeopts} -C /usr/src/linux-kexec-64 ARCH=x86_64 CROSS_COMPILE=x86_64- 2>/dev/null
-
-cp -a /usr/src/linux-kexec/arch/x86/boot/bzImage    /usr/local/boot/kernel-kexec.zi
-cp -a /usr/src/linux-kexec-64/arch/x86/boot/bzImage /usr/local/boot/kernel-kexec-64.zi
+sinfo "Compiling main and KEXEC kernels"
+${helpdir}/gen-kernel
 
 
 sinfo "Creating initramfs image"
-extmods=`sed -n '/^[^#]/p' ${HOME}/initrd/modules.extra`
-globmods=
-for globmod in `sed -n '/^[^#]/p' ${HOME}/initrd/modules.global`; do
-    globmods="${globmods} "`find /lib/modules/${kversion}/kernel/drivers/${globmod} \
-        -name '*.ko' -printf '%f\n' | sed 's/\.ko$//'`
-done
-
-cpiodir=`mktemp -d`
-for mod in ${extmods} ${globmods}; do
-    # extract canonical name (e.g., _ vs. -, aliases, ...)
-    mod=$(basename $(modinfo -F filename -k ${kversion} ${mod}))
-
-    # unlike "modinfo -F depends", modules.dep lists nested dependencies
-    grep /${mod}: /lib/modules/${kversion}/modules.dep \
-        | tr -d : | tr ' ' '\n' >> ${cpiodir}/modules.extra
-done
-
-for mod in `sort -u ${cpiodir}/modules.extra`; do
-    mod=/lib/modules/${kversion}/${mod}
-    mkdir -p     ${cpiodir}`dirname ${mod}`
-    cp -p ${mod} ${cpiodir}`dirname ${mod}`
-done
-depmod -b ${cpiodir} -e -F /usr/src/linux/System.map ${kversion}
-
-cp ${HOME}/initrd/initramfs ${cpiodir}
-find ${cpiodir} -mindepth 3 -type d \
-    -printf 'dir  %P    0755 0 0\n' >> ${cpiodir}/initramfs
-find ${cpiodir} -mindepth 3 -type f \
-    -printf 'file %P %p 0644 0 0\n' >> ${cpiodir}/initramfs
-
-/usr/src/linux/usr/gen_init_cpio ${cpiodir}/initramfs \
-    | xz -c -C crc32 > /boot/initrd-x86.xz
-
-rm -r ${cpiodir}
+${helpdir}/gen-initramfs
 
 
 sinfo "Creating kexec initramfs image"
@@ -639,61 +508,35 @@ sinfo "Creating kexec initramfs image"
 sinfo "Verifying XZ decompression memory requirements"
 kernxz=arch/x86/boot/compressed/vmlinux.bin.xz
 
-head -c -4 /usr/src/linux/${kernxz}       | xz -t -M $((2 * ${xzmem}))MiB
+head -c -4 /usr/src/linux/${kernxz}          | xz -t -M $((2 * ${xzmem}))MiB
 xz -t -M ${xzmem}MiB /boot/initrd-x86.xz
 
-head -c -4 /usr/src/linux-kexec/${kernxz} | xz -t -M $((2 * ${xzmem}))MiB
+head -c -4 /usr/src/linux-kexec/${kernxz}    | xz -t -M $((2 * ${xzmem}))MiB
+head -c -4 /usr/src/linux-kexec-64/${kernxz} | xz -t -M $((2 * ${xzmem}))MiB
 xz -t -M ${xzmem}MiB /usr/local/boot/initrd-kexec.xz
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config          || true
+diff ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config          || :
 
 
 sinfo "Kexec kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config    || true
-diff ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config || true
+diff ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config    || :
+diff ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config || :
 
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then
     sinfo "BusyBox config differences:"
-    diff /etc/portage/savedconfig/sys-apps/busybox{,-*} || true
+    diff /etc/portage/savedconfig/sys-apps/busybox{,-*} || :
 fi
 
 
-# serial_cs: necessary firmware included by kernel automatically
-# b43:                net-wireless/b43-firmware
-# atmel,at76c50x-usb: net-wireless/atmel-firmware
 sinfo "Unknown missing firmwares:"
-for fw in $(strings -a -n 10 $(find /lib/modules -name '*.ko' \
-    ! -name serial_cs.ko ! -name 'b43*.ko' ! -name atmel.ko ! -name at76c50x-usb.ko) \
-    | sed -n 's/^firmware=//p' | sort -u); do
-    if [ ! -e /lib/firmware/${fw} ]  &&  ! grep -q "^${fw}\$" \
-        /etc/portage/savedconfig/sys-kernel/linux-firmware; then
-        echo ${fw}
-    fi
-done
+${helpdir}/lst-firmwares
 
 
 sinfo "Generating SYSLINUX configuration"
-rm    -f /boot/boot
-mkdir -p /boot/syslinux
-syslinux -v 2>&1 | cut -d' ' -f2 > /boot/syslinux/version
-cp -p /usr/share/syslinux/{syslinux.exe,{menu,chain,hdt,reboot}.c32,poweroff.com,isolinux.bin} /boot/syslinux/
-tar cpjf /boot/syslinux/syslinux-x86.tbz \
-    -C /sbin extlinux -C /usr/share/syslinux altmbr_c.bin \
-    -C /usr/bin syslinux mtools mcopy mmove mattrib
-cp -p /usr/share/consolefonts/${consolefont}.gz /boot/syslinux/
-rm -f /boot/syslinux/${consolefont}
-gunzip /boot/syslinux/${consolefont}.gz
-
-cat ${HOME}/config/syslinux.cfg \
-    | sed "/^##/d ;
-           s@PREFIX@/liberte@ ;
-           s@VERSION@${LVERSION}@ ;
-           s@CONSOLEFONT@${consolefont}@" \
-    | iconv -f UTF-8 -t CP437 \
-    > /boot/syslinux/syslinux.cfg
+${helpdir}/gen-syslinux
 
 
 sinfo "Done."

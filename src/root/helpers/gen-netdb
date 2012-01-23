@@ -1,0 +1,98 @@
+#!/bin/sh -e
+
+export LC_ALL=C
+
+
+# Skip update of a recent netDb
+netdbdst=/var/lib/i2p/router/netDb
+if [ "`find ${netdbdst} -maxdepth 0 -mtime -1 2>/dev/null`" = ${netdbdst} ]; then
+    echo "I2P netDb was updated less than 24h ago, skipping"
+    exit
+fi
+
+
+# Fetch URL and parameters
+netdburl=https://netdb.i2p2.de/
+
+maxnetdblst=2000
+maxfetches=50
+maxnetdb=100
+
+
+# Regular expressions (extended)
+rinfore='routerInfo-[[:alnum:]~-]{43}=\.dat'
+
+
+# Paths
+netdbdir=`mktemp -d`
+netdblst=${netdbdir}/names
+i2pjar=/opt/i2p/lib/i2p.jar
+
+
+# Retrieve >= maxnetdblst routerInfos (in overlapping portions of 100)
+# in at most maxfetches attempts (hard limit)
+touch ${netdblst}
+while [ "`cat ${netdblst} | wc -l`" -lt ${maxnetdblst}    \
+            -a  ${maxfetches} -gt 0 ]; do
+    # curl error code is discarded in pipe
+    curl -sfg --compressed ${netdburl}                    \
+        | sed 's/>/>\n/g'                                 \
+        | sed -nr "s@^.*\<href=\"(${rinfore})\".*\$@\1@p" \
+        >> ${netdblst}
+
+    # remove added duplicate entries
+    sort -u ${netdblst} > ${netdblst}.tmp
+    mv ${netdblst}.tmp ${netdblst}
+
+    maxfetches=$((maxfetches - 1))
+done
+
+# Pick arbitrary maxnetdblst entries
+shuf -n ${maxnetdblst} -o ${netdblst}.tmp ${netdblst}
+mv ${netdblst}.tmp ${netdblst}
+
+
+if [ ! -s ${netdblst} ]; then
+
+    rm -r ${netdbdir}
+
+    if [ -e ${netdbdst} ]; then
+        echo "I2P netDb update failed (ignoring)"
+    else
+        echo "Could not retrieve I2P netDb list"
+        exit 1
+    fi
+
+else
+
+    echo "Retrieving `cat ${netdblst} | wc -l` routerInfos"
+    curl -sf --compressed -o ${netdbdir}/#1 \
+        ${netdburl}`cat ${netdblst} | tr '\n' , | sed 's/^/{/; s/,$/}/'` || :
+
+    # Delete non-conforming files as precautionary measure (includes namedblst)
+    find ${netdbdir} -regextype posix-egrep -mindepth 1 \
+        \( ! -type f -o ! -regex "${netdbdir}/${rinfore}" \) -delete
+    chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
+
+    # Delete non-NTCP+OR/OfR-capable routerInfos
+    # (see http://zzz.i2p.to/topics/280)
+    java -cp ${i2pjar} net.i2p.data.RouterInfo ${netdbdir}/routerInfo-*=.dat \
+        | sed -nr 's/^[[:blank:]]+//; /^(Hash: [[:alnum:]~-]{43}=|TransportStyle: NTCP|\[caps\] = \[(OR|OfR)\])$/p' \
+        | tr '\n' ,                                                  \
+        | sed -r 's/,(Hash:|$)/\n\1/g'                               \
+        | sed -r '/,TransportStyle:.*,\[caps\]/d'                    \
+        | sed -r "s@^Hash: ([^,]*).*@${netdbdir}/routerInfo-\1.dat@" \
+        | xargs rm -f --
+
+    # Delete arbitrary extraneous routerInfos
+    netdborig=`find ${netdbdir} -type f | wc -l`
+    find ${netdbdir} -type f | shuf | tail -n +$((maxnetdb+1)) | xargs rm -f --
+
+    # Install new netDb
+    rm -rf         ${netdbdst}
+    mv ${netdbdir} ${netdbdst}
+
+    netdbsel=`find ${netdbdst} -type f | wc -l`
+    echo "Selected ${netdbsel} (out of ${netdborig}) NTCP+OR/OfR-capable routerInfos"
+
+fi

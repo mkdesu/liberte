@@ -4,6 +4,12 @@ cldir=/usr/local/share/customize-locale
 locdef=${XDG_CONFIG_HOME}/shell/locale
 
 
+if [ ! -e ${locdef} ]  &&  ! touch ${locdef} 2>/dev/null; then
+    echo "Could not create ${locdef}"
+    exit 1
+fi
+
+
 update_var() {
     local var="$1" value="$2"
 
@@ -65,6 +71,6 @@ if [ -n "${newtz}" ]; then
 fi
 
 if [ -n "${newkbd}" ]; then
-    update_var X11_KBD_LAYOUT  "`echo "${newkbd}" | cut -d. -f1`"
-    update_var X11_KBD_VARIANT "`echo "${newkbd}" | cut -d. -f2`"
+    update_var X11_KBD_LAYOUT  "${newkbd%.*}"
+    update_var X11_KBD_VARIANT "${newkbd#*.}"
 fi

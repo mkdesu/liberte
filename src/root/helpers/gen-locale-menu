@@ -1,0 +1,60 @@
+#!/bin/sh -e
+
+export LC_ALL=C
+
+
+# Directory used by customize-locale script
+cldir=/usr/local/share/customize-locale
+mkdir -p ${cldir}
+
+
+# Generated menus
+i18nmenu=${cldir}/locale.menu
+tzmenu=${cldir}/timezone.menu
+kbdmenu=${cldir}/keyboard.menu
+
+
+# Databases
+iso3166=/usr/share/zoneinfo/iso3166.tab
+i18ndb=/usr/share/i18n/locales
+i18nlst=/usr/share/i18n/SUPPORTED
+tzs=/usr/share/zoneinfo/zone.tab
+kbds=/usr/share/X11/xkb/rules/xorg.lst
+
+
+# s/^AD\>/"Andorra"/;...
+ccrep=`awk -F '\t' '!/^#/ { printf "s/^%s\\\\>/\"%s\"/;", $1, $2 }' ${iso3166}`
+
+# s:__aa_DJ :"Afar language locale for Djibouti (Cadu/Laaqo Dialects)" :;...
+lcrep=`awk '/^[[:blank:]]*title\y/                                         \
+           { match(FILENAME, /(.*\/)?(.*)/, a);                            \
+             match($0, /^[[:blank:]]*title[[:blank:]]+(.*)/, b);           \
+             printf "s:__%s :%s :;", a[2], gensub(/\.\"$/, "\"", 1, b[1]); \
+             nextfile                                                      \
+           }' ${i18ndb}/*`
+
+
+# ES __ca_ES@valencia ca_ES.UTF-8@valencia (+ ccrep, lcrep)
+# -> "Spain" "Valencian (southern Catalan) locale for Spain with Euro" ca_ES.UTF-8@valencia
+awk '/UTF-8/ && !/^iw_IL/ && !/^pap_AN/                                     \
+    { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a);                    \
+      printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); \
+      print $1 }' ${i18nlst}                                                \
+    | sed "${ccrep}${lcrep}" | sort | tr '\n' ' ' > ${i18nmenu}
+
+# "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"
+awk -F '\t' '/^[^#]/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' ${tzs} \
+    | sed "${ccrep}"         | sort | tr '\n' ' ' > ${tzmenu}
+
+
+# Add keyboard layout pseudo-countries to the replacement list
+ccrepext="${ccrep}"'s/^ARA\>/"Arabic"/;s/^BRAI\>/"Braille"/;s/^EPO\>/"Esperanto"/;s/^LATAM\>/"Latin America"/;s/^MAO\>/"New Zealand"/;s:^NEC_VNDR/JP\>:"Japan":;'
+
+# "Switzerland" ch "German (Switzerland)"
+# "Switzerland" ch.fr "French (Switzerland)"
+(   sed '1,/^! layout$/d;  /^! /q' ${kbds} \
+        | sed -nr 's/^[[:blank:]]*([^!][^[:blank:]]*)[[:blank:]]+(.*)/\1 \1. "\2"/p';
+    sed '1,/^! variant$/d; /^! /q' ${kbds} \
+        | sed -nr 's/^[[:blank:]]*([^!][^[:blank:]]*)[[:blank:]]+([^[:blank:]]+):[[:blank:]]+(.*)/\2 \2.\1 "\3"/p'
+)   | awk '{ $1 = toupper($1); print; }'   \
+    | sed "${ccrepext}"      | sort | tr '\n' ' ' > ${kbdmenu}

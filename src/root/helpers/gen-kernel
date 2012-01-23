@@ -1,0 +1,57 @@
+#!/bin/sh -e
+
+# Kernel version
+hsversion=`cat ${HOME}/config/kversion`
+kversion=${hsversion/-/-hardened-}
+
+
+# Build host anonymity
+export KBUILD_BUILD_VERSION=0
+export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
+export KBUILD_BUILD_USER=liberte
+export KBUILD_BUILD_HOST=dee.su
+
+
+# Paths
+mainsrc=/usr/src/linux-${kversion}
+kexecsrc=/usr/src/linux-kexec
+kexec64src=/usr/src/linux-kexec-64
+
+mainimg=/boot/kernel-x86.zi
+kexecimg=/usr/local/boot/kernel-kexec.zi
+kexec64img=/usr/local/boot/kernel-kexec-64.zi
+
+bzimage=arch/x86/boot/bzImage
+compile_h=include/generated/compile.h
+
+
+# Make options
+makeopts=`portageq envvar MAKEOPTS`
+
+
+# Reset build version
+rm -f ${mainsrc}/${compile_h}
+rm -f ${kexecsrc}/${compile_h}
+rm -f ${kexec64src}/${compile_h}
+
+
+# Compile main kernel
+make -s ${makeopts} -C ${mainsrc} 2>/dev/null
+make -s ${makeopts} -C ${mainsrc} modules_install
+
+rm /lib/modules/*/{build,source}
+cp -a ${mainsrc}/${bzimage} ${mainimg}
+
+
+# "main" argument is used before building @system
+if [ "$1" != main ]; then
+    # Compile KEXEC kernel
+    make -s ${makeopts} -C ${kexecsrc} 2>/dev/null
+    cp -a ${kexecsrc}/${bzimage}   ${kexecimg}
+
+
+    # Cross-compile 64-bit KEXEC kernel
+    # (x86_64-gcc is a wrapper, x86_64-{ar,ld,nm,objcopy} are symlinks)
+    make -s ${makeopts} -C ${kexec64src} ARCH=x86_64 CROSS_COMPILE=x86_64- 2>/dev/null
+    cp -a ${kexec64src}/${bzimage} ${kexec64img}
+fi

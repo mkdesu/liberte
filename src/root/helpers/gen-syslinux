@@ -1,0 +1,52 @@
+#!/bin/sh -e
+
+# Font to use in boot menu
+consolefont=ter-i16n.psf
+encoding=CP437
+
+
+# Paths
+templcfg=${HOME}/config/syslinux.cfg
+
+sysroot=/boot/syslinux
+syscfg=${sysroot}/syslinux.cfg
+sysbins=${sysroot}/syslinux-x86.tbz
+
+
+# Syslinux modules and binaries to copy
+modules="syslinux.exe isolinux.bin menu.c32 chain.c32 hdt.c32 reboot.c32 poweroff.com"
+binaries="-C /usr/bin            syslinux mtools mcopy mmove mattrib
+          -C /sbin               extlinux
+          -C /usr/share/syslinux altmbr_c.bin"
+
+
+rm    -f /boot/boot
+mkdir -p ${sysroot}
+
+
+# Save Syslinux version required for setup.sh
+syslinux -v 2>&1 | cut -d' ' -f2 > ${sysroot}/version
+
+
+# Copy Syslinux modules and binaries
+for mod in ${modules}; do
+    cp -p /usr/share/syslinux/${mod} ${sysroot}
+done
+
+tar cpjf ${sysbins} ${binaries}
+
+
+# Copy console font
+cp -p  /usr/share/consolefonts/${consolefont}.gz ${sysroot}
+rm -f  ${sysroot}/${consolefont}
+gunzip ${sysroot}/${consolefont}.gz
+
+
+# Substitute and copy template
+cat ${templcfg}                           \
+    | sed "/^##/d ;
+           s@PREFIX@/liberte@ ;
+           s@VERSION@${LVERSION}@ ;
+           s@CONSOLEFONT@${consolefont}@" \
+    | iconv -f UTF-8 -t ${encoding}       \
+    > ${syscfg}

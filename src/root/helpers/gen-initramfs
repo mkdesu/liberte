@@ -1,0 +1,66 @@
+#!/bin/sh -e
+
+# Kernel version
+hsversion=`cat ${HOME}/config/kversion`
+kversion=${hsversion/-/-hardened-}
+
+
+# modules.fs:     per-filesystem module lists to load during init
+# modules.extra:  extra modules to add to initramfs (covers modules.fs)
+# modules.global: complete module directories to add to initramfs
+extralst=${HOME}/initrd/modules.extra
+globlst=${HOME}/initrd/modules.global
+initramfs=${HOME}/initrd/initramfs
+
+
+# Modules staging directory
+stagedir=`mktemp -d`
+modlst=${stagedir}/modules.list
+initlst=${stagedir}/initramfs
+image=/boot/initrd-x86.xz
+
+
+# Determine module names to add to initramfs (not necessarily canonical)
+extmods=`sed -n '/^[^#]/p' ${extralst}`
+globmods=
+for globmod in `sed -n '/^[^#]/p' ${globlst}`; do
+    globmods="${globmods} "`find /lib/modules/${kversion}/kernel/drivers/${globmod} \
+                                 -name '*.ko' -printf '%f\n' | sed 's/\.ko$//'`
+done
+
+
+# Build list of modules to copy, including dependencies
+for mod in ${extmods} ${globmods}; do
+    # extract canonical name (e.g., _ vs. -, aliases, ...)
+    mod=$(basename $(modinfo -F filename -k ${kversion} ${mod}))
+
+    # unlike "modinfo -F depends", modules.dep lists nested dependencies
+    grep /${mod}: /lib/modules/${kversion}/modules.dep \
+        | tr -d : | tr ' ' '\n' >> ${modlst}
+done
+
+
+# Copy modules and compute their dependencies and map
+# (depmod will fail if not all dependencies are present)
+for mod in `sort -u ${modlst}`; do
+    mod=/lib/modules/${kversion}/${mod}
+    mkdir -p     ${stagedir}`dirname ${mod}`
+    cp -p ${mod} ${stagedir}`dirname ${mod}`
+done
+depmod -b ${stagedir} -e -F /usr/src/linux-${kversion}/System.map ${kversion}
+
+
+# Build complete initramfs file list
+cp ${initramfs} ${stagedir}
+find ${stagedir} -mindepth 3 -type d \
+    -printf 'dir  %P    0755 0 0\n' >> ${initlst}
+find ${stagedir} -mindepth 3 -type f \
+    -printf 'file %P %p 0644 0 0\n' >> ${initlst}
+
+
+# Generate compressed initramfs
+/usr/src/linux-${kversion}/usr/gen_init_cpio ${initlst} \
+    | xz -c -C crc32 > ${image}
+
+
+rm -r ${stagedir}
