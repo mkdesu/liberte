@@ -13,7 +13,7 @@
    width="186.25217"
    height="215.8593"
    id="svg2381"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="McXe.svg"
    style="display:inline">
   <metadata
@@ -24,7 +24,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -45,7 +45,7 @@
      showborder="true"
      inkscape:showpageshadow="false"
      inkscape:zoom="2.8284271"
-     inkscape:cx="96.055058"
+     inkscape:cx="96.762165"
      inkscape:cy="115.88692"
      inkscape:window-x="79"
      inkscape:window-y="18"
@@ -123,14 +123,12 @@
      inkscape:label="Extra">
     <text
        xml:space="preserve"
-       style="font-size:22px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Bitstream Vera Sans Bold"
+       style="font-size:22px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Arial;-inkscape-font-specification:Arial Bold"
        x="3.2584062"
        y="19.390841"
        id="text4346"
        sodipodi:linespacing="100%"><tspan
          sodipodi:role="line"
-         id="tspan4348"
-         x="3.2584062"
-         y="19.390841">i'm lovin' it</tspan></text>
+         id="tspan2994">i’m lovin’ it</tspan></text>
   </g>
 </svg>
