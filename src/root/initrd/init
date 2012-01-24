@@ -128,21 +128,21 @@ while true; do
 
                 # Unless the media is already in ro mode, write-protect it during mount
                 mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
-                [ ${mediaro} == 1 ] || blockdev --setro ${mediadev}
+                [ ${mediaro} = 1 ] || blockdev --setro ${mediadev}
 
                 if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${sboot} >/dev/null 2>&1; then
                     # Check for the recognition file
                     if [ -e ${sboot}${param_loop} ]; then
                         good_msg "Media found on ${mediadev}"
 
-                        [ ${mediaro} == 1 ] || blockdev --setrw ${mediadev}
+                        [ ${mediaro} = 1 -o -n "${param_readonly}" ] || blockdev --setrw ${mediadev}
                         break 2
                     else
                         umount ${sboot}
                     fi
                 fi
 
-                [ ${mediaro} == 1 ] || blockdev --setrw ${mediadev}
+                [ ${mediaro} = 1 ] || blockdev --setrw ${mediadev}
                 waitmsg=1
             fi
         fi
