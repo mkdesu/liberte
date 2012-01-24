@@ -51,7 +51,7 @@ net-libs/glib-networking        -gnome libproxy
 # Multimedia
 media-video/totem               -youtube nsplugin
 media-sound/sox                 encode
-media-plugins/audacious-plugins lame libsamplerate mms
+media-plugins/audacious-plugins lame libsamplerate mms mtp
 media-video/gpac                -* aac mad vorbis
 media-plugins/gst-plugins-meta  dv lame theora vpx  a52 dts dvd mms mpeg  ffmpeg
 media-libs/libtheora            encode

@@ -437,7 +437,7 @@ chmod 664       /var/run/utmp
 # "grpck -r" fails during early emerge shadow because of user "games" in /etc/group
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
 # "users"     group: some apps require for DBUS communication
-# "plugdev"   group: changing NetworkManager (and ModemManager) settings via DBUS
+# "plugdev"   group: changing NetworkManager (and ModemManager) settings via DBUS; MTP protocol
 # "audio"     group: ALSA/OSS devices access
 # "video"     group: V4L2 devices access (webcam - mplayer tv://)
 # "cdrom"     group: raw CD devices access (cd playing + cd/dvd writing)
