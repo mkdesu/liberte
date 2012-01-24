@@ -3,5 +3,5 @@
 #   /mnt/live            - ro squashfs bind unionfs branch
 #   /mnt/restrict/rwroot - rw tmpfs         unionfs branch
 #   /mnt/restrict/union  - rw unionfs
-#   /etc:/var            - rw unionfs busy binds into ro / (see initramfs's init)
+#   /etc, /var           - rw unionfs busy binds into ro / (see initramfs's init)
 no_umounts="/mnt/boot:/mnt/live:/mnt/restrict/rwroot:/mnt/restrict/union:/etc:/var"

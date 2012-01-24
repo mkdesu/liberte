@@ -7,6 +7,7 @@
   * Fixed 3G support for modems with PIN unlocking
   * More extensive firmware support
   * Better filesystem security (read-only root fs)
+  * Added "readonly" boot parameter for disabling persistence
 
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)

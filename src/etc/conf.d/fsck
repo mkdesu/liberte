@@ -5,6 +5,9 @@ fsck_args="-A -a"
 # Whether to check only specific passno's
 # fsck_passno="=1 =2 >1 <2"
 
+# Mountpoints to check (mutually exclusive with fsck_passno)
+# fsck_mnt="/home"
+
 # Whether to trigger when on battery as well as AC
 # (do not turn off for JFS partitions)
 fsck_on_battery="YES"

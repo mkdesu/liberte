@@ -97,7 +97,7 @@ count=0 last= sqsort=`mktemp`
 for p in ${livecd}/tmp/transient/pkg/unlisted-files ${livecd}/tmp/transient/pkg/*=*; do
     chroot ${livecd} file -zhN --mime-type -F '' -f ${p#${livecd}} \
         | sed -n "s:^/\(.*\)/\([^/]*\) \(.*\)$:\3 ${p##*/} \1 \1/\2:p"
-done | sort | while read id1 id2 id3 file; do
+done | sort -s -k1,3 | while read id1 id2 id3 file; do
     if [ "${id1},${id2},${id3}" != "${last}" ]; then
         count=$((count-1))
         last="${id1},${id2},${id3}"
