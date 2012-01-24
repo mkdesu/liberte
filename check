@@ -52,7 +52,8 @@ sinfo "Sources:"
 ${FIND} -name '*.h' -o \( -name '*.inc' ! -path '/usr/share/keymaps/*' \) \
         -o -name '*.c' -o -name '*.cpp' \
         -o -name '*.m4' -o -name '*.el' -o -name '*.py' \
-        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm'
+        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm' \
+        -o \( -name '*.lua' ! -path '/usr/share/libquvi-scripts/lua/*' \)
 
 sinfo "Objects:"
 ${FIND} -name '*.o' -o -name '*.a' -o -name '*.pc' \

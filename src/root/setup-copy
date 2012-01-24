@@ -123,6 +123,10 @@ sinfo "Recompiling build-dependent packages"
 emerge -quDN @world
 
 
+sinfo "Compiling Lua scripts"
+find /usr/share/libquvi-scripts/lua -type f -name '*.lua' -exec luac -s -o {} {} \;
+
+
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)
 sinfo "Unmerging build and temporary dependencies"
 emerge -qc --with-bdeps n
