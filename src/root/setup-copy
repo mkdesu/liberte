@@ -57,7 +57,7 @@ ebuilds="app-misc/ca-certificates
          sys-apps/lm_sensors
          sys-apps/portage
          x11-libs/gtk+
-         x11-proto/xcb-proto
+         x11-libs/libxcb
          x11-wm/openbox"
 
 # /usr/portage is bind-mounted ro
@@ -72,17 +72,14 @@ sed -i 's/\${python_dep}//' ${ebuild_portage}
 
 # Python
 # exiv2                    not needed                  (#398959)
-# libxcb:                  needed at build-time        (#398953)
 # libglade:                libglade-convert            (#398955)
 # librsvg:                 rsvg                        (#398951)
 # gtk+:                    gtk-builder-convert
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
 # openbox:                 openbox-xdg-autostart
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_xcbproto} ${ebuild_libglade} \
-                                         ${ebuild_gtk} ${ebuild_exiv2}         \
-                                         ${ebuild_gobjectintrospection}        \
-                                         ${ebuild_librsvg}
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_gtk} ${ebuild_exiv2} \
+                                         ${ebuild_gobjectintrospection} ${ebuild_librsvg}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
 
@@ -96,10 +93,12 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp} ${ebuild_g
 
 # [cpio]                            splashutils:      splash_geninitramfs
 # [debianutils]                     ca-certificates:  update-ca-certificates
+# [xcb-proto]                       libxcb:           needed at build-time    (#398953)
 # [eclipse-ecj,gjdoc]               jamvm:            javac, javadoc symlinks (#371461)
 # [encodings,mkfontdir,mkfontscale] font-misc-meltho: not needed              (#312077)
 sed -i s:app-arch/cpio::              ${ebuild_splashutils}
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
+sed -i 's:>=x11-proto/xcb-proto-[^[:blank:]"]*::'             ${ebuild_libxcb}
 sed -i 's:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":'  ${ebuild_fontmiscmeltho}
 
