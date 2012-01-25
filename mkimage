@@ -92,18 +92,9 @@ sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 
 
 # Unreferenced files have default priority 0 (which is the top priority)
-sinfo "Preparing <mimetype,package,dir> SquashFS ordering"
-count=0 last= sqsort=`mktemp`
-for p in ${livecd}/tmp/transient/pkg/unlisted-files ${livecd}/tmp/transient/pkg/*=*; do
-    chroot ${livecd} file -zhN --mime-type -F '' -f ${p#${livecd}} \
-        | sed -n "s:^/\(.*\)/\([^/]*\) \(.*\)$:\3 ${p##*/} \1 \1/\2:p"
-done | sort -s -k1,3 | while read id1 id2 id3 file; do
-    if [ "${id1},${id2},${id3}" != "${last}" ]; then
-        count=$((count-1))
-        last="${id1},${id2},${id3}"
-    fi
-    echo "${file}" ${count} >> ${sqsort}
-done
+sinfo "Preparing SquashFS ordering"
+chroot ${livecd} /tmp/transient/bin/gen-file-ordering
+sqsort=${livecd}/tmp/transient/pkg/squashfs.sort
 
 
 # Using default block size of 128KiB
@@ -115,7 +106,6 @@ ${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
     -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
     -sort ${sqsort} -ef ${src}/conf/rootfs.ignore
 chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
-rm ${sqsort}
 
 
 sinfo "Converting text files to DOS line endings"

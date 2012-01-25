@@ -1,0 +1,44 @@
+#!/bin/sh -e
+
+# This script is supposed to run directly from mkimage via chroot
+# C sort ordering matters for "-" extension entries
+umask 022
+export LC_ALL=C
+
+
+# Paths
+pakdir=/tmp/transient/pkg
+unlisted=${pakdir}/unlisted-files
+sqsort=${pakdir}/squashfs.sort
+
+
+# Support running more than once
+truncate -s 0 ${sqsort}
+
+
+# Order on <mimetype,extension,package,directory>
+# Unreferenced files have default priority 0 (which is the top priority)
+priority=0
+last=
+
+# Some files have : in name, but none have space (filtered previously)
+for p in ${unlisted} ${pakdir}/*=*; do
+    file -zhN --mime-type -F '' -f ${p} \
+        | while read file mimetype; do
+              ext="${file##*.}"
+              [ "${file}" != "${ext}" ] || ext=-
+
+              #    <mimetype>    <extension> <package>  <directory>  <file>
+              echo "${mimetype}" "${ext}"    "${p##*/}" "${file%/*}" "${file}"
+          done
+done \
+    | sort -s -k1,4 \
+    | while read key1 key2 key3 key4 file; do
+          # priority per each file would be too wasteful (-32768..32767)
+          if [ "${key1} ${key2} ${key3} ${key4}" != "${last}" ]; then
+              priority=$((priority-1))
+              last="${key1} ${key2} ${key3} ${key4}"
+          fi
+
+          echo "${file#/}" ${priority} >> ${sqsort}
+      done

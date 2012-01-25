@@ -1,5 +1,8 @@
 #!/bin/bash -e
 
+helpdir=${HOME}/helpers
+
+
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
 }
@@ -394,6 +397,12 @@ mkdir -p ${pakdir}
 for p in `find /var/db/pkg -mindepth 2 -maxdepth 2 -type d -printf '%P\n'`; do
     sed -n 's/^\(obj\|sym\) \([^ ]\+\).*$/\2/p' /var/db/pkg/${p}/CONTENTS > ${pakdir}/${p//\//=}
 done
+
+
+sinfo "Saving helper scripts for mkimage"
+savedir=/tmp/transient/bin
+mkdir ${savedir}
+cp ${helpdir}/gen-file-ordering ${savedir}
 
 
 sinfo "Done."
