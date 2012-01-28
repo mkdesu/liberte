@@ -13,6 +13,7 @@ ROOTPART=none
 # memtest=1: 0x00 once
 # memtest=2: 0x00, 0xff, 0x00
 # memtest=3: 0x00, 0xff, 0x55, 0x00
-KPARAM="quiet memtest=2"
+# Add "halt alert": workaround for (#401231)
+KPARAM="quiet memtest=2 halt alert"
 
-LOAD_DURING_SHUTDOWN=both
+LOAD_DURING_SHUTDOWN=no
