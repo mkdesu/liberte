@@ -249,6 +249,4 @@
 /usr/bin/vpxdec
 /usr/bin/vpxenc
 /usr/bin/luac
-/usr/bin/orcc
-/usr/bin/orc-bugreport
 /usr/sbin/vboxguest-service

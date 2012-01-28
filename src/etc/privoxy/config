@@ -34,7 +34,8 @@ forward         *AAAA:443/              127.0.0.1:4445
 
 forward         127.0.0.1/              .
 forward         localhost/              .
-#forward        192.168.*.*/            .
+forward         liberte/                .
+# forward        192.168.*.*/             .
 
 forwarded-connect-retries               2
 accept-intercepted-requests             0

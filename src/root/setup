@@ -292,10 +292,10 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-# midori, totem, gst-plugin-scanner: ffmpeg, ffmpegscale, postproc GStreamer plugins
+# midori, totem: ffmpeg, ffmpegscale
+# fuser: (#394443)
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/midori /usr/bin/totem* /usr/libexec/gstreamer*/gst-plugin-scanner \
-          /usr/bin/mpg123 /usr/bin/jamvm
+paxctl -m /usr/bin/midori /usr/bin/totem* /usr/bin/mpg123 /usr/bin/jamvm /bin/fuser
 
 
 # No sub-pixel rendering, since LCD / cable type is unknown

@@ -167,18 +167,20 @@ app-text/epdfview
 app-text/evince
 app-office/abiword
 app-office/gnumeric
-mail-client/claws-mail-notification
-mail-client/claws-mail-acpi-notifier
-mail-client/claws-mail-att-remover
-mail-client/claws-mail-archive
-mail-client/claws-mail-fancy
+mail-client/claws-mail
 app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/midori
 app-text/fbreader
 net-irc/xchat
+net-im/pidgin
 
 # Plugins
+mail-client/claws-mail-notification
+mail-client/claws-mail-acpi-notifier
+mail-client/claws-mail-att-remover
+mail-client/claws-mail-archive
+mail-client/claws-mail-fancy
 media-plugins/gst-plugins-meta
 media-plugins/gst-plugins-cdio
 media-plugins/gst-plugins-jpeg
