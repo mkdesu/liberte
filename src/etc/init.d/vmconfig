@@ -11,6 +11,9 @@ cleanlabel() {
 
 
 depend() {
+    # need /etc
+    need localmount
+
     # don't bother autofs with SIGHUPs from ps-mount
     before autofs
 

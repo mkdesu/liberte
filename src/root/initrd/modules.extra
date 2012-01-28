@@ -1,7 +1,6 @@
 # Filesystem modules
 loop
 squashfs
-unionfs
 
 vfat
 isofs

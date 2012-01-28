@@ -4,19 +4,24 @@ description="Sets up user anonymous identity, and randomizes wireless MACs."
 
 luser=anon
 lmount=/home/${luser}/persist
+live=/mnt/live
 
 ltordir=${lmount}/security/tor/hidden_service
 li2pdir=${lmount}/security/i2p/eepsite
 certsdir=${lmount}/security/cable/certs
 
+# certdate should be legal, and also recent to allow
+# for migration of v1.0 cables certificates
 gentorhost=gen-tor-hostname
 geni2phost=gen-i2p-hostname
 genuser=gen-cable-username
-certdate=2011-11-01
+certdate=2012-01-28
 
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite
-cableflag=/var/www/cable
+
+cablepub=/srv/www
+cableflag=${cablepub}/cable
 
 i2pnmplugin=/etc/NetworkManager/dispatcher.d/03-i2p
 
@@ -99,28 +104,36 @@ start() {
         # Temporarily fix the date while generating certificates, otherwise
         # the certificates might be generated with an invalid (future) date
         curdate=`date -u +'%F %T'`
-        date -us "${certdate}" 1>/dev/null && \
-            sudo -n -u ${luser} ${genuser} && \
-            date -us "${curdate} `date -u +-%H%M`" 1>/dev/null
+        date -us "${certdate}" 1>/dev/null
+        sudo -n -u ${luser} ${genuser}
 
         eend $?
+        date -us "${curdate} `date -u +-%H%M`" 1>/dev/null
+
         input_end
     fi
 
 
+    ebegin Initializing /srv directory
+    rsync -aHAXS -x --delete-excluded ${live}${cablepub}/ ${cablepub}
+    eend $?
+
+
     # Initialize public cables directory
-    if [ -e ${certsdir}/username  -a  -e ${cableflag} ]; then
+    if [ -e ${certsdir}/username ]; then
         ebegin Initializing cables directory
         username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
-        rsync -lptHS --safe-links --chmod=u=rw,g=r,o= ${certsdir}/*.pem ${certsdir}/*.sig ${cableflag}/certs \
-            && mv -T ${cableflag} /var/www/"${username}" \
-            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" /etc/nginx/nginx-cable.conf
+        rsync -lptHS --safe-links --chmod=u=rw,g=r,o=                \
+              ${certsdir}/*.pem ${certsdir}/*.sig ${cableflag}/certs \
+            && mv -T ${cableflag} ${cablepub}/"${username}"          \
+            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/"  \
+                      /etc/nginx/nginx-cable.conf
         eend $?
     fi
 
 
     if get_bootparam 'i2p'; then
-        ewarn Enabling I2P
+        einfo Enabling I2P
         chmod a+x ${i2pnmplugin}
         eend $?
     fi

@@ -36,8 +36,8 @@ net-wireless/prism54-firmware
 # Handling of "--" and non-.gz suffixes
 =app-arch/pigz-2.1.7*
 
-# Linux3 support (#398083)
-=app-laptop/laptop-mode-tools-1.60*
-
 # Fixes Gentoo bug (#394457)
 =app-portage/portage-utils-0.9
+
+# Fixes Gentoo bug (#391213)
+=dev-libs/gobject-introspection-1.30.0-r2

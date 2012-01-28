@@ -364,13 +364,6 @@ sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
 ${helpdir}/vfy-databases
 
 
-if [ ! -e /var/lib/tor/data ]; then
-    sinfo "Initializing Tor data directory"
-    mkdir -m 700  /var/lib/tor/data
-    chown tor:tor /var/lib/tor/data
-fi
-
-
 sinfo "Creating initial netDb for I2P"
 ${helpdir}/gen-netdb
 
@@ -386,7 +379,7 @@ sed "s@VERSION@${LVERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab kexec iptables cabled"
+initpatches="inittab kexec iptables htpdate"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
@@ -401,7 +394,7 @@ svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
-delsvcboot="urandom swap bootmisc"
+delsvcboot="urandom swap bootmisc root mtab"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
 
@@ -427,10 +420,6 @@ sinfo "Disabling non-rotating logs"
 ln -sf /dev/null /var/log/ConsoleKit/history
 ln -sf /dev/null /var/log/lastlog
 rm -f  /var/log/wtmp
-
-truncate -s 0   /var/run/utmp
-chown root:utmp /var/run/utmp
-chmod 664       /var/run/utmp
 
 
 # Root password good for maintenance before /etc/init.d/local.start is in charge
@@ -472,7 +461,7 @@ useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
-for uid in i2p nginx htp; do
+for uid in i2p nginx; do
     touch               /tmp/${uid}-ref
     chown ${uid}:${uid} /tmp/${uid}-ref
 done

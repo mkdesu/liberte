@@ -21,9 +21,10 @@ SLOT="0"
 KEYWORDS="x86 amd64"
 LICENSE="GPL-2"
 IUSE=""
-DEPEND=">=virtual/jdk-1.5"
+DEPEND=">=virtual/jdk-1.5
+	sys-devel/gettext"
 RDEPEND=">=virtual/jre-1.5
-         dev-java/java-service-wrapper"
+	dev-java/java-service-wrapper"
 
 pkg_setup() {
 	enewgroup i2p
@@ -74,9 +75,9 @@ src_install() {
 
 	doinitd "${FILESDIR}"/i2p
 
-	keepdir         /var/lib/i2p /var/run/i2p /var/log/i2p
-	fperms  750     /var/lib/i2p /var/run/i2p /var/log/i2p
-	fowners i2p:i2p /var/lib/i2p /var/run/i2p /var/log/i2p
+	keepdir         /var/lib/i2p /var/log/i2p
+	fperms  750     /var/lib/i2p /var/log/i2p
+	fowners i2p:i2p /var/lib/i2p /var/log/i2p
 }
 
 pkg_postinst() {

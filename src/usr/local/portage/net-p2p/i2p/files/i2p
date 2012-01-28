@@ -6,7 +6,9 @@
 description="Starts I2P service."
 
 pidfile=/var/run/i2p.pid
+rundir=/var/run/i2p
 i2puser=i2p
+i2pgroup=i2p
 
 # cf. wrapper.jvm_exit.timeout
 timeout=65
@@ -20,6 +22,11 @@ depend() {
 }
 
 start() {
+	if [ ! -e ${rundir} ]; then
+		mkdir -m 750 ${rundir}
+		chown -h ${i2puser}:${i2pgroup} ${rundir}
+	fi
+
 	ebegin "Starting I2P"
 	start-stop-daemon -S -q -u ${i2puser} -p ${pidfile} -bm -x ${wrapper} -- \
 		${wrapper_cfg} wrapper.daemonize=FALSE

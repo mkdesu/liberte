@@ -47,7 +47,6 @@ net-analyzer/netcat                          -crypt
 net-libs/libproxy               -gnome -networkmanager
 net-libs/glib-networking        -gnome libproxy
 
-
 # Multimedia
 media-video/totem               -youtube nsplugin
 media-sound/sox                 encode
@@ -71,7 +70,6 @@ sys-apps/busybox                -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
-x11-libs/cairo                  -glib
 x11-misc/xdg-utils              -perl
 gnome-extra/zenity              -compat
 app-editors/nano                -spell

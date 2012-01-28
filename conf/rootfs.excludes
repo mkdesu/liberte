@@ -109,7 +109,6 @@
 /var/tmp/**
 /var/cache/**
 /var/log/*.log
-/var/run/*.pid
 /usr/local/addons/
 
 # Miscellaneous
@@ -119,6 +118,7 @@
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
 /lib/systemd/
+/var/www/
 /etc/*-
 /etc/resolv.conf
 /etc/issue.logo
@@ -129,7 +129,6 @@
 /etc/ca-certificates/
 /etc/ca-certificates.conf
 /etc/splash/*.ttf
-/var/run/bootstrap-progress
 /usr/lib/cracklib_dict.*
 /var/lib/dbus/machine-id
 /usr/local/bin/uname

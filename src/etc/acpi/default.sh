@@ -26,7 +26,12 @@ case "${group}" in
             lid)
                 case "${id}" in
                     close)
-                        touch /var/run/lid-events/close.flag
+                        lidevents=/var/run/lid-events
+                        if [ ! -e ${lidevents} ]; then
+                            mkdir -m 750   ${lidevents} 2>/dev/null
+                            chgrp -h video ${lidevents}
+                        fi
+                        touch ${lidevents}/close.flag
                         ;;
 
                     *)

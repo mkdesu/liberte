@@ -6,6 +6,9 @@ daemon=/usr/local/sbin/tordate
 pidfile=/var/run/tordate.pid
 
 depend() {
+    # need /var
+    need   localmount
+
     before NetworkManager tor i2p
 }
 

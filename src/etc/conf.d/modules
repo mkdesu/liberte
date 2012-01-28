@@ -1,5 +1,10 @@
 modules=
 
+
+# Plugin binary formats support
+modules="${modules} binfmt_misc"
+
+
 # Support for CPU frequency scaling governors
 # compiled in: cpufreq_conservative, cpufreq_performance
 # modules:     cpufreq_powersave, cpufreq_userspace

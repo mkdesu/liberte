@@ -7,6 +7,13 @@ if [ "`id -u`" != 0 ]; then
 fi
 
 
+if ! /usr/bin/test -w .; then
+    echo "Please cd to a writable directory."
+    echo "E.g.: cd /mnt/boot"
+    exit 1
+fi
+
+
 # Save files in a temporary directory
 rep="`pwd`/bug-report.tar.xz"
 dir=`mktemp -d`

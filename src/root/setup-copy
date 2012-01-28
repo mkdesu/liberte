@@ -343,9 +343,10 @@ ln -snf ../usr/sbin/fbcondecor_ctl /sbin/fbcondecor_ctl.static
 ln -snf ../usr/sbin/splash_util    /sbin/splash_util.static
 
 
-# (#398931)
+# (#400921, #398931)
 sinfo "Fixing init.d services Bash-dependent checks"
-sed -i 's/-w "\$RC_LIBEXECDIR"/-z 1/' /etc/init.d/{consolefont,keymaps,termencoding}
+sed -i 's/\<need[[:blank:]]\+root\>/use root/; s/-w "\$RC_LIBEXECDIR"/-z 1/' \
+       /etc/init.d/{consolefont,keymaps,termencoding}
 
 
 sinfo "Removing invalid symlinks, dirs and files"
@@ -382,6 +383,15 @@ sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /
 
 sinfo "Updating init scripts dependencies cache"
 rc-update -u
+
+
+# /run/lock is not strictly necessary, but prevents a dangling symlink
+sinfo "Migrating /var/run and /var/lock"
+rm -rf /run /var/run /var/lock
+mkdir -p -m 775 /run/lock
+chown root:uucp /run/lock
+ln -s  ../run      /var/run
+ln -s  ../run/lock /var/lock
 
 
 sinfo "Setting sh (dash) and java (jamvm) symlinks"

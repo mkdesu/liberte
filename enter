@@ -45,13 +45,10 @@ else
           --exclude=/root/                 \
           --exclude=/home/anon/            \
           --exclude=/home/nofw/            \
-          --exclude=/mnt/restrict/         \
           --exclude=/var/lib/i2p/          \
           --exclude=/var/lib/portage/      \
           --exclude=/usr/local/portage/    \
           --exclude=/etc/nginx/            \
-          --exclude=/var/run/lid-events    \
-          --exclude=/var/run/htpdate       \
           --exclude=/etc/sudoers           \
           --exclude=/etc/sysctl.conf       \
           --exclude=/etc/autofs/.auto.lock \
@@ -60,7 +57,6 @@ else
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
-    ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/mnt/restrict      ${LIVECD}/mnt
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
     ${RSYNC} --chmod=u=rwX,go=rX -i --delete --exclude=/portage/distfiles -C ${SRC}/usr/local/portage ${LIVECD}/usr/local
@@ -73,14 +69,6 @@ else
 
     if [ -e ${LIVECD}/var/log/privoxy ]; then
         chown -hR --from=`stat -c %u:%g ${LIVECD}/var/log/privoxy` 0:0 ${LIVECD}/etc/privoxy
-    fi
-
-    ${RSYNC} --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/lid-events ${LIVECD}/var/run
-    chown -hR --from=0:0 :`grep video ${LIVECD}/etc/group | cut -d: -f3` ${LIVECD}/var/run/lid-events
-
-    ${RSYNC} --chmod=u=rwX,g=rX,o= -i                -C ${SRC}/var/run/htpdate    ${LIVECD}/var/run
-    if [ -e ${LIVECD}/tmp/htp-ref ]; then
-        chown -h --from=0:0 --reference=${LIVECD}/tmp/htp-ref ${LIVECD}/var/run/htpdate
     fi
 
     ${RSYNC} --chmod=ug=r,o=     -i ${SRC}/etc/sudoers           ${LIVECD}/etc

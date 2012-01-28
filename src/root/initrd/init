@@ -9,24 +9,17 @@ export PATH="/sbin:/bin"
 # mount /live   (from squashfs in /boot)
 # move  /boot   -> /live/mnt/boot
 # bind  /live   -> /live/mnt/live
-# move  /rwroot -> /live/mnt/restrict/rwroot
-# mount /union  (from /live/mnt/restrict/rwroot + /live/mnt/live)
-# move  /union  -> /live/mnt/restrict/union
-# bind  /live/mnt/restrict/union/{etc,var,tmp,home,root} -> /live/{...}
+# move  /rwroot -> /live/mnt/rwroot
 # switch_root to /live
 stage=/stage
 
 sboot=${stage}/boot
 slive=${stage}/live
 srwroot=${stage}/rwroot
-sunion=${stage}/union
 
 mboot=${slive}/mnt/boot
 mlive=${slive}/mnt/live
-mrwroot=${slive}/mnt/restrict/rwroot
-munion=${slive}/mnt/restrict/union
-
-mbinds="/etc /var /tmp /root /home"
+mrwroot=${slive}/mnt/rwroot
 
 
 # External scripts
@@ -39,9 +32,9 @@ mbinds="/etc /var /tmp /root /home"
 mount -t proc  proc  /proc
 mount -t sysfs sysfs /sys
 
-# Mount rwroot tmpfs directory
-mount -t tmpfs -o mode=755 tmpfs ${srwroot}
-mkdir -m 755 ${srwroot}/etc
+# Mount rwroot tmpfs directory (nosuid,... don't affect unionfs)
+mount -t tmpfs -o mode=700,nosuid,nodev,noexec tmpfs ${srwroot}
+mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 
 
 # Parse kernel options
@@ -55,7 +48,7 @@ done
 
 # Specify required filesystem modules (no autoloading on mount)
 # Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
-eval force_load=\"loop squashfs unionfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
+eval force_load=\"loop squashfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
 
 
 # Handle uvesafb, and propagate options to rwroot
@@ -154,7 +147,7 @@ done
 test_success "find media to mount"
 
 
-# Setup the loopback mounts and add fstab entries for fsck
+# Setup the loopback mounts
 if [ -n "${param_loop}" ]; then
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
@@ -163,14 +156,9 @@ if [ -n "${param_loop}" ]; then
 
     # Move boot mountpoint under live
     mount -o move ${sboot} ${mboot}
-
-    echo "${mediadev} ${mboot#${slive}} ${param_cdroot_type} ro,${param_cdroot_flags} 0 1" > /etc/fstab.extra
-    echo "${mboot#${slive}}${param_loop} / squashfs ro,loop 0 2"                          >> /etc/fstab.extra
 else
     # Treat boot mountpoint as live mountpoint
     mount -o move ${sboot} ${slive}
-
-    echo "${mediadev} / ${param_cdroot_type} ro,${param_cdroot_flags} 0 2" > /etc/fstab.extra
 fi
 
 # Bind extra live mountpoint under live
@@ -178,26 +166,6 @@ mount -r -o bind ${slive}   ${mlive}
 
 # Move rwroot mountpoint under live
 mount -o move    ${srwroot} ${mrwroot}
-
-
-# Using ${slive} instead of ${mlive} hangs unionfs on ${slive}${sub} access
-good_msg "Creating union mount"
-mount -t unionfs -o dirs=${mrwroot}=rw:${mlive}=ro unionfs ${sunion}
-test_success 'create union mount'
-
-# Move union mountpoint under live
-mount -o move ${sunion} ${munion}
-
-
-# Bind rw union subtrees under live
-for sub in ${mbinds}; do
-    mount -o bind ${munion}${sub} ${slive}${sub}
-    mount -o remount,nosuid,nodev ${slive}${sub}
-done
-
-
-# Add useful lines to /etc/fstab
-cat /etc/fstab.extra >> ${slive}/etc/fstab
 
 
 # Run debug shell again if requested

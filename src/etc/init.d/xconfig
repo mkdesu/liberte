@@ -2,12 +2,13 @@
 
 description="Sets up cgroups, configures X server and sound."
 
-cgroupmnt=/sys/fs/cgroup
+cgroupmnt=/sys/fs/cgroup/cpu
 cgrouprel=/usr/local/sbin/cgroup-release
 
 silentflag=/etc/splash/silent/active
 
-xorgrc=/etc/X11/xorg.conf
+xorgdir=/etc/X11
+xorglog=/var/log/Xorg.0.log
 
 amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
@@ -32,7 +33,7 @@ start() {
     fi
 
     if egrep -q '\<splash=([^ ]*,)?theme:silent\>' /proc/cmdline; then
-        ebegin Detected silent theme
+        ebegin Enabling silent theme
         touch ${silentflag}
         eend $?
     fi
@@ -64,20 +65,21 @@ start() {
     # Configure X server, unless "nox" is given to kernel
     if get_bootparam 'nox'; then
         ewarn Skipping X server configuration
-    elif [ ! -e ${xorgrc} ]; then
+    elif [ ! -e ${xorgdir}/xorg.conf ]; then
         ebegin Configuring X server
-        if HOME=/root Xorg -configure 2>/dev/null; then
+        if HOME=${xorgdir} Xorg -configure 2>/dev/null; then
             # Work around Xorg autodetection / fallback bug
-            if grep -q 'Number of created screens does not match number of detected devices' /var/log/Xorg.0.log \
-                && grep -q '"vesa"' /root/xorg.conf.new; then
+            if grep -q 'Number of created screens does not match number of detected devices' ${xorglog} \
+                && grep -q '"vesa"' ${xorgdir}/xorg.conf.new; then
                 # Work around inability to remove a file on read-only filesystem
-                mount -r -B /usr/lib/xorg/modules/drivers/dummy_drv.so /usr/lib/xorg/modules/drivers/vesa_drv.so
-                rm /root/xorg.conf.new
-                HOME=/root Xorg -configure 2>/dev/null
+                mount -r -B /usr/lib/xorg/modules/drivers/dummy_drv.so \
+                            /usr/lib/xorg/modules/drivers/vesa_drv.so
+                rm ${xorgdir}/xorg.conf.new
+                HOME=${xorgdir} Xorg -configure 2>/dev/null
             fi
 
-            if [ -e /root/xorg.conf.new ]; then
-                mv /root/xorg.conf.new ${xorgrc}
+            if [ -e ${xorgdir}/xorg.conf.new ]; then
+                mv ${xorgdir}/xorg.conf.new ${xorgdir}/xorg.conf
 
                 # Turn off text cursor on vt3 (cf. xserverrc)
                 echo -n "\033[?25l" > /dev/tty3

@@ -4,15 +4,18 @@ description="Arms boot media removal watchdog."
 
 boot=/mnt/boot
 
+cablepub=/srv/www
+lidevents=/var/run/lid-events
+
 launcher=/usr/local/sbin/poweroff-watchdog
 pidfile=/var/run/poweroff-watchdog.pid
 
 depend() {
+    # this is a boot-level service
+    need localmount
+
     # power-off watchdog needs kexec
     use kexec
-
-    # no point in shutting down the power-off watchdog
-    keyword -stop
 }
 
 start() {
@@ -35,6 +38,19 @@ start() {
     else
         ewarn Skipping boot media removal watchdog
     fi
+
+
+    # See also: /etc/acpi/default.sh
+    if [ ! -e ${lidevents} ]; then
+        ebegin Creating closed lid indicator
+        checkpath -q -d -m 750 -o root:video ${lidevents}
+        touch ${lidevents}/close.flag
+        eend $?
+    fi
+
+
+    # Workaround /run incompatibility (#400899)
+    checkpath -q -d -m 700 /var/run/spawn-fcgi
 }
 
 stop() {

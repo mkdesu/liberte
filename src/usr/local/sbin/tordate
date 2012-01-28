@@ -3,11 +3,12 @@
 # This script is executed with root privileges,
 # so be careful with externally supplied files.
 
-# ${tordir} and ${htpdir} must exist!
-
 export LC_ALL=C
 
+
+# inotify timeout handles race conditions
 inotifytimeout=60
+dirwait=15
 
 tordir=/var/lib/tor/data
 consensus=${tordir}/cached-consensus
@@ -19,6 +20,12 @@ htpflag=${htpdir}/timeset.flag
 
 tag=tordate
 datere='[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
+
+
+# ${tordir} and ${htpdir} must exist for inotifywaits below
+while [ ! -e ${tordir} -o ! -e ${htpdir} ]; do
+    sleep ${dirwait}
+done
 
 
 # Delegate time setting to other daemons if Tor connections work

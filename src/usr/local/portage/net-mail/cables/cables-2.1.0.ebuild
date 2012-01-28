@@ -66,14 +66,14 @@ src_install() {
 
 	rm -r    "${D}"/usr/share/cable
 
-	# /var/www(/cable)        drwx--x--x root  root
-	# /var/www/cable/certs    d-wx--s--T root  nginx
-	# /var/www/cable/(r)queue d-wx--s--T cable nginx
-	keepdir       /var/www/cable/{certs,{,r}queue}
-	fperms  3310  /var/www/cable/{certs,{,r}queue}   || die
-	fperms   711  /var/www{,/cable}                  || die
-	fowners      :nginx /var/www/cable/certs         || die "failed to change ownership"
-	fowners cable:nginx /var/www/cable/{,r}queue     || die "failed to change ownership"
+	# /srv/www(/cable)        drwx--x--x root  root
+	# /srv/www/cable/certs    d-wx--s--T root  nginx
+	# /srv/www/cable/(r)queue d-wx--s--T cable nginx
+	keepdir       /srv/www/cable/{certs,{,r}queue}
+	fperms  3310  /srv/www/cable/{certs,{,r}queue}   || die
+	fperms   711  /srv/www{,/cable}                  || die
+	fowners      :nginx /srv/www/cable/certs         || die "failed to change ownership"
+	fowners cable:nginx /srv/www/cable/{,r}queue     || die "failed to change ownership"
 }
 
 pkg_postinst() {
