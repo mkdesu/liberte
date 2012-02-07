@@ -248,7 +248,7 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
         echo "Unable to compute device partition byte"
         exit 1
     fi
-    printf "\\${devbyte}" | cat ${sysmbr} - | dd bs=440 count=1 conv=notrunc of=${rdev}
+    printf "\\${devbyte}" | cat ${sysmbr} - | dd bs=440 count=1 iflag=fullblock conv=notrunc of=${rdev}
 fi
 
 
