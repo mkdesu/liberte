@@ -7,5 +7,7 @@ x11-libs/gtk+:3
 >=media-sound/audacious-3
 >=media-plugins/audacious-plugins-3
 
+>=lxde-base/lxpolkit-0.1.0-r1
+
 # Workaround for Gentoo bug #394821
 sys-devel/gcc:4.5

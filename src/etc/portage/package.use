@@ -90,7 +90,7 @@ gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive
 dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
-app-office/abiword              plugins gnome
+app-office/abiword              gnome
 gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
 net-misc/networkmanager-pptp    gnome
