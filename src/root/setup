@@ -94,6 +94,11 @@ spatch ${HOME}/patches/portage/xf86-video-virtualbox-3-localconfig.patch -p0
 chown --from=root:portage portage:portage ${vvb}/files/xf86-video-virtualbox-3-localconfig
 ebuild ${vvb}/${vvbv}.ebuild manifest
 
+# (#401127)
+sut=/usr/portage/media-gfx/splashutils/splashutils-1.5.4.4.ebuild
+spatch ${HOME}/patches/portage/splashutils.patch -p0
+ebuild ${sut} manifest
+
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
