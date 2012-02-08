@@ -1,13 +1,15 @@
 # Python 3
 >=dev-lang/python-3
 
+
 # GTK 3
 x11-libs/gtk+:3
 
->=media-sound/audacious-3
->=media-plugins/audacious-plugins-3
+# optional again in 3.2
+=media-sound/audacious-3.0*
+=media-sound/audacious-3.1*
+=media-plugins/audacious-plugins-3.0*
+=media-plugins/audacious-plugins-3.1*
 
+# (#402515)
 >=lxde-base/lxpolkit-0.1.0-r1
-
-# Workaround for Gentoo bug #394821
-sys-devel/gcc:4.5

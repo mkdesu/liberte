@@ -91,11 +91,6 @@ media-libs/libquvi-scripts      offensive
 dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
 app-office/abiword              gnome
-gnome-extra/gucharmap           gnome
-app-text/evince                 gnome
-net-misc/networkmanager-pptp    gnome
-net-misc/networkmanager-openvpn gnome
-net-misc/networkmanager-vpnc    gnome
 media-gfx/graphicsmagick        imagemagick
 www-servers/nginx               aio
 
@@ -106,6 +101,13 @@ sys-apps/man-pages              -linguas_*
 sys-apps/groff                  -linguas_*
 app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
+
+# GConf (+ gnome-keyring for nm-*)
+gnome-extra/gucharmap           gnome
+app-text/evince                 gnome
+net-misc/networkmanager-pptp    gnome
+net-misc/networkmanager-openvpn gnome
+net-misc/networkmanager-vpnc    gnome
 
 # Quirks
 # (gnome-doc-utils bdep)

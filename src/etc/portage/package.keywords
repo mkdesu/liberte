@@ -1,3 +1,6 @@
+# Compiler (#394821)
+=sys-devel/gcc-4.5.3-r2
+
 # System
 =app-emulation/virt-what-1.11*
 =sys-apps/haveged-1.2*
@@ -33,7 +36,7 @@ net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
 
-# Handling of "--" and non-.gz suffixes
+# Handling of "--" and non-.gz suffixes (#402517)
 =app-arch/pigz-2.1.7*
 
 # Fixes Gentoo bug (#394457)
