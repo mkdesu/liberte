@@ -56,6 +56,7 @@ ebuilds="app-misc/ca-certificates
          sys-apps/lm_sensors
          sys-apps/portage
          x11-libs/gtk+
+         x11-libs/xcb-util-wm
          x11-wm/openbox"
 
 # /usr/portage is bind-mounted ro
@@ -90,10 +91,12 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [cpio]                            splashutils:      splash_geninitramfs
 # [debianutils]                     ca-certificates:  update-ca-certificates
+# [xcb-proto]                       xcb-util-wm:      not needed              (#398953, upstream)
 # [eclipse-ecj,gjdoc]               jamvm:            javac, javadoc symlinks (#371461)
 # [encodings,mkfontdir,mkfontscale] font-misc-meltho: not needed              (#312077)
 sed -i s:app-arch/cpio::              ${ebuild_splashutils}
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
+sed -i 's:\<x11-proto/xcb-proto\>::'  ${ebuild_xcbutilwm}
 sed -i 's:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":'  ${ebuild_fontmiscmeltho}
 
