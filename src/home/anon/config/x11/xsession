@@ -60,9 +60,9 @@ bluetooth-applet &
 # Launch LXPolKit (GTK+ authenticating dialog for PolKit)
 /usr/libexec/lxpolkit &
 
-# Launch shared clipboard service on VirtualBox [--clipboard/display/seamless]
+# Launch shared clipboard / seamless display / display resize services on VirtualBox
 if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then
-    VBoxClient --clipboard &
+    VBoxClient-all &
 fi
 
 # Wait for WM exit
