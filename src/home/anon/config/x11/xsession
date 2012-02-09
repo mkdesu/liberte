@@ -57,8 +57,8 @@ scim -d &
 nm-applet --sm-disable &
 bluetooth-applet &
 
-# Launch LXPolKit (GTK+ authenticating dialog for PolKit)
-/usr/libexec/lxpolkit &
+# Launch GTK+ authenticating dialog agent for PolKit
+/usr/libexec/polkit-gnome-authentication-agent-1 &
 
 # Launch shared clipboard / seamless display / display resize services on VirtualBox
 if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then

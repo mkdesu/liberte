@@ -78,7 +78,6 @@ sys-apps/paxctl
 app-misc/vlock
 x11-misc/alock
 net-misc/ssh-askpass-fullscreen
-lxde-base/lxpolkit
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
