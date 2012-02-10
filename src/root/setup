@@ -393,7 +393,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 sinfo "Configuring start-up services"
 svcsysinit="udev"
-svcboot="consolefont microcode_ctl irqbalance haveged kexec metalog
+svcboot="consolefont microcode_ctl irqbalance haveged metalog
          iptables consolekit alsasound fbcondecor lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm

@@ -30,6 +30,12 @@ start() {
     fi
 
 
+    # Arm KEXEC wipe & halt
+    ebegin Arming anti-forensic RAM wipe on shutdown
+    kexec-load arm
+    eend $?
+
+
     # Arm the poweroff watchdog
     if [ -n "${cddevpath}" ]; then
         ebegin Arming power-off on boot media removal
