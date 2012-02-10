@@ -17,7 +17,6 @@ sys-apps/v86d
 media-gfx/splashutils
 
 # Firmware
-# (no fw for AR9170_USB in portage)
 sys-apps/microcode-ctl
 sys-kernel/amd-ucode
 x11-drivers/radeon-ucode
@@ -130,6 +129,8 @@ sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
 media-tv/v4l-utils
+games-util/joystick
+app-misc/joy2key
 net-print/ink
 
 # Virtualization
