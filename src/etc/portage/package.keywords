@@ -35,6 +35,8 @@ net-wireless/iwl6050-ucode
 net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
+media-tv/cx18-firmware
+media-tv/linuxtv-dvb-firmware
 
 # Handling of "--" and non-.gz suffixes (#402517)
 =app-arch/pigz-2.1.7*
