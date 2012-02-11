@@ -61,6 +61,7 @@ dev-java/gnu-classpath          gstreamer
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
+sys-fs/lvm2                     -static-libs
 sys-fs/ntfs3g                   -udev
 dev-libs/openssl                -gmp
 net-libs/neon                   -pkcs11
