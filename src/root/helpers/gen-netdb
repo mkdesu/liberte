@@ -26,6 +26,7 @@ rinfore='routerInfo-[[:alnum:]~-]{43}=\.dat'
 # Paths
 netdbdir=`mktemp -d`
 netdblst=${netdbdir}/names
+netdberr=${netdbdir}/errors
 i2pjar=/opt/i2p/lib/i2p.jar
 
 
@@ -66,13 +67,24 @@ if [ ! -s ${netdblst} ]; then
 else
 
     echo "Retrieving `cat ${netdblst} | wc -l` routerInfos"
-    curl -sf --compressed -o ${netdbdir}/#1 \
+    curl -s --compressed -o ${netdbdir}/#1 \
         ${netdburl}`cat ${netdblst} | tr '\n' , | sed 's/^/{/; s/,$/}/'` || :
 
     # Delete non-conforming files as precautionary measure (includes namedblst)
     find ${netdbdir} -regextype posix-egrep -mindepth 1 \
         \( ! -type f -o ! -regex "${netdbdir}/${rinfore}" \) -delete
     chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
+
+    # Delete fetch errors
+    rm -f `file -N --mime-type -F '' ${netdbdir}/routerInfo-*=.dat | sed -n 's/ text\/html$//p'`
+
+    # Make sure all files are in correct format
+    java -cp ${i2pjar} net.i2p.data.RouterInfo ${netdbdir}/routerInfo-*=.dat 1>/dev/null 2>${netdberr}
+    if [ -s ${netdberr} ]; then
+        echo "Error parsing fetched routerInfos"
+        exit 1
+    fi
+    rm ${netdberr}
 
     # Delete non-NTCP+OR/OfR-capable routerInfos
     # (see http://zzz.i2p.to/topics/280)
