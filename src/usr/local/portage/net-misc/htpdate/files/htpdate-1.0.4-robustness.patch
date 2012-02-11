@@ -1,6 +1,6 @@
 --- htpdate.c	2008-10-13 19:04:08.000000000 +0000
-+++ htpdate.c	2011-10-09 04:00:59.000000000 +0000
-@@ -30,6 +30,17 @@
++++ htpdate.c	2012-02-11 20:32:02.000000000 +0000
+@@ -30,6 +30,18 @@
  	http://www.gnu.org/copyleft/gpl.html
  */
  
@@ -13,12 +13,13 @@
 +	+ Buffer overflow prevention when copying Date: header contents
 +	+ Added -T <tagfile> option to specify output file with initial time step
 +	+ Fixed umask setting
++	+ Fixed group privileges dropping
 + */
 +
  /* Needed to avoid implicit warnings from strptime */
  #define _GNU_SOURCE
  
-@@ -144,6 +155,7 @@
+@@ -144,6 +156,7 @@
  static long getHTTPdate( char *host, char *port, char *proxy, char *proxyport, char *httpversion, int ipversion, int when ) {
  	int					server_s;
  	int					rc;
@@ -26,7 +27,7 @@
  	struct addrinfo		hints, *res, *res0;
  	struct tm			tm;
  	struct timeval		timevalue = {LONG_MAX, 0};
-@@ -240,7 +252,8 @@
+@@ -240,7 +253,8 @@
  	/* Receive data from the web server
  	   The return code from recv() is the number of bytes received
  	*/
@@ -36,7 +37,7 @@
  
  		/* Assuming that network delay (server->htpdate) is neglectable,
  		   the received web server time "should" match the local time.
-@@ -261,13 +274,16 @@
+@@ -261,13 +275,16 @@
  			timeofday.tv_usec - when;
  
  		/* Look for the line that contains Date: */
@@ -55,7 +56,7 @@
  			} else {
  				printlog( 1, "%s unknown time format", host );
  			}
-@@ -289,7 +305,7 @@
+@@ -289,7 +306,7 @@
  	/* Return the time delta between web server time (timevalue)
  	   and system time (timeofday)
  	*/
@@ -64,7 +65,7 @@
  			
  }
  
-@@ -387,7 +403,7 @@
+@@ -387,7 +404,7 @@
  	puts("htpdate version "VERSION"\n\
  Usage: htpdate [-046abdhlqstxD] [-i pid file] [-m minpoll] [-M maxpoll]\n\
           [-p precision] [-P <proxyserver>[:port]] [-u user[:group]]\n\
@@ -73,7 +74,7 @@
    -0    HTTP/1.0 request\n\
    -4    Force IPv4 name resolution only\n\
    -6    Force IPv6 name resolution only\n\
-@@ -405,6 +421,7 @@
+@@ -405,6 +422,7 @@
    -q    query only, don't make time changes (default)\n\
    -s    set time\n\
    -t    turn off sanity time check\n\
@@ -81,7 +82,7 @@
    -u    run daemon as user\n\
    -x    adjust kernel clock\n\
    host  web server hostname or ip address (maximum of 16)\n\
-@@ -448,7 +465,7 @@
+@@ -448,7 +466,7 @@
  	signal(SIGHUP, SIG_IGN);
  
  	/* Change the file mode mask */
@@ -90,7 +91,7 @@
  
  	/* Change the current working directory */
  	if ( chdir("/") < 0 ) {
-@@ -480,8 +497,25 @@
+@@ -480,8 +498,25 @@
  }
  
  
@@ -116,7 +117,7 @@
  	char				*port;
  	char				*httpversion = DEFAULT_HTTP_VERSION;
  	char				*pidfile = DEFAULT_PID_FILE;
-@@ -500,6 +534,7 @@
+@@ -500,6 +535,7 @@
  	int					maxsleep = DEFAULT_MAX_SLEEP;
  	int					sleeptime = minsleep;
  	int					sw_uid = 0, sw_gid = 0;
@@ -124,7 +125,7 @@
  	time_t				starttime = 0;
  
  	struct passwd		*pw;
-@@ -510,7 +545,7 @@
+@@ -510,7 +546,7 @@
  
  
  	/* Parse the command line switches and arguments */
@@ -133,7 +134,7 @@
  	switch( param ) {
  
  		case '0':			/* HTTP/1.0 */
-@@ -604,6 +639,9 @@
+@@ -604,6 +640,9 @@
  			proxyport = DEFAULT_PROXY_PORT;
  			splithostport( &proxy, &proxyport );
  			break;
@@ -143,7 +144,17 @@
  		case '?':
  			return 1;
  		default:
-@@ -758,7 +796,7 @@
+@@ -638,8 +677,8 @@
+ 	}
+ 
+ 	/* Now we are root, we drop the privileges (if specified) */
+-	if ( sw_uid ) seteuid( sw_uid );
+ 	if ( sw_gid ) setegid( sw_gid );
++	if ( sw_uid ) seteuid( sw_uid );
+ 
+     /* Calculate GMT offset from local timezone */
+     time(&gmtoffset);
+@@ -758,7 +797,7 @@
  		}
  
  		/* Do I really need to change the time?  */
@@ -152,7 +163,7 @@
  			/* If a precision was specified and the time offset is small
  			   (< +-1 second), adjust the time with the value of precision
  			*/
-@@ -768,10 +806,21 @@
+@@ -768,10 +807,21 @@
  			/* Correct the clock, if not in "adjtimex" mode */
  			if ( setclock( timeavg, setmode ) < 0 )
  					printlog( 1, "Time change failed" );
@@ -174,7 +185,7 @@
  			if ( daemonize ) {
  				if ( starttime ) {
  					/* Calculate systematic clock drift */
-@@ -814,11 +863,6 @@
+@@ -814,11 +864,6 @@
  			exit(1);
  	}
  
