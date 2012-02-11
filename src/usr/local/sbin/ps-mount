@@ -5,17 +5,23 @@
 exec 1>/dev/null 2>&1
 
 # Use of auto.media is exclusive via file lock
-lock=/etc/autofs/.auto.lock
+lock=/var/lock/ps-mount.lock
 lockfd=20
 
-# Real work is done in forked process
-if [ "$1" = fork ]; then
+
+# Fork in order not to stall udev on this and related devices
+if [ fork != "$1" ]; then
+    # Bash doesn't understand ${lockfd}>>
+    (flock ${lockfd}; "$0" fork "$@") 20>> ${lock} &
+else
     shift
 
     # Files and scripts
     prefix=/media
-    mounts=/etc/autofs/auto.media
     daemon=/etc/init.d/autofs
+
+    mountsorg=/etc/autofs/auto.media
+    mounts=/var/run/auto.media
 
     # Mount options (permissions: rw-r----- / rwx--x---)
     supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf hfs hfsplus vmhgfs vboxsf "
@@ -35,6 +41,11 @@ if [ "$1" = fork ]; then
     opts_vmhgfs=${opts_common},uid=${luser},gid=${lgroup},fmask=0177,dmask=077
     opts_vboxsf=nosuid,nodev,noexec,uid=${luser},gid=${lgroup},umask=0177,dmask=077
     opts_auto=${opts_vfat}
+
+    # Ensure that ${mounts} exists
+    if [ ! -e ${mounts} ]; then
+        cp ${mountsorg} ${mounts}
+    fi
 
     # Checking whether device is in fstab (except root fs), or is mounted
     DEVLINKS=" ${DEVLINKS}"
@@ -227,15 +238,4 @@ if [ "$1" = fork ]; then
             reload_autofs
         fi
     fi
-# Fork in order not to stall udev on this and related devices
-else
-    if [ ! -f ${lock} ]; then
-        umsave=`umask`
-        umask 077
-        touch ${lock}
-        umask ${umsave}
-    fi
-
-    # Bash doesn't understand ${lockfd}<
-    (flock ${lockfd}; "$0" fork "$@") 20< ${lock} &
 fi

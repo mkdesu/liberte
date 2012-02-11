@@ -67,7 +67,7 @@ alsa-info --no-dialog --with-aplay --with-amixer --with-alsactl --with-devices \
 echo Disks ...
 lsblk -t                             > 10-blk
 cp /proc/mounts                        10-mnt
-cp /etc/autofs/auto.media              10-autos
+cp /var/run/auto.media                 10-autos
 
 
 for dev in `find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b -exec readlink -f {} \;`; do

@@ -42,7 +42,7 @@ cgroup=cable
 lmount=/home/${luser}/persist
 boot=/mnt/boot
 live=/mnt/live
-autos=/etc/autofs/auto.media
+autos=/var/run/auto.media
 otfefile=${boot}${OTFEFILE}
 ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
 

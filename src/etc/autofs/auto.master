@@ -1,4 +1,7 @@
+# The system booted using *some* filesystem, therefore
+# /var/run/auto.media must have been created by ps-mount.
+
 # Low timeout in order to allow for fast removable media
 # extraction. Possibly somewhat problematic with CDs.
 # (now a bit higher, since vfat is mounted with "flush")
-/media	/etc/autofs/auto.media	--ghost --timeout=60
+/media	/var/run/auto.media	--ghost --timeout=60
