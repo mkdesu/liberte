@@ -5,6 +5,10 @@ modules=
 modules="${modules} binfmt_misc"
 
 
+# Automatic CPU microcode updating
+modules="${modules} microcode"
+
+
 # Support for CPU frequency scaling governors
 # compiled in: cpufreq_conservative, cpufreq_performance
 # modules:     cpufreq_powersave, cpufreq_userspace

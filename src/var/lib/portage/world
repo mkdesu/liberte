@@ -17,7 +17,7 @@ sys-apps/v86d
 media-gfx/splashutils
 
 # Firmware
-sys-apps/microcode-ctl
+sys-apps/microcode-data
 sys-kernel/amd-ucode
 x11-drivers/radeon-ucode
 media-sound/alsa-firmware

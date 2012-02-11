@@ -250,3 +250,4 @@
 /usr/bin/vpxenc
 /usr/bin/luac
 /usr/sbin/vboxguest-service
+/lib/firmware/microcode.dat

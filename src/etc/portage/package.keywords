@@ -22,6 +22,7 @@ app-emulation/open-vm-tools-kmod
 =net-irc/xchat-otr-0.3*
 
 # Firmware
+sys-apps/microcode-data
 sys-kernel/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
@@ -36,7 +37,6 @@ net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
 media-tv/cx18-firmware
-media-tv/linuxtv-dvb-firmware
 
 # Handling of "--" and non-.gz suffixes (#402517)
 =app-arch/pigz-2.1.7*
