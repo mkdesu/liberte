@@ -130,6 +130,17 @@ if [ ${devfs} = fat ]; then
 
         mattrbin=${systmpdir}/mattrib
         export PATH=${systmpdir}:"${PATH}"
+
+        # 32-bit: /lib/ld-linux.so.2, 64-bit: /lib/ld-linux-x86-64.so.2
+        if [ ! -e /lib/ld-linux.so.2 ]; then
+            echo "WARNING: it looks like 32-bit ELF binaries are unsupported"
+        fi
+
+        # Use test(1) from coreutils (it calls access(2), honoring MS_NOEXEC and MS_RDONLY)
+        if ! `which test` -x ${sysbin}; then
+            echo "WARNING: executing bundled binaries will fail"
+            echo "(no 32-bit support, or `dirname ${systmpdir}` mounted noexec)"
+        fi
     fi
 
     # Create OTFE directory so that it can be hidden, too
