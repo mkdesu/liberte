@@ -321,6 +321,11 @@ sed -i 's/\<need[[:blank:]]\+root\>/use root/; s/-w "\$RC_LIBEXECDIR"/-z 1/' \
        /etc/init.d/{consolefont,keymaps,termencoding}
 
 
+sinfo "Creating a VESA-only Xorg drivers directory"
+mkdir /usr/lib/xorg/modules/drivers.vesa
+ln    /usr/lib/xorg/modules/drivers{/vesa_drv.so,.vesa}
+
+
 sinfo "Removing invalid symlinks, dirs and files"
 find / -xdev -type l ! -xtype f ! -xtype d ! -xtype c -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}

@@ -9,6 +9,7 @@ silentflag=/etc/splash/silent/active
 
 xorgdir=/etc/X11
 xorglog=/var/log/Xorg.0.log
+xorgdrv=/usr/lib/xorg/modules/drivers
 
 amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
@@ -66,16 +67,22 @@ start() {
     if get_bootparam 'nox'; then
         ewarn Skipping X server configuration
     elif [ ! -e ${xorgdir}/xorg.conf ]; then
+        # Temporarily mount a VESA-only drivers directory if requested
+        if get_bootparam 'xvesa'; then
+            ewarn Forcing VESA X server driver
+            mount ${xorgdrv}
+        fi
+
         ebegin Configuring X server
         if HOME=${xorgdir} Xorg -configure 2>/dev/null; then
             # Work around Xorg autodetection / fallback bug
             if grep -q 'Number of created screens does not match number of detected devices' ${xorglog} \
-                && grep -q '"vesa"' ${xorgdir}/xorg.conf.new; then
-                # Work around inability to remove a file on read-only filesystem
-                mount -r -B /usr/lib/xorg/modules/drivers/dummy_drv.so \
-                            /usr/lib/xorg/modules/drivers/vesa_drv.so
+                && grep -q '"vesa"' ${xorgdir}/xorg.conf.new && [ -e ${xorgdrv}/dummy_drv.so ]; then
+                # Temporarily blacklist VESA driver and rerun autodetection
+                mount  ${xorgdrv}/vesa_drv.so
                 rm ${xorgdir}/xorg.conf.new
                 HOME=${xorgdir} Xorg -configure 2>/dev/null
+                umount ${xorgdrv}/vesa_drv.so
             fi
 
             if [ -e ${xorgdir}/xorg.conf.new ]; then
@@ -90,5 +97,10 @@ start() {
             false
         fi
         eend $?
+
+        # mountpoint fails for bind mounts
+        if get_bootparam 'xvesa'; then
+            umount ${xorgdrv}
+        fi
     fi
 }
