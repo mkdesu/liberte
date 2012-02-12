@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Proxy settings don't work in gFTP
+exec torify /usr/bin/gftp "$@"

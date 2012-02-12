@@ -36,9 +36,11 @@
 # Logs
 /config/audacious/log
 /config/geeqie/history
+/config/gftp/gftp.log
 
 # Transient directories
 /config/qalculate/tmp/
+/config/gftp/cache/
 /config/local/webkit/
 /config/local/gvfs-metadata/
 /config/local/geeqie/metadata/

@@ -58,6 +58,7 @@ libetpan                ssl, gnutls             gnutls          claws-mail
 cyrus-sasl              ssl                     ssl             pidgin
 xchat                   ssl                     ssl
 pidgin                  gnutls, nss             gnutls
+gftp                    ssl                     ssl
 
 
 libgcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring, libotr(pidgin-otr)

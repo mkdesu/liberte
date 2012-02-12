@@ -39,6 +39,7 @@ net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager               gnutls -nss
 net-misc/openvpn                ssl
 dev-libs/pkcs11-helper               -gnutls -nss
+net-ftp/gftp                    ssl
 net-irc/xchat                   ssl
 net-im/pidgin                         gnutls sasl
 dev-libs/cyrus-sasl             ssl          -crypt
