@@ -12,7 +12,7 @@ export TMPDIR=${TMPDIR:-/tmp/.private/${USER}}
 
 
 if [ $# -lt 2 ]; then
-    echo "$0 <save|restore> <persist directory> [livecd directory]"
+    echo "$0 <save|restore> <persist directory>"
     exit 1
 fi
 
@@ -22,15 +22,10 @@ op="$1"
 setdir="$2"
 savedir=${HOME}/config
 settings="${setdir}"/config.tar.xz
+livecd=/mnt/live
 
 
 if [ "${op}" = save ]; then
-    livecd="$3"
-
-    if [ -z "${livecd}" ]; then
-        echo "please provide the livecd directory"
-        exit 1
-    fi
 
     if [ ! -d "${setdir}"  -o  ! -d "${livecd}"${HOME} ]; then
         echo "${setdir} or ${livecd}${HOME} doesn't exist"

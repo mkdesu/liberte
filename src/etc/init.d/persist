@@ -4,7 +4,6 @@ description="Restores and saves user configuration."
 
 luser=anon
 lmount=/home/${luser}/persist
-live=/mnt/live
 persist=persistence
 
 depend() {
@@ -35,7 +34,7 @@ stop() {
         else
             # ${lmount}/settings is created in identity service for the first time
             ebegin Saving configuration: ${lmount}/settings
-            sudo -n -u ${luser} ${persist} save ${lmount}/settings ${live}
+            sudo -n -u ${luser} ${persist} save ${lmount}/settings
             eend $?
         fi
     else
