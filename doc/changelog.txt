@@ -9,6 +9,8 @@
   * Better filesystem security (read-only root fs)
   * Filesystem is now FHS-3.2+/run-compliant
   * Added "readonly" boot parameter for disabling persistence
+  * Added "gentoo=xvesa" boot parameter for forcing VESA driver in X server
+  * setup.sh is now more robust (MBR write fix, 64-bit-only systems warning)
 
   * Cables communication now maintains repudiability
   * Added Open Virtualization bundle (OVA)
@@ -16,6 +18,7 @@
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
   * Better Bluetooth support
+  * Better hardware support (nVidia SATA, DVBs, joysticks, input tablets)
   * Added gFTP file transfer client
   * Replaced Xarchiver with File Roller
 
