@@ -153,7 +153,7 @@ lxde-base/lxterminal
 x11-terms/sakura
 x11-misc/parcellite
 app-accessibility/florence
-app-arch/xarchiver
+app-arch/file-roller
 app-misc/emelfm2
 app-cdr/xcdroast
 # app-cdr/graveman

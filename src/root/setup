@@ -298,6 +298,7 @@ ${helpdir}/gen-locale-menu
 
 
 # midori, totem: ffmpeg, ffmpegscale
+# jamvm: signal handling by libwrapper.so
 # fuser: (#394443)
 sinfo "Selectively disabling PAX"
 paxctl -m /usr/bin/midori /usr/bin/totem* /usr/bin/mpg123 /usr/bin/jamvm /bin/fuser
