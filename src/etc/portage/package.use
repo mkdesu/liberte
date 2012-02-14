@@ -23,7 +23,6 @@ x11-base/xorg-drivers           -video_cards_fbdev
 media-libs/mesa                 -video_cards_vmware shared-dricore -gallium -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
-sys-fs/udev                     extras
 sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
@@ -62,6 +61,8 @@ dev-java/gnu-classpath          gstreamer
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
+sys-apps/pciutils               -zlib
+sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
 sys-fs/ntfs3g                   -udev
 dev-libs/openssl                -gmp
@@ -87,6 +88,7 @@ virtual/jpeg                    static-libs
 media-libs/jpeg                 static-libs
 media-libs/libpng               static-libs
 sys-devel/gcc                   cxx
+sys-fs/udev                     gudev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive

@@ -297,11 +297,14 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-# midori, totem: ffmpeg, ffmpegscale
+# midori, totem:     ffmpeg, ffmpegscale
+# audacious, mpg123: libmpg123.so
 # jamvm: signal handling by libwrapper.so
 # fuser: (#394443)
 sinfo "Selectively disabling PAX"
-paxctl -m /usr/bin/midori /usr/bin/totem* /usr/bin/mpg123 /usr/bin/jamvm /bin/fuser
+paxctl -m /usr/bin/midori    /usr/bin/totem* \
+          /usr/bin/audacious /usr/bin/mpg123 \
+          /usr/bin/jamvm     /bin/fuser
 
 
 # No sub-pixel rendering, since LCD / cable type is unknown
@@ -344,10 +347,7 @@ eselect xvmc   set xorg-x11
 # The piciids/usbids sites are notorious for various failures
 sinfo "Updating PCI, USB, SMART and I2P hosts databases"
 
-sed -i '/^PCI_COMPRESSED_IDS=1$/d; s/^\(DEST=.*\)\.gz$/\1/' /usr/sbin/update-pciids
 update-pciids -q     || echo "update-pciids failed (ignoring)"
-
-rm -f /usr/share/misc/usb.ids.gz
 update-usbids -q     || echo "update-usbids failed (ignoring)"
 
 update-smart-drivedb || echo "update-smart-drivedb failed (ignoring)"

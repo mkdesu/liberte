@@ -117,7 +117,7 @@
 /root/**
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
-/lib/systemd/
+/usr/lib/systemd/
 /var/www/
 /etc/*-
 /etc/resolv.conf

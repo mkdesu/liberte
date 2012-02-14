@@ -75,6 +75,7 @@ sys-apps/gradm
 app-shells/dash
 app-admin/metalog
 app-admin/sudo
+gnome-extra/polkit-gnome
 app-misc/hatools
 sys-apps/paxctl
 app-misc/vlock
@@ -185,7 +186,7 @@ mail-client/claws-mail-notification
 mail-client/claws-mail-acpi-notifier
 mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
-mail-client/claws-mail-fancy
+# mail-client/claws-mail-fancy (depends: webkit-gtk:2)
 media-plugins/gst-plugins-meta
 media-plugins/gst-plugins-cdio
 media-plugins/gst-plugins-jpeg
@@ -325,6 +326,7 @@ gnome-extra/zenity
 
 # X11 themes
 x11-themes/xcursor-neutral
+# x11-themes/light-themes (depends: unstable gtk+:3)
 x11-themes/murrine-themes
 x11-themes/gnome-icon-theme
 x11-themes/sound-theme-freedesktop

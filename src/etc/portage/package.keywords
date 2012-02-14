@@ -12,6 +12,10 @@
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
 
+# GTK+ 3
+x11-themes/light-themes
+x11-themes/gtk-engines-unico
+
 # Guest virtualization
 app-emulation/open-vm-tools
 app-emulation/open-vm-tools-kmod
