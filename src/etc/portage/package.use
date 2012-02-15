@@ -14,6 +14,7 @@ dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline
 dev-db/sqlite                   -readline
 media-libs/jasper               -opengl
+x11-themes/light-themes         gtk3
 
 # Drivers
 # (fbdev conflicts with vesa, mesa's vmware is gallium-only, vbox dri conflicts w/ mprotect)
@@ -80,6 +81,7 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
 media-gfx/splashutils           -truetype
+x11-themes/gtk-engines-murrine  -themes
 
 # Extra functionality
 sys-apps/busybox                static savedconfig

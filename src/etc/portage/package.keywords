@@ -12,9 +12,12 @@
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
 
-# GTK+ 3
+# GTK+ 3 (unico depends on unstable gtk+:3)
 x11-themes/light-themes
 x11-themes/gtk-engines-unico
+=x11-libs/gtk+-3.2.3*:3
+=x11-libs/pango-1.29.4*
+=dev-libs/atk-2.2.0*
 
 # Guest virtualization
 app-emulation/open-vm-tools

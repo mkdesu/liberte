@@ -4,7 +4,7 @@ mail-mta/ssmtp-0
 # virtual/mailx (smartmontools)
 mail-client/mailx-0
 
-# mostly unneeded (ghostscript-gpl <- graphicsmagick, libwmf <- abiword)
+# Mostly unneeded (ghostscript-gpl <- graphicsmagick, libwmf <- abiword)
 media-fonts/urw-fonts-2.4.9
 
 # Gnuplot is an overkill, and is superficially integrated (sci-libs/libqalculate)

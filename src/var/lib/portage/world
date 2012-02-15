@@ -326,7 +326,7 @@ gnome-extra/zenity
 
 # X11 themes
 x11-themes/xcursor-neutral
-# x11-themes/light-themes (depends: unstable gtk+:3)
+x11-themes/light-themes
 x11-themes/murrine-themes
 x11-themes/gnome-icon-theme
 x11-themes/sound-theme-freedesktop

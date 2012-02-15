@@ -99,6 +99,7 @@
 /usr/share/X11/locale/*/
 /usr/share/fc-lang/
 /usr/share/mime/packages/
+/usr/share/themes/*/**
 /usr/share/claws-mail/themes/**
 /usr/share/games/eboard/themeconf.extras*
 /usr/share/games/eboard/[A-Z]*.png
@@ -121,6 +122,7 @@
 /var/www/
 /etc/*-
 /etc/resolv.conf
+/etc/machine-id
 /etc/issue.logo
 /etc/skel/
 /etc/locale.gen
@@ -130,7 +132,7 @@
 /etc/ca-certificates.conf
 /etc/splash/*.ttf
 /usr/lib/cracklib_dict.*
-/var/lib/dbus/machine-id
+/usr/share/sounds/alsa/
 /usr/local/bin/uname
 /usr/local/bin/file
 /usr/local/bin/x86_64-*
@@ -143,7 +145,6 @@
 /usr/share/fonts/*/fonts.dir
 /usr/share/fonts/*/fonts.scale
 /usr/share/fonts/*/encodings.dir
-/usr/share/themes/Murrine/xfwm4/
 
 # I2P (lib directory is pruned)
 /opt/i2p/geoip/
