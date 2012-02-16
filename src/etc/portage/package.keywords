@@ -1,6 +1,9 @@
 # Compiler (#402847)
 =sys-devel/gcc-4.5.3-r2
 
+# TEXTRELs (#389471)
+=media-plugins/gst-plugins-ffmpeg-0.10.13-r1
+
 # System
 =app-emulation/virt-what-1.11*
 =net-misc/connect-100*

@@ -49,11 +49,13 @@ net-libs/libproxy               -gnome -networkmanager
 net-libs/glib-networking        -gnome libproxy
 
 # Multimedia
+# [mpg123: TEXTRELs (#164504)]
 media-video/totem               -youtube nsplugin
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
 media-video/gpac                -* aac mad vorbis
 media-plugins/gst-plugins-meta  dv lame theora vpx  a52 dts dvd mms mpeg  ffmpeg
+media-sound/mpg123              -mmx -sse -3dnow -3dnowext
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 dev-java/gnu-classpath          gstreamer

@@ -1,0 +1,10 @@
+--- /usr/portage/app-emulation/open-vm-tools-kmod/open-vm-tools-kmod-2011.11.20.535097.ebuild	2012-02-04 17:01:03.000000000 +0000
++++ /usr/portage/app-emulation/open-vm-tools-kmod/open-vm-tools-kmod-2011.11.20.535097.ebuild.new	2012-02-15 07:46:42.000000000 +0000
+@@ -49,6 +49,7 @@
+ }
+ 
+ src_prepare() {
++	epatch "${FILESDIR}"/vmci-driver.patch
+ 	sed -i.bak -e '/\smake\s/s/make/$(MAKE)/g' modules/linux/{vmblock,vmci,vmhgfs,vmsync,vmxnet,vsock}/Makefile\
+ 		|| die "Sed failed."
+ 	kernel_is ge 3 2 0 && epatch "${FILESDIR}/moduleparam.patch"

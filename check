@@ -88,6 +88,10 @@ ${FIND} -type f -perm /u+s      -printf '%M %u %g\t%p\n'
 ${FIND} -type f -perm /g+s,o+w  -printf '%M %u %g\t%p\n'
 ${FIND} -type d -perm /a+st,o+w -printf '%M %u %g\t%p\n'
 
+sinfo "STACK/TEXTRELs/PaX markings:"
+${FIND} -type f \( -name '*.so*' -o -perm /111 \) ! -path '/usr/lib/paxtest/*' -print0 \
+    | xargs -0 chroot ${LIVECD} scanelf -qtex
+
 sinfo "Build environment:"
 if [ -e ${SRC}/conf/checkregexps ]; then
     regexps=`cat ${SRC}/conf/checkregexps | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`

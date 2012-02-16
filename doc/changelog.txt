@@ -3,6 +3,7 @@
 
   * Kernel 3.0.4
   * Fixed memory wiping in KEXEC kernel
+  * Removed almost all PaX protection exceptions
   * Fixed multilingual disk labels support for automount
   * Fixed 3G support for modems with PIN unlocking
   * More extensive firmware support
