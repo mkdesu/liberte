@@ -101,6 +101,7 @@
 /usr/share/mime/packages/
 /usr/share/themes/*/**
 /usr/share/claws-mail/themes/**
+/usr/share/audacious/Skins/**
 /usr/share/games/eboard/themeconf.extras*
 /usr/share/games/eboard/[A-Z]*.png
 /usr/share/games/eboard/*[^1].wav
