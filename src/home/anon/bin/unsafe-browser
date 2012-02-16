@@ -3,13 +3,14 @@
 # Add "force" parameter to skip Tor circuit check
 
 nofw=nofw
+torctl=/usr/local/sbin/tor-ctrl
 
 
 # Exit if Tor has established a circuit.
 # Don't prevent knowledgeable users from launching
 # Unsafe Browser directly via sudo (the alternative is
 # giving user nofw access to sudo).
-if [ force != "$1" ]  &&  sudo -n -u tor /usr/local/sbin/tor-ctrl status; then
+if [ force != "$1" ]  &&  sudo -n -u tor ${torctl} status; then
     exec zenity --warning --title="Tor is running" \
                 --text='<big><b>Tor reports that it has successfully established a circuit.</b></big>
 
