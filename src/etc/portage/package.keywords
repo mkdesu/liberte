@@ -16,8 +16,8 @@
 <net-misc/networkmanager-vpnc-0.8.5
 
 # GTK+ 3 (unico depends on unstable gtk+:3)
-x11-themes/light-themes
-x11-themes/gtk-engines-unico
+=x11-themes/light-themes-0.1.8.27.2*
+=x11-themes/gtk-engines-unico-1.0.1*
 =x11-libs/gtk+-3.2.3*:3
 =x11-libs/pango-1.29.4*
 =dev-libs/atk-2.2.0*
@@ -41,7 +41,6 @@ net-wireless/iwl5150-ucode
 net-wireless/iwl6000-ucode
 net-wireless/iwl6005-ucode
 net-wireless/iwl6030-ucode
-net-wireless/iwl6050-ucode
 net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware

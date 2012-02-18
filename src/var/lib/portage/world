@@ -75,7 +75,7 @@ sys-apps/gradm
 app-shells/dash
 app-admin/metalog
 app-admin/sudo
-gnome-extra/polkit-gnome
+lxde-base/lxpolkit
 app-misc/hatools
 sys-apps/paxctl
 app-misc/vlock

@@ -49,7 +49,7 @@ net-libs/libproxy               -gnome -networkmanager
 net-libs/glib-networking        -gnome libproxy
 
 # Multimedia
-# [mpg123: TEXTRELs (#164504)]
+# [mpg123: TEXTRELs (#164504, fixed in 1.13.4)]
 media-video/totem               -youtube nsplugin
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
