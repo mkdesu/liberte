@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# Permissions augmented in /etc/polkit-1/localauthority/30-site.d/10-su.dee.liberte.consolekit.pkla
+# (inactive permissions due to different VT, multiple-users due to possible root login)
+ckm=org.freedesktop.ConsoleKit.Manager
+ckmo=/org/freedesktop/ConsoleKit/Manager
+
+
 choice=
 if [ -e ${TMPDIR}/logout-choice ]; then
     choice=`cat ${TMPDIR}/logout-choice`
@@ -11,11 +17,12 @@ ret=0
 
 case "${choice}" in
 shutdown)
-    sudo -n shutdown -h now
+    # --print-reply is required (a bug in D-Bus?)
+    dbus-send --system --type=method_call --print-reply --dest=${ckm%.*} ${ckmo} ${ckm}.Stop    1>/dev/null
     sleep 5
     ;;
 reboot)
-    sudo -n shutdown -r now
+    dbus-send --system --type=method_call --print-reply --dest=${ckm%.*} ${ckmo} ${ckm}.Restart 1>/dev/null
     sleep 5
     ;;
 login)

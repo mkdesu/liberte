@@ -17,7 +17,6 @@
 # User privilege specification (group prefix = %)
 root	ALL=(ALL : ALL) ALL
 
-anon	liberte = NOPASSWD: /sbin/shutdown -[hr] now
 anon	liberte = NOPASSWD: /usr/local/sbin/sysrq [01]
 anon	liberte = NOPASSWD: /usr/local/sbin/otfe-resize, /usr/local/sbin/mac-randomize
 
