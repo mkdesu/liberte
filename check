@@ -57,8 +57,7 @@ ${FIND} -name '*.h' -o \( -name '*.inc' ! -path '/usr/share/keymaps/*' \) \
 
 sinfo "Objects:"
 ${FIND} -name '*.o' -o -name '*.a' -o -name '*.pc' \
-        -o \( -name '*.la' ! -path '/usr/lib/GraphicsMagick-*' \
-                           ! -path '/usr/lib/scim-*' \)
+        -o \( -name '*.la' ! -path '/usr/lib/GraphicsMagick-*' \)
 
 sinfo "Duplicate libraries:"
 for lib in `${FIND} -name 'lib*.so'`; do

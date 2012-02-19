@@ -34,6 +34,7 @@
 /config/fbreader/*.db
 
 # Logs
+/config/uim/dict/*-history
 /config/audacious/log
 /config/geeqie/history
 /config/gftp/gftp.log

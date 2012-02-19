@@ -33,9 +33,9 @@ export XAUTHORITY=${TMPDIR}/Xauthority
 # export LC_TIME=en_GB.UTF-8
 
 # X11 internationalization
-export XMODIFIERS=@im=SCIM
-export GTK_IM_MODULE=scim
-export QT_IM_MODULE=scim-bridge
+export XMODIFIERS=@im=uim
+export GTK_IM_MODULE=uim
+export QT_IM_MODULE=uim
 
 # Application settings
 export BROWSER=midori

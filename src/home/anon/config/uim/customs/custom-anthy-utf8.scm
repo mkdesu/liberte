@@ -1,0 +1,5 @@
+(define anthy-utf8-widgets '(widget_anthy_utf8_input_mode widget_anthy_utf8_kana_input_method))
+(define default-widget_anthy_utf8_input_mode 'action_anthy_utf8_hiragana)
+(define anthy-utf8-input-mode-actions '(action_anthy_utf8_direct action_anthy_utf8_hiragana action_anthy_utf8_katakana action_anthy_utf8_halfkana action_anthy_utf8_halfwidth_alnum action_anthy_utf8_fullwidth_alnum))
+(define default-widget_anthy_utf8_kana_input_method 'action_anthy_utf8_roma)
+(define anthy-utf8-kana-input-method-actions '(action_anthy_utf8_roma action_anthy_utf8_kana action_anthy_utf8_azik action_anthy_utf8_act action_anthy_utf8_kzik))

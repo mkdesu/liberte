@@ -4,6 +4,9 @@ mail-mta/ssmtp-0
 # virtual/mailx (smartmontools)
 mail-client/mailx-0
 
+# Unneeded (app-i18n/uim (#404463))
+media-fonts/font-sony-misc-0
+
 # Mostly unneeded (ghostscript-gpl <- graphicsmagick, libwmf <- abiword)
 media-fonts/urw-fonts-2.4.9
 

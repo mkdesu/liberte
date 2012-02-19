@@ -1,6 +1,0 @@
-/DefaultHelperManagerSocketAddress = local:/tmp/.private/anon/scim-helper-manager-socket
-/DefaultKeyboardLayout = Unknown
-/DefaultPanelSocketAddress = local:/tmp/.private/anon/scim-panel-socket
-/DefaultSocketConfigAddress = local:/tmp/.private/anon/scim-socket-frontend
-/DefaultSocketFrontEndAddress = local:/tmp/.private/anon/scim-socket-frontend
-/DefaultSocketIMEngineAddress = local:/tmp/.private/anon/scim-socket-frontend

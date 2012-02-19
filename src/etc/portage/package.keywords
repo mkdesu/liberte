@@ -16,6 +16,7 @@
 <net-misc/networkmanager-vpnc-0.8.5
 
 # GTK+ 3 (unico depends on unstable gtk+:3)
+=app-i18n/uim-1.7.1*
 =x11-themes/light-themes-0.1.8.27.2*
 =x11-themes/gtk-engines-unico-1.0.1*
 =x11-libs/gtk+-3.2.3*:3

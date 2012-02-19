@@ -4,6 +4,7 @@ sys-process/psmisc              -X
 media-gfx/fbida                 -X
 media-fonts/terminus-font       -X -pcf
 app-text/ghostscript-gpl        -X
+dev-java/icedtea-bin            -X -cjk -alsa
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
@@ -14,6 +15,7 @@ dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline
 dev-db/sqlite                   -readline
 media-libs/jasper               -opengl
+app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
 # Drivers
@@ -103,6 +105,7 @@ media-gfx/graphicsmagick        imagemagick
 www-servers/nginx               aio
 
 # Internationalization
+app-i18n/uim                    -linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
 sys-apps/man-pages              -linguas_*
