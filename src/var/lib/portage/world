@@ -121,6 +121,8 @@ sys-power/powertop
 sys-process/latencytop
 app-laptop/laptop-mode-tools
 app-emulation/virt-what
+sys-boot/efibootmgr
+sys-libs/libsmbios
 sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils

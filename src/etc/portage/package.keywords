@@ -9,6 +9,7 @@
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
 =dev-java/java-service-wrapper-3.3.3*
+=sys-boot/efibootmgr-0.5.4*
 
 # Network
 <net-misc/networkmanager-openvpn-0.8.5
