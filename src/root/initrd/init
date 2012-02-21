@@ -149,10 +149,27 @@ test_success "find media to mount"
 
 # Setup the loopback mounts
 if [ -n "${param_loop}" ]; then
+    rootimg=${sboot}${param_loop}
+
+    # If copying squashfs image to RAM, force read-only losetup
+    # (BusyBox does not do that automatically (Busybox: #4784))
+    if [ -n "${param_toram}" ]; then
+        good_msg 'Copying filesystem image to RAM ...'
+        rootimgram=${srwroot}/cache/root.sfs
+
+        mkdir -m 700  ${srwroot}/cache
+        cp ${rootimg} ${rootimgram} || rm ${rootimgram}
+        rootimg=${rootimgram}
+
+        mount -o remount,ro ${srwroot}
+    fi
+
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting squashfs filesystem'
-    mount -r -t squashfs -o loop ${sboot}${param_loop} ${slive}
+    mount -r -t squashfs -o loop ${rootimg} ${slive}
     test_success 'mount compressed filesystem'
+
+    [ -z "${param_toram}" ] || mount -o remount,rw ${srwroot}
 
     # Move boot mountpoint under live
     mount -o move ${sboot} ${mboot}

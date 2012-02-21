@@ -1,2 +1,7 @@
 # Don't save OpenRC dependency cache
 rc_need="!savecache"
+
+# Do not remount read-only on shutdown:
+#   /           - ro squashfs
+#   /mnt/live   - ro squashfs bind unionfs branches
+# no_umounts="/:/mnt/live"

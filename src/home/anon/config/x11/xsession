@@ -57,6 +57,7 @@ nm-applet --sm-disable &
 bluetooth-applet &
 
 # Launch input method daemons
+# uim-toolbar-gtk-systray is squashed by lxpanel (#405025)
 uim-xim --engine=direct &
 uim-toolbar-gtk &
 

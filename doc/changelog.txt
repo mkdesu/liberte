@@ -10,6 +10,7 @@
   * Better filesystem security (read-only root fs)
   * Filesystem is now FHS-3.2+/run-compliant
   * Added "readonly" boot parameter for disabling persistence
+  * Added "toram" boot parameter for copying root filesystem to RAM
   * Added "gentoo=xvesa" boot parameter for forcing VESA driver in X server
   * setup.sh is now more robust (MBR write fix, 64-bit-only systems warning)
 
