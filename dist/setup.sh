@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh
+set -e
 
 # Required Syslinux version
 sysver=SYSVER
@@ -12,8 +13,12 @@ mattrbin=mattrib
 sysdir=/liberte/boot/syslinux
 systmpdir=
 
+# Filesystem types (for auto mode)
+fs_fat=4d44
+fs_ext=ef53
 
-if [ ! \( $# = 1 -o \( $# = 2 -a "$2" = nombr \) \) ]; then
+
+if [ ! \( $# = 1 -o \( $# = 2 -a "$2" = nombr \) -o "$1" = automagic \) ]; then
     cat <<EOF
 This script installs SYSLINUX on a device with Liberté Linux.
 
@@ -26,6 +31,7 @@ You need the following installed.
 
 Run setup.sh as:
 
+    setup.sh auto     [nombr]
     setup.sh /dev/XXX [nombr]
 
 If the optional <nombr> parameter is specified, and /dev/XXX
@@ -42,10 +48,71 @@ dev="$1"
 nombr="$2"
 
 
+# Error handling
+error() {
+    echo "$@"
+    exit 1
+}
+
+
+# Handle auto mode
+if [ "${dev}" = auto ]; then
+    echo "*** Determining device name ***"
+    shift
+
+    mpoint=`readlink -f "$0"`
+    if [ "${mpoint}" = "${mpoint%/liberte/setup.sh}" ]; then
+        error "Bad script path"
+    fi
+    mpoint="${mpoint%/liberte/setup.sh}"
+
+    if ! mountpoint -q "${mpoint}"; then
+        error "${mpoint} is not a mount point"
+    fi
+
+    fstype=`stat -f -c "%t" "${mpoint}"`
+    fsdev=/dev/block/`mountpoint -d "${mpoint}"`
+    fsdev=`readlink -f "${fsdev}"`
+
+    case "${fstype}" in
+        ${fs_fat})
+            echo "${fsdev} is mounted as FAT(32) on ${mpoint}"
+            setup=`mktemp`
+            cp $0 "${setup}"
+
+            exec /bin/sh "${setup}" automagic "${mpoint}" "${fsdev}" "$@"
+            ;;
+
+        ${fs_ext})
+            echo "${fsdev} is mounted as ext[234] on ${mpoint}"
+            exec /bin/sh "$0" "${fsdev}" "$@"
+            ;;
+
+        *)
+            error "Unknown filesystem type"
+            ;;
+    esac
+
+    error "Internal error"
+fi
+
+if [ "${dev}" = automagic ]; then
+    mpoint="$2"
+    shift 2
+
+    echo "Unmounting ${mpoint}"
+    umount "${mpoint}"
+
+    /bin/sh "$0" "$@"
+    exec rm "$0"
+
+    error "Internal error"
+fi
+
+
 # Check that the argument is a block device
 if [ ! -b "${dev}" ]; then
-    echo "${dev} is not a block device."
-    exit 1
+    error "${dev} is not a block device."
 fi
 
 
@@ -73,8 +140,7 @@ fi
 devpath=`udevadm info -q path -n "${dev}"`
 devtype=`udevadm info -q property -p ${devpath} | grep '^DEVTYPE=' | cut -d= -f2`
 if [ "${devtype}" != partition -a "${devtype}" != disk ]; then
-    echo "${dev} is neither a disk nor a disk partition"
-    exit 1
+    error "${dev} is neither a disk nor a disk partition"
 fi
 
 
@@ -82,11 +148,10 @@ fi
 devfs=`udevadm info -q property -p ${devpath} | grep '^ID_FS_TYPE=' | cut -d= -f2`
 case "${devfs}" in
     '')
-        echo "${dev} is not formatted, format it as FAT/ext2 or specify a partition instead"
-        exit 1
+        error "${dev} is not formatted, format it as FAT/ext2 or specify a partition instead"
         ;;
     vfat|msdos)
-        echo "Detected FAT/FAT32 filesystem, will install using SYSLINUX"
+        echo "Detected FAT(32) filesystem, will install using SYSLINUX"
         devfs=fat
         ;;
     ext2|ext3|ext4)
@@ -94,8 +159,7 @@ case "${devfs}" in
         devfs=ext2
         ;;
     *)
-        echo "${dev} has a [${devfs}] filesystem type, need FAT/ext2"
-        exit 1
+        error "${dev} has a [${devfs}] filesystem type, need FAT/ext2"
         ;;
 esac
 
@@ -104,8 +168,7 @@ if [ ${devfs} = fat ]; then
 
     # Check for mounted filesystem (be a bit paranoid, so no '$' after ${dev})
     if cut -d' ' -f1 /proc/mounts | grep -q "^${dev}"; then
-        echo "${dev} is mounted, unmount it or wait for auto-unmount"
-        exit 1
+        error "${dev} is mounted, unmount it or wait for auto-unmount"
     fi
 
 
@@ -153,8 +216,7 @@ if [ ${devfs} = fat ]; then
     rmdir     ${mntdir}
 
     if [ ${hassysdir} = 0 ]; then
-        echo "Directory ${sysdir} not found or incorrect on ${dev}"
-        exit 1
+        error "Directory ${sysdir} not found or incorrect on ${dev}"
     fi
 
 
@@ -177,13 +239,11 @@ elif [ ${devfs} = ext2 ]; then
     if [ -n "${devdir}" ]  &&  mountpoint -q "${devdir}"; then
         echo "Detected ${dev} mount on ${devdir}"
     else
-        echo "${dev} is not mounted, please manually mount or auto-mount it"
-        exit 1
+        error "${dev} is not mounted, please manually mount or auto-mount it"
     fi
 
     if [ ! -e "${devdir}"${sysdir}/syslinux-x86.tbz ]; then
-        echo "Directory ${sysdir} not found or incorrect in ${devdir}"
-        exit 1
+        error "Directory ${sysdir} not found or incorrect in ${devdir}"
     elif [ ${sysok} = 0 ]; then
         echo "Using bundled 32-bit EXTLINUX binary and MBR"
 
@@ -199,8 +259,7 @@ elif [ ${devfs} = ext2 ]; then
     ${extbin} -i "${devdir}"${sysdir}/ext
 
 else
-    echo "Internal error"
-    exit 1
+    error "Internal error"
 fi
 
 
@@ -214,16 +273,14 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
     # Check that the parent device is a block device
     if [ ! -b "${rdev}" ]; then
-        echo "${rdev} is not a block device."
-        exit 1
+        error "${rdev} is not a block device."
     fi
 
 
     # Check that the parent device is indeed a disk
     rdevtype=`udevadm info -q property -p ${rdevpath} | grep '^DEVTYPE=' | cut -d= -f2`
     if [ "${rdevtype}" != disk ]; then
-        echo "${rdev} is not a disk, but ${rdevtype}, aborting"
-        exit 1
+        error "${rdev} is not a disk, but ${rdevtype}, aborting"
     fi
 
 
@@ -240,15 +297,13 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
     # Check that the partition table is MSDOS
     ptable=`udevadm info -q property -p ${rdevpath} | grep '^ID_PART_TABLE_TYPE=' | cut -d= -f2`
     if [ "${ptable}" != dos ]; then
-        echo "Partition table is of type [${ptable}], need MS-DOS"
-        exit 1
+        error "Partition table is of type [${ptable}], need MS-DOS"
     fi
 
 
     # Determine partition number
     if [ ! -e /sys${devpath}/partition ]; then
-        echo "Unable to reliably determine partition number of ${dev}"
-        exit 1
+        error "Unable to reliably determine partition number of ${dev}"
     fi
     devpart=`cat /sys${devpath}/partition`
 
@@ -256,14 +311,13 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)
     devbyte=$((devpart/64))$(((devpart%64)/8))$((devpart%8))
     if [ ${#devbyte} != 3 ]; then
-        echo "Unable to compute device partition byte"
-        exit 1
+        error "Unable to compute device partition byte"
     fi
     printf "\\${devbyte}" | cat ${sysmbr} - | dd bs=440 count=1 iflag=fullblock conv=notrunc of=${rdev}
 fi
 
 
-# Erase temporary directories
+# Remove temporary directories
 if [ -n "${systmpdir}" ]; then
     rm -r ${systmpdir}
 fi
