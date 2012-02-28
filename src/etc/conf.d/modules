@@ -9,8 +9,8 @@ modules="${modules} binfmt_misc"
 modules="${modules} microcode"
 
 
-# PCI hotplugging support
-modules="${modules} acpiphp pciehp"
+# PCI hotplugging support (acpiphp, pciehp)
+modules="${modules} pciehp"
 
 
 # Support for CPU frequency scaling governors
