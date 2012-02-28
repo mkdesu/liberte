@@ -10,9 +10,9 @@
 # devfs:      /dev{/pts,/shm}
 
 # Unionfs subdirectories mounted into ro /
-unionfs /etc  unionfs dirs=/mnt/rwroot/etc=rw:/mnt/live/etc=ro,nosuid,nodev        0 0
-unionfs /var  unionfs dirs=/mnt/rwroot/var=rw:/mnt/live/var=ro,nosuid,nodev,noexec 0 0
-unionfs /home unionfs dirs=/mnt/rwroot/home=rw:/mnt/live/home=ro,nosuid,nodev      0 0
+unionfs /etc  unionfs dirs=/mnt/rwroot/etc=rw:/mnt/live/etc=ro,nosuid,nodev,iversion        0 0
+unionfs /var  unionfs dirs=/mnt/rwroot/var=rw:/mnt/live/var=ro,nosuid,nodev,noexec,iversion 0 0
+unionfs /home unionfs dirs=/mnt/rwroot/home=rw:/mnt/live/home=ro,nosuid,nodev,iversion      0 0
 
 # Empty writable directories
 tmpfs   /tmp  tmpfs   mode=1777,nosuid,nodev,noexec 0 0

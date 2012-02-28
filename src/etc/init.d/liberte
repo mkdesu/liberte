@@ -64,8 +64,9 @@ start() {
     # Remount media root read-write (for non-loop/cd/dvd)
     mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
     if [ ${mediaro} = 0 ]; then
+        # -o iversion can not be appended in Initramfs (Busybox: #4802)
         ebegin Remounting ${boot} read-write
-        mount -o remount,rw ${boot}
+        mount -o remount,rw,iversion ${boot}
         mediaro=$?
         eend ${mediaro}
     else
@@ -85,7 +86,7 @@ start() {
         # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
         # device later, and for otfe-resize script to be able to mount it
         if ! grep -q "^/dev/mapper/${OTFEVOLUME} " /etc/fstab; then
-            echo "/dev/mapper/${OTFEVOLUME} ${lmount} ntfs-3g noauto,${ntfsflags} 0 0" >> /etc/fstab
+            echo "/dev/mapper/${OTFEVOLUME} ${lmount} ntfs-3g noauto,${ntfsflags},iversion 0 0" >> /etc/fstab
         fi
 
         # Initialize LUKS image mapping (create if it doesn't exist)
