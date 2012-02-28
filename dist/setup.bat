@@ -9,7 +9,7 @@ ECHO.
 
 ECHO Installing SYSLINUX on %~d0, optionally with bootloader.
 ECHO.
-%~d0\liberte\boot\syslinux\syslinux.exe -i -m -a -d /liberte/boot/syslinux %~d0
+%~d0\liberte\boot\syslinux\syslinux.exe -i -m -a -f -d /liberte/boot/syslinux %~d0
 ECHO.
 
 ECHO Hiding %~d0\liberte and %~d0\otfe directories.

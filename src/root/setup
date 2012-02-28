@@ -4,6 +4,7 @@ helpdir=${HOME}/helpers
 
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
+[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
 xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
@@ -77,16 +78,17 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (#398229, #386721)
-ovt=/usr/portage/app-emulation/open-vm-tools-kmod/open-vm-tools-kmod-2011.11.20.535097.ebuild
-spatch ${HOME}/patches/portage/open-vm-tools-kmod.patch -p0
-rsync -t --chmod=u=rwX,go=rX ${HOME}/patches/portage/vmci-driver.patch ${ovt%/*}/files/
+# (#398229)
+ovt=/usr/portage/app-emulation/open-vm-tools/open-vm-tools-2011.12.20.562307.ebuild
+ovthash=421c396d4cc345165d1f4076792c62ae95cbcd06007e5a4e930c021f90fee570
+cp -a ${ovt/2011.12.20.562307/2011.11.20.535097} ${ovt}
 ebuild ${ovt} manifest
+grep -q "^DIST open-vm-tools-2011.12.20.562307.tar.gz .* SHA256 ${ovthash}\>" ${ovt%/*}/Manifest
 
-# (#394757)
-vvb=/usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.4.ebuild
-spatch ${HOME}/patches/portage/xf86-video-virtualbox-3-localconfig.patch -p0
-ebuild ${vvb} manifest
+ovt=${ovt//tools/tools-kmod}
+cp -a ${ovt/2011.12.20.562307/2011.11.20.535097} ${ovt}
+sed -i 's/src_prepare/&_off/'                    ${ovt}
+ebuild ${ovt} manifest
 
 # (#401127)
 sut=/usr/portage/media-gfx/splashutils/splashutils-1.5.4.4.ebuild
@@ -121,9 +123,9 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec
     rsync -aHS --delete-excluded /usr/src/linux-${kversion}/ /usr/src/linux-kexec-64
 
-    cp ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config
-    cp ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config
-    cp ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config
+    cp ${HOME}/config/linux-${kversion%-r*}.config          /usr/src/linux/.config
+    cp ${HOME}/config/linux-${kversion%-r*}-kexec.config    /usr/src/linux-kexec/.config
+    cp ${HOME}/config/linux-${kversion%-r*}-kexec-64.config /usr/src/linux-kexec-64/.config
 
 
     sinfo "Downloading kernel patches"
@@ -134,7 +136,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     sinfo "Applying kernel patches"
     spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-3.0-rc2.patch   -d /usr/src/linux -p1
-    spatch /usr/local/portage/distfiles/unionfs-2.5.10_for_3.0.4.diff.gz -d /usr/src/linux -p1
+    spatch /usr/local/portage/distfiles/unionfs-2.5.11_for_3.2.2.diff.gz -d /usr/src/linux -p1
 
 
     # Filter locales before remerging libc
@@ -514,12 +516,12 @@ xz -t -M ${xzmem}MiB /usr/local/boot/initrd-kexec.xz
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}.config          /usr/src/linux/.config          || :
+diff ${HOME}/config/linux-${kversion%-r*}.config          /usr/src/linux/.config          || :
 
 
 sinfo "Kexec kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-*}-kexec.config    /usr/src/linux-kexec/.config    || :
-diff ${HOME}/config/linux-${kversion%-*}-kexec-64.config /usr/src/linux-kexec-64/.config || :
+diff ${HOME}/config/linux-${kversion%-r*}-kexec.config    /usr/src/linux-kexec/.config    || :
+diff ${HOME}/config/linux-${kversion%-r*}-kexec-64.config /usr/src/linux-kexec-64/.config || :
 
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then

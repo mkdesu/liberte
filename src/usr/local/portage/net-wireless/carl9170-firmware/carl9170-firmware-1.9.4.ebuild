@@ -8,14 +8,14 @@ inherit linux-info
 
 FW_NAME="carl9170-1.fw"
 
-DESCRIPTION="Atheros USB AR9170 firmware (kernel <=3.0)"
+DESCRIPTION="Atheros USB AR9170 firmware (kernel >=3.1)"
 
 HOMEPAGE="http://linuxwireless.org/en/users/Drivers/carl9170"
 SRC_URI="http://linuxwireless.org/en/users/Drivers/carl9170/fw${PV}?action=AttachFile&do=get&target=${FW_NAME} -> ${P}.fw"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
+KEYWORDS="x86 amd64"
 
 IUSE=""
 

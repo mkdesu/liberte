@@ -1,6 +1,3 @@
-# Compiler (#402847)
-=sys-devel/gcc-4.5.3-r2
-
 # TEXTRELs (#389471)
 =media-plugins/gst-plugins-ffmpeg-0.10.13-r1
 
@@ -24,15 +21,18 @@
 =x11-libs/pango-1.29.4*
 =dev-libs/atk-2.2.0*
 
-# Guest virtualization
-app-emulation/open-vm-tools
-app-emulation/open-vm-tools-kmod
+# Guest virtualization (#398229, #394757)
+=app-emulation/open-vm-tools-2011.12.20.562307*
+=app-emulation/open-vm-tools-kmod-2011.12.20.562307*
+=app-emulation/virtualbox-guest-additions-4.1.8*
+=x11-drivers/xf86-video-virtualbox-4.1.8*
 
 # Applications
 =x11-misc/fpm2-0.79*
 =net-irc/xchat-otr-0.3*
 
 # Firmware
+sys-kernel/linux-firmware
 sys-apps/microcode-data
 sys-kernel/amd-ucode
 net-wireless/b43-firmware

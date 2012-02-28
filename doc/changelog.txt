@@ -1,12 +1,14 @@
-2012-XX-XX
+2012-03-XX
   + 2012.1 release
 
-  * Kernel 3.0.4
+  * Kernel 3.3.2
   * Fixed memory wiping in KEXEC kernel
   * Removed almost all PaX protection exceptions
   * Fixed multilingual disk labels support for automount
   * Fixed 3G support for modems with PIN unlocking
   * More extensive firmware support
+  * Better hardware support (nVidia SATA, BRCM4313, DVBs, joysticks, tablets)
+
   * Better filesystem security (read-only root fs)
   * Filesystem is now FHS-3.2+/run-compliant
   * Added "readonly" boot parameter for disabling persistence
@@ -21,7 +23,7 @@
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
   * Better Bluetooth support
-  * Better hardware support (nVidia SATA, DVBs, joysticks, input tablets)
+  * Replaced SCIM with uim
   * Added gFTP file transfer client
   * Replaced Xarchiver with File Roller
 
