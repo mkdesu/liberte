@@ -9,6 +9,10 @@ modules="${modules} binfmt_misc"
 modules="${modules} microcode"
 
 
+# PCI hotplugging support
+modules="${modules} acpiphp pciehp"
+
+
 # Support for CPU frequency scaling governors
 # compiled in: cpufreq_conservative, cpufreq_performance
 # modules:     cpufreq_powersave, cpufreq_userspace
