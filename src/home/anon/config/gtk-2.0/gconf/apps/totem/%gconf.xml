@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <gconf>
+	<entry name="hue" mtime="1330464988" type="int" value="32768"/>
+	<entry name="brightness" mtime="1330464988" type="int" value="32768"/>
+	<entry name="saturation" mtime="1330464988" type="int" value="32768"/>
+	<entry name="contrast" mtime="1330464988" type="int" value="32768"/>
 	<entry name="autoload_subtitles" mtime="1319813975" type="bool" value="true"/>
 	<entry name="open_path" mtime="1319813735" type="string">
 		<stringvalue>file:///home/anon</stringvalue>
