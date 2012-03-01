@@ -96,6 +96,7 @@ dev-java/jamvm
 net-analyzer/netcat
 net-firewall/iptables
 sys-apps/ethtool
+net-wireless/rfkill
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
 net-misc/networkmanager
@@ -107,6 +108,7 @@ gnome-extra/nm-applet
 net-misc/htpdate
 net-misc/tor
 net-misc/connect
+net-misc/whois
 net-p2p/i2p
 net-proxy/tsocks
 net-proxy/privoxy

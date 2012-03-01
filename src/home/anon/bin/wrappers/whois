@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# No proxy support
+exec torify /usr/bin/whois "$@"

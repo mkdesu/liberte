@@ -57,6 +57,7 @@ pkcs11-tool -Lv                      > 07-pcsc
 echo Network ...
 ifconfig -a -v                       > 08-net-eth
 (iwconfig; iwpriv)                   > 08-net-wifi
+rfkill list                          > 08-net-rfkill
 hciconfig -a                         > 08-net-hci
 route -vne                           > 08-net-route
 
@@ -110,6 +111,7 @@ exec 2>&1
 echo Sanitizing ...
 sed -ri 's/\<(Serial Number:?[[:blank:]]+|SerialNo=)[^[:blank:]].+/\1[SN REMOVED]/ig' *
 sed -ri 's/\<((iSerial[[:blank:]]+[[:digit:]]+|SerialNumber:)[[:blank:]]+)[^[:blank:]:]+$/\1[SN REMOVED]/i' *
+sed -ri 's/\<(UUID:[[:blank:]]+)[^[:blank:]].+/\1[UUID REMOVED]/ig' *
 
 sed -ri 's/\<version:?[[:blank:]]+[[:digit:].]+\>/&/; t; s/\<(0|127|255)\.(0|255)\.(0|255)\./ipMaGiK&/g; s/\<([[:digit:]]{1,3}\.){3}[[:digit:]]{1,3}\>/[IP REMOVED]/ig; s/ipMaGiK//g' *
 sed -ri 's/\<([[:xdigit:]]{2}:){5,}[[:xdigit:]]{2}\>/[MAC REMOVED]/ig' *
