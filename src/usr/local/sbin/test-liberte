@@ -102,11 +102,25 @@ stest fail "Fetch https:.org w/o proxy as i2p"     sudo -n -u i2p  curl -fsSI -x
 stest fail "Fetch IP w/o proxy as i2p"             sudo -n -u i2p  curl -fsSI -x ""                            ${webip}
 stest pass "Fetch https:IP w/o proxy as i2p"       sudo -n -u i2p  curl -fsSI -x "" -k                         https://${webip}
 
+
 # Tor control port access
 stest fail "Access Tor control port as root"                       nc -q 0 127.0.0.1 9051
 stest fail "Access Tor control port as anon"       sudo -n -u anon nc -q 0 127.0.0.1 9051
 stest pass "Access Tor control port as tor"        sudo -n -u tor  nc -q 0 127.0.0.1 9051
 stest pass "Invoke tor-ctrl"                       sudo -n -u tor  tor-ctrl status
+
+
+# I2P hidden IP
+i2pishidden() {
+    local i2pjar=/opt/i2p/lib/i2p.jar
+    local rinfoclass=net.i2p.data.RouterInfo
+    local rinfo=/var/lib/i2p/router/router.info
+
+    sudo -n -u i2p java -Xmx16M -cp ${i2pjar} ${rinfoclass} ${rinfo} | grep -q "^[[:blank:]]*Addresses: #: 0$"
+}
+
+stest pass "Zero addresses in I2P RouterInfo"      i2pishidden
+
 
 # Cables communication service server access
 stest fail "Fetch CC service as root"                              curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
@@ -114,7 +128,6 @@ stest fail "Fetch CC service as anon"              sudo -n -u anon curl -fsSI -x
 stest fail "Fetch CC service as nofw"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
 stest pass "Fetch CC service as tor"               sudo -n -u tor  curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
 stest pass "Fetch CC service as i2p"               sudo -n -u i2p  curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
-
 
 # Cables communication ping
 stest pass "CC-ping @tor as anon"                  sudo -n -u anon cable-ping ${ccuser}@${cctor}
@@ -138,6 +151,8 @@ EOF
 
 stest pass "Send cable to self (Tor -> Tor, I2P)" ccsend "Tor -> Tor, I2P" ${ccuser}@${cctor} ${ccuser}@${cctor} ${ccuser}@${cci2p}
 stest pass "Send cable to self (I2P -> Tor, I2P)" ccsend "I2P -> Tor, I2P" ${ccuser}@${cci2p} ${ccuser}@${cctor} ${ccuser}@${cci2p}
+stest fail "Bogus cable host"                     ccsend "Bogus"           ${ccuser}@bogus    ${ccuser}@${cctor}
+stest fail "Bogus cable username"                 ccsend "Bogus"           ${ccuser}@${cctor} bogus@${cctor}
 echo "NOTE: 8 messages should be delivered to user mailbox"
 
 
