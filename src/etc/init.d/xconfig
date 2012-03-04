@@ -1,9 +1,6 @@
 #!/sbin/runscript
 
-description="Sets up cgroups, configures X server and sound."
-
-cgroupmnt=/sys/fs/cgroup/cpu
-cgrouprel=/usr/local/sbin/cgroup-release
+description="Configures X server and sound."
 
 silentflag=/etc/splash/silent/active
 
@@ -15,7 +12,7 @@ amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
 
 depend() {
-    # need cgroup mount
+    # need /etc mount
     need   localmount
 
     # X server is configured here
@@ -23,16 +20,6 @@ depend() {
 }
 
 start() {
-    # Setup cgroups
-    if [ ! -e ${cgroupmnt}/user ]; then
-        ebegin Setting up control groups
-        echo ${cgrouprel} > ${cgroupmnt}/release_agent
-        echo 1            > ${cgroupmnt}/notify_on_release
-        mkdir -m 3770 ${cgroupmnt}/user
-        chgrp users   ${cgroupmnt}/user
-        eend $?
-    fi
-
     if egrep -q '\<splash=([^ ]*,)?theme:silent\>' /proc/cmdline; then
         ebegin Enabling silent theme
         touch ${silentflag}

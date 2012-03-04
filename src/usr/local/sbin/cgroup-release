@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-if [ x"$1" != x/user ]; then
-    exec /bin/rmdir /sys/fs/cgroup/cpu"$1"
-fi
