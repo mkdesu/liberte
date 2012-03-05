@@ -98,14 +98,14 @@ sqsort=${livecd}/tmp/transient/pkg/squashfs.sort
 
 
 # Using default block size of 128KiB
-# Multi-threaded execution often causes deadlock after image creation
+# (chmod due to GRKERNSEC_HIDESYM)
 sinfo "Creating SquashFS image"
 
 ${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
     -noappend -no-exports -no-progress -no-xattrs -comp xz -Xbcj x86 \
     -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
     -sort ${sqsort} -ef ${src}/conf/rootfs.ignore
-chmod 644 ${cdroot}/liberte/boot/root-x86.sfs
+chmod go= ${cdroot}/liberte/boot/root-x86.sfs
 
 
 sinfo "Converting text files to DOS line endings"
@@ -122,7 +122,7 @@ zipfile=${cdroot}/../${distname}.zip
 sinfo "Creating ISO image ${distname}.iso"
 isofile=${cdroot}/../${distname}.iso
 mkisofs -quiet -iso-level 2 -no-pad -J -sysid '' -V '' -A '' \
-    -r -no-emul-boot -boot-load-size 4 -boot-info-table      \
+    -R -no-emul-boot -boot-load-size 4 -boot-info-table      \
     -c boot.cat -hide boot.cat -hide-joliet boot.cat         \
     -b liberte/boot/syslinux/isolinux.bin -o ${isofile}      \
     -hidden isolinux -hidden liberte -hide-joliet isolinux -hide-joliet liberte ${cdroot}

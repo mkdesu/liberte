@@ -58,9 +58,10 @@ find ${stagedir} -mindepth 3 -type f \
     -printf 'file %P %p 0644 0 0\n' >> ${initlst}
 
 
-# Generate compressed initramfs
+# Generate compressed initramfs (chmod due to GRKERNSEC_HIDESYM)
 /usr/src/linux-${kversion}/usr/gen_init_cpio ${initlst} \
     | xz -c -C crc32 > ${image}
+chmod go= ${image}
 
 
 rm -r ${stagedir}
