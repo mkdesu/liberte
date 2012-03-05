@@ -28,9 +28,9 @@ mksqver=4.2
 luser=2101
 lgroup=9000
 
-# see /usr/local/sbin/ps-mount
+# See also /usr/local/sbin/ps-mount
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0177,dmask=077
-isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},dmode=0500
+isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8
 extflags=noatime,nosuid,nodev,acl,user_xattr
 
 
@@ -66,22 +66,6 @@ sinfo "Copying USB /boot"
 mkdir -p -m 755 ${cdroot} ${cdroot}/liberte ${cdroot}/isolinux
 rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
     ${livecd}/boot ${cdroot}/liberte
-sed -i "s/TAG //; s/ROOTFS/vfat/;    s/FSFLAGS/${vfatflags}/"  \
-    ${cdroot}/liberte/boot/syslinux/syslinux.cfg
-
-# EXTLINUX config takes precedence over SYSLINUX one when in same directory
-mkdir -m 755 ${cdroot}/liberte/boot/syslinux/ext
-cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
-sed -i "s/TAG //; s/ROOTFS/ext4/;    s/FSFLAGS/${extflags}/"   \
-    ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
-
-# ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
-cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
-sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
-        s/theme:liberte/theme:liberty/;
-        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/"             \
-    ${cdroot}/liberte/boot/syslinux/isolinux.cfg
-cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
 
 
 sinfo "Copying USB add-ons"
@@ -106,6 +90,31 @@ ${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
     -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
     -sort ${sqsort} -ef ${src}/conf/rootfs.ignore
 chmod go= ${cdroot}/liberte/boot/root-x86.sfs
+
+sfshash=`sha256sum ${cdroot}/liberte/boot/root-x86.sfs`
+sfshash="${sfshash%% *}"
+
+
+sinfo "Adapting Syslinux configuration"
+
+sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/; s/FSHASH/${sfshash}/" \
+    ${cdroot}/liberte/boot/syslinux/syslinux.cfg
+
+# EXTLINUX config takes precedence over SYSLINUX one when in same directory
+mkdir -m 755 ${cdroot}/liberte/boot/syslinux/ext
+cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+sed -i "s/TAG //; s/ROOTFS/ext4/; s/FSFLAGS/${extflags}/;  s/FSHASH/${sfshash}/" \
+    ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+
+# ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
+cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660/; s/FSFLAGS/${isofsflags}/;
+        s/FSHASH/${sfshash}/; s/theme:liberte/theme:liberty/;
+        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
+    ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
+
+sed -i "s/FSHASH/${sfshash}/" ${cdroot}/liberte/qemulate.sh
 
 
 sinfo "Converting text files to DOS line endings"

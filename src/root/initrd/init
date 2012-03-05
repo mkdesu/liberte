@@ -64,7 +64,6 @@ fi > /etc/modprobe.d/framebuffer.conf
 cp -a /etc/modprobe.d ${srwroot}/etc
 
 
-quiet_kmsg
 good_msg 'Loading modules'
 
 # Setup hotplugging before starting coldplugging
@@ -91,10 +90,8 @@ mdev -s
 rundebugshell
 
 
-splash init
-
-
 # No "udevadm settle" with mdev, so just loop
+splash init
 good_msg "Looking for the media"
 tested=' '
 waitmsg=0
@@ -148,6 +145,21 @@ test_success "find media to mount"
 
 
 # Setup the loopback mounts
+verifyroot() {
+    local image="$1"
+
+    if [ -n "${param_cdroot_hash}" ]; then
+        good_msg 'Verifying filesystem image ...'
+        sfshash=`sha256sum ${image}`
+        param_cdroot_hash=`echo "${param_cdroot_hash}" | tr A-F a-f`
+
+        [ "${param_cdroot_hash}" = "${sfshash%% *}" ]
+        test_success "verify filesystem image hash"
+    else
+        warn_msg 'Skipping filesystem image verification'
+    fi
+}
+
 if [ -n "${param_loop}" ]; then
     rootimg=${sboot}${param_loop}
 
@@ -164,8 +176,10 @@ if [ -n "${param_loop}" ]; then
         mount -o remount,ro ${srwroot}
     fi
 
+    verifyroot ${rootimg}
+
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
-    good_msg 'Mounting squashfs filesystem'
+    good_msg 'Mounting SquashFS filesystem'
     mount -r -t squashfs -o loop ${rootimg} ${slive}
     test_success 'mount compressed filesystem'
 
@@ -175,6 +189,7 @@ if [ -n "${param_loop}" ]; then
     mount -o move ${sboot} ${mboot}
 else
     # Treat boot mountpoint as live mountpoint
+    verifyroot ${mediadev}
     mount -o move ${sboot} ${slive}
 fi
 
@@ -189,7 +204,6 @@ mount -o move    ${srwroot} ${mrwroot}
 rundebugshell
 
 
-verbose_kmsg
 good_msg 'Booting (initramfs)'
 if [ ! -e ${slive}/dev/console  -o  ! -e ${slive}/dev/null ]; then
     bad_msg 'Real /dev is missing files required to boot (console and null)'
@@ -211,8 +225,6 @@ exec switch_root -c /dev/console ${slive} /sbin/init
 
 # If we get here, something bad has happened
 splash verbose
-
-
 echo 'A fatal error has probably occured since /sbin/init did not'
 echo 'boot correctly. Trying to open a shell...'
 exec sh

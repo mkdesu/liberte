@@ -20,19 +20,6 @@ warn_msg() {
 }
 
 
-quiet_kmsg() {
-    if [ -z "${param_debug}" ]; then
-        echo 4 > /proc/sys/kernel/printk
-    else
-        verbose_kmsg
-    fi
-}
-
-verbose_kmsg() {
-    echo 6 > /proc/sys/kernel/printk
-}
-
-
 test_success() {
     if [ $? != 0 ]; then
         bad_msg "Failed to ${1:-run command}; failing back to the shell..."

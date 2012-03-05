@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.19.3
-# Thu Jan  5 06:19:23 2012
+# Mon Mar  5 06:42:12 2012
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -255,7 +255,7 @@ CONFIG_RMDIR=y
 # CONFIG_FEATURE_RMDIR_LONG_OPTIONS is not set
 CONFIG_SEQ=y
 # CONFIG_SHA1SUM is not set
-# CONFIG_SHA256SUM is not set
+CONFIG_SHA256SUM=y
 # CONFIG_SHA512SUM is not set
 CONFIG_SLEEP=y
 CONFIG_FEATURE_FANCY_SLEEP=y
@@ -302,7 +302,11 @@ CONFIG_FEATURE_AUTOWIDTH=y
 # Common options for df, du, ls
 #
 CONFIG_FEATURE_HUMAN_READABLE=y
-# CONFIG_FEATURE_MD5_SHA1_SUM_CHECK is not set
+
+#
+# Common options for md5sum, sha1sum, sha256sum, sha512sum
+#
+CONFIG_FEATURE_MD5_SHA1_SUM_CHECK=y
 
 #
 # Console Utilities
