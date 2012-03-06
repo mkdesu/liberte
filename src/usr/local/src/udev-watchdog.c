@@ -38,6 +38,7 @@
 #include <sys/un.h>
 #include <sys/select.h>
 #include <sys/reboot.h>
+#include <sys/mman.h>
 #include <linux/types.h>
 #include <linux/netlink.h>
 #include <linux/reboot.h>
@@ -51,7 +52,7 @@ static void sig_handler(int signum)
 		udev_exit = 2;
 }
 
-static int print_device(struct udev_device *device, const char *f_action, const char *f_devsuffix)
+static int print_device(struct udev_device *device, const char *f_action1, const char *f_action2, const char *f_devsuffix)
 {
 	struct timeval  tv;
 
@@ -64,7 +65,7 @@ static int print_device(struct udev_device *device, const char *f_action, const 
 	       (unsigned long) tv.tv_sec, (unsigned int) tv.tv_usec,
 	       action, devpath);
 
-    if (! strcmp(f_action, action)) {
+    if (!strcmp(f_action1, action) || !strcmp(f_action2, action)) {
         f_len = strlen(f_devsuffix);
         d_len = strlen(devpath);
 
@@ -88,7 +89,8 @@ int main(int argc, char *argv[])
 
 	const char *filter_subsys    = "block";
 	/* const char *filter_devtype   = "partition"; */
-    const char *filter_action    = "remove";
+    const char *filter_action1   = "remove";
+    const char *filter_action2   = "change";
     const char *filter_devsuffix;
 
     int kexec = 0;
@@ -132,6 +134,10 @@ int main(int argc, char *argv[])
 		goto out;
 	}
 
+    /* lock process memory */
+    if (mlockall(MCL_CURRENT) != 0)
+        fprintf(stderr, "warning: failed to lock process memory: %s\n", strerror(errno));
+
 	while (!udev_exit) {
 		int fdcount;
 
@@ -153,7 +159,7 @@ int main(int argc, char *argv[])
 			device = udev_monitor_receive_device(kernel_monitor);
 			if (device == NULL)
 				continue;
-			if (print_device(device, filter_action, filter_devsuffix))
+			if (print_device(device, filter_action1, filter_action2, filter_devsuffix))
                 udev_exit = 1;
 
 			udev_device_unref(device);
