@@ -10,18 +10,16 @@ lidevents=/var/run/lid-events
 launcher=/usr/local/sbin/poweroff-watchdog
 pidfile=/var/run/poweroff-watchdog.pid
 
+
 depend() {
     # this is a boot-level service
     need localmount
 
-    # power-off watchdog needs kexec
+    # power-off watchdog uses kexec
     use kexec
 }
 
 start() {
-    cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null)
-
-
     # Lock root account's password, unless gentoo=root was given
     if ! get_bootparam 'root'; then
         ebegin Disabling root password
@@ -37,9 +35,10 @@ start() {
 
 
     # Arm the poweroff watchdog
-    if [ -n "${cddevpath}" ]; then
+    if mountpoint -q ${boot}; then
         ebegin Arming power-off on boot media removal
-        start-stop-daemon -S -q -p ${pidfile} -bm -x ${launcher} -- "${cddevpath}"
+        mediadev=/dev/block/`mountpoint -d ${boot}`
+        start-stop-daemon -S -q -p ${pidfile} -bm -x ${launcher} -- ${mediadev}
         eend $?
     else
         ewarn Skipping boot media removal watchdog

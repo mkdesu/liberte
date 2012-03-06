@@ -48,29 +48,32 @@ ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
 
 
 start() {
-    # Determine boot device and its label
-    mediadev=/dev/block/`mountpoint -d ${boot}`
-    medialabel=`udevadm info -q property -p ${mediadev} 2>/dev/null | sed -n 's/^ID_FS_LABEL=//p'`
+    mediaro=1
+    if mountpoint -q ${boot}; then
+        # Determine boot device and its label
+        mediadev=/dev/block/`mountpoint -d ${boot}`
+        medialabel=`udevadm info -q property -p ${mediadev} | sed -n 's/^ID_FS_LABEL=//p'`
 
-    if [ -n "${medialabel}" ]; then
-        # Can result in duplicate autofs entries if label is later changed
-        # to that of other media, and this service is then restarted
-        ebegin "Creating ${boot} -> /media/${medialabel} alias"
-        sed -i "s@^[^#].*\( [^ ]* :${boot}\$\)@\"${medialabel}\"\1@" ${autos}
-        eend $?
-    fi
+        if [ -n "${medialabel}" ]; then
+            # Can result in duplicate autofs entries if label is later changed
+            # to that of other media, and this service is then restarted
+            ebegin "Creating ${boot} -> /media/${medialabel} alias"
+            sed -i "s@^[^#].*\( [^ ]* :${boot}\$\)@\"${medialabel}\"\1@" ${autos}
+            eend $?
+        fi
 
 
-    # Remount media root read-write (for non-loop/cd/dvd)
-    mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
-    if [ ${mediaro} = 0 ]; then
-        # -o iversion can not be appended in Initramfs (Busybox: #4802)
-        ebegin Remounting ${boot} read-write
-        mount -o remount,rw,iversion ${boot}
-        mediaro=$?
-        eend ${mediaro}
-    else
-        ewarn Boot media is read-only, not remounting
+        # Remount media root read-write (for non-loop/cd/dvd)
+        mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
+        if [ ${mediaro} = 0 ]; then
+            # -o iversion can not be appended in Initramfs (Busybox: #4802)
+            ebegin Remounting ${boot} read-write
+            mount -o remount,rw,iversion ${boot} && /usr/bin/test -w ${boot}
+            mediaro=$?
+            eend ${mediaro}
+        else
+            ewarn Boot media is read-only, not remounting
+        fi
     fi
 
 
@@ -171,48 +174,49 @@ start() {
             echo
         fi
 
-
-        # Mount OTFE filesystem
-        if [ -e /dev/mapper/${OTFEVOLUME} ]; then
-            ebegin Mounting encrypted storage: ${lmount}
-            mount ${lmount}
-            eend $?
-        fi
-
-        # Verify directories and reset file permissions
-        # NOTE: service fails if this verification fails
-        if mountpoint -q ${lmount}; then
-            ebegin Verifying persistence directories and permissions
-
-            # newlines in filename are converted to \012 by getfacl
-            getfacl -npsR ${lmount} | sed -n 's/^# file: //p' | xargs -rd '\n' setfacl -b --
-
-            # similar to cp -an, but without unnecessary inode changes
-            rsync -x -rlpgo --include='**/' --exclude='/**' ${live}${lmount}/ ${lmount}
-            rsync -x -rlpgo --ignore-existing               ${live}${lmount}/ ${lmount}
-
-            # ownership
-            find ${lmount} -xdev -path ${lmount}/cables -prune -o \
-                ! \( -user ${luser} -group ${lgroup} \) -print0   \
-                | xargs -0r chown -h ${luser}:${lgroup} --
-            find ${lmount}/cables -xdev -mindepth 2 ! \( -user ${cuser} -group ${cgroup} \) -print0 \
-                | xargs -0r chown -h ${cuser}:${cgroup} --
-
-            # permissions (sloppy w.r.t dirs, but rsync takes care of dirs that matter)
-            find ${lmount} -xdev -perm /6007 -type d -print0 | xargs -0r chmod ug-s,o-rwx --
-            find ${lmount} -xdev -path ${lmount}/security/cable -prune -o \
-                -perm /7077 ! -type d ! -type l -print0 | xargs -0r chmod go=,u-s --
-
-            # cables certs permissions
-            find ${lmount}/security/cable -xdev ! -perm 710 -type d -print0 | xargs -0r chmod 710 --
-            find ${lmount}/security/cable -xdev ! -perm 640 ! -type d ! -type l -print0 \
-                | xargs -0r chmod 640 --
-
-            eend $?
-        fi
-
     else
         ewarn Skipping OTFE persistence setup
+    fi
+
+
+    # Mount OTFE filesystem
+    if [ -e /dev/mapper/${OTFEVOLUME} ]; then
+        ebegin Mounting encrypted storage: ${lmount}
+        mount ${lmount}
+        eend $?
+    fi
+
+
+    # Verify directories and reset file permissions
+    # NOTE: service fails if this verification fails
+    if mountpoint -q ${lmount}; then
+        ebegin Verifying persistence directories and permissions
+
+        # newlines in filename are converted to \012 by getfacl
+        getfacl -npsR ${lmount} | sed -n 's/^# file: //p' | xargs -rd '\n' setfacl -b --
+
+        # similar to cp -an, but without unnecessary inode changes
+        rsync -x -rlpgo --include='**/' --exclude='/**' ${live}${lmount}/ ${lmount}
+        rsync -x -rlpgo --ignore-existing               ${live}${lmount}/ ${lmount}
+
+        # ownership
+        find ${lmount} -xdev -path ${lmount}/cables -prune -o \
+            ! \( -user ${luser} -group ${lgroup} \) -print0   \
+            | xargs -0r chown -h ${luser}:${lgroup} --
+        find ${lmount}/cables -xdev -mindepth 2 ! \( -user ${cuser} -group ${cgroup} \) -print0 \
+            | xargs -0r chown -h ${cuser}:${cgroup} --
+
+        # permissions (sloppy w.r.t dirs, but rsync takes care of dirs that matter)
+        find ${lmount} -xdev -perm /6007 -type d -print0 | xargs -0r chmod ug-s,o-rwx --
+        find ${lmount} -xdev -path ${lmount}/security/cable -prune -o \
+            -perm /7077 ! -type d ! -type l -print0 | xargs -0r chmod go=,u-s --
+
+        # cables certs permissions
+        find ${lmount}/security/cable -xdev ! -perm 710 -type d -print0 | xargs -0r chmod 710 --
+        find ${lmount}/security/cable -xdev ! -perm 640 ! -type d ! -type l -print0 \
+            | xargs -0r chmod 640 --
+
+        eend $?
     fi
 }
 

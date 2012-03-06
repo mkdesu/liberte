@@ -13,24 +13,24 @@ depend() {
 }
 
 start() {
-    # (copied from lockdown)
-    cddevpath=$(udevadm info -q path -p /dev/block/$(mountpoint -d ${boot}) 2>/dev/null)
+    mediadev=none
+    if mountpoint -q ${boot}; then
+        mediadev=$(readlink -f /dev/block/$(mountpoint -d ${boot}))
+    fi
 
     # Put ATA/SCSI drives into quiet mode
     # /dev/disk/by-path should contain only physical devices
     if [ -e /dev/disk/by-path ]; then
-        hdevs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b  \
-                                      -exec udevadm info -q path -n {} \;`
-        for devpath in ${hdevs}; do
-            dev=/dev/`udevadm info -q name -p ${devpath}`
-
+        devs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b \
+                                     -exec readlink -f {} \;`
+        for dev in ${devs}; do
             if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
                 ebegin Enabled acoustic settings: ${dev}
                 eend 0
             fi
 
             # Ignore boot media (desirable if it is a disk)
-            if [ "${cddevpath#${devpath}}" = "${cddevpath}" ]; then
+            if [ "${mediadev#${dev}}" = "${mediadev}" ]; then
                 if hdparm -y ${dev} 1>/dev/null 2>&1; then
                     ebegin Enabled standby mode: ${dev}
                     eend 0
