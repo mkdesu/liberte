@@ -136,16 +136,23 @@ else
 fi
 
 
+# udev properties accessor
+udevprop() {
+    local devpath="$1" prop="$2"
+    udevadm info -q property -p "${devpath}" | sed -n "s/^${prop}=//p"
+}
+
+
 # Check for wrong block device type (highly unlikely)
 devpath=`udevadm info -q path -n "${dev}"`
-devtype=`udevadm info -q property -p ${devpath} | grep '^DEVTYPE=' | cut -d= -f2`
+devtype=`udevprop ${devpath} DEVTYPE`
 if [ "${devtype}" != partition -a "${devtype}" != disk ]; then
     error "${dev} is neither a disk nor a disk partition"
 fi
 
 
 # Check and normalize filesystem type
-devfs=`udevadm info -q property -p ${devpath} | grep '^ID_FS_TYPE=' | cut -d= -f2`
+devfs=`udevprop ${devpath} ID_FS_TYPE`
 case "${devfs}" in
     '')
         error "${dev} is not formatted, format it as FAT/ext2 or specify a partition instead"
@@ -267,7 +274,7 @@ fi
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
     # Get the parent device
     rdevpath=`dirname ${devpath}`
-    rdev=`udevadm info -q property -p ${rdevpath} | grep '^DEVNAME=' | cut -d= -f2`
+    rdev=`udevprop ${rdevpath} DEVNAME`
 
     echo "*** Installing bootloader to the MBR of ${rdev} ***"
 
@@ -278,7 +285,7 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Check that the parent device is indeed a disk
-    rdevtype=`udevadm info -q property -p ${rdevpath} | grep '^DEVTYPE=' | cut -d= -f2`
+    rdevtype=`udevprop ${rdevpath} DEVTYPE`
     if [ "${rdevtype}" != disk ]; then
         error "${rdev} is not a disk, but ${rdevtype}, aborting"
     fi
@@ -295,7 +302,7 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Check that the partition table is MSDOS
-    ptable=`udevadm info -q property -p ${rdevpath} | grep '^ID_PART_TABLE_TYPE=' | cut -d= -f2`
+    ptable=`udevprop ${rdevpath} ID_PART_TABLE_TYPE`
     if [ "${ptable}" != dos ]; then
         error "Partition table is of type [${ptable}], need MS-DOS"
     fi
