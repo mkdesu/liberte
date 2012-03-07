@@ -37,7 +37,7 @@ mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 
 
 # Parse kernel options
-param_cdroot='/dev/sd* /dev/hd* /dev/sr* /dev/vd* /dev/ubd*'
+param_cdroot='/dev/sd* /dev/sr* /dev/vd*'
 param_cdroot_type=auto
 param_cdroot_flags=noatime
 for param in `cat /proc/cmdline`; do

@@ -24,9 +24,9 @@ depend() {
 
 start() {
     # Lock root account's password, unless gentoo=root was given
-    if ! get_bootparam 'root'; then
-        ebegin Disabling root password
-        usermod -L root
+    if get_bootparam 'root'; then
+        ebegin Enabling root password: liberte
+        usermod -U root
         eend $?
     fi
 

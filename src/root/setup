@@ -449,6 +449,7 @@ grpck -r
 grpconv
 
 echo root:liberte | chpasswd
+usermod -L root
 
 groupadd -f -r games
 groupadd -f -r plugdev
