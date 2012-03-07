@@ -2,7 +2,7 @@
 
 description="Configures X server and sound."
 
-silentflag=/etc/splash/silent/active
+silentflag=/var/run/nologo
 
 xorgdir=/etc/X11
 xorglog=/var/log/Xorg.0.log
@@ -15,13 +15,16 @@ depend() {
     # need /etc mount
     need   localmount
 
+    # using /var/run
+    after bootmisc
+
     # X server is configured here
     before xdm
 }
 
 start() {
-    if egrep -q '\<splash=([^ ]*,)?theme:silent\>' /proc/cmdline; then
-        ebegin Enabling silent theme
+    if get_bootparam 'nologo'; then
+        ebegin Disabling desktop branding
         touch ${silentflag}
         eend $?
     fi

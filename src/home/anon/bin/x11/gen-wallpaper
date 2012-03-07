@@ -4,10 +4,10 @@ dir=${HOME}/config/images
 svg=${dir}/liberte-logo-nofont.svg
 png=${dir}/liberte-logo-wallpaper.png
 
-silentflag=/etc/splash/silent/active
+silentflag=/var/run/nologo
 silentpng=${dir}/liberte-logo-empty.png
 
-vmtype=/etc/vmtype
+vmtype=/var/run/vmtype
 vmfont=/usr/share/fonts/dejavu/DejaVuSans.ttf
 
 timeout=120
@@ -31,7 +31,7 @@ if [ ! -e ${png} ]; then
     calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
     size=`qalc -t "${calc}"`
 
-    # Do not use the logo if silent splash theme has been specified
+    # Do not use the logo if gentoo=nologo has been specified
     if [ -e ${silentflag} ]; then
         cp ${silentpng} ${png}
     # Black background is needed for xlock (display +matte has no antialiasing)

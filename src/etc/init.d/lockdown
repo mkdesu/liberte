@@ -15,6 +15,9 @@ depend() {
     # this is a boot-level service
     need localmount
 
+    # using /var/run
+    after bootmisc
+
     # power-off watchdog uses kexec
     use kexec
 }

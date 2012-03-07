@@ -88,18 +88,12 @@ start() {
 
     # Create (big) private key + communication certificates + username
     if [ ! -e ${certsdir} ]  &&  mountpoint -q ${lmount}; then
-        # Import splash functions (with an OpenRC compatibility hack)
-        . /sbin/splash-functions.sh
-        input_begin()   { splash svc_input_begin ${RC_SVCNAME}; }
-        input_end()     { splash svc_input_end   ${RC_SVCNAME}; }
-
-
         echo
         ebegin Generating communication certificates
         einfo 'It is a one-time operation - please do not interrupt'
         echo
 
-        input_begin
+        # input_begin
 
         # Temporarily fix the date while generating certificates, otherwise
         # the certificates might be generated with an invalid (future) date
@@ -110,7 +104,7 @@ start() {
         eend $?
         date -us "${curdate} `date -u +-%H%M`" 1>/dev/null
 
-        input_end
+        # input_end
     fi
 
 

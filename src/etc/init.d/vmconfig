@@ -2,7 +2,7 @@
 
 description="Configures the system as a guest in virtual machine."
 
-vmflag=/etc/vmtype
+vmflag=/var/run/vmtype
 
 cleanlabel() {
     local label="$1"
@@ -13,6 +13,9 @@ cleanlabel() {
 depend() {
     # need /etc
     need localmount
+
+    # using /var/run
+    after bootmisc
 
     # don't bother autofs with SIGHUPs from ps-mount
     before autofs

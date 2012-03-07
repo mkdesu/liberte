@@ -90,11 +90,6 @@ cp -a ${ovt/2011.12.20.562307/2011.11.20.535097} ${ovt}
 sed -i 's/src_prepare/&_off/'                    ${ovt}
 ebuild ${ovt} manifest
 
-# (#401127)
-sut=/usr/portage/media-gfx/splashutils/splashutils-1.5.4.4.ebuild
-spatch ${HOME}/patches/portage/splashutils.patch -p0
-ebuild ${sut} manifest
-
 # (#348367)
 jsw=/usr/portage/dev-java/java-service-wrapper/java-service-wrapper-3.3.3.ebuild
 spatch ${HOME}/patches/portage/java-service-wrapper.patch -p0
@@ -112,7 +107,7 @@ grep -q "^DIST uim-1.7.3.tar.bz2 .* SHA256 ${uimhash}\>" ${uim%/*}/Manifest
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
-    # emerge -q1 dev-libs/klibc media-gfx/splashutils sys-apps/v86d
+    # emerge -q1 dev-libs/klibc sys-apps/v86d
     #            app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
@@ -135,7 +130,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
 
     sinfo "Applying kernel patches"
-    spatch /usr/local/portage/distfiles/fbcondecor-0.9.6-3.0-rc2.patch   -d /usr/src/linux -p1
     spatch /usr/local/portage/distfiles/unionfs-2.5.11_for_3.2.2.diff.gz -d /usr/src/linux -p1
 
 
@@ -399,7 +393,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 sinfo "Configuring start-up services"
 svcsysinit="udev"
 svcboot="consolefont irqbalance haveged metalog
-         iptables consolekit alsasound fbcondecor lockdown"
+         iptables consolekit alsasound lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy

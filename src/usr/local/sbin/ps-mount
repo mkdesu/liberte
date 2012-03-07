@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
-# Apparently, very weird things can happen if some output goes
-# to console ("grep: command not found" in splash-functions.sh...)
+# Weird things can happen if some output goes to console
 exec 1>/dev/null 2>&1
 
 # Use of auto.media is exclusive via file lock

@@ -74,6 +74,6 @@ if [ -z "${NO_STARTX}" ]; then
         fi
 
         # Switch from silent splash mode VT (if any)
-        chvt 1
+        # chvt 1
     fi
 fi

@@ -1,5 +1,0 @@
-# If tty list is not provided, rc_tty_number is used
-FBCONDECOR_TTYS="1 2 4"
-
-# Set per-console themes, space-separated
-# FBCONDECOR_TTY_MAP="1:liberte"

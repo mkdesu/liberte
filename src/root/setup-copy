@@ -49,7 +49,6 @@ ebuilds="app-misc/ca-certificates
          gnome-base/librsvg
          media-fonts/font-misc-meltho
          media-gfx/exiv2
-         media-gfx/splashutils
          media-plugins/gst-plugins-vp8
          net-dialup/pptpclient
          net-im/pidgin
@@ -89,12 +88,10 @@ sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
 sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient}
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
-# [cpio]                            splashutils:      splash_geninitramfs
 # [debianutils]                     ca-certificates:  update-ca-certificates
 # [xcb-proto]                       xcb-util-wm:      not needed              (#398953, upstream)
 # [eclipse-ecj,gjdoc]               jamvm:            javac, javadoc symlinks (#371461)
 # [encodings,mkfontdir,mkfontscale] font-misc-meltho: not needed              (#312077)
-sed -i s:app-arch/cpio::              ${ebuild_splashutils}
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'  ${ebuild_xcbutilwm}
 sed -i 's:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
@@ -306,13 +303,6 @@ rezip /usr/share/java-service-wrapper/lib/wrapper.jar
 for jar in /opt/i2p/lib/*.jar /opt/i2p/webapps/*.war; do
     rezip ${jar}
 done
-
-
-# /lib/rc/plugins/splash.so can't be patched (fbsplashd)
-sinfo "Substituting dynamic executables for splashutils"
-ln -snf ../usr/sbin/fbsplashd      /sbin/fbsplashd.static
-ln -snf ../usr/sbin/fbcondecor_ctl /sbin/fbcondecor_ctl.static
-ln -snf ../usr/sbin/splash_util    /sbin/splash_util.static
 
 
 # (#400921, #398931)

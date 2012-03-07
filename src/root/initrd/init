@@ -25,7 +25,6 @@ mrwroot=${slive}/mnt/rwroot
 # External scripts
 . /etc/modules.fs
 . /etc/init.scripts
-# . /etc/init.splash
 
 
 # Mount virtual filesystems
@@ -57,7 +56,7 @@ if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
     vesa_mode=${vesa_mode%%,*}
 
     echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap"
-    force_load="${force_load} uvesafb"
+    force_load="${force_load} fbcon uvesafb"
 else
     echo "blacklist uvesafb"
 fi > /etc/modprobe.d/framebuffer.conf
@@ -91,7 +90,6 @@ rundebugshell
 
 
 # No "udevadm settle" with mdev, so just loop
-splash init
 good_msg "Looking for the media"
 tested=' '
 waitmsg=0
@@ -207,8 +205,6 @@ rundebugshell
 good_msg 'Booting (initramfs)'
 if [ ! -e ${slive}/dev/console  -o  ! -e ${slive}/dev/null ]; then
     bad_msg 'Real /dev is missing files required to boot (console and null)'
-elif [ -e /etc/init.splash      -a  ! -e ${slive}/dev/tty1 ]; then
-    bad_msg 'Real /dev is missing tty1, which is required for splash'
 fi
 
 
@@ -224,7 +220,6 @@ exec switch_root -c /dev/console ${slive} /sbin/init
 
 
 # If we get here, something bad has happened
-splash verbose
 echo 'A fatal error has probably occured since /sbin/init did not'
 echo 'boot correctly. Trying to open a shell...'
 exec sh

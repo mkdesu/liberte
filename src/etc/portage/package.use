@@ -19,11 +19,11 @@ app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
 # Drivers
-# (fbdev conflicts with vesa, mesa's vmware is gallium-only, vbox dri conflicts w/ mprotect)
 # [temporarily disable gallium until r600 can be enabled w/o r300 due to llvm dependency]
 # [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
+# [fbdev conflicts with vesa, vbox dri conflicts w/ mprotect]
+media-libs/mesa                 shared-dricore -gallium -egl -llvm
 x11-base/xorg-drivers           -video_cards_fbdev
-media-libs/mesa                 -video_cards_vmware shared-dricore -gallium -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 sys-fs/ntfsprogs                minimal -crypt
@@ -84,15 +84,11 @@ app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
-media-gfx/splashutils           -truetype
 x11-themes/gtk-engines-murrine  -themes
 
 # Extra functionality
 sys-apps/busybox                static savedconfig
 sys-kernel/linux-firmware       savedconfig
-virtual/jpeg                    static-libs
-media-libs/jpeg                 static-libs
-media-libs/libpng               static-libs
 sys-devel/gcc                   cxx
 sys-fs/udev                     gudev
 media-libs/openjpeg             tools

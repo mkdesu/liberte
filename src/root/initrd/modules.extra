@@ -34,3 +34,4 @@ pcmcia
 
 # VESA framebuffer
 uvesafb
+fbcon

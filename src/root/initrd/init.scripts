@@ -11,7 +11,6 @@ good_msg() {
 }
 
 bad_msg() {
-    splash verbose
     echo -e "${tag_bad}!!${tag_normal}${tag_bold} ${1:-...}${tag_normal}"
 }
 
@@ -34,7 +33,3 @@ rundebugshell() {
         ash
     fi
 }
-
-
-# Default implementation in absence of init.splash
-splash() { return 0; }

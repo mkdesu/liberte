@@ -12,10 +12,6 @@ sys-apps/kexec-tools
 sys-apps/memtest86+
 net-dialup/mingetty
 
-# Framebuffer
-sys-apps/v86d
-media-gfx/splashutils
-
 # Firmware
 sys-apps/microcode-data
 sys-kernel/amd-ucode
@@ -129,6 +125,8 @@ sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils
 sys-apps/pcmciautils
+sys-apps/v86d
+sys-libs/gpm
 net-wireless/bluez
 sys-fs/obexfs
 dev-libs/opensc
@@ -138,6 +136,7 @@ sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
 media-tv/v4l-utils
+media-gfx/fbgrab
 games-util/joystick
 app-misc/joy2key
 net-print/ink

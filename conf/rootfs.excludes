@@ -63,7 +63,6 @@
 /usr/share/openrc/
 /usr/share/openvpn/
 /usr/share/readline/
-/usr/share/splashutils/
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
@@ -131,7 +130,6 @@
 /etc/sgml/
 /etc/ca-certificates/
 /etc/ca-certificates.conf
-/etc/splash/*.ttf
 /usr/lib/cracklib_dict.*
 /usr/share/sounds/alsa/
 /usr/local/bin/uname
@@ -157,10 +155,6 @@
 /opt/i2p/*i2psnark*
 
 # Statically linked binaries (and symlinks)
-# (other splashutils static binaries are substituted with dynamic,
-#  except for /sbin/fbcondecor_helper which is needed by FBCONDECOR)
-/sbin/fbtruetype.static
-/sbin/fbsplashctl
 /sbin/ldconfig
 /sbin/sln
 
@@ -174,12 +168,6 @@
 /usr/bin/libglade-convert
 # x11-libs/gtk+: glade -> xml conversion
 /usr/bin/gtk-builder-convert
-# media-gfx/splashutils: themes creation and conversion,
-# cpio-using initramfs generator
-/usr/bin/splash_resize
-/usr/bin/bootsplash2fbsplash
-/usr/bin/splashy2fbsplash.py
-/usr/sbin/splash_geninitramfs
 # net-misc/ntp: servers chain tracer, ntpq loop wrapper
 /usr/bin/ntptrace
 /usr/bin/ntp-wait

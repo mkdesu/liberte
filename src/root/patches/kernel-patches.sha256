@@ -1,4 +1,2 @@
 # URL http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5.11_for_3.2.2.diff.gz
-# URL http://dev.gentoo.org/~spock/projects/fbcondecor/archive/fbcondecor-0.9.6-3.0-rc2.patch
 ce6ffa3c17a11dcca24196c11f6efc95c59b65a5b99958e73e8d4cc8e4b1f1ef  /usr/local/portage/distfiles/unionfs-2.5.11_for_3.2.2.diff.gz
-4dfeb082f912732c9fed05f0b66b547813271e83a495aa0c9bc559778a90f5e4  /usr/local/portage/distfiles/fbcondecor-0.9.6-3.0-rc2.patch
