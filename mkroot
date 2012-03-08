@@ -203,7 +203,6 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
           ${LIVECD}/src/dev/random ${LIVECD}/src/dev/urandom
     ln -s /proc/self/fd ${LIVECD}/src/dev/
     mkdir ${LIVECD}/src/dev/pts    ${LIVECD}/src/dev/.udev
-    mknod -m 600 ${LIVECD}/src/dev/initctl p
 
 
     sinfo "Extracting portage to ${LIVECD}/src/usr"

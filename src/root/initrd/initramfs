@@ -1,17 +1,15 @@
-# Device nodes (partly needed by v86d)
+# Pre-devtmpfs device nodes
 dir   dev            0755 0 0
 nod   dev/null       0666 0 0  c 1 3
-nod   dev/zero       0666 0 0  c 1 5
 nod   dev/console    0600 0 0  c 5 1
-nod   dev/tty1       0600 0 0  c 4 1
-nod   dev/mem        0600 0 0  c 1 1
 
 # Init scripts
 dir   etc            0755 0 0
-dir   etc/modprobe.d 0755 0 0
+dir   sbin           0755 0 0
 file  init              /root/initrd/init         0755 0 0
 file  etc/init.scripts  /root/initrd/init.scripts 0644 0 0
 file  etc/modules.fs    /root/initrd/modules.fs   0644 0 0
+file  sbin/hotplug      /root/initrd/hotplug      0755 0 0
 
 # Init scripts support
 dir   stage          0755 0 0
@@ -20,16 +18,9 @@ dir   stage/live     0755 0 0
 dir   stage/rwroot   0755 0 0
 dir   stage/union    0755 0 0
 
-# Busybox (mdev link not in /sbin due to a bug in gen_init_cpio)
+# Busybox
 dir   bin            0755 0 0
 file  bin/busybox       /bin/busybox              0755 0 0
-file  etc/mdev.conf     /root/initrd/mdev.conf    0644 0 0
-slink bin/mdev          busybox                   0777 0 0
-
-# v86d
-dir   root           0700 0 0
-dir   sbin           0755 0 0
-file  sbin/v86d         /sbin/v86d                0755 0 0
 
 # Mount points
 dir   proc           0755 0 0

@@ -3,6 +3,9 @@
 # sys-kernel/linux-firmware sublist
 fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
 
+# initramfs image
+initrd=/boot/initrd-x86.xz
+
 
 # serial_cs:          necessary firmware included by kernel automatically
 # b43, b43legacy:     net-wireless/b43-firmware
@@ -19,4 +22,13 @@ for fw in $(strings -a -n 10                               \
     if [ ! -e /lib/firmware/${fw} ] && ! grep -q "^${fw}\$" ${fwlst}; then
         echo ${fw}
     fi
+done
+
+
+# Ensure that initramfs modules do not require any firmware
+for fw in $(strings -a -n 10                                           \
+              $(bsdtar tf ${initrd} 'lib/modules/*.ko' | sed 's:^:/:') \
+              | sed -n 's/^firmware=//p'                               \
+              | sort -u); do
+    echo initramfs: ${fw}
 done

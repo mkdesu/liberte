@@ -1,7 +1,7 @@
 2012-03-XX
   + 2012.1 release
 
-  * Kernel 3.3.2
+  * Kernel 3.3.2 with devtmpfs in initramfs
   * Fixed memory wiping in KEXEC kernel
   * Removed almost all PaX protection exceptions
   * Fixed multilingual disk labels support for automount
@@ -20,7 +20,7 @@
   * setup.sh is now more robust (MBR write fix, 64-bit-only systems warning)
 
   * Cables communication now maintains repudiability
-  * Added Open Virtualization bundle (OVA)
+  * Added Open Virtualization bundle (OVA) (backported to 2011.2)
 
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail

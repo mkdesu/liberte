@@ -35,6 +35,9 @@ mount -t sysfs sysfs /sys
 mount -t tmpfs -o mode=700,nosuid,nodev,noexec tmpfs ${srwroot}
 mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 
+# Mount devtmpfs filesystem (noexec: (#92921))
+mount -t devtmpfs -o nosuid devtmpfs /dev
+
 
 # Parse kernel options
 param_cdroot='/dev/sd* /dev/sr* /dev/vd*'
@@ -55,25 +58,21 @@ if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
     vesa_mode=${param_video#uvesafb:}
     vesa_mode=${vesa_mode%%,*}
 
-    echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap"
-    force_load="${force_load} fbcon uvesafb"
-else
-    echo "blacklist uvesafb"
-fi > /etc/modprobe.d/framebuffer.conf
-cp -a /etc/modprobe.d ${srwroot}/etc
+    # Overrides uvesafb blacklist in underlying live fs file
+    mkdir ${srwroot}/etc/modprobe.d
+    echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap" > ${srwroot}/etc/modprobe.d/framebuffer.conf
+fi
 
 
+# Hotplugging is handled similarly in /sbin/hotplug (UEVENT_HELPER_PATH)
 good_msg 'Loading modules'
-
-# Setup hotplugging before starting coldplugging
-echo /bin/mdev > /proc/sys/kernel/hotplug
 
 oldmods=
 newmods=" ${force_load} "
 while [ "${oldmods}" != "${newmods}" ]; do
     for modalias in ${newmods}; do
         if ! echo "${oldmods}" | grep -q " ${modalias} "; then
-            modprobe -q ${modalias} 2>/dev/null
+            modprobe -qb ${modalias}
         fi
     done
 
@@ -81,15 +80,12 @@ while [ "${oldmods}" != "${newmods}" ]; do
     newmods=' '$(cat $(find /sys/devices -name modalias) | sort -u | tr '\n' ' ')
 done
 
-# Start device manager
-mdev -s
-
 
 # Run debug shell if requested
 rundebugshell
 
 
-# No "udevadm settle" with mdev, so just loop
+# No "udevadm settle", so just loop
 good_msg "Looking for the media"
 tested=' '
 waitmsg=0
@@ -100,8 +96,8 @@ while true; do
         waitmsg=0
 
         # Incorrect USB hubs? (VMWare)
-        modprobe -q sd_mod      2>/dev/null
-        modprobe -q usb-storage 2>/dev/null
+        modprobe -b sd_mod
+        modprobe -b usb-storage
     fi
 
     for mediadev in ${param_cdroot}; do
@@ -203,12 +199,8 @@ rundebugshell
 
 
 good_msg 'Booting (initramfs)'
-if [ ! -e ${slive}/dev/console  -o  ! -e ${slive}/dev/null ]; then
-    bad_msg 'Real /dev is missing files required to boot (console and null)'
-fi
 
-
-# Disable mdev hotplug, and disable time change logging (hwclock starts before sysctl)
+# Disable hotplugging and time change logging (hwclock starts before sysctl)
 echo   > /proc/sys/kernel/hotplug
 echo 0 > /proc/sys/kernel/grsecurity/timechange_logging
 umount /sys  || bad_msg 'Failed to unmount /sys'
@@ -216,6 +208,7 @@ umount /proc || bad_msg 'Failed to unmount /proc'
 
 
 cd ${slive}
+mount -o move /dev ${slive}/dev
 exec switch_root -c /dev/console ${slive} /sbin/init
 
 

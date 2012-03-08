@@ -1,9 +1,3 @@
 boot
+dev
 tmp/transient
-dev/null
-dev/ptmx
-dev/random
-dev/urandom
-dev/fd
-dev/pts
-dev/.udev
