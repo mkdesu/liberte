@@ -1,7 +1,7 @@
 2012-03-XX
   + 2012.1 release
 
-  * Kernel 3.3.2 with devtmpfs in initramfs
+  * Kernel 3.2.2 with devtmpfs in initramfs
   * Fixed memory wiping in KEXEC kernel
   * Removed almost all PaX protection exceptions
   * Fixed multilingual disk labels support for automount
@@ -12,6 +12,8 @@
   * Better filesystem security (read-only root fs)
   * CD boot media ejection now triggers shutdown (same as USB boot media)
   * Filesystem is now FHS-3.2+/run-compliant
+  * Removed framebuffer console splash and decoration
+  * Reworked framebuffer handling and simplified boot menu entries
   * Added SquashFS image verification during early boot
   * Added "readonly" boot parameter for disabling persistence
   * Added "toram" boot parameter for copying root filesystem to RAM

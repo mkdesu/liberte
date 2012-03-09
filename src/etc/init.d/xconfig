@@ -11,6 +11,7 @@ xorgdrv=/usr/lib/xorg/modules/drivers
 amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
 
+
 depend() {
     # need /etc mount
     need   localmount
@@ -22,12 +23,14 @@ depend() {
     before xdm
 }
 
+
 start() {
     if get_bootparam 'nologo'; then
         ebegin Disabling desktop branding
         touch ${silentflag}
         eend $?
     fi
+
 
     # Select preferred audio card based on the number of mixer controls
     if [ -e /proc/asound ]; then
@@ -52,6 +55,7 @@ start() {
         ${amixerrst}
         eend $?
     fi
+
 
     # Configure X server, unless "nox" is given to kernel
     if get_bootparam 'nox'; then

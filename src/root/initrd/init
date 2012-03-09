@@ -29,6 +29,7 @@ mrwroot=${slive}/mnt/rwroot
 
 # Mount virtual filesystems
 mount -t proc  proc  /proc
+echo 0 > /proc/sys/kernel/grsecurity/audit_mount
 mount -t sysfs sysfs /sys
 
 # Mount rwroot tmpfs directory (nosuid,... don't affect unionfs)
@@ -44,28 +45,16 @@ param_cdroot='/dev/sd* /dev/sr* /dev/vd*'
 param_cdroot_type=auto
 param_cdroot_flags=noatime
 for param in `cat /proc/cmdline`; do
-    eval param_${param%%=*}=${param#*=}
+    eval param_${param%%[=.]*}=${param#*=} 2>/dev/null
 done
-
-
-# Specify required filesystem modules (no autoloading on mount)
-# Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
-eval force_load=\"loop squashfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
-
-
-# Handle uvesafb, and propagate options to rwroot
-if [ "${param_video}" != "${param_video#uvesafb:}" ]; then
-    vesa_mode=${param_video#uvesafb:}
-    vesa_mode=${vesa_mode%%,*}
-
-    # Overrides uvesafb blacklist in underlying live fs file
-    mkdir ${srwroot}/etc/modprobe.d
-    echo "options uvesafb mode_option=${vesa_mode} mtrr=3 scroll=ywrap" > ${srwroot}/etc/modprobe.d/framebuffer.conf
-fi
 
 
 # Hotplugging is handled similarly in /sbin/hotplug (UEVENT_HELPER_PATH)
 good_msg 'Loading modules'
+
+# Specify required filesystem modules (no autoloading on mount)
+# Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
+eval force_load=\"loop squashfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
 
 oldmods=
 newmods=" ${force_load} "

@@ -5,5 +5,5 @@ exec </dev/null 1>/dev/console 2>&1
 
 
 if [ "${ACTION}" = add  -a  -n "${MODALIAS}" ]; then
-    modprobe -qb "${MODALIAS}"
+    exec modprobe -qb "${MODALIAS}"
 fi

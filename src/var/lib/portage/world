@@ -136,6 +136,7 @@ sys-power/acpid
 sys-apps/lm_sensors
 media-sound/alsa-utils
 media-tv/v4l-utils
+sys-apps/fbset
 media-gfx/fbgrab
 games-util/joystick
 app-misc/joy2key

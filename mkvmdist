@@ -118,8 +118,6 @@ rsync -aHS ${cdroot}/liberte ${vmstage}/vpart
 
 sinfo "Installing boot manager"
 ${cdroot}/liberte/setup.sh ${loop}
-sed -i 's/^\(DEFAULT[[:blank:]]\+\)liberte\+\>/\1nokms/' \
-       ${vmstage}/vpart/liberte/boot/syslinux/ext/extlinux.conf
 
 
 sinfo "Unmounting filesystem"

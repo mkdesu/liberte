@@ -223,6 +223,8 @@
 /usr/bin/gst-visualise*
 # media-video/totem: bug reporting
 /usr/libexec/totem/totem-bugreport.py
+# sys-apps/fbset: modeline to fb.modes translator
+/usr/bin/modeline2fb
 
 # OpenSSH server
 /etc/ssh/sshd_config
