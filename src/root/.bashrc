@@ -9,4 +9,18 @@ alias g="grep"
 alias du="du -ks"
 alias ..="cd .."
 
-alias okroot="unset TMOUT; usermod -U root"
+okroot() {
+    if [ -n "${TMOUT}" ]; then
+        unset TMOUT
+        echo 'shell timeout: removed'
+    else
+        echo 'shell timeout: not set'
+    fi
+
+    if grep -q '^root:!' /etc/shadow; then
+        usermod -U root
+        echo 'root account:  unlocked'
+    else
+        echo 'root account:  not locked'
+    fi
+}
