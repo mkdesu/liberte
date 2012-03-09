@@ -31,19 +31,16 @@ done
 
 # Build list of modules to copy, including dependencies
 for mod in ${extmods} ${globmods}; do
-    # extract canonical name (e.g., _ vs. -, aliases, ...)
-    mod=$(basename $(modinfo -F filename -k ${kversion} ${mod}))
-
-    # unlike "modinfo -F depends", modules.dep lists nested dependencies
-    grep /${mod}: /lib/modules/${kversion}/modules.dep \
-        | tr -d : | tr ' ' '\n' >> ${modlst}
+    # unlike "modinfo -F depends", "modprobe -i --show-depends" lists nested
+    # dependencies, and does it with canonical paths (i.e., _ vs. -, aliases, ...)
+    modprobe -ni --show-depends -S ${kversion} ${mod} \
+        | sed -n 's/^insmod //p' >> ${modlst}
 done
 
 
 # Copy modules and compute their dependencies and map
 # (depmod will fail if not all dependencies are present)
 for mod in `sort -u ${modlst}`; do
-    mod=/lib/modules/${kversion}/${mod}
     mkdir -p     ${stagedir}`dirname ${mod}`
     cp -p ${mod} ${stagedir}`dirname ${mod}`
 done
