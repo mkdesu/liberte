@@ -17,9 +17,6 @@ depend() {
 
     # using /var/run
     after bootmisc
-
-    # power-off watchdog uses kexec
-    use kexec
 }
 
 start() {

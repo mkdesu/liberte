@@ -106,7 +106,7 @@ net-misc/tor
 net-misc/connect
 net-misc/whois
 net-p2p/i2p
-net-proxy/tsocks
+net-proxy/torsocks
 net-proxy/privoxy
 net-mail/cables
 

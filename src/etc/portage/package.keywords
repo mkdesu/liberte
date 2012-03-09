@@ -8,7 +8,8 @@
 =dev-java/java-service-wrapper-3.3.3*
 =sys-boot/efibootmgr-0.5.4*
 
-# Network
+# Network (torsocks: (#395215))
+=net-proxy/torsocks-1.2*
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
