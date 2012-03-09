@@ -95,14 +95,6 @@ jsw=/usr/portage/dev-java/java-service-wrapper/java-service-wrapper-3.3.3.ebuild
 spatch ${HOME}/patches/portage/java-service-wrapper.patch -p0
 ebuild ${jsw} manifest
 
-# (#401143)
-uim=/usr/portage/app-i18n/uim/uim-1.7.3.ebuild
-uimhash=d2909d2d624a92677935461ce03413f33b7e5af6e19796410406628e59bd561c
-cp -a ${uim/1.7.3/1.7.1-r1} ${uim}
-sed -i /1.7.1-qt4.patch/d   ${uim}
-ebuild ${uim} manifest
-grep -q "^DIST uim-1.7.3.tar.bz2 .* SHA256 ${uimhash}\>" ${uim%/*}/Manifest
-
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
