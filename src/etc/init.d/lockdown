@@ -48,7 +48,7 @@ start() {
     # See also: /etc/acpi/default.sh
     if [ ! -e ${lidevents} ]; then
         ebegin Creating closed lid indicator
-        checkpath -q -d -m 750 -o root:video ${lidevents}
+        checkpath -q -d -m 750 -o root:wheel ${lidevents}
         touch ${lidevents}/close.flag
         eend $?
     fi

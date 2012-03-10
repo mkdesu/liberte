@@ -9,10 +9,12 @@ if [ "${TERM}" = linux ]; then
     setterm -blength 0
     echo -ne "\033[?17;0;64c"
 
-    TMOUT=120
+    if grep -q '^root:!' /etc/shadow; then
+        TMOUT=120
 
-    echo 'Type "okroot" to enable root account (password: liberte).'
-    echo 'This login session will time out after 2 minutes.'
+        echo 'Type "okroot" to enable root account (password: liberte).'
+        echo 'This login session will time out after 2 minutes.'
+    fi
 fi
 
 . ${HOME}/.bashrc

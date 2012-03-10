@@ -29,7 +29,7 @@ case "${group}" in
                         lidevents=/var/run/lid-events
                         if [ ! -e ${lidevents} ]; then
                             mkdir -m 750   ${lidevents} 2>/dev/null
-                            chgrp -h video ${lidevents}
+                            chgrp -h wheel ${lidevents}
                         fi
                         touch ${lidevents}/close.flag
                         ;;

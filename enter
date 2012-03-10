@@ -106,10 +106,6 @@ else
         ${RSYNC} --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
     fi
 
-    if [ -e ${LIVECD}/usr/bin/xcdroast ]; then
-        find ${LIVECD}/usr/lib/xcdroast-*/bin/xcdrwrap ! -perm 4755 -exec chmod 4755 {} \;
-    fi
-
     if [ -e ${LIVECD}/var/log/nginx ]; then
         find ${LIVECD}/var/log/nginx -maxdepth 0         ! -perm 2750 -exec chmod 2750 {} \;
         find ${LIVECD}/var/tmp/nginx -maxdepth 1 -type d ! -perm  750 -exec chmod  750 {} \;
