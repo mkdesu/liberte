@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 # Add "force" parameter to skip Tor circuit check
 
@@ -24,6 +24,7 @@ xhost +si:localuser:${nofw}
 
 
 # DISPLAY is preserved by sudo
+set +e
 sudo -n -u ${nofw} /usr/local/sbin/unsafe-browser
 sudo -n            /usr/local/sbin/slay ${nofw}
 

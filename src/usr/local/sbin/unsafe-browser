@@ -6,21 +6,14 @@ umask 077
 # This command is run via "sudo -u nofw"
 # Available environment: HOME, USER
 
+# pam_namespace takes care of reinitializing directories
+
+
 # Some sanity checks
 if [ "${HOME}" != /home/nofw ]; then
     echo "This program should be run via sudo"
     exit 1
 fi
-
-refdir=/mnt/live${HOME}
-if [ ! -e ${refdir} ]; then
-    echo "Could not locate reference directory"
-    exit 1
-fi
-
-
-# Reinitialize home directory
-rsync -aHAXS -x --delete-excluded ${refdir}/ ${HOME}
 
 
 # Rely on pam_mktemp (sudo doesn't pass default variables)
@@ -41,11 +34,4 @@ export GST_REGISTRY_UPDATE=no
 
 
 # Run Midori (which uses getpwent instead of ${HOME})
-set +e
-midori -c ${XDG_CONFIG_HOME}/midori
-
-
-# Reinitialize home directory
-# (rm fails to rmdir ${USER} from /tmp/.private)
-rsync -aHAXS -x --delete-excluded ${refdir}/ ${HOME}
-rm -rf --one-file-system ${TMPDIR} 2>/dev/null
+exec midori -c ${XDG_CONFIG_HOME}/midori

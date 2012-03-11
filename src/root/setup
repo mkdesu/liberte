@@ -273,6 +273,7 @@ mkdir -p /usr/lib/xchat/plugins
 cflags="-std=c99 -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
 gcc  ${cflags} -o /usr/local/sbin/udev-watchdog      /usr/local/src/udev-watchdog.c -ludev
 gcc  ${cflags} -o /usr/local/sbin/slay               /usr/local/src/slay.c
+gcc  ${cflags} -o /usr/local/sbin/privsh             /usr/local/src/privsh.c
 gcc  ${cflags} -o /usr/local/bin/log-limit           /usr/local/src/log-limit.c
 gcc  ${cflags} -o /usr/lib/xchat/plugins/cap_sasl.so /usr/local/src/cap_sasl.c -shared -fPIC \
      -D _GNU_SOURCE -I /usr/include/glib-2.0 -I /usr/lib/glib-2.0/include -Wl,--export-dynamic
@@ -283,6 +284,7 @@ klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.
 
 strip -s /usr/local/sbin/udev-watchdog       \
          /usr/local/sbin/slay                \
+         /usr/local/sbin/privsh              \
          /usr/local/bin/log-limit            \
          /usr/local/addons/initrd/init-kexec \
          /usr/lib/xchat/plugins/cap_sasl.so
@@ -375,7 +377,7 @@ sed "s@VERSION@${LVERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab iptables htpdate"
+initpatches="inittab system-auth iptables htpdate"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done

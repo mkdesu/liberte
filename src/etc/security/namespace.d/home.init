@@ -1,0 +1,18 @@
+#!/usr/local/sbin/privsh -e
+
+live=/mnt/live
+
+poly="$1"
+instance="$2"
+new="$3"
+user="$4"
+
+
+if [ "${new}" = 1 ]; then
+    /bin/chmod 700  "${poly}"
+    /bin/chgrp -h 0 "${poly}"
+    /bin/mount -o remount,nosuid,nodev,noexec "${poly}"
+    /usr/bin/rsync -aHAXS -x --delete-excluded ${live}"${poly}"/ "${poly}"
+else
+    echo "WARNING: non-new polyinstantiation directory" 1>&2
+fi

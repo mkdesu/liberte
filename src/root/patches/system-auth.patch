@@ -1,0 +1,10 @@
+--- /etc/pam.d/system-auth	2012-02-09 00:27:23.000000000 +0000
++++ /etc/pam.d/system-auth.new	2012-03-10 20:49:42.000000000 +0000
+@@ -10,6 +10,7 @@
+  
+ session		required	pam_limits.so 
+ session		required	pam_env.so 
++session		required	pam_namespace.so 
+ session		optional	pam_mktemp.so
+ session		required	pam_unix.so 
+ session		optional	pam_permit.so
