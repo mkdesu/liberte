@@ -128,11 +128,11 @@ fi
 for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; do
     mount -B ${dir} ${LIVECD}${dir}
 done
-mount -o remount,ro ${LIVECD}/proc
+mount -rB -o remount ${LIVECD}/proc
 
 if [ ${PHASE} = copy -a -d ${LIVECD}/usr/portage ]; then
     mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
-    mount -o remount,ro ${LIVECD}/usr/portage
+    mount -rB -o remount ${LIVECD}/usr/portage
 fi
 
 if [ -d /usr/portage/distfiles -a -d ${LIVECD}/usr/portage/distfiles ]; then

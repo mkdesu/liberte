@@ -64,7 +64,7 @@ fi
 
 sinfo "Copying USB /boot"
 mkdir -p -m 755 ${cdroot} ${cdroot}/liberte ${cdroot}/isolinux
-rsync -aHAXS -i --delete-excluded --exclude /boot/syslinux/version \
+rsync -aHS -i --delete-excluded --exclude /boot/syslinux/version \
     ${livecd}/boot ${cdroot}/liberte
 
 
