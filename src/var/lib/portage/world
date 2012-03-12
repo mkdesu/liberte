@@ -61,7 +61,6 @@ app-arch/arj
 app-arch/lha
 sys-fs/inotify-tools
 sys-fs/ntfs3g
-sys-fs/ntfsprogs
 sys-fs/dosfstools
 sys-fs/udftools
 net-fs/autofs
@@ -112,7 +111,8 @@ net-mail/cables
 
 # Peripheral utilities
 sys-apps/irqbalance
-sys-apps/x86info
+# (#367823, #400743)
+# sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
 sys-power/powertop

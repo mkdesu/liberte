@@ -30,6 +30,7 @@
   * Replaced SCIM with uim
   * Added gFTP file transfer client
   * Replaced Xarchiver with File Roller
+  * Unsafe Browser execution environment is sanitized with pam_namespace
 
   * Unsafe Browser now refuses to run once Tor has established a circuit
   * Added keyboard layout configuration via locale customization applet

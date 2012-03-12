@@ -200,7 +200,7 @@ emerge -qC app-portage/gentoolkit
 
 sinfo "Faking Python removal"
 dbpython=`mktemp -d`
-mv /var/db/pkg/dev-lang/python-* ${dbpython}/python
+mv /var/db/pkg/dev-lang/python-* ${dbpython}
 
 
 sinfo "Unmerging orphaned packages"
@@ -232,7 +232,7 @@ rm -r /usr/lib/portage/
 
 
 sinfo "Actually removing Python"
-rm -f `awk '! /^dir / { print $2 }' ${dbpython}/python/CONTENTS`
+rm -f `awk '! /^dir / { print $2 }' ${dbpython}/python-*/CONTENTS`
 rm -r /usr/lib/python*/
 rm -r ${dbpython}
 

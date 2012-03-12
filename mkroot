@@ -176,8 +176,8 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Verifying stage3 MD5 and SHA1 digests"
-    (cd ${LIVECD}/mirror/stage3; md5sum  --quiet -c ${stage3file}.DIGESTS.asc)
-    (cd ${LIVECD}/mirror/stage3; sha1sum --quiet -c ${stage3file}.DIGESTS.asc)
+    (cd ${LIVECD}/mirror/stage3; md5sum  --status -c ${stage3file}.DIGESTS.asc)
+    (cd ${LIVECD}/mirror/stage3; sha1sum --status -c ${stage3file}.DIGESTS.asc)
 
 
     if tar --version | grep -q '(GNU tar)'; then

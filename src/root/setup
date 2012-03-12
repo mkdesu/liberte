@@ -165,13 +165,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     rm -f ${protected}
 
 
-    sinfo "Removing unnecessary packages"
-    python2=`eselect python list | awk '{ print $2 }' | grep '^python2\.'`
-    eselect python set ${python2}
-
-    emerge -qC --deselect=n "=dev-lang/python-3*"
-
-
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
     emerge -qepv @system
@@ -427,7 +420,7 @@ rm -f  /var/log/wtmp
 # "plugdev"   group: ModemManager control PolicyKit permissions;
 #                    wireless/bluetooth rfkill switch
 # "lp"        group: D-Bus communication with bluetoothd
-# "uucp"      group: access to RFCOMM devices (e.g., obexftp)
+# ["uucp"]    group: access to RFCOMM devices (e.g., obexftp)
 # "games"     group: prevent games complaining about not keeping scores
 # "vmware"    group: VMware's drag-n-drop feature for file exchange (when enabled)
 # "vboxguest" group: VirtualBox seamless mode, auto-resize and clipboard
@@ -451,8 +444,8 @@ groupadd -g 9001 nofw   || [ $? = 9 ]
 useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 
-usermod -G wheel,plugdev,lp,uucp,games,vmware,vboxguest anon
-usermod -G legion                                       cable
+usermod -G wheel,plugdev,lp,games,vmware,vboxguest anon
+usermod -G legion                                  cable
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]

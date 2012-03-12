@@ -113,7 +113,7 @@ fi
 
 sinfo "Unsupported scripts:"
 find ${LIVECD} -xdev -type f -print0 | xargs -0 grep -lE \
-    '^#![[:blank:]]*/usr/bin/(perl|python|env[[:blank:]]+(perl|python))\>' \
+    '^#![[:blank:]]*/usr/bin/(perl|python|env[[:blank:]]+(perl|python))' \
      | sed "s:^${LIVECD}::"
 
 true

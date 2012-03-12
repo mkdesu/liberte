@@ -26,7 +26,6 @@ media-libs/mesa                 shared-dricore -gallium -egl -llvm
 x11-base/xorg-drivers           -video_cards_fbdev
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
-sys-fs/ntfsprogs                minimal -crypt
 
 # Networking, including SSL/TLS
 dev-lang/python                 ssl
