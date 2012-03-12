@@ -140,7 +140,7 @@ start() {
 
                         # LC_ALL enables UTF-8 label support
                         ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                        LC_ALL=en_GB.UTF-8 mkntfs -q -f -C -I -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                        LC_ALL=en_GB.UTF-8 mkntfs -qfCIU -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
                         eend $?
                     fi
                 else

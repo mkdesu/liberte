@@ -13,26 +13,48 @@ export LC_ALL=C
 luser=anon
 lmount=/home/${luser}/persist
 
+
+# Error reporting
+error() {
+    echo "**" "$@"
+    exit 1
+}
+
+
 # Mounting and unmounting the filesystem
 umount_fs() {
     # Unmount the filesystem if it's mounted
     unmount=0
     if mountpoint -q ${lmount}; then
-        echo "Unmounting ${lmount}"
+        echo ">> Unmounting ${lmount}"
         umount ${lmount}
         unmount=1
     else
-        echo "${lmount} is not mounted"
+        error "${lmount} is not mounted"
     fi
 }
 
 mount_fs() {
     # Mount the filesystem if it was previously unmounted
     if [ ${unmount} = 1 ]; then
-        echo "Re-mounting ${lmount}"
+        echo ">> Mounting ${lmount}"
         mount ${lmount}
     else
-        echo "${lmount} was not previously mounted"
+        error "${lmount} was not previously mounted"
+    fi
+}
+
+
+# Resizing a filesystem with a dry run
+do_resize() {
+    echo ">> Performing a dry run"
+    if ! ntfsresize -n "$@"; then
+        return 1
+    else
+        # last command sets pipe's error status
+        # pipe must come last, so that function can be used in an "if"
+        echo ">> Performing actual resize"
+        echo y | ntfsresize "$@"
     fi
 }
 
@@ -57,6 +79,8 @@ EOF
     exit 1
 fi
 
+trap '[ $? = 0 ] || error "Resizing failed!"' 0
+
 
 # Retrieve devices stack
 otfe=`cryptsetup status ${OTFEVOLUME} | head -n 1 | awk '{ print $1 }'`
@@ -70,8 +94,7 @@ otfesize=`cryptsetup status ${OTFEVOLUME} | awk '/^[[:blank:]]*size:.* sectors/ 
 # Sanity checks
 if [ ! -b "${otfe}"  -o  ! -b "${loop}"  -o  ! -f "${file}" \
      -o  "`dirname "${otfe}"`" != /dev/mapper ]; then
-    echo "Sanity checks failed: ${otfe}, ${loop}, ${file}"
-    exit 1
+    error "Sanity checks failed: ${otfe}, ${loop}, ${file}"
 fi
 
 
@@ -82,15 +105,13 @@ oldsize=`du -b "${file}" | cut -f1`
 # More sanity checks
 # Minimum is (1M + 512B) for NTFS, and (1M + 8K) for OTFE
 if [ ${oldsize} -lt $((2*1024*1024 + 512 + 8*1024)) ]; then
-    echo "Sanity check failed: ${file} is too small"
-    exit 1
+    error "Sanity check failed: ${file} is too small"
 fi
 
 # Check that OTFE offset+size add up (assume 512B sectors)
 # This also ensures that OTFE file size is a multiple of 512
 if [ ${oldsize} -ne $(((otfeoffset + otfesize) * 512)) ]; then
-    echo "Sanity check failed: [${OTFEVOLUME}] size and offset don't match size of ${file}"
-    exit 1
+    error "Sanity check failed: [${OTFEVOLUME}] size and offset don't match size of ${file}"
 fi
 
 
@@ -109,9 +130,8 @@ fi
 
 
 # Check that the parameter is not too long
-if [ ${#size} -gt 12 ]; then
-    echo "Parameter is too long"
-    exit 1
+if [ ${#1} -gt 12 ]; then
+    error "Parameter is too long"
 fi
 
 
@@ -122,15 +142,13 @@ shift
 
 # Check that the parameter has digits
 if [ -z "${size}" ]; then
-    echo "Sanitized parameter is empty"
-    exit 1
+    error "Sanitized parameter is empty"
 fi
 
 
 # See the calculation above for the minimum possible size
 if [ ${size} -lt 3 ]; then
-    echo "Minimum supported size is 3 MiB"
-    exit 1
+    error "Minimum supported size is 3 MiB"
 fi
 size=$((size * 1024 * 1024))
 
@@ -140,7 +158,7 @@ if [ ${size} -ge ${oldsize} ]; then
 
     # Same-size run is useful as a sanity check
     if [ ${size} -eq ${oldsize} ]; then
-        echo "No size change, running in growth mode anyway"
+        echo ">> No size change, running in growth mode anyway"
     fi
 
 
@@ -151,9 +169,9 @@ if [ ${size} -ge ${oldsize} ]; then
 
 
     # Increase OTFE file size
-    echo "Growing ${file} to ${size} bytes"
+    echo ">> Growing ${file} to ${size} bytes"
     if ! truncate -s ${size} "${file}"; then
-        echo "Restoring the original size of ${file}"
+        echo ">> Restoring the original size of ${file}"
         truncate -s ${oldsize} "${file}"
         mount_fs
         exit 1
@@ -161,18 +179,18 @@ if [ ${size} -ge ${oldsize} ]; then
 
 
     # Make loop device aware of the file resize
-    echo "Notifying ${loop} of the new size"
+    echo ">> Notifying ${loop} of the new size"
     losetup -c "${loop}"
 
 
     # Resize the OTFE volume according to loop device size
-    echo "Growing the [${OTFEVOLUME}] volume"
+    echo ">> Growing the [${OTFEVOLUME}] volume"
     cryptsetup resize ${OTFEVOLUME}
 
 
     # Resize the NTFS filesystem on encrypted volume
-    echo "Growing the NTFS filesystem on ${otfe}"
-    echo y | ntfsresize -f -P "${otfe}"
+    echo ">> Growing the NTFS filesystem on ${otfe}"
+    do_resize -fP "${otfe}"
     mount_fs
 
 else
@@ -182,9 +200,8 @@ else
     # Resize the NTFS filesystem on encrypted volume
     # (assuming 512B sectors - see sanity checks above)
     umount_fs
-    echo "Shrinking the NTFS filesystem on ${otfe}"
-    if ! echo y | ntfsresize -f -P -s $((otfesize*512 - sizediff)) "${otfe}"; then
-        echo "NTFS shrinking failed, attempting remount"
+    echo ">> Shrinking the NTFS filesystem on ${otfe}"
+    if ! do_resize -fP -s $((otfesize*512 - sizediff)) "${otfe}"; then
         mount_fs
         exit 1
     fi
@@ -193,20 +210,20 @@ else
 
     # Resize the OTFE volume according to loop device size
     # (assuming 512B sectors - see sanity checks above)
-    echo "Shrinking the [${OTFEVOLUME}] volume"
+    echo ">> Shrinking the [${OTFEVOLUME}] volume"
     cryptsetup -b $((otfesize - sizediff/512)) resize ${OTFEVOLUME}
 
 
     # Decrease OTFE file size
-    echo "Shrinking ${file} to ${size} bytes"
+    echo ">> Shrinking ${file} to ${size} bytes"
     truncate -s ${size} "${file}"
 
 
     # Make loop device aware of the file resize
-    echo "Notifying ${loop} of the new size"
+    echo ">> Notifying ${loop} of the new size"
     losetup -c "${loop}"
 
 fi
 
 
-echo "Done"
+echo ">> Done"
