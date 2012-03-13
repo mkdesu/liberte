@@ -113,8 +113,7 @@ net-mail/cables
 
 # Peripheral utilities
 sys-apps/irqbalance
-# (#367823, #400743)
-# sys-apps/x86info
+sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
 sys-power/powertop
