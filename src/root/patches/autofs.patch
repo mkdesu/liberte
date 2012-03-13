@@ -1,0 +1,16 @@
+--- /etc/init.d/autofs	2012-03-12 02:00:55.000000000 +0000
++++ /etc/init.d/autofs.new	2012-03-13 18:41:32.000000000 +0000
+@@ -49,8 +49,12 @@
+ 	fi
+ 
+ 	start-stop-daemon --start --exec ${DAEMON} -- -p ${PIDFILE} ${OPTIONS}
++	status=$?
+ 
+-	eend $?
++	chmod o=    /media
++	chgrp wheel /media
++
++	eend ${status}
+ }
+ 
+ stop() {
