@@ -37,7 +37,7 @@ mount -t tmpfs -o mode=700,nosuid,nodev,noexec tmpfs ${srwroot}
 mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 
 # Mount devtmpfs filesystem (noexec: (#92921))
-mount -t devtmpfs -o nosuid devtmpfs /dev
+mount -t devtmpfs -o nosuid,noexec devtmpfs /dev
 
 
 # Parse kernel options
