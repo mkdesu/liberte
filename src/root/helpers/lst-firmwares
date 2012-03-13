@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 # sys-kernel/linux-firmware sublist
 fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
@@ -20,7 +20,10 @@ for fw in $(strings -a -n 10                               \
               | sed -n 's/^firmware=//p'                   \
               | sort -u); do
     if [ ! -e /lib/firmware/${fw} ] && ! grep -q "^${fw}\$" ${fwlst}; then
-        echo ${fw}
+        # Support older iwlwifi ucodes
+        if [ ! -e /lib/firmware/${fw/-6.ucode/-5.ucode} ]; then
+            echo ${fw}
+        fi
     fi
 done
 

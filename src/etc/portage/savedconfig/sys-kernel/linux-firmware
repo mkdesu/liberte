@@ -6,12 +6,9 @@ iwlwifi-105-6.ucode
 iwlwifi-135-6.ucode
 iwlwifi-2000-6.ucode
 iwlwifi-2030-6.ucode
-# (overlaps: iwl6030-ucode)
-iwlwifi-6000g2b-6.ucode
 # (missing, but: IWL*_UCODE_API_MIN/OK)
-iwlwifi-100-6.ucode
-iwlwifi-1000-6.ucode
-iwlwifi-6000g2a-6.ucode
+# iwlwifi-100-6.ucode
+# (1000-6, 6000g2[ab]-6 overlap w/ dedicated pkgs)
 
 # BRCMSMAC
 brcm/bcm43xx-0.fw
@@ -28,10 +25,6 @@ rtlwifi/rtl8192cfwU_B.bin
 
 # ATH9K_HTC
 htc_7010.fw
-
-# RT2800{PCI,USB}
-rt2860.bin
-rt2870.bin
 
 # MWL8K
 mwl8k/helper_8366.fw

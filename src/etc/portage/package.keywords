@@ -44,6 +44,8 @@ net-wireless/iwl5150-ucode
 net-wireless/iwl6000-ucode
 net-wireless/iwl6005-ucode
 net-wireless/iwl6030-ucode
+net-wireless/rt2860-firmware
+net-wireless/rt2870-firmware
 net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 net-wireless/prism54-firmware
