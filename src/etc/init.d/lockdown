@@ -29,7 +29,7 @@ start() {
 
 
     # Arm KEXEC wipe & halt
-    ebegin Arming anti-forensic RAM wipe on shutdown
+    ebegin Arming anti-forensic RAM wipe with halt
     kexec-load arm
     eend $?
 

@@ -1,0 +1,23 @@
+#!/sbin/runscript
+
+description="Arms shutdown/reboot memory wipe."
+
+
+depend() {
+    # this is a shutdown service
+    before killprocs
+}
+
+
+start() {
+    # Arm KEXEC wipe
+    if yesno "${RC_REBOOT}"; then
+        ebegin Arming anti-forensic RAM wipe with reboot
+        kexec-load reboot
+        eend $?
+    else
+        ebegin Arming anti-forensic RAM wipe with halt
+        kexec-load halt
+        eend $?
+    fi
+}

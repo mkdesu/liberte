@@ -385,18 +385,19 @@ svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy
             nginx spawn-fcgi.cable udev-postmount"
+svcshutdown="memwipe"
 delsvcboot="urandom swap bootmisc root mtab"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
 
-for runlevel in sysinit boot default; do
+for runlevel in sysinit boot default shutdown; do
     eval svcs=\${svc${runlevel}}
     for svc in ${svcs}; do
         [   -e /etc/runlevels/${runlevel}/${svc} ] || rc-update add ${svc} ${runlevel}
     done
 done
 
-for runlevel in boot default shutdown nonetwork; do
+for runlevel in boot default shutdown; do
     eval svcs=\${delsvc${runlevel}}
     for svc in ${svcs}; do
         [ ! -e /etc/runlevels/${runlevel}/${svc} ] || rc-update del ${svc} ${runlevel}
