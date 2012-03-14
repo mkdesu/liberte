@@ -33,6 +33,7 @@ modprobe msr
 # Build the report
 echo Architecture ...
 x86info -a                           > 01-x86
+sudo -n -u nobody x86info -a         > 01-x86-npriv
 lsmsr -a -V 4                        > 01-msr
 cp /proc/cpuinfo                       02-cpu
 cpufreq-info                         > 02-cpu-freq
