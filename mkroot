@@ -113,7 +113,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
 
 
     sinfo "Downloading ${stage3file}"
-    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
+    wget -c -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
         ${stage3base}/${stage3}.CONTENTS ${stage3base}/${stage3}
 
     sinfo "Downloading portage-latest.tar.bz2"
@@ -129,9 +129,12 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
         keyid=`echo -n ${fpr} | tail -c 8`
 
         if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
-            eval wget -nv --retry-connrefused                   \
-                --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
-                -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"
+            if ! eval wget -nv --retry-connrefused                         \
+                           --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
+                           -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"; then
+                echo "Warning: Failed to fetch ${org}-${keyid}.asc, copying from cache"
+                cp ${FROM}/conf/certs/${org}-${keyid}.asc ${LIVECD}/mirror/keys
+            fi
         fi
 
         if type gpg 1>/dev/null 2>&1; then
