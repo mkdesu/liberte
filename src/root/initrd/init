@@ -163,7 +163,7 @@ if [ -n "${param_loop}" ]; then
 
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting SquashFS filesystem'
-    mount -r -t squashfs -o loop ${rootimg} ${slive}
+    mount -r -t squashfs -o loop,nodev ${rootimg} ${slive}
     test_success 'mount compressed filesystem'
 
     [ -z "${param_toram}" ] || mount -o remount,rw ${srwroot}
