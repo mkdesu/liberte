@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Change Locale
+Name=Language and Time Zone
 Comment=Select user interface language, time zone and keyboard layout
 Exec=customize-locale
 Terminal=false
