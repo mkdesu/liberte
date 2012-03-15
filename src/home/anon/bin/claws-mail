@@ -2,23 +2,27 @@
 
 cableid=cable-id
 cablesend=/usr/bin/cable-send
+dummyaddr=anonymous@liberte
 confdir=${XDG_CONFIG_HOME}/claws-mail
 
-# If neither Tor nor I2P address is selected, configure the Tor one
-if username=`${cableid} user 2>/dev/null`; then
-    torhost=`${cableid} tor`
-    i2phost=`${cableid} i2p`
 
-    if ! grep -q "^address=${username}@\(${torhost}\|${i2phost}\)\$" ${confdir}/accountrc; then
-        echo "Resetting account address to ${username}@${torhost}"
-        sed -i "s/^\(address=\).*/\1${username}@${torhost}/" ${confdir}/accountrc
-    fi
+# Configure the Tor address if none is set
+if grep -q "^address=${dummyaddr}\$" ${confdir}/accountrc \
+    && username=`${cableid} user 2>/dev/null`; then
+
+    torhost=`${cableid} tor`
+    echo "Resetting account address to ${username}@${torhost}"
+
+    sed -i "s/^\(address=\)${dummyaddr}\$/\1${username}@${torhost}/" \
+        ${confdir}/accountrc
 fi
 
-# the path has changed twice
+
+# Legacy configuration support: the path has changed twice
 if ! grep -q "^mail_command=${cablesend}\$" ${confdir}/accountrc; then
     sed -i "s:^\(mail_command=\).*:\1${cablesend}:" ${confdir}/accountrc
 fi
+
 
 # Run via torify for users who want additional "regular" accounts
 exec torify /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"
