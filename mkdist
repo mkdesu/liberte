@@ -21,8 +21,7 @@ distname=liberte-${version}
 
 
 sinfo "Creating source distribution ${distname}-src.tar.bz2"
-cd ${SRC}
-git -c tar.umask=022 archive --format=tar --prefix=${distname}/ master \
+(cd ${SRC}; git -c tar.umask=022 archive --format=tar --prefix=${distname}/ master) \
     | bzip2 > ${DIST}/${distname}-src.tar.bz2
 
 

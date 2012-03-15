@@ -123,7 +123,7 @@ find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
 
 
 sinfo "Building binary distribution ${distname}.zip"
-zipfile=${cdroot}/../${distname}.zip
+zipfile=`readlink -f ${cdroot}/../${distname}.zip`
 (cd ${cdroot}; zip -FS -r9 -q ${zipfile} liberte)
 
 
