@@ -26,3 +26,6 @@
 # Executables requiring development libraries
 /usr/bin/cairo-trace
 /usr/lib/cairo/libcairo-trace.*
+
+# Workaround for (#408117)
+/etc/init.d/dmcrypt

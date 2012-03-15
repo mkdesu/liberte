@@ -14,3 +14,6 @@ OTFEHASH=sha256
 # LVM partition name
 # (also used by otfe-resize)
 OTFEVOLUME=otfe
+
+# Password entry attempts
+OTFEPWDTRIES=10

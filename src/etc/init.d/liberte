@@ -106,49 +106,38 @@ start() {
             ebegin "Initializing ${otfesize} MiB encrypted storage (${OTFESIZE} of free space)"
             if [ -n "${otfesize}"  -a  -e ${otfefile}.tag ]  &&  truncate -s ${otfesize}M ${otfefile}; then
                 chmod -f 600 ${otfefile}
-                loop=`losetup -f ${otfefile} --show`
                 eend $?
 
-                eprompt Please specify new password for ${otfefile}
-                # input_begin
+                inittries=${OTFEPWDTRIES}
+                while [ ${inittries} -ne 0 ]; do
+                    eprompt Please specify new password for ${otfefile}
+                    if cryptsetup -q -c ${OTFECIPHER} -s ${OTFEKEYSIZE} -h ${OTFEHASH} luksFormat ${otfefile}; then
+                        eprompt Please re-enter the password for ${otfefile}
+                        if cryptsetup -T 1 luksOpen ${otfefile} ${OTFEVOLUME}; then
+                            rm ${otfefile}.tag
+                            break
+                        else
+                            ewarn Passwords do not match
+                        fi
+                    fi
 
-                inittries=10
-                while [ ${inittries} -ne 0 ] && ! cryptsetup -qy -c ${OTFECIPHER} -s ${OTFEKEYSIZE} -h ${OTFEHASH} luksFormat ${loop}; do
                     inittries=$((inittries-1))
                 done
 
-                if [ ${inittries} -ne 0 ]; then
-                    echo
-                    einfo 'OTFE initialized, run "sudo otfe-resize" to resize encrypted storage'
+                if [ -e /dev/mapper/${OTFEVOLUME} ]; then
+                    echo;  einfo 'OTFE initialized, run "sudo otfe-resize" to resize encrypted storage'
 
-                    eprompt Please re-enter the password for ${otfefile}
-                    if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
-                        eerror Failed to attach encrypted storage, removing ${otfefile}
-                        losetup -d ${loop}
-                        rm ${otfefile}
-                    else
-                        rm ${otfefile}.tag
-                    fi
+                    ebegin Backing up crypto header: ${otfefile}-hdr.bak
+                    cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${otfefile}
+                    eend $?
 
-                    # input_end
-                    echo
-
-                    if [ ! -e ${otfefile}.tag ]; then
-                        ebegin Backing up crypto header: ${otfefile}-hdr.bak
-                        cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${loop}
-                        eend $?
-
-                        # LC_ALL enables UTF-8 label support
-                        ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                        LC_ALL=en_GB.UTF-8 mkntfs -qfCIU -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
-                        eend $?
-                    fi
+                    # LC_ALL enables UTF-8 label support
+                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
+                    LC_ALL=en_GB.UTF-8 mkntfs -qfCIU -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                    eend $?
                 else
-                    losetup -d ${loop}
                     rm ${otfefile}
-
                     eerror Failed to initialize encrypted storage
-                    # input_end
                 fi
             else
                 rm -f ${otfefile}
@@ -156,14 +145,10 @@ start() {
             fi
         else
             eprompt Please provide a password for ${otfefile}
-            # input_begin
 
-            loop=`losetup -f ${otfefile} --show`
-            if ! cryptsetup -T 100 luksOpen ${loop} ${OTFEVOLUME}; then
+            if ! cryptsetup -T ${OTFEPWDTRIES} luksOpen ${otfefile} ${OTFEVOLUME}; then
                 eerror Failed to attach encrypted storage: ${otfefile}
             fi
-
-            # input_end
             echo
         fi
 
@@ -224,10 +209,9 @@ stop() {
 
 
     # Detach encrypted volume
-    if cryptsetup status ${OTFEVOLUME} 1>/dev/null 2>&1; then
+    if [ -e /dev/mapper/${OTFEVOLUME} ]; then
         ebegin Detaching encrypted storage
         cryptsetup luksClose ${OTFEVOLUME}
-        losetup -d `losetup -j ${otfefile} | cut -d: -f1`
         eend $?
 
     fi
