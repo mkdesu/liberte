@@ -334,11 +334,6 @@ rm /usr/bin/python{,-wrapper}
 rm /usr/share/eselect/modules/{binutils,kernel,news,profile,python}.eselect
 
 
-sinfo "Tighting up SUID permissions"
-chgrp wheel     /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
-chmod u+s,o-rwx /usr/{bin/{cdrecord,cdda2wav,readcd},sbin/rscsi}
-
-
 sinfo "Setting cables-related permissions"
 chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
 
