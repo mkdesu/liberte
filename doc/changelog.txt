@@ -8,6 +8,7 @@
   * Fixed 3G support for modems with PIN unlocking
   * More extensive firmware support
   * Better hardware support (nVidia SATA, BRCM4313, DVBs, joysticks, tablets)
+  * Preliminary (U)EFI booting support using GRUB 2
 
   * Better filesystem security (read-only root fs)
   * CD boot media ejection now triggers shutdown (same as USB boot media)

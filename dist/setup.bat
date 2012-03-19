@@ -16,6 +16,7 @@ ECHO Hiding %~d0\liberte and %~d0\otfe directories.
 IF NOT EXIST %~d0\otfe MKDIR %~d0\otfe
 ATTRIB +H %~d0\liberte
 ATTRIB +H %~d0\otfe
+ATTRIB +H %~d0\EFI
 
 GOTO end
 

@@ -6,8 +6,9 @@
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
 =dev-java/java-service-wrapper-3.3.3*
-=sys-boot/efibootmgr-0.5.4*
 =sys-apps/x86info-1.30*
+=sys-boot/efibootmgr-0.5.4*
+=sys-boot/grub-1.99*:2 **
 
 # Network (torsocks: (#395215))
 =net-proxy/torsocks-1.2*

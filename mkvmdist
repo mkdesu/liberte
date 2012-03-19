@@ -31,6 +31,7 @@ distname=liberte-${version}
 
 # Derived paths
 logosvg=${src}/src/home/anon/config/images/liberte-logo-nofont.svg
+efiboot=${cdroot}/isolinux/efiboot.img
 syslinux=${cdroot}/liberte/boot/syslinux/syslinux-x86.tbz
 
 ovfpath=${vmstage}/${distname}.ovf
@@ -85,22 +86,31 @@ vmware-mount -f ${diskpath} ${vmstage}/vdisk
 
 
 sinfo "Partitioning and installing MBR"
-parted -s ${vmstage}/vdisk/flat                     \
-          mklabel msdos                             \
-          mkpart  primary ext2 32KiB ${disksize}MiB \
-          set     1       boot on
+efisize=`du -s -B 1K --apparent-size ${efiboot} | sed 's/[[:blank:]].*//'`
+
+parted -s ${vmstage}/vdisk/flat                                       \
+          mklabel msdos                                               \
+          mkpart  primary fat16 32KiB $(((32 + efisize) * 1024 - 1))B \
+          mkpart  primary ext2  $((32 + efisize))KiB 100%             \
+          set     2       boot on
+
+(echo t; echo 1; echo ef; echo w) | fdisk ${vmstage}/vdisk/flat 1>/dev/null 2>&1
 
 loop=`losetup -f`
 losetup ${loop} ${vmstage}/vdisk/flat
 
 tar -xjf ${syslinux} -C ${vmstage} altmbr_c.bin
-printf '\001' | cat ${vmstage}/altmbr_c.bin - > ${loop}
+printf '\002' | cat ${vmstage}/altmbr_c.bin - > ${loop}
+
+
+sinfo "Copying EFI filesystem"
+dd if=${efiboot} of=${loop} bs=1K seek=32
 
 while ! losetup -d ${loop}; do sleep 1; done
 
 
-sinfo "Creating filesystem"
-losetup -o 32768 ${loop} ${vmstage}/vdisk/flat
+sinfo "Creating main filesystem"
+losetup -o $(((32 + efisize) * 1024)) ${loop} ${vmstage}/vdisk/flat
 
 mke2fs -q -m0 -T largefile -L "${volume}" -O ^resize_inode,^dir_index,sparse_super \
        -F ${loop}
@@ -129,8 +139,12 @@ sinfo "Unmounting virtual disk image"
 vmware-mount -d ${vmstage}/vdisk
 
 
-sinfo "Verifying virtual partition"
+sinfo "Verifying virtual partitions"
 vmware-mount ${diskpath} 1 ${vmstage}/vpart
+test -e ${vmstage}/vpart/EFI/BOOT/BOOTx64.EFI
+vmware-mount -d ${vmstage}/vpart
+
+vmware-mount ${diskpath} 2 ${vmstage}/vpart
 test -e ${vmstage}/vpart/liberte/boot/syslinux/ext/ldlinux.sys
 vmware-mount -d ${vmstage}/vpart
 

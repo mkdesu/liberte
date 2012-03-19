@@ -1,6 +1,7 @@
 # Temporary dependencies
 sys-kernel/hardened-sources       # TEMP
 sys-boot/syslinux                 # TEMP
+sys-boot/grub                     # TEMP
 media-fonts/terminus-font         # TEMP
 app-portage/gentoolkit            # (explicit unmerge in setup-copy)
 app-portage/portage-utils         # TEMP

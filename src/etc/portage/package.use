@@ -3,6 +3,7 @@ sys-apps/groff                  -X
 sys-process/psmisc              -X
 media-gfx/fbida                 -X
 media-fonts/terminus-font       -X -pcf
+media-fonts/unifont             -X
 app-text/ghostscript-gpl        -X
 dev-java/icedtea-bin            -X -cjk -alsa
 sys-devel/gcc                   -gtk

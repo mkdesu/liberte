@@ -28,10 +28,13 @@ mksqver=4.2
 luser=2101
 lgroup=9000
 
+efilabel=LIBERTE_EFI
+
 # See also /usr/local/sbin/ps-mount
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0177,dmask=077
 isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8
 extflags=noatime,nosuid,nodev,acl,user_xattr
+hfspflags=noatime,nosuid,nodev,uid=${luser},gid=${lgroup},umask=077
 
 
 # POSIX shells should (probably) support $(())
@@ -62,17 +65,20 @@ if [ -e ${cdroot}/liberte/boot/packages.lst ]; then
 fi
 
 
-sinfo "Copying USB /boot"
-mkdir -p -m 755 ${cdroot} ${cdroot}/liberte ${cdroot}/isolinux
-rsync -aHS -i --delete-excluded --exclude /boot/syslinux/version \
-    ${livecd}/boot ${cdroot}/liberte
-
-
 sinfo "Copying USB add-ons"
+rm -rf          ${cdroot}
+mkdir -p -m 755 ${cdroot}
+
 rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
-    --delete-excluded -C -f "P /boot/"             \
+    --delete-excluded -C                           \
     ${src}/dist/ ${cdroot}/liberte
 sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
+
+
+sinfo "Copying USB /boot"
+rsync -aHS -i --delete-excluded --exclude /boot/syslinux/version \
+    ${livecd}/boot ${cdroot}/liberte
+mv ${cdroot}/liberte/boot/EFI ${cdroot}
 
 
 # Unreferenced files have default priority 0 (which is the top priority)
@@ -95,10 +101,13 @@ sfshash=`sha256sum ${cdroot}/liberte/boot/root-x86.sfs`
 sfshash="${sfshash%% *}"
 
 
-sinfo "Adapting Syslinux configuration"
+sinfo "Adapting Syslinux and GRUB configuration"
 
 sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/; s/FSHASH/${sfshash}/" \
     ${cdroot}/liberte/boot/syslinux/syslinux.cfg
+sed -i "s/FSHASH/${sfshash}/; s/VFATFLAGS/${vfatflags}/; s/EXTFLAGS/${extflags}/;
+        s/ISOFSFLAGS/${isofsflags}/; s/HFSPFLAGS/${hfspflags}/" \
+    ${cdroot}/liberte/boot/grub/grub.cfg
 
 # EXTLINUX config takes precedence over SYSLINUX one when in same directory
 mkdir -m 755 ${cdroot}/liberte/boot/syslinux/ext
@@ -107,11 +116,13 @@ sed -i "s/TAG //; s/ROOTFS/ext4/; s/FSFLAGS/${extflags}/;  s/FSHASH/${sfshash}/"
     ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
 
 # ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
+# (translation equivalent to mount's map=normal is still performed)
 cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660 readonly toram/; s/FSFLAGS/${isofsflags}/;
-        s/FSHASH/${sfshash}/; s/theme:liberte/theme:liberty/;
-        s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
+        s/FSHASH/${sfshash}/; s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
     ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+
+mkdir -m 755 ${cdroot}/isolinux
 cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
 
 sed -i "s/FSHASH/${sfshash}/" ${cdroot}/liberte/qemulate.sh
@@ -122,19 +133,36 @@ find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
     -exec sed -i 's/$/\r/' {} \;
 
 
+# UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
+# the use of conforming FAT partitions which do not use the ESP GUID."
 sinfo "Building binary distribution ${distname}.zip"
 zipfile=`readlink -f ${cdroot}/../${distname}.zip`
-(cd ${cdroot}; zip -FS -r9 -q ${zipfile} liberte)
+rm -f ${zipfile}
+(cd ${cdroot}; zip -r9 -q ${zipfile} EFI liberte)
+
+
+# Add two extra 4K blocks (may need adjustment)
+sinfo "Creating EFI boot image for El-Torito"
+efiboot=${cdroot}/isolinux/efiboot.img
+efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | sed 's/[[:blank:]].*//'`
+truncate -s $(((efiblocks + 2) * 4))K ${efiboot};  chmod 644 ${efiboot}
+mkdosfs -n "${efilabel}" -I -f 1 -r 16 -R 1 ${efiboot}
+mount -t vfat -o loop ${efiboot} ${cdroot}/isolinux
+rsync -aHS ${cdroot}/EFI         ${cdroot}/isolinux
+umount -d                        ${cdroot}/isolinux
 
 
 # Hide root directories on Windows, and reset volume information
+# Requires cdrtools >= 3.01a05 (for -eltorito-platform)
 sinfo "Creating ISO image ${distname}.iso"
 isofile=${cdroot}/../${distname}.iso
-mkisofs -quiet -iso-level 2 -no-pad -J -sysid '' -V '' -A '' \
-    -R -no-emul-boot -boot-load-size 4 -boot-info-table      \
-    -c boot.cat -hide boot.cat -hide-joliet boot.cat         \
-    -b liberte/boot/syslinux/isolinux.bin -o ${isofile}      \
-    -hidden isolinux -hidden liberte -hide-joliet isolinux -hide-joliet liberte ${cdroot}
+mkisofs -quiet -iso-level 2 -no-pad -sysid '' -V '' -A '' -R \
+    -no-emul-boot -boot-load-size 4 -boot-info-table         \
+    -c boot.cat -b liberte/boot/syslinux/isolinux.bin        \
+    -eltorito-alt-boot -no-emul-boot                         \
+    -eltorito-platform efi -b isolinux/efiboot.img           \
+    -hide boot.cat -hidden isolinux -hidden liberte -m EFI   \
+    -o ${isofile} ${cdroot}
 isovfy ${isofile}
 
 

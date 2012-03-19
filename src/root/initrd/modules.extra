@@ -5,6 +5,7 @@ squashfs
 vfat
 isofs
 ext4
+hfsplus
 
 nls_cp437
 nls_iso8859-1

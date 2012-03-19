@@ -238,7 +238,7 @@ if [ ${devfs} = fat ]; then
     export MTOOLS_SKIP_CHECK=1
     export MTOOLS_FAT_COMPATIBILITY=1
 
-    ${mattrbin} -i "${dev}" +h ::/liberte ::/otfe
+    ${mattrbin} -i "${dev}" +h ::/liberte ::/otfe ::/EFI
 
 elif [ ${devfs} = ext2 ]; then
 
