@@ -237,10 +237,6 @@ rm -r /usr/lib/python*/
 rm -r ${dbpython}
 
 
-sinfo "Verifying HTP servers"
-${helpdir}/vfy-htp-servers
-
-
 # Done here because cache may be recreated after "src" phase
 sinfo "Trimming icons directories and cache"
 for theme in /usr/share/icons/*/index.theme; do
@@ -334,8 +330,9 @@ rm /usr/bin/python{,-wrapper}
 rm /usr/share/eselect/modules/{binutils,kernel,news,profile,python}.eselect
 
 
-sinfo "Setting cables-related permissions"
+sinfo "Setting cables-related and /root permissions"
 chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
+chmod -R go= /root
 
 
 sinfo "Updating ld cache"

@@ -54,7 +54,7 @@ else
           --exclude=/etc/polkit-1          \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
-    ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${SRC}/root              ${LIVECD}
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc

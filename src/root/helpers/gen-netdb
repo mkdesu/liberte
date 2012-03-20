@@ -3,14 +3,6 @@
 export LC_ALL=C
 
 
-# Skip update of a recent netDb
-netdbdst=/var/lib/i2p/router/netDb
-if [ "`find ${netdbdst} -maxdepth 0 -mtime -1 2>/dev/null`" = ${netdbdst} ]; then
-    echo "I2P netDb was updated less than 24h ago, skipping"
-    exit
-fi
-
-
 # Fetch URL and parameters
 netdburl=https://netdb.i2p2.de/
 
@@ -24,7 +16,7 @@ rinfore='routerInfo-[[:alnum:]~-]{43}=\.dat'
 
 
 # Paths
-netdbdir=`mktemp -d`
+netdbdir=/tmp/netDb
 netdblst=${netdbdir}/names
 netdberr=${netdbdir}/errors
 i2pjar=/opt/i2p/lib/i2p.jar
@@ -32,11 +24,13 @@ i2pjar=/opt/i2p/lib/i2p.jar
 
 # Retrieve >= maxnetdblst routerInfos (in overlapping portions of 100)
 # in at most maxfetches attempts (hard limit)
-touch ${netdblst}
+rm -rf ${netdbdir}
+mkdir  ${netdbdir}
+touch  ${netdblst}
 while [ "`cat ${netdblst} | wc -l`" -lt ${maxnetdblst}    \
             -a  ${maxfetches} -gt 0 ]; do
     # curl error code is discarded in pipe
-    curl -sfg --compressed ${netdburl}                    \
+    curl -k -sfg --compressed ${netdburl}                 \
         | sed 's/>/>\n/g'                                 \
         | sed -nr "s@^.*\<href=\"(${rinfore})\".*\$@\1@p" \
         >> ${netdblst}
@@ -54,26 +48,16 @@ mv ${netdblst}.tmp ${netdblst}
 
 
 if [ ! -s ${netdblst} ]; then
-
     rm -r ${netdbdir}
-
-    if [ -e ${netdbdst} ]; then
-        echo "I2P netDb update failed (ignoring)"
-    else
-        echo "Could not retrieve I2P netDb list"
-        exit 1
-    fi
-
+    exit 1
 else
-
     echo "Retrieving `cat ${netdblst} | wc -l` routerInfos"
-    curl -s --compressed -o ${netdbdir}/#1 \
+    curl -k -s --compressed -o ${netdbdir}/#1 \
         ${netdburl}`cat ${netdblst} | tr '\n' , | sed 's/^/{/; s/,$/}/'` || :
 
     # Delete non-conforming files as precautionary measure (includes namedblst)
     find ${netdbdir} -regextype posix-egrep -mindepth 1 \
         \( ! -type f -o ! -regex "${netdbdir}/${rinfore}" \) -delete
-    chown -R i2p:i2p ${netdbdir}; chmod 600 ${netdbdir}/*
 
     # Delete fetch errors
     rm -f `file -N --mime-type -F '' ${netdbdir}/routerInfo-*=.dat | sed -n 's/ text\/html$//p'`
@@ -100,11 +84,6 @@ else
     netdborig=`find ${netdbdir} -type f | wc -l`
     find ${netdbdir} -type f | shuf | tail -n +$((maxnetdb+1)) | xargs rm -f --
 
-    # Install new netDb
-    rm -rf         ${netdbdst}
-    mv ${netdbdir} ${netdbdst}
-
-    netdbsel=`find ${netdbdst} -type f | wc -l`
+    netdbsel=`find ${netdbdir} -type f | wc -l`
     echo "Selected ${netdbsel} (out of ${netdborig}) NTCP+OR/OfR-capable routerInfos"
-
 fi

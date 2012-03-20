@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 helpdir=${HOME}/helpers
+noroot="sudo -n -u nobody"
 
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
@@ -9,7 +10,10 @@ xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
 
-i2phosts=https://www.i2p2.de/hosts.txt
+i2phostsurl=https://www.i2p2.de/hosts.txt
+i2phosts=/opt/i2p/hosts.txt
+netdbdir=/tmp/netDb
+netdbdst=/var/lib/i2p/router/netDb
 
 
 sinfo() {
@@ -334,25 +338,45 @@ update-usbids -q     || echo "update-usbids failed (ignoring)"
 update-smart-drivedb || echo "update-smart-drivedb failed (ignoring)"
 
 if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
-    sinfo "Do PCI/USB IDs lists use compressed format exclusively?"
+    echo "Do PCI/USB IDs lists use compressed format exclusively?"
     exit 1
 fi
 
 # zzz @ #i2p-dev: hosts.txt in the source tree is the same or newer
-if wget -nv -O /opt/i2p/hosts.txt.new ${i2phosts}; then
-    mv /opt/i2p/hosts.txt{.new,}
+if ${noroot} curl -k -sSfg --compressed ${i2phostsurl} > ${i2phosts}.new; then
+    mv ${i2phosts}{.new,}
 else
     echo "I2P hosts.txt update failed (ignoring)"
-    rm -f /opt/i2p/hosts.txt.new
+    rm -f ${i2phosts}.new
 fi
 
 
 sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
-${helpdir}/vfy-databases
+${noroot} ${helpdir}/vfy-databases
 
 
+# Skip update of a recent netDb
 sinfo "Creating initial netDb for I2P"
-${helpdir}/gen-netdb
+
+if [ "`find ${netdbdst} -maxdepth 0 -mtime -1 2>/dev/null`" = ${netdbdst} ]; then
+    echo "I2P netDb was updated less than 24h ago, skipping"
+elif ! ${noroot} ${helpdir}/gen-netdb; then
+    if [ -e ${netdbdst} ]; then
+        echo "I2P netDb update failed (ignoring)"
+    else
+        echo "Could not retrieve I2P netDb list"
+        exit 1
+    fi
+else
+    chown -R i2p:i2p ${netdbdir}
+    chmod -R go=     ${netdbdir}
+    rm -rf         ${netdbdst}
+    mv ${netdbdir} ${netdbdst}
+fi
+
+
+sinfo "Verifying HTP servers"
+${noroot} ${helpdir}/vfy-htp-servers
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
