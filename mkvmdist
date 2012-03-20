@@ -93,8 +93,7 @@ parted -s ${vmstage}/vdisk/flat                                       \
           mkpart  primary fat16 32KiB $(((32 + efisize) * 1024 - 1))B \
           mkpart  primary ext2  $((32 + efisize))KiB 100%             \
           set     2       boot on
-
-(echo t; echo 1; echo ef; echo w) | fdisk ${vmstage}/vdisk/flat 1>/dev/null 2>&1
+sfdisk -q --change-id ${vmstage}/vdisk/flat 1 ef
 
 loop=`losetup -f`
 losetup ${loop} ${vmstage}/vdisk/flat
