@@ -81,16 +81,12 @@ mac_get() {
 
 # Change addresses
 if [ -n "${ifaces}" ]; then
-    wireless=0
-    wired=0
     for iface in ${ifaces}; do
 
         if [ -e /sys/class/net/${iface}/phy80211 ]; then
-            wireless=1
             echo "Wireless interface: ${iface}"
         else
-            wired=1
-            echo "Interface: ${iface}"
+            echo "Wired interface:    ${iface}"
         fi
 
         if [ -z "${mac}" ]; then
@@ -109,11 +105,8 @@ if [ -n "${ifaces}" ]; then
         ifconfig ${iface} up
     done
 
-    if [ ${wired} = 1 ]  &&  /etc/init.d/NetworkManager -q status; then
+    if /etc/init.d/NetworkManager -q status; then
         echo "Restarting NetworkManager"
         /etc/init.d/NetworkManager -qs restart
-    elif [ ${wireless} = 1 ] && pgrep -u root -x wpa_supplicant 1>/dev/null; then
-        echo "Killing wpa_supplicant"
-        pkill -u root -x wpa_supplicant
     fi
 fi
