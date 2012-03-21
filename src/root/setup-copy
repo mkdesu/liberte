@@ -206,10 +206,12 @@ mv /var/db/pkg/dev-lang/python-* ${dbpython}
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
 
-if [ -e /usr/sbin/python-updater ]; then
+if [ -e /usr/sbin/python-updater  -o  -e /usr/bin/python-wrapper ]; then
     sinfo "Failed to discard Python dependencies"
     false
 fi
+
+ln -sf python3 /usr/bin/python
 
 
 # Unmerge packages that other package depend upon, but are not needed
@@ -313,21 +315,19 @@ ln    /usr/lib/xorg/modules/drivers{/vesa_drv.so,.vesa}
 
 
 sinfo "Removing invalid symlinks, dirs and files"
-find / -xdev -type l ! -xtype f ! -xtype d ! -xtype c -delete
+find  /usr/i686-pc-linux-gnu -xtype l -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
 
-rm /etc/env.d/05binutils
-rm /etc/env.d/05gcc-i686-pc-linux-gnu
-rm -rf /etc/env.d/{binutils,gcc,python}
+rm -r /etc/env.d/{05{binutils,gcc-i686-pc-linux-gnu},binutils,gcc,python}
 rm /etc/{init,conf,pam}.d/sshd
 
-rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,c89,c99,gcov}
-rm /lib/cpp
+rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,c89,c99,gcov} /lib/cpp
 rm /sbin/fix_libtool_files.sh
 
 rm /usr/bin/{kernel,profile,python}-config
-rm /usr/bin/python{,-wrapper}
-rm /usr/share/eselect/modules/{binutils,kernel,news,profile,python}.eselect
+rm /usr/share/eselect/modules/{binutils,kernel,news,profile}.eselect
+
+find / -xdev -xtype l -delete
 
 
 sinfo "Setting cables-related and /root permissions"
