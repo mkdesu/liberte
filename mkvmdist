@@ -98,8 +98,8 @@ sfdisk -q --change-id ${vmstage}/vdisk/flat 1 ef
 loop=`losetup -f`
 losetup ${loop} ${vmstage}/vdisk/flat
 
-tar -xjf ${syslinux} -C ${vmstage} altmbr_c.bin
-printf '\002' | cat ${vmstage}/altmbr_c.bin - > ${loop}
+tar -xjf ${syslinux} -C ${vmstage} mbr_c.bin
+cat ${vmstage}/mbr_c.bin > ${loop}
 
 
 sinfo "Copying EFI filesystem"

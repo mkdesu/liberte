@@ -5,8 +5,8 @@ set -e
 sysver=SYSVER
 sysbin=syslinux
 extbin=extlinux
-sysmbr=/usr/share/syslinux/altmbr_c.bin
-sysmbr2=/usr/lib/syslinux/altmbr_c.bin
+sysmbr=/usr/share/syslinux/mbr_c.bin
+sysmbr2=/usr/lib/syslinux/mbr_c.bin
 mattrbin=mattrib
 
 # Directory for ldlinux.sys and bundled syslinux binary
@@ -152,7 +152,7 @@ fi
 
 
 # Check and normalize filesystem type
-devfs=`udevprop ${devpath} ID_FS_TYPE`
+devfs=`udevprop "${devpath}" ID_FS_TYPE`
 case "${devfs}" in
     '')
         error "${dev} is not formatted, format it as FAT/ext2 or specify a partition instead"
@@ -196,7 +196,7 @@ if [ ${devfs} = fat ]; then
         tar -xpjf ${mntdir}${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
         sysbin=${systmpdir}/syslinux
-        sysmbr=${systmpdir}/altmbr_c.bin
+        sysmbr=${systmpdir}/mbr_c.bin
 
         mattrbin=${systmpdir}/mattrib
         export PATH=${systmpdir}:"${PATH}"
@@ -207,7 +207,7 @@ if [ ${devfs} = fat ]; then
         fi
 
         # Use test(1) from coreutils (it calls access(2), honoring MS_NOEXEC and MS_RDONLY)
-        if ! `which test` -x ${sysbin}; then
+        if [ ! -x ${sysbin} ] || { [ -e /usr/bin/test ] && ! /usr/bin/test -x ${sysbin}; }; then
             echo "WARNING: executing bundled binaries will fail"
             echo "(no 32-bit support, or `dirname ${systmpdir}` mounted noexec)"
         fi
@@ -232,7 +232,7 @@ if [ ${devfs} = fat ]; then
     ${sysbin} -i -d ${sysdir} "${dev}"
 
     # Hide directories
-    echo "*** Hiding /liberte and /otfe directories ***"
+    echo "*** Hiding top-level directories ***"
 
     unset  MTOOLSRC
     export MTOOLS_SKIP_CHECK=1
@@ -258,7 +258,7 @@ elif [ ${devfs} = ext2 ]; then
         tar -xpjf "${devdir}"${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
         extbin=${systmpdir}/extlinux
-        sysmbr=${systmpdir}/altmbr_c.bin
+        sysmbr=${systmpdir}/mbr_c.bin
     fi
 
     # Install EXTLINUX
@@ -273,8 +273,8 @@ fi
 # If necessary, install Syslinux-supplied MBR
 if [ -z "${nombr}" -a ${devtype} = partition ]; then
     # Get the parent device
-    rdevpath=`dirname ${devpath}`
-    rdev=`udevprop ${rdevpath} DEVNAME`
+    rdevpath=`dirname "${devpath}"`
+    rdev=`udevprop "${rdevpath}" DEVNAME`
 
     echo "*** Installing bootloader to the MBR of ${rdev} ***"
 
@@ -285,15 +285,15 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Check that the parent device is indeed a disk
-    rdevtype=`udevprop ${rdevpath} DEVTYPE`
+    rdevtype=`udevprop "${rdevpath}" DEVTYPE`
     if [ "${rdevtype}" != disk ]; then
         error "${rdev} is not a disk, but ${rdevtype}, aborting"
     fi
 
 
     # Check that the disk is a removable device
-    if [ -e "/sys${rdevpath}/removable" ]; then
-        if [ "`cat /sys${rdevpath}/removable`" = 0 ]; then
+    if [ -e /sys"${rdevpath}"/removable ]; then
+        if [ "`cat /sys"${rdevpath}"/removable`" = 0 ]; then
             echo "WARNING: ${rdev} is not a removable device"'!'
             echo "Press Ctrl-C now to abort (waiting 10 seconds)..."
             sleep 10
@@ -302,25 +302,26 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Check that the partition table is MSDOS
-    ptable=`udevprop ${rdevpath} ID_PART_TABLE_TYPE`
+    ptable=`udevprop "${rdevpath}" ID_PART_TABLE_TYPE`
     if [ "${ptable}" != dos ]; then
         error "Partition table is of type [${ptable}], need MS-DOS"
     fi
 
 
     # Determine partition number
-    if [ ! -e /sys${devpath}/partition ]; then
+    if [ ! -e /sys"${devpath}"/partition ]; then
         error "Unable to reliably determine partition number of ${dev}"
     fi
-    devpart=`cat /sys${devpath}/partition`
+    devpart=`cat /sys"${devpath}"/partition`
 
 
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)
-    devbyte=$((devpart/64))$(((devpart%64)/8))$((devpart%8))
-    if [ ${#devbyte} != 3 ]; then
-        error "Unable to compute device partition byte"
+    if ! type sfdisk 1>/dev/null 2>&1; then
+        error "sfdisk not found, cannot mark partition ${devpart} active"
     fi
-    printf "\\${devbyte}" | cat ${sysmbr} - | dd bs=440 count=1 iflag=fullblock conv=notrunc of=${rdev}
+
+    sfdisk -q -A"${devpart}" "${rdev}"
+    dd bs=440 count=1 iflag=fullblock conv=notrunc if=${sysmbr} of="${rdev}"
 fi
 
 
