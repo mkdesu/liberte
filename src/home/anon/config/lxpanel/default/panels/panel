@@ -50,11 +50,14 @@ Plugin {
 }
 
 Plugin {
+    type = dirmenu
+    Config {
+    }
+}
+
+Plugin {
     type = launchbar
     Config {
-        Button {
-            id=/usr/share/applications/pcmanfm.desktop
-        }
         Button {
             id=/usr/share/applications/midori.desktop
         }
@@ -124,6 +127,10 @@ Plugin {
 
 Plugin {
     type = cpu
+}
+
+Plugin {
+    type = cpufreq
 }
 
 Plugin {
