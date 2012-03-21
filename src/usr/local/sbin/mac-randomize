@@ -26,10 +26,9 @@ mac=
 # ${mac} contains the MAC address (${ifaces} has one interface then)
 if [ $# = 1 ]; then
     if [ X"$1" = Xwireless ]; then
-        # Rely on the deprecated WIRELESS_EXT_SYSFS in kernel
         ifaces2=
         for iface in ${ifaces}; do
-            if [ -e /sys/class/net/${iface}/wireless ]; then
+            if [ -e /sys/class/net/${iface}/phy80211 ]; then
                 ifaces2="${ifaces2}${iface} "
             fi
         done
@@ -86,7 +85,7 @@ if [ -n "${ifaces}" ]; then
     wired=0
     for iface in ${ifaces}; do
 
-        if [ -e /sys/class/net/${iface}/wireless ]; then
+        if [ -e /sys/class/net/${iface}/phy80211 ]; then
             wireless=1
             echo "Wireless interface: ${iface}"
         else
