@@ -75,9 +75,10 @@ rm -rf ${vmstage}
 mkdir  ${vmstage}
 
 
+# See also disk controller resource below
 sinfo "Initializing virtual disk"
 rm -f ${diskpath}
-vmware-vdiskmanager -c -q -a lsilogic -t 0 -s ${disksize}MB ${diskpath}
+vmware-vdiskmanager -c -q -a ide -t 0 -s ${disksize}MB ${diskpath}
 
 
 sinfo "Mounting virtual disk image"
@@ -175,7 +176,7 @@ mkovf --net    ${param} -i ${netid} -e ${nettype} -m "Virtual Networks" \
 mkovf --vs     ${param} -i "${distname}" -m "Virtual Appliance"
 
 # Add Guest OS
-mkovf --os     ${param} -d "Linux 2.6.x" -m "Guest Operating System"
+mkovf --os     ${param} -d "Linux 2.6.x" -m "Guest Operating System" --secID=99
 
 # Add virtual hardware section
 mkovf --virthw ${param} -p vmx-6 --instanceID=1 -n ${vhwname} \
@@ -193,24 +194,27 @@ mkovf --resource ${param} --elementName="Memory" -u "MegaBytes" \
 mkovf --resource ${param} --elementName="Network Adapter" -t True \
                  -i 3 -k 10 -d "Ethernet Adapter" -b E1000 -n ${nettype}
 
-# Allocate SCSI controller
-mkovf --resource ${param} --elementName="SCSI" \
-                 -i 4 -k 6 -d "SCSI Controller" -b lsilogic -a 0
+# Allocate disk controller
+# IDE:  -k  5               (TianoCore EFI fw does not support SCSI disks)
+# SCSI: -k  6 / -b lsilogic
+# SATA: -k 20 / -b AHCI     (Not supported in VMware)
+mkovf --resource ${param} --elementName="IDE" \
+                 -i 4 -k 5 -d "IDE Controller" -b lsilogic -a 0
 
 # Allocate disk
 mkovf --resource ${param} --elementName="Hard Disk" \
                  -i 5 -k 17 -d "Hard Disk" -j 4 -p 0 -r ovf://disk/${diskid}
 
-# Allocate USB controller (optional)
+# Allocate USB controller (optional; EHCI (USB 2.0) is not on by default, however)
 mkovf --resource ${param} --elementName="USB" \
-                 -i 6 -k 23 -d "USB Controller" -b vmware.usb.ehci -y False
+                 -i 6 -k 23 -d "USB Controller" -b vmware.usb.ehci -y
 
-# Allocate sound adapter
+# Allocate sound adapters (optional, VMware and VirtualBox subtypes)
 mkovf --resource ${param} --elementName="Sound" \
-                 -i 7 -k 35 -d "Sound Card" -b ensoniq1371 -y False
+                 -i 7 -k 35 -d "Sound Card" -b ensoniq1371 -y
 
 mkovf --resource ${param} --elementName="Sound" \
-                 -i 8 -k 1  -d "Sound Card" -b vmware.soundcard.ensoniq1371 -y False
+                 -i 8 -k 1  -d "Sound Card" -b vmware.soundcard.ensoniq1371 -y
 
 
 # Create informative sections
@@ -223,12 +227,10 @@ mkovf --icon     ${param} -t image/png -w ${logowidth} -n ${iconid} -s ${pclass}
                  --instance=${pclass}.1
 
 
-# Post-process unicode names ("mkovf --os" ignores --encoding)
-# Add missing OS id ("mkovf --os" doesn't provide a switch)
-# -y is not handled correctly
+# Post-process unicode names (mkovf uses --encoding only for XML header)
+# mkovf --resource -y is an on-switch without corresponding off-switch
 sinfo "Fixing OVF envelope"
 sed -i 's/Liberte/Liberté/g ;
-        s/<OperatingSystemSection\>/& ovf:id="99"/g ;
         s/\<Item ovf:required="true"/Item ovf:required="false"/g' \
     ${ovfpath}
 
