@@ -63,6 +63,7 @@ net-im/pidgin                   -gstreamer
 dev-java/gnu-classpath          gstreamer
 
 # Unnecessary functionality
+sys-apps/portage                -xattr
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
