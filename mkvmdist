@@ -45,6 +45,7 @@ pname="Liberte Linux"
 purl="http://dee.su/liberte"
 pdesc="${pname}: Mission-critical stealth communication."
 pclass=su.dee.liberte
+efilabel=LIBERTE_EFI
 
 # VM parameters
 ramsize=256
@@ -52,6 +53,7 @@ disksize=512
 diskformat="http://www.vmware.com/interfaces/specifications/vmdk.html#sparse"
 nettype=NAT
 logowidth=128
+efiextrablocks=32
 
 # Internal names
 vhwname=hw0
@@ -87,12 +89,13 @@ vmware-mount -f ${diskpath} ${vmstage}/vdisk
 
 
 sinfo "Partitioning and installing MBR"
-efisize=`du -s -B 1K --apparent-size ${efiboot} | sed 's/[[:blank:]].*//'`
+efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | sed 's/[[:blank:]].*//'`
+efisize=$(((efiblocks + 2 + efiextrablocks) * 4))
 
-parted -s ${vmstage}/vdisk/flat                                       \
-          mklabel msdos                                               \
-          mkpart  primary fat16 32KiB $(((32 + efisize) * 1024 - 1))B \
-          mkpart  primary ext2  $((32 + efisize))KiB 100%             \
+parted -s ${vmstage}/vdisk/flat                                     \
+          mklabel msdos                                             \
+          mkpart  primary fat16 4KiB $(((4 + efisize) * 1024 - 1))B \
+          mkpart  primary ext2  $((4 + efisize))KiB 100%            \
           set     2       boot on
 sfdisk -q --change-id ${vmstage}/vdisk/flat 1 ef
 
@@ -102,23 +105,27 @@ losetup ${loop} ${vmstage}/vdisk/flat
 tar -xjf ${syslinux} -C ${vmstage} mbr_c.bin
 cat ${vmstage}/mbr_c.bin > ${loop}
 
-
-sinfo "Copying EFI filesystem"
-dd if=${efiboot} of=${loop} bs=1K seek=32
-
 while ! losetup -d ${loop}; do sleep 1; done
 
 
+sinfo "Creating EFI filesystem"
+losetup -o $((4 * 1024)) -s $((efisize * 1024)) ${loop} ${vmstage}/vdisk/flat
+mkdosfs -n "${efilabel}" ${loop}
+
+mkdir ${vmstage}/vpart
+mount -t vfat ${loop} ${vmstage}/vpart
+
+rsync -aHS ${cdroot}/EFI ${vmstage}/vpart
+umount -d ${vmstage}/vpart
+
+
 sinfo "Creating main filesystem"
-losetup -o $(((32 + efisize) * 1024)) ${loop} ${vmstage}/vdisk/flat
+losetup -o $(((4 + efisize) * 1024)) ${loop} ${vmstage}/vdisk/flat
 
 mke2fs -q -m0 -T largefile -L "${volume}" -O ^resize_inode,^dir_index,sparse_super \
        -F ${loop}
 tune2fs -c 0 -i 0 ${loop}
 
-
-sinfo "Mounting filesystem"
-mkdir ${vmstage}/vpart
 mount -t ext2 -o noatime ${loop} ${vmstage}/vpart
 
 
@@ -129,10 +136,7 @@ rsync -aHS ${cdroot}/liberte ${vmstage}/vpart
 sinfo "Installing boot manager"
 ${cdroot}/liberte/setup.sh ${loop}
 
-
-sinfo "Unmounting filesystem"
-umount ${vmstage}/vpart
-while ! losetup -d ${loop}; do sleep 1; done
+umount -d ${vmstage}/vpart
 
 
 sinfo "Unmounting virtual disk image"
@@ -199,7 +203,7 @@ mkovf --resource ${param} --elementName="Network Adapter" -t True \
 # SCSI: -k  6 / -b lsilogic
 # SATA: -k 20 / -b AHCI     (Not supported in VMware)
 mkovf --resource ${param} --elementName="IDE" \
-                 -i 4 -k 5 -d "IDE Controller" -b lsilogic -a 0
+                 -i 4 -k 5 -d "IDE Controller" -a 0
 
 # Allocate disk
 mkovf --resource ${param} --elementName="Hard Disk" \
