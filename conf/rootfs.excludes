@@ -238,8 +238,7 @@
 /usr/bin/g-ir-*
 /usr/bin/glsl_compiler
 /usr/bin/gs
-/usr/bin/vpxdec
-/usr/bin/vpxenc
+/usr/bin/vp8_scalable_patterns
 /usr/bin/luac
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat

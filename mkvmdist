@@ -179,8 +179,8 @@ mkovf --net    ${param} -i ${netid} -e ${nettype} -m "Virtual Networks" \
 # Define a virtual system
 mkovf --vs     ${param} -i "${distname}" -m "Virtual Appliance"
 
-# Add Guest OS
-mkovf --os     ${param} -d "Linux 2.6.x" -m "Guest Operating System" --secID=99
+# Add Guest OS (100 = Linux 2.6 (64-bit) in VirtualBox, required for x64 EFI)
+mkovf --os     ${param} -d "Linux 3.x" -m "Guest Operating System" --secID=100
 
 # Add virtual hardware section
 mkovf --virthw ${param} -p vmx-6 --instanceID=1 -n ${vhwname} \
