@@ -6,12 +6,10 @@
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
 =dev-java/java-service-wrapper-3.3.3*
-=sys-apps/x86info-1.30*
 =sys-boot/efibootmgr-0.5.4*
 =sys-boot/grub-1.99*:2 **
 
 # Network (torsocks: (#395215))
-=net-proxy/torsocks-1.2*
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
@@ -19,7 +17,6 @@
 # GTK+ 3
 =app-i18n/uim-1.7.3*
 =x11-themes/light-themes-0.1.8.27.2*
-=x11-themes/gtk-engines-unico-1.0.1*
 
 # Guest virtualization (#398229, #394757)
 =app-emulation/open-vm-tools-2011.12.20.562307*

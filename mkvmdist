@@ -90,7 +90,7 @@ vmware-mount -f ${diskpath} ${vmstage}/vdisk
 
 sinfo "Partitioning and installing MBR"
 efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | sed 's/[[:blank:]].*//'`
-efisize=$(((efiblocks + 2 + efiextrablocks) * 4))
+efisize=$(((efiblocks + 6 + efiextrablocks) * 4))
 
 parted -s ${vmstage}/vdisk/flat                                     \
           mklabel msdos                                             \
