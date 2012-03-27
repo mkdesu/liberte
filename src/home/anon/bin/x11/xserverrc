@@ -1,4 +1,8 @@
 #!/bin/sh -e
 
+# Early switch to VT used by X (without cursor).  will also return
+# to it before shutdown (silent splash) / chvt 1 (.profile)
+# chvt 3
+
 # nice -n -10 doesn't work with xinit (since run by user)
 exec /usr/bin/X vt3 -nolisten tcp -br -deferglyphs 16 "$@"

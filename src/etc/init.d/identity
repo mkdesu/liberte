@@ -15,7 +15,7 @@ certsdir=${lmount}/security/cable/certs
 gentorhost=gen-tor-hostname
 geni2phost=gen-i2p-hostname
 genuser=gen-cable-username
-certdate=2012-01-28
+certdate=2012-03-27
 
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite

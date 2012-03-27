@@ -19,6 +19,7 @@
   * Added "readonly" boot parameter for disabling persistence
   * Added "toram" boot parameter for copying root filesystem to RAM
   * Added "gentoo=xvesa" boot parameter for forcing VESA driver in X server
+  * Added "gentoo=xfb" boot parameter for forcing framebuffer driver in X server
   * setup.sh now supports "auto" mode, w/o unmounting and script copying
   * setup.sh is now more robust (MBR write fix, 64-bit-only systems warning)
 

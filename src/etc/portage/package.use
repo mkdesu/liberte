@@ -22,9 +22,8 @@ x11-themes/light-themes         gtk3
 # Drivers
 # [temporarily disable gallium until r600 can be enabled w/o r300 due to llvm dependency]
 # [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
-# [fbdev conflicts with vesa, vbox dri conflicts w/ mprotect]
+# [vbox dri conflicts w/ mprotect]
 media-libs/mesa                 shared-dricore -gallium -egl -llvm
-x11-base/xorg-drivers           -video_cards_fbdev
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 

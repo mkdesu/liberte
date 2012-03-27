@@ -309,9 +309,11 @@ sed -i 's/\<need[[:blank:]]\+root\>/use root/; s/-w "\$RC_LIBEXECDIR"/-z 1/' \
        /etc/init.d/{consolefont,keymaps,termencoding}
 
 
-sinfo "Creating a VESA-only Xorg drivers directory"
-mkdir /usr/lib/xorg/modules/drivers.vesa
-ln    /usr/lib/xorg/modules/drivers{/vesa_drv.so,.vesa}
+sinfo "Creating specialized Xorg driver directories"
+mkdir /usr/lib/xorg/modules/drivers.{native,vesa,fbdev}
+ln    /usr/lib/xorg/modules/drivers{/*.so,.native}
+mv    /usr/lib/xorg/modules/drivers{.native/vesa_drv.so,.vesa}
+mv    /usr/lib/xorg/modules/drivers{.native/fbdev_drv.so,.fbdev}
 
 
 sinfo "Removing invalid symlinks, dirs and files"

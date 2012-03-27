@@ -7,6 +7,7 @@ silentflag=/var/run/nologo
 xorgdir=/etc/X11
 xorglog=/var/log/Xorg.0.log
 xorgdrv=/usr/lib/xorg/modules/drivers
+xorgdrvtype=native
 
 amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
@@ -60,41 +61,35 @@ start() {
     # Configure X server, unless "nox" is given to kernel
     if get_bootparam 'nox'; then
         ewarn Skipping X server configuration
-    elif [ ! -e ${xorgdir}/xorg.conf ]; then
-        # Temporarily mount a VESA-only drivers directory if requested
+    else
+        # Temporarily mount native/VESA/fbdev-only drivers directory if requested
         if get_bootparam 'xvesa'; then
             ewarn Forcing VESA X server driver
-            mount ${xorgdrv}
+            xorgdrvtype=vesa
+        elif get_bootparam 'xfb'; then
+            ewarn Forcing framebuffer X server driver
+            xorgdrvtype=fbdev
         fi
+        mount -rB ${xorgdrv}.${xorgdrvtype} ${xorgdrv}
 
         ebegin Configuring X server
-        if HOME=${xorgdir} Xorg -configure 2>/dev/null; then
-            # Work around Xorg autodetection / fallback bug
-            if grep -q 'Number of created screens does not match number of detected devices' ${xorglog} \
-                && grep -q '"vesa"' ${xorgdir}/xorg.conf.new && [ -e ${xorgdrv}/dummy_drv.so ]; then
-                # Temporarily blacklist VESA driver and rerun autodetection
-                mount  ${xorgdrv}/vesa_drv.so
-                rm ${xorgdir}/xorg.conf.new
-                HOME=${xorgdir} Xorg -configure 2>/dev/null
-                umount ${xorgdrv}/vesa_drv.so
-            fi
+        rm -f ${xorgdir}/xorg.conf.new
+        HOME=${xorgdir} Xorg -configure 2>/dev/null
+        if [ ! -e ${xorgdir}/xorg.conf.new  -a  ${xorgdrvtype} = native ]; then
+            ewarn Falling back to VESA X server driver
+            umount ${xorgdrv} && mount -rB ${xorgdrv}.vesa ${xorgdrv}
+            HOME=${xorgdir} Xorg -configure 2>/dev/null
+        fi
+        umount ${xorgdrv}
 
-            if [ -e ${xorgdir}/xorg.conf.new ]; then
-                mv ${xorgdir}/xorg.conf.new ${xorgdir}/xorg.conf
+        if [ -e ${xorgdir}/xorg.conf.new ]  &&  ! grep -q 'Configuration failed' ${xorglog}; then
+            mv ${xorgdir}/xorg.conf.new ${xorgdir}/xorg.conf
 
-                # Turn off text cursor on vt3 (cf. xserverrc)
-                echo -n "\033[?25l" > /dev/tty3
-            else
-                false
-            fi
+            # Turn off text cursor on vt3 (cf. xserverrc)
+            echo ${BASH:+-e} -n "\033[?25l" > /dev/tty3
         else
             false
         fi
         eend $?
-
-        # mountpoint fails for bind mounts
-        if get_bootparam 'xvesa'; then
-            umount ${xorgdrv}
-        fi
     fi
 }

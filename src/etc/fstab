@@ -21,8 +21,4 @@ tmpfs   /srv  tmpfs   mode=0755,nosuid,nodev,noexec 0 0
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc
 
-# Non-auto mounts used by /etc/init.d/xconfig
-/usr/lib/xorg/modules/drivers.vesa         /usr/lib/xorg/modules/drivers             none noauto,bind,ro 0 0
-/usr/lib/xorg/modules/drivers/dummy_drv.so /usr/lib/xorg/modules/drivers/vesa_drv.so none noauto,bind,ro 0 0
-
 # Persistence mount is added below by /etc/init.d/liberte
