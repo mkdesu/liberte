@@ -82,18 +82,6 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (#398229)
-ovt=/usr/portage/app-emulation/open-vm-tools/open-vm-tools-2011.12.20.562307.ebuild
-ovthash=421c396d4cc345165d1f4076792c62ae95cbcd06007e5a4e930c021f90fee570
-cp -a ${ovt/2011.12.20.562307/2011.11.20.535097} ${ovt}
-ebuild ${ovt} manifest
-grep -q "^DIST open-vm-tools-2011.12.20.562307.tar.gz .* SHA256 ${ovthash}\>" ${ovt%/*}/Manifest
-
-ovt=${ovt//tools/tools-kmod}
-cp -a ${ovt/2011.12.20.562307/2011.11.20.535097} ${ovt}
-sed -i 's/src_prepare/&_off/'                    ${ovt}
-ebuild ${ovt} manifest
-
 # (#348367)
 jsw=/usr/portage/dev-java/java-service-wrapper/java-service-wrapper-3.3.3.ebuild
 spatch ${HOME}/patches/portage/java-service-wrapper.patch -p0

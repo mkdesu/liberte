@@ -9,7 +9,7 @@
 =sys-boot/efibootmgr-0.5.4*
 =sys-boot/grub-1.99*:2 **
 
-# Network (torsocks: (#395215))
+# Network
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
@@ -18,9 +18,9 @@
 =app-i18n/uim-1.7.3*
 =x11-themes/light-themes-0.1.8.27.2*
 
-# Guest virtualization (#398229, #394757)
-=app-emulation/open-vm-tools-2011.12.20.562307*
-=app-emulation/open-vm-tools-kmod-2011.12.20.562307*
+# Guest virtualization
+=app-emulation/open-vm-tools-2012.03.13.651368*
+=app-emulation/open-vm-tools-kmod-2012.03.13.651368*
 =app-emulation/virtualbox-guest-additions-4.1.8*
 =x11-drivers/xf86-video-virtualbox-4.1.8*
 
