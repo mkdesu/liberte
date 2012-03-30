@@ -154,7 +154,6 @@ sys-apps/less
 app-editors/nano
 app-editors/hexedit
 app-editors/e3
-app-cdr/cdrtools
 
 # Applications
 lxde-base/lxterminal
@@ -164,6 +163,7 @@ app-accessibility/florence
 app-arch/file-roller
 app-misc/emelfm2
 # app-cdr/graveman
+app-cdr/cdrtools
 app-cdr/isomaster
 media-sound/audacious
 media-video/totem

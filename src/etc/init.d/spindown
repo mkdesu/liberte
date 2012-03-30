@@ -20,22 +20,27 @@ start() {
 
     # Put ATA/SCSI drives into quiet mode
     # /dev/disk/by-path should contain only physical devices
+    # NOTE: hdparm -M and -y do not wake up disks from standby
     if [ -e /dev/disk/by-path ]; then
+        ebegin Enabling drive acoustic and standby modes
+        eindent
+
         devs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b \
                                      -exec readlink -f {} \;`
         for dev in ${devs}; do
-            if hdparm -M 128 ${dev} 1>/dev/null 2>&1; then
-                ebegin Enabled acoustic settings: ${dev}
-                eend 0
+            if hdparm -q -M 128 "${dev}" 2>/dev/null; then
+                einfo "Quiet mode:   ${dev}"
             fi
 
             # Ignore boot media (desirable if it is a disk)
             if [ "${mediadev#${dev}}" = "${mediadev}" ]; then
-                if hdparm -y ${dev} 1>/dev/null 2>&1; then
-                    ebegin Enabled standby mode: ${dev}
-                    eend 0
+                if hdparm -q -y "${dev}" 2>/dev/null; then
+                    einfo "Standby mode: ${dev}"
                 fi
             fi
         done
+
+        eoutdent
+        eend $?
     fi
 }

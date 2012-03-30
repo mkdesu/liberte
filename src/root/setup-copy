@@ -316,6 +316,10 @@ mv    /usr/lib/xorg/modules/drivers{.native/vesa_drv.so,.vesa}
 mv    /usr/lib/xorg/modules/drivers{.native/fbdev_drv.so,.fbdev}
 
 
+sinfo "Replacing laptop-mode drive-waking hdparm calls"
+sed -i 's/\<hdparm -[SW]\>/fast-&/' /usr/share/laptop-mode-tools/modules/hdparm
+
+
 sinfo "Removing invalid symlinks, dirs and files"
 find  /usr/i686-pc-linux-gnu -xtype l -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}

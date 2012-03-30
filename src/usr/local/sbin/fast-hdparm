@@ -1,0 +1,14 @@
+#!/bin/sh -e
+
+eval dev=\${$#}
+
+if [ -b "${dev}" ]; then
+    # possible states (hdparm.c):
+    #   unknown, standby, NVcache_{spindown,spinup}, idle, active/idle
+    if ! hdparm -C "${dev}" 2>/dev/null | grep -q '\<idle\>'; then
+        echo "${dev} would wake up: ignoring command"
+        exit 42
+    fi
+fi
+
+exec hdparm "$@"
