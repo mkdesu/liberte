@@ -186,6 +186,7 @@ app-text/fbreader
 net-irc/xchat
 net-im/pidgin
 net-ftp/gftp
+www-client/uget
 
 # Plugins
 mail-client/claws-mail-notification

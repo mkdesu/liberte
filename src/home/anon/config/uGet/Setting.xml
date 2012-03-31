@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<UgSetting version='1'>
+  <LaunchApp value='0'/>
+  <LaunchAppTypes value='torrent'/>
+  <AutoSave value='1'/>
+  <AutoSaveInterval value='3'/>
+  <DownloadColumn>
+    <completed value='1'/>
+    <total value='1'/>
+    <percent value='1'/>
+    <elapsed value='1'/>
+    <left value='1'/>
+    <speed value='1'/>
+    <UploadSpeed value='1'/>
+    <uploaded value='0'/>
+    <ratio value='1'/>
+    <retry value='1'/>
+    <category value='0'/>
+    <URL value='0'/>
+    <AddedOn value='1'/>
+    <CompletedOn value='0'/>
+    <sort-nth value='13'/>
+    <sort-order value='1'/>
+  </DownloadColumn>
+  <Summary>
+    <name value='1'/>
+    <folder value='1'/>
+    <category value='0'/>
+    <URL value='0'/>
+    <message value='1'/>
+  </Summary>
+  <Window>
+    <Toolbar value='1'/>
+    <Statusbar value='1'/>
+    <Category value='1'/>
+    <Summary value='1'/>
+    <x value='63'/>
+    <y value='170'/>
+    <width value='620'/>
+    <height value='400'/>
+    <maximized value='0'/>
+  </Window>
+  <UserInterface>
+    <CloseConfirmation value='0'/>
+    <CloseAction value='0'/>
+    <DeleteConfirmation value='1'/>
+    <ShowTrayIcon value='1'/>
+    <StartInTray value='0'/>
+    <StartInOfflineMode value='0'/>
+    <StartNotification value='1'/>
+    <SoundNotification value='0'/>
+  </UserInterface>
+  <Clipboard>
+    <pattern value='ZIP|BIN|GZ|7Z|Z|TAR|TGZ|BZ2|A[0-9]?|LZH|MP3|RPM|DEB|EXE|RAR|R[0-9][0-9]'/>
+    <monitor value='1'/>
+    <quiet value='0'/>
+    <NthCategory value='0'/>
+  </Clipboard>
+  <Scheduler>
+    <enable value='0'/>
+    <state>3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,</state>
+  </Scheduler>
+  <Plug-in>
+    <aria2-enable value='0'/>
+    <aria2-launch value='1'/>
+    <aria2-shutdown value='1'/>
+    <aria2-path value='aria2c'/>
+    <aria2-args value='--enable-xml-rpc'/>
+    <aria2-uri value='http://localhost:6800/rpc'/>
+  </Plug-in>
+  <FolderList>
+    <string value='/home/anon/persist/documents'/>
+  </FolderList>
+</UgSetting>

@@ -49,7 +49,7 @@ pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup(midori, gst-plugins-soup)
 libsoup                 gnutls                  gnutls          midori, gst-plugins-soup, totem-pl-parser
-curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi
+curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi, uget
 neon                    ssl, gnutls             gnutls          audacious-plugins
 wget                    ssl                     ssl             portage, libqalculate(forex)
 
@@ -61,7 +61,7 @@ pidgin                  gnutls, nss             gnutls
 gftp                    ssl                     ssl
 
 
-libgcrypt users: cryptsetup, gnutls, gnupg, gnome-keyring, libotr(pidgin-otr)
+libgcrypt users: cryptsetup, gnupg, gnome-keyring, libotr(pidgin-otr)
 
 
 

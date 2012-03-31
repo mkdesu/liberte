@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<UgCategoryList version='1'>
+  <category>
+    <name value='Documents'/>
+    <ActiveLimit value='3'/>
+    <FinishedLimit value='300'/>
+    <RecycledLimit value='300'/>
+    <DownloadDefault>
+      <DataList>
+        <DataClass name='common'>
+          <folder value='/home/anon/persist/documents'/>
+          <ConnectTimeout value='30'/>
+          <TransmitTimeout value='30'/>
+          <RetryDelay value='6'/>
+          <RetryLimit value='99'/>
+          <MaxConnections value='1'/>
+          <MaxUploadSpeed value='0'/>
+          <MaxDownloadSpeed value='0'/>
+          <AttachedStamp value='0'/>
+        </DataClass>
+        <DataClass name='proxy'>
+          <port value='80'/>
+          <type value='0'/>
+        </DataClass>
+        <DataClass name='relation'>
+          <hints value='0'/>
+          <AttachedStamp value='0'/>
+          <MessageType value='0'/>
+        </DataClass>
+        <DataClass name='http'>
+          <RedirectionLimit value='30'/>
+          <RedirectionCount value='0'/>
+        </DataClass>
+      </DataList>
+    </DownloadDefault>
+    <DownloadIndices/>
+  </category>
+</UgCategoryList>

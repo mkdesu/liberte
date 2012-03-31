@@ -31,6 +31,7 @@
   * Better Bluetooth support
   * Replaced SCIM with uim
   * Added gFTP file transfer client
+  * Added uGet download manager
   * Replaced Xarchiver with File Roller
   * Unsafe Browser execution environment is sanitized with pam_namespace
   * Laptop Mode Tools do not wake up drives on PM state changes
