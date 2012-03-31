@@ -75,7 +75,6 @@ app-admin/sudo
 lxde-base/lxpolkit
 app-misc/hatools
 sys-apps/paxctl
-app-misc/vlock
 x11-misc/alock
 net-misc/ssh-askpass-fullscreen
 sys-fs/cryptsetup
