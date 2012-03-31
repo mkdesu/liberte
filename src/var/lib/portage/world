@@ -6,7 +6,6 @@ media-fonts/terminus-font         # TEMP
 app-portage/gentoolkit            # (explicit unmerge in setup-copy)
 app-portage/portage-utils         # TEMP
 app-portage/eix                   # TEMP
-# dev-python/pysqlite             # TEMP
 
 # LiveCD tools
 sys-apps/kexec-tools
@@ -17,7 +16,6 @@ net-dialup/mingetty
 sys-apps/microcode-data
 sys-kernel/amd-ucode
 x11-drivers/radeon-ucode
-media-sound/alsa-firmware
 net-wireless/b43-firmware
 net-wireless/b43-firmware:b43legacy
 net-wireless/ar9271-firmware
@@ -45,6 +43,7 @@ net-wireless/bluez-firmware
 media-tv/ivtv-firmware
 media-tv/cx18-firmware
 sys-kernel/linux-firmware
+# media-sound/alsa-firmware
 # media-tv/linuxtv-dvb-firmware
 
 # Disk utilities
