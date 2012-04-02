@@ -51,7 +51,7 @@ ${SRC}/mkroot ${LIVECD} clean
 
 # Builds "liberte" dir in ${LIVECD}/dist to deploy
 sinfo "Mastering deployment directory"
-${SRC}/mkimage ${LIVECD}
+${SRC}/enter ${LIVECD} image -c ./mkimage
 
 # OK to copy "liberte" dir and run setup.sh
 sinfo "Done: ZIP archive in ${LIVECD}/dist"

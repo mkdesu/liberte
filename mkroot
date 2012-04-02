@@ -47,48 +47,6 @@ elif [ "$2" = clean ]; then
         --exclude-from=${FROM}/conf/rootfs-cp.excludes \
         ${LIVECD}/copy/ ${LIVECD}/copy | head
 
-
-    sinfo "Removing unnecessary SUID bits"
-    chmod a-s `sed -n "s:^/:${LIVECD}/copy&:p" ${FROM}/conf/rootfs.nosuid`
-
-
-    ${FROM}/check ${LIVECD}
-
-
-    sinfo "Creating pruned packages list"
-    pakdir=${LIVECD}/copy/tmp/transient/pkg
-    for p in ${pakdir}/*=*; do
-        sort ${p} | while read f; do
-            if [ -h ${LIVECD}/copy"${f}"  -o  -e ${LIVECD}/copy"${f}" ]; then
-                echo "${f}" >> ${p}.pruned
-            fi
-        done
-
-        if [ -e ${p}.pruned ]; then
-            mv ${p}.pruned ${p}
-            chmod 644 ${p}
-        else
-            rm ${p}
-        fi
-    done
-
-    find ${pakdir} -type f -name '*=*' -printf '%f\n' \
-        | tr = / | sort > ${LIVECD}/copy/boot/packages.lst
-    chmod 644 ${LIVECD}/copy/boot/packages.lst
-
-    # Skip files with spaces to prevents problems with SquashFS sorting
-    sinfo "Creating unregistered files list"
-    find ${LIVECD}/copy -xdev \( -type l -o -type f \) ! -name '* *' \
-        ! -path "${pakdir}/*" ! -path "${LIVECD}/copy/boot/*"        \
-        ! -path "${LIVECD}/copy/dev/*" -printf '/%P\n' | sort        \
-        > ${pakdir}/all-files
-    cat ${pakdir}/*=* | sort -u > ${pakdir}/listed-files
-
-    comm -13  ${pakdir}/listed-files ${pakdir}/all-files > ${pakdir}/unlisted-files
-    rm        ${pakdir}/listed-files ${pakdir}/all-files
-    chmod 644                                              ${pakdir}/unlisted-files
-
-
     sinfo "Done."
     exit
 fi

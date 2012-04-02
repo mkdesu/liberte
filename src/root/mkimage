@@ -8,27 +8,31 @@ sinfo() {
 }
 
 
-# Must have root directory as an argument
-if [ -z "$1" ]; then
-    echo "$0 <livecd root>"
-    exit 1
-fi
-
-
 # Variables
-src=`dirname $0`
-livecd=$1/copy
-cdroot=$1/dist/cdroot
+helpdir=${HOME}/helpers
+nosuid=${HOME}/config/rootfs.nosuid
 
-version=`cat ${src}/conf/version`
-distname=liberte-${version}
-sysver=`cat ${livecd}/boot/syslinux/version`
-mksqver=4.2
+live=/mnt/live
+cdroot=/mnt/boot/cdroot
+distroot=/mnt/boot
 
-luser=2101
-lgroup=9000
+distname=liberte-${LVERSION}
+zipfile=${distroot}/${distname}.zip
+isofile=${distroot}/${distname}.iso
 
 efilabel=LIBERTE_EFI
+efiboot=${cdroot}/isolinux/efiboot.img
+
+sqimage=${cdroot}/liberte/boot/root-x86.sfs
+sqsort=${live}/tmp/transient/pkg/squashfs.sort
+sqpseudo=${HOME}/config/rootfs.pseudo
+sqignore=${HOME}/config/rootfs.ignore
+
+luser=`id -u anon`
+lgroup=`id -g anon`
+
+sysver=`syslinux -v 2>&1 | cut -d' ' -f2`
+
 
 # See also /usr/local/sbin/ps-mount
 vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0177,dmask=077
@@ -37,67 +41,54 @@ extflags=noatime,nosuid,nodev,acl,user_xattr
 hfspflags=noatime,nosuid,nodev,uid=${luser},gid=${lgroup},umask=077
 
 
-# POSIX shells should (probably) support $(())
 mibsize() {
-    bytes=`stat -c %s "$1"`
+    local bytes=`stat -c %s "$1"`
     echo $(((bytes + 512 * 1024) / (1024 * 1024)))
 }
 
 
-if type mksquashfs 1>/dev/null 2>&1; then
-    mksquashfs=mksquashfs
-else
-    echo "SquashFS Tools not found"
-    exit 1
-fi
+sinfo "Removing unnecessary SUID bits"
+chmod a-s `sed -n "s:^/:${live}&:p" ${nosuid}`
 
-mksqversion=`${mksquashfs} -version | head -1 | cut -d' ' -f3`
-if [ "${mksqversion}" != ${mksqver} ]; then
-    echo "Need SquashFS Tools v${mksqver}, but detected v${mksqversion}"
-    exit 1
-fi
+
+# Check the live tree
+${helpdir}/chk-live-tree
+
+
+sinfo "Preparing packages list and SquashFS ordering"
+${helpdir}/gen-package-list
 
 
 if [ -e ${cdroot}/liberte/boot/packages.lst ]; then
     sinfo "Listing package changes"
-    diff -U 0 ${cdroot}/liberte/boot/packages.lst ${livecd}/boot/packages.lst \
+    diff -U 0 ${cdroot}/liberte/boot/packages.lst ${live}/boot/packages.lst \
         | tail -n +3 | sed '/^@@/d'
 fi
 
 
-sinfo "Copying USB add-ons"
-rm -rf          ${cdroot}
-mkdir -p -m 755 ${cdroot}
+sinfo "Copying image add-ons"
+rm -rf ${cdroot}
+mkdir  ${cdroot}
 
-rsync -aHS -i -O --no-o --no-g --chmod=u=rwX,go=rX \
-    --delete-excluded -C                           \
-    ${src}/dist/ ${cdroot}/liberte
+rsync -aHS --delete-excluded ${HOME}/dist/  ${cdroot}/liberte
 sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
 
 
-sinfo "Copying USB /boot"
-rsync -aHS -i --delete-excluded --exclude /boot/syslinux/version \
-    ${livecd}/boot ${cdroot}/liberte
+sinfo "Copying image /boot"
+rsync -aHS --delete-excluded ${live}/boot ${cdroot}/liberte
 mv ${cdroot}/liberte/boot/EFI ${cdroot}
-
-
-# Unreferenced files have default priority 0 (which is the top priority)
-sinfo "Preparing SquashFS ordering"
-chroot ${livecd} /tmp/transient/bin/gen-file-ordering
-sqsort=${livecd}/tmp/transient/pkg/squashfs.sort
 
 
 # Using default block size of 128KiB
 # (chmod due to GRKERNSEC_HIDESYM)
 sinfo "Creating SquashFS image"
 
-${mksquashfs} ${livecd} ${cdroot}/liberte/boot/root-x86.sfs          \
-    -noappend -no-exports -no-progress -no-xattrs -comp xz -Xbcj x86 \
-    -always-use-fragments -pf ${src}/conf/rootfs.pseudo              \
-    -sort ${sqsort} -ef ${src}/conf/rootfs.ignore
-chmod go= ${cdroot}/liberte/boot/root-x86.sfs
+mksquashfs ${live} ${sqimage} -noappend -no-progress -no-exports \
+    -always-use-fragments -no-xattrs -comp xz -Xbcj x86          \
+    -pf ${sqpseudo} -sort ${sqsort} -ef ${sqignore}
+chmod go= ${sqimage}
 
-sfshash=`sha256sum ${cdroot}/liberte/boot/root-x86.sfs`
+sfshash=`sha256sum ${sqimage}`
 sfshash="${sfshash%% *}"
 
 
@@ -110,19 +101,19 @@ sed -i "s/FSHASH/${sfshash}/; s/VFATFLAGS/${vfatflags}/; s/EXTFLAGS/${extflags}/
     ${cdroot}/liberte/boot/grub/grub.cfg
 
 # EXTLINUX config takes precedence over SYSLINUX one when in same directory
-mkdir -m 755 ${cdroot}/liberte/boot/syslinux/ext
-cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+mkdir ${cdroot}/liberte/boot/syslinux/ext
+cp -p ${live}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
 sed -i "s/TAG //; s/ROOTFS/ext4/; s/FSFLAGS/${extflags}/;  s/FSHASH/${sfshash}/" \
     ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
 
 # ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
 # (translation equivalent to mount's map=normal is still performed)
-cp -p ${livecd}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
+cp -p ${live}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660 readonly toram/; s/FSFLAGS/${isofsflags}/;
         s/FSHASH/${sfshash}/; s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
     ${cdroot}/liberte/boot/syslinux/isolinux.cfg
 
-mkdir -m 755 ${cdroot}/isolinux
+mkdir ${cdroot}/isolinux
 cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
 
 sed -i "s/FSHASH/${sfshash}/" ${cdroot}/liberte/qemulate.sh
@@ -136,26 +127,20 @@ find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
 # UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
 # the use of conforming FAT partitions which do not use the ESP GUID."
 sinfo "Building binary distribution ${distname}.zip"
-zipfile=`readlink -f ${cdroot}/../${distname}.zip`
 rm -f ${zipfile}
 (cd ${cdroot}; zip -r9 -q ${zipfile} EFI liberte)
 
 
 # Add two extra 4K blocks (may need adjustment)
 sinfo "Creating EFI boot image for El-Torito"
-efiboot=${cdroot}/isolinux/efiboot.img
-efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | sed 's/[[:blank:]].*//'`
-truncate -s $(((efiblocks + 2) * 4))K ${efiboot};  chmod 644 ${efiboot}
+efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | cut -f1`
+truncate -s $(((efiblocks + 2) * 4))K ${efiboot}
 mkdosfs -n "${efilabel}" -I -f 1 -r 16 -R 1 ${efiboot}
-mount -t vfat -o loop ${efiboot} ${cdroot}/isolinux
-rsync -aHS ${cdroot}/EFI         ${cdroot}/isolinux
-umount -d                        ${cdroot}/isolinux
+MTOOLS_SKIP_CHECK=1 mcopy -i ${efiboot} -smQ ${cdroot}/EFI ::
 
 
 # Hide root directories on Windows, and reset volume information
-# Requires cdrtools >= 3.01a05 (for -eltorito-platform)
 sinfo "Creating ISO image ${distname}.iso"
-isofile=${cdroot}/../${distname}.iso
 mkisofs -quiet -iso-level 2 -no-pad -sysid '' -V '' -A '' -R \
     -no-emul-boot -boot-load-size 4 -boot-info-table         \
     -c boot.cat -b liberte/boot/syslinux/isolinux.bin        \

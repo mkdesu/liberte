@@ -2,6 +2,8 @@
 sys-kernel/hardened-sources       # TEMP
 sys-boot/syslinux                 # TEMP
 sys-boot/grub                     # TEMP
+sys-fs/mtools                     # TEMP
+sys-fs/squashfs-tools             # TEMP
 media-fonts/terminus-font         # TEMP
 app-portage/gentoolkit            # (explicit unmerge in setup-copy)
 app-portage/portage-utils         # TEMP
@@ -82,7 +84,6 @@ app-crypt/gnupg
 app-crypt/mcrypt
 x11-misc/fpm2
 dev-libs/engine_pkcs11
-# app-crypt/steghide (masked, #319679)
 app-crypt/ccid
 app-crypt/tpm-tools
 sys-apps/haveged

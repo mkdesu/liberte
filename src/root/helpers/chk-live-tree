@@ -1,0 +1,113 @@
+#!/bin/bash
+
+export LC_ALL=C
+
+
+sinfo() {
+    echo -e "\033[1;33;41m$@\033[0m"
+}
+
+
+# Variables
+live=/mnt/live
+regexps=${HOME}/config/checkregexps
+
+
+check_shlib() {
+    local acc=
+    for f in $*; do
+        if [ -z "${f/#${acc}*/}" ]; then
+            acc=${f}
+        else
+            echo "${f}"
+        fi
+    done
+}
+
+
+sinfo "Checking ${live}"
+cd ${live}
+
+
+sinfo "Invalid files and symlinks:"
+find . ! \( -type d -o -type f -o -type l \)
+find . -type l ! -xtype f ! -xtype d
+
+sinfo "Archives:"
+find . -type f  \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
+           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.[jw]ar' \) \
+        ! -path './opt/i2p/lib/*' ! -path './opt/i2p/webapps/*'
+
+sinfo "Sources:"
+find . -name '*.h' -o \( -name '*.inc' ! -path './usr/share/keymaps/*' \) \
+        -o -name '*.c' -o -name '*.cpp' \
+        -o -name '*.m4' -o -name '*.el' -o -name '*.py' \
+        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm' \
+        -o \( -name '*.lua' ! -path './usr/share/libquvi-scripts/lua/*' \)
+
+sinfo "Objects:"
+find . -name '*.o' -o -name '*.a' -o -name '*.pc' \
+        -o \( -name '*.la' ! -path './usr/lib/GraphicsMagick-*' \)
+
+sinfo "Duplicate libraries:"
+for lib in `find . -name 'lib*.so'`; do
+    check_shlib ${lib}*
+done
+
+sinfo "Docs:"
+find . \( -name '*.info*' ! -path './usr/lib/aspell*.info' \) \
+        -o -name '*.htm*' -o -name '*.1.bz2'
+
+sinfo "Hidden:"
+find . -mindepth 1 -name '.*' ! \( -path './home/anon/*' -o -path './root/*' \
+        -o -path './dev/*' \) ! -path './usr/share/gnumeric/*.category'
+
+sinfo "Cache, backup, and temp:"
+find . -name '*.cache' -o -name '*.loaders' -o -name '*.immodules'
+find . \( -name '*~*' -o -name '*-' -o -name '*#*' -o -name '*.bak' \
+           -o -name '*;*' -o -name '*.orig' \
+           -o \( -path '*/tmp/*' ! -path './tmp/transient/*' \) \) \
+        ! -name 'routerInfo-*.dat'
+
+sinfo "Logs:"
+find . -name '*.log*' -o -type f \( -path './var/run/*' -o -path './var/log/*' \)
+
+
+sinfo "SUID/SGID:"
+find . -type f -perm /u+s      -printf '%M %u %g\t%P\n'
+find . -type f -perm /g+s,o+w  -printf '%M %u %g\t%P\n'
+find . -type d -perm /a+st,o+w -printf '%M %u %g\t%P\n'
+
+
+sinfo "STACK/TEXTRELs/PaX markings:"
+find . -type f \( -name '*.so*' -o -perm /111 \) ! -path './usr/lib/paxtest/*' -print0 \
+    | xargs -0 scanelf -qtex
+
+
+sinfo "Build environment:"
+if [ -e ${regexps} ]; then
+    regexps=`cat ${regexps} | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
+
+    grep   -iE "${regexps}"                                     \
+        /usr/src/linux/arch/*/boot/compressed/vmlinux.bin       \
+        /usr/src/linux-kexec/arch/*/boot/compressed/vmlinux.bin \
+        /usr/src/linux-kexec-64/arch/*/boot/compressed/vmlinux.bin
+
+    xzgrep -iE "${regexps}" \
+        ./boot/initrd-*.xz  \
+        ./usr/local/boot/initrd-kexec.xz
+
+    find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
+        ! -name 'libgucharmap.so.*' ! -name oui.txt -print0 \
+        | xargs -0 grep -liE "${regexps}"
+else
+    echo "checkregexp file not found, skipping"
+fi
+
+
+sinfo "Unsupported scripts:"
+find . -type f -print0 | xargs -0 grep -lE \
+    '^#![[:blank:]]*/usr/bin/(perl|python|env[[:blank:]]+(perl|python))'
+
+
+true

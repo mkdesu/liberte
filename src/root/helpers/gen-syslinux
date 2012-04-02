@@ -24,10 +24,6 @@ rm    -f /boot/boot
 mkdir -p ${sysroot}
 
 
-# Save Syslinux version required for setup.sh
-syslinux -v 2>&1 | cut -d' ' -f2 > ${sysroot}/version
-
-
 # Copy Syslinux modules and binaries
 for mod in ${modules}; do
     cp -p /usr/share/syslinux/${mod} ${sysroot}

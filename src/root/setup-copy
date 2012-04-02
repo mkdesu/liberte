@@ -108,8 +108,8 @@ for ebuild in ${!ebuild_*}; do
 done
 rm -f /var/cache/edb/vdb_*.pickle
 
-# [gettext] coreutils, nano, powertop: not needed (#398983, #398975, #398977)
-echo sys-devel/gettext-0.15 >> /etc/portage/profile/package.provided
+# [gettext] coreutils, nano, powertop, cdrtools: not needed (#398983, #398975, #398977, #410501)
+echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 # java-config wrappers are superfluous for minimal VMs (and require Python)
 echo dev-java/java-config-2.1.11 >> /etc/portage/profile/package.provided
@@ -366,17 +366,12 @@ ln -s  ../local/libexec/java.wrapper /usr/bin/java
 
 # Spaces in entries are not handled, but it doesn't matter here
 sinfo "Saving current packages list in /tmp/transient/pkg"
+rm -rf /tmp/transient
 pakdir=/tmp/transient/pkg
 mkdir -p ${pakdir}
 for p in `find /var/db/pkg -mindepth 2 -maxdepth 2 -type d -printf '%P\n'`; do
     sed -n 's/^\(obj\|sym\) \([^ ]\+\).*$/\2/p' /var/db/pkg/${p}/CONTENTS > ${pakdir}/${p//\//=}
 done
-
-
-sinfo "Saving helper scripts for mkimage"
-savedir=/tmp/transient/bin
-mkdir ${savedir}
-cp ${helpdir}/gen-file-ordering ${savedir}
 
 
 sinfo "Done."

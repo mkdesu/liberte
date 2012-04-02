@@ -7,7 +7,7 @@ sinfo() {
 
 # Must have root directory as an argument
 if [ -z "$1" ]; then
-    echo "$0 <livecd root> [copy] [-c shell command...]"
+    echo "$0 <livecd root> [copy|image] [-c shell command...]"
     exit 1
 fi
 
@@ -30,6 +30,10 @@ done
 if [ "$2" = copy ]; then
     PHASE=$2
     LIVECD=$1/${PHASE}
+    shift 2
+elif [ "$2" = image ]; then
+    PHASE=$2
+    LIVECD=$1/src
     shift 2
 else
     PHASE=src
@@ -54,7 +58,8 @@ else
           --exclude=/etc/polkit-1          \
           --exclude=/etc/portage/gnupg/ -C ${SRC}/ ${LIVECD}
 
-    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${SRC}/root              ${LIVECD}
+    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded \
+        -C --exclude=.gitignore                          ${SRC}/root              ${LIVECD}
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
@@ -130,13 +135,19 @@ for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; d
 done
 mount -rB -o remount ${LIVECD}/proc
 
-if [ ${PHASE} = copy -a -d ${LIVECD}/usr/portage ]; then
+if [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
     mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
     mount -rB -o remount ${LIVECD}/usr/portage
 fi
 
-if [ -d /usr/portage/distfiles -a -d ${LIVECD}/usr/portage/distfiles ]; then
+if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
     mount -B /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
+fi
+
+if [ ${PHASE} = image ]; then
+    mkdir -p ${LIVECD}/../dist
+    mount -B ${LIVECD}/../copy ${LIVECD}/mnt/live
+    mount -B ${LIVECD}/../dist ${LIVECD}/mnt/boot
 fi
 
 
@@ -154,11 +165,16 @@ fi
 
 sinfo "Unmounting system directories"
 
-if [ -d /usr/portage/distfiles -a -d ${LIVECD}/usr/portage/distfiles ]; then
+if [ ${PHASE} = image ]; then
+    umount ${LIVECD}/mnt/live
+    umount ${LIVECD}/mnt/boot
+fi
+
+if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
     umount ${LIVECD}/usr/portage/distfiles
 fi
 
-if [ -d ${LIVECD}/usr/portage -a ${PHASE} = copy ]; then
+if [ -d ${LIVECD}/usr/portage  -a  ${PHASE} = copy ]; then
     umount ${LIVECD}/usr/portage
 fi
 
