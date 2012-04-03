@@ -28,6 +28,7 @@ x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 
 # Networking, including SSL/TLS
+# (epiphany: +networkmanager requires >=net-misc/networkmanager-0.8.997)
 dev-lang/python                 ssl
 mail-client/claws-mail                gnutls
 net-libs/libetpan               -ssl  gnutls
@@ -46,7 +47,8 @@ net-im/pidgin                         gnutls sasl
 dev-libs/cyrus-sasl             ssl          -crypt
 dev-libs/libevent               -ssl
 net-analyzer/netcat                          -crypt
-net-libs/libproxy               -gnome -networkmanager
+www-client/epiphany             -nss   -networkmanager
+net-libs/libproxy               -gnome
 net-libs/glib-networking        -gnome libproxy
 
 # Multimedia

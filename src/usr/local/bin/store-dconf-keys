@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+# This script expects output of list-dconf-keys as input.
+# It just stores the keys, so run
+#     rm ${XDG_CONFIG_HOME}/dconf/user
+# to get a clean dconf state.
+
+sed -n '/^[^#]/p' | while IFS== read key value; do
+    dconf write "${key}" "${value}"
+done

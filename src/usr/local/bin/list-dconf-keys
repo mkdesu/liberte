@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+lastprefix=
+list_keys() {
+    local path="$1" entry= prefix=
+
+    if [ "${path}" = "${path%/}" ]; then
+        prefix="${path%/*}/"
+        if [ "${prefix}" != "${lastprefix}" ]; then
+            [ -z "${lastprefix}" ] || echo
+            echo "# ${prefix}"
+            lastprefix="${prefix}"
+        fi
+
+        echo -n "${path}="
+        dconf read "${path}"
+    else
+        for entry in `dconf list "${path}"`; do
+            list_keys "${path}${entry}"
+        done
+    fi
+}
+
+list_keys /

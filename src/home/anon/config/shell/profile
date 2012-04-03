@@ -38,7 +38,7 @@ export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 
 # Application settings
-export BROWSER=midori
+export BROWSER=epiphany
 export LESS="-R -M --shift 16 -Swi -x4"
 export LESSHISTFILE=-
 export EDITOR=nano

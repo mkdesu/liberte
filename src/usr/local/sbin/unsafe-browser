@@ -26,6 +26,7 @@ export XDG_CONFIG_HOME=${HOME}/config
 export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
 export XDG_CACHE_HOME=${TMPDIR}/cache
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
+export GSETTINGS_BACKEND=dconf
 
 # NOTE: GStreamer only works if nofw can access /dev/snd/*
 # (mirrors /etc/env.d/99gstreamer)
@@ -33,5 +34,5 @@ export GST_REGISTRY=/var/cache/gstreamer/registry.bin
 export GST_REGISTRY_UPDATE=no
 
 
-# Run Midori (which uses getpwent instead of ${HOME})
-exec midori -c ${XDG_CONFIG_HOME}/midori
+# Run Epiphany
+exec epiphany

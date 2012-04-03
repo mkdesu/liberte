@@ -4,6 +4,9 @@ mail-mta/ssmtp-0
 # virtual/mailx (smartmontools)
 mail-client/mailx-0
 
+# Needed only for HTML validation support (epiphany-extensions:error-viewer)
+app-text/opensp-0
+
 # Unneeded (app-i18n/uim (#404463))
 media-fonts/font-sony-misc-0
 

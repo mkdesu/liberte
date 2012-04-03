@@ -74,9 +74,9 @@ find . -name '*.log*' -o -type f \( -path './var/run/*' -o -path './var/log/*' \
 
 
 sinfo "SUID/SGID:"
-find . -type f -perm /u+s      -printf '%M %u %g\t%P\n'
-find . -type f -perm /g+s,o+w  -printf '%M %u %g\t%P\n'
-find . -type d -perm /a+st,o+w -printf '%M %u %g\t%P\n'
+find . -type f -perm /u+s      -printf '%M %u %g\t/%P\n'
+find . -type f -perm /g+s,o+w  -printf '%M %u %g\t/%P\n'
+find . -type d -perm /a+st,o+w -printf '%M %u %g\t/%P\n'
 
 
 sinfo "STACK/TEXTRELs/PaX markings:"

@@ -47,8 +47,8 @@ wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
 openvpn                 ssl                     ssl             networkmanager-openvpn
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
-glib-networking         gnutls                  gnutls          libsoup(midori, gst-plugins-soup)
-libsoup                 gnutls                  gnutls          midori, gst-plugins-soup, totem-pl-parser
+glib-networking         gnutls                  gnutls          libsoup
+libsoup                 gnutls                  gnutls          gst-plugins-soup, totem, webkit-gtk
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi, uget
 neon                    ssl, gnutls             gnutls          audacious-plugins
 wget                    ssl                     ssl             portage, libqalculate(forex)

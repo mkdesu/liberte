@@ -59,7 +59,7 @@ Plugin {
     type = launchbar
     Config {
         Button {
-            id=/usr/share/applications/midori.desktop
+            id=/usr/share/applications/epiphany.desktop
         }
         Button {
             id=/usr/share/applications/claws-mail.desktop

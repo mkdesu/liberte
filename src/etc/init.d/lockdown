@@ -52,10 +52,6 @@ start() {
         touch ${lidevents}/close.flag
         eend $?
     fi
-
-
-    # Workaround /run incompatibility (#400899)
-    checkpath -q -d -m 700 /var/run/spawn-fcgi
 }
 
 stop() {

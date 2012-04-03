@@ -1,23 +1,10 @@
-#############################################################################
-# $Id: match-all.action,v 1.2 2009/02/14 10:41:07 fabiankeil Exp $
-#
-# This file contains the actions that are applied to all requests and
-# may be overruled later on by other actions files. Less experienced
-# users should only edit this file through the actions file editor.
-#
-#############################################################################
 { \
 +change-x-forwarded-for{block} \
 +hide-from-header{block} \
 +hide-referer{forge} \
-+hide-user-agent{Mozilla/5.0 (Windows NT 6.1; rv:5.0) Gecko/20100101 Firefox/5.0} \
-+hide-accept-language{en-us,en;q=0.5} \
 +overwrite-last-modified{randomize} \
 +session-cookies-only \
 +set-image-blocker{pattern} \
 +client-header-filter{hide-tor-exit-notation} \
-+client-header-filter{tweak-accept} \
-+client-header-filter{tweak-accept-encoding} \
-+add-header{Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7} \
 }
 / # Match all URLs

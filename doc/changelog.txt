@@ -29,6 +29,7 @@
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
   * Better Bluetooth support
+  * Replaced Midori with Epiphany (also based on WebKit-GTK+)
   * Replaced SCIM with uim
   * Added gFTP file transfer client
   * Added uGet download manager

@@ -41,7 +41,7 @@ if [ "${op}" = save ]; then
             --exclude-from=${savedir}/persist.excludes \
             ${savedir} "${livecd}"${HOME}              \
         | sed '/^[^>ch.]/d; s/^[^ ]* //' > ${savelist}
-    bsdtar -cJf "${settings}".new -C ${HOME} -n -T ${savelist}
+    bsdtar -cJf "${settings}".new -C ${HOME} -n --options xz:compression-level=4 -T ${savelist}
     rm ${savelist}
 
     # store a backup of previous archive, if it exists,

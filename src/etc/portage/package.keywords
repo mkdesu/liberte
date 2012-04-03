@@ -18,6 +18,8 @@
 # GTK+ 3
 =app-i18n/uim-1.7.3*
 =x11-themes/light-themes-0.1.8.27.2*
+=www-client/epiphany-3.2.1
+=www-client/epiphany-extensions-3.2*
 
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.03.13.651368*
@@ -54,5 +56,11 @@ media-tv/cx18-firmware
 # Fixes Gentoo bug (#394457)
 =app-portage/portage-utils-0.9
 
-# battery plugin fixes for recent sysfs ACPI
+# Battery plugin fixes for recent sysfs ACPI
 =lxde-base/lxpanel-0.5.8-r1
+
+# /var/run/spawn-fcgi directory (#400899)
+=www-servers/spawn-fcgi-1.6.3*
+
+# edit-select-all-symbolic.svg (#410483)
+=x11-themes/gnome-icon-theme-symbolic-3.4.0*
