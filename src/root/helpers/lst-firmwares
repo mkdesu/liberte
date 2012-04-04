@@ -20,7 +20,7 @@ for fw in $(strings -a -n 10                               \
               | sed -n 's/^firmware=//p'                   \
               | sort -u); do
     if [ ! -e /lib/firmware/${fw} ] && ! grep -q "^${fw}\$" ${fwlst}; then
-        # Support older iwlwifi ucodes
+        # Support older iwlwifi ucodes (IWL*_UCODE_API_MIN/OK)
         if [ ! -e /lib/firmware/${fw/-6.ucode/-5.ucode} ]; then
             echo ${fw}
         fi

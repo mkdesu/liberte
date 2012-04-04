@@ -1,0 +1,40 @@
+#!/bin/bash -e
+
+keyworded=/etc/portage/package.keywords
+linuxfw=/etc/portage/savedconfig/sys-kernel/linux-firmware
+
+
+sinfo() {
+    echo -e "\033[1;33;41m$@\033[0m"
+}
+
+
+sinfo "Unnecessary unmasking:"
+comm -23 <(sed -n 's/^[=<]\(.*\)-[0-9].*/\1/; /^[^#]/p' ${keyworded} | sort) \
+         <(eix --installed-unstable --only-names | sort)
+
+
+sinfo "Unincluded firmware:"
+NEWLINE=true eix '\<(ucode|firmware|microcode)\>' -\* --testing \
+    --format '{!installed}<bestversion*:NAMEVERSION>\t <description>{}'
+
+
+sinfo "Missing from linux-firmware:"
+skip=0 noskip=1
+sed -n '/^$\|^[^#]/p' ${linuxfw} | while read fw; do
+    if [ -z "${fw}"  -a  ${noskip} != 1 ]; then
+        skip=1
+    elif [ ! -e /lib/firmware/"${fw}" ]; then
+        if [ ${skip} = 1  -a  ${noskip} != 1 ]; then
+            echo
+            skip=0
+        fi
+
+        echo -n "${fw} "
+        noskip=0
+    fi
+done
+echo
+
+
+sinfo "Done."

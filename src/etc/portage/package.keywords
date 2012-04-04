@@ -32,7 +32,6 @@
 =net-irc/xchat-otr-0.3*
 
 # Firmware
-sys-kernel/linux-firmware
 sys-apps/microcode-data
 sys-kernel/amd-ucode
 net-wireless/b43-firmware

@@ -55,8 +55,8 @@ ath3k-1.fw
 
 # BT_MRVL_SDIO
 mrvl/sd8787_uapsta.bin
-mrvl/sd8797_uapsta.bin
 # (missing)
+mrvl/sd8797_uapsta.bin
 sd8688.bin
 sd8688_helper.bin
 
