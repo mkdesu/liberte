@@ -1,4 +1,7 @@
 #!/bin/sh
 
 export TZ=:UTC
-exec /usr/bin/epiphany "$@"
+
+# Use --new-window to override --new-tab (-n), which does
+# not seem to interfere with any other options (like -b)
+exec /usr/bin/epiphany -n "$@"
