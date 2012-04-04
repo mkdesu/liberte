@@ -3,21 +3,18 @@
 # Weird things can happen if some output goes to console
 exec 1>/dev/null 2>&1
 
-# Use of auto.media is exclusive via file lock
-lock=/var/lock/ps-mount.lock
-lockfd=20
-
 
 # Fork in order not to stall udev on this and related devices
 if [ fork != "$1" ]; then
-    # Bash doesn't understand ${lockfd}>>
-    (flock ${lockfd}; "$0" fork "$@") 20>> ${lock} &
+    # Use of auto.media is exclusive via file lock
+    lock=/var/lock/ps-mount.lock
+    (flock 20; "$0" fork "$@") 20>>${lock} &
 else
     shift
 
     # Files and scripts
     prefix=/media
-    daemon=/etc/init.d/autofs
+    autofspid=/var/run/autofs.pid
 
     mountsorg=/etc/autofs/auto.media
     mounts=/var/run/auto.media
@@ -119,41 +116,13 @@ else
 
     # Reloading autofs if it is running
     reload_autofs() {
-        local actual
-        local expected
-
-        if ${daemon} -q status; then
-            # Sends SIGHUP to automount (autofs 5.0.4: only effective when adding mount points)
-            ${daemon} -qs reload
-
-            # Wait up to 2s for changes to take effect
-            local count=0
-            expected=`echo "${autokeys}" | tr ' ' '\n' | sed '/^$/d' | sort`
-            while [ ${count} -lt 8 ]; do
-                actual=`find ${prefix} -mindepth 1 -maxdepth 1 -printf '%f\n' | sort`
-
-                if [ "${actual}" = "${expected}" ]; then
-                    count=100
-                else
-                    sleep 0.25
-                    let count=count+1
-                fi
-            done
-
-            # Changes weren't reflected in /media
-            if [ ${count} != 100 ]; then
-                logger -p 4 -t auto.media "autofs reloading failed, restarting service"
-
-                # Deadlock if the lock is still held at this point
-                # Rather unreliable otherwise, but better than nothing
-                flock -u ${lockfd}
-                ${daemon} -qs restart
-            fi
+        if [ -r ${autofspid} ]; then
+            kill -HUP `cat ${autofspid}`
         fi
     }
 
     # Adding new auto.media entry
-    # (also update autokeys for reload_autofs)
+    # (also update autokeys)
     add_entry() {
         case "${ID_FS_TYPE}" in
             auto|ext2|ext3|ext4|vfat|iso9660|udf|hfs|hfsplus|vmhgfs|vboxsf)
@@ -183,7 +152,7 @@ else
     }
 
     # Unmount and remove existing auto.media entry (or entries)
-    # (also update autokeys for fixlabel after ACTION=change, and for reload_autofs)
+    # (also update autokeys for fixlabel after ACTION=change)
     remove_entry() {
         # Unmount mount points, not devices (since there can be several per device)
         local keys=`awk '/^[^#]/ && $3 == ":'"${DEVNAME}"'" { print substr($1,2,length($1)-2) }' ${mounts}`
@@ -192,7 +161,7 @@ else
 
         for key in ${keys}; do
             # NOTE: lazy unmount
-            umount -l ${prefix}/"${key}" 2>/dev/null || true
+            umount -l ${prefix}/"${key}" 2>/dev/null || :
             autokeys="${autokeys/ ${key} / }"
 
             if [ "${kl}" = keeplabel ]; then
