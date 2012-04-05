@@ -117,7 +117,7 @@ sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
 sys-power/powertop
-sys-process/latencytop
+# sys-process/latencytop
 app-laptop/laptop-mode-tools
 app-emulation/virt-what
 sys-boot/efibootmgr
