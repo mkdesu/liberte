@@ -225,6 +225,8 @@
 /usr/libexec/totem/totem-bugreport.py
 # sys-apps/fbset: modeline to fb.modes translator
 /usr/bin/modeline2fb
+# sys-apps/pcsc-lite: LD_PRELOAD=/usr/lib/libpcscspy.so wrapper
+/usr/bin/pcsc-spy
 
 # OpenSSH server
 /etc/ssh/sshd_config
