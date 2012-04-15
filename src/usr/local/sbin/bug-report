@@ -118,6 +118,7 @@ sed -ri 's/\<version:?[[:blank:]]+[[:digit:].]+\>/&/; t; s/\<(0|127|255)\.(0|255
 sed -ri 's/\<([[:xdigit:]]{2}:){5,}[[:xdigit:]]{2}\>/[MAC REMOVED]/ig' *
 sed -ri "s/\<(domain name) '[^']*'/\1 '[DN REMOVED]'/ig" *
 
+sed -ri 's/\<(Encryption key:[[:blank:]]*)[^[:blank:]]+/\1[KEY REMOVED]/' *
 sed -rn 's/^.*\<ESSID:"([^"]+)".*$/\1/p' 08-net-wifi | while read net; do
     sed -i "s^\<${net}\>^[ESSID REMOVED]^g" *
 done
