@@ -29,27 +29,22 @@ app-emulation/open-vm-tools     -X
 
 # Networking, including SSL/TLS
 # (epiphany: +networkmanager requires >=net-misc/networkmanager-0.8.997)
-dev-lang/python                 ssl
-mail-client/claws-mail                gnutls
-net-libs/libetpan               -ssl  gnutls
-net-misc/wget                   ssl
-net-libs/libsoup                ssl
-net-libs/glib-networking        ssl
-net-misc/curl                   ssl   gnutls -nss
-net-libs/neon                   ssl   gnutls
+net-misc/curl                   gnutls
+net-libs/neon                   gnutls
+net-libs/libetpan               gnutls
 net-wireless/wpa_supplicant     -ssl  gnutls
-net-misc/networkmanager               gnutls -nss
-net-misc/openvpn                ssl
-dev-libs/pkcs11-helper               -gnutls -nss
-net-ftp/gftp                    ssl
-net-irc/xchat                   ssl
-net-im/pidgin                         gnutls sasl
-dev-libs/cyrus-sasl             ssl          -crypt
+net-misc/networkmanager         gnutls
+net-im/pidgin                   gnutls sasl
+dev-libs/cyrus-sasl             -crypt
 dev-libs/libevent               -ssl
-net-analyzer/netcat                          -crypt
-www-client/epiphany             -nss   -networkmanager
-net-libs/libproxy               -gnome
-net-libs/glib-networking        -gnome libproxy
+net-analyzer/netcat             -crypt
+www-servers/nginx               -ssl
+dev-libs/nettle                 -ssl
+net-misc/iputils                -ssl
+dev-libs/opensc                 -ssl
+app-i18n/uim                    -ssl
+www-client/epiphany             -nss -networkmanager
+net-libs/glib-networking        -gnome
 
 # Multimedia
 # [mpg123: TEXTRELs (#164504, fixed in 1.13.4)]
