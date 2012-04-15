@@ -71,7 +71,7 @@ sed -i 's/\${python_dep}//' ${ebuild_portage}
 # Python
 # exiv2                    not needed                  (#398959)
 # libglade:                libglade-convert            (#398955)
-# librsvg:                 rsvg                        (#398951)
+# librsvg:                 rsvg                        (#398951, fixed in 2.36.0)
 # gtk+:                    gtk-builder-convert         (#402905, fixed in 2.24.10-r1)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)

@@ -17,15 +17,13 @@
 
 # GTK+ 3
 =app-i18n/uim-1.7.3*
-=x11-themes/light-themes-0.1.8.27.2*
+=x11-themes/light-themes-0.1.8.32*
 =www-client/epiphany-3.2.1
 =www-client/epiphany-extensions-3.2*
 
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.03.13.651368*
 =app-emulation/open-vm-tools-kmod-2012.03.13.651368*
-=app-emulation/virtualbox-guest-additions-4.1.8*
-=x11-drivers/xf86-video-virtualbox-4.1.8*
 
 # Applications
 =x11-misc/fpm2-0.79*
