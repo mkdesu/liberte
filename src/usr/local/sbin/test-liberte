@@ -53,9 +53,9 @@ cci2p=`cat /home/anon/persist/security/i2p/eepsite/hostname`
 
 # Check that wireless MAC addresses were changed
 for netdev in /sys/class/net/*; do
-    if [ -e "${netdev}"/phy80211 ]; then
-        wmachw=`cat ${netdev}/phy80211/macaddress`
-        wmac=`cat ${netdev}/address`
+    if iwdetect "${netdev}" && [ -e "${netdev}"/phy80211 ]; then
+        wmachw=`cat "${netdev}"/phy80211/macaddress`
+        wmac=`cat "${netdev}"/address`
         stest pass "Changed MAC: `basename ${netdev}`" [ ${#wmachw} = ${#wmac} -a "${wmachw}" != "${wmac}" ]
     fi
 done

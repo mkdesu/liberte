@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+if [ $# != 1 ]; then
+    echo "$0 <netdev>"
+    exit 1
+fi
+
+export LC_ALL=C
+dev="$1"
+
+# wireless-tools < v30 does not return proper error code
+! iwconfig "${dev}" 2>&1 | grep -qi "\<\(no wireless extensions\|No such device\)\>"

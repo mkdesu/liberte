@@ -28,7 +28,7 @@ if [ $# = 1 ]; then
     if [ X"$1" = Xwireless ]; then
         ifaces2=
         for iface in ${ifaces}; do
-            if [ -e /sys/class/net/${iface}/phy80211 ]; then
+            if iwdetect "${iface}"; then
                 ifaces2="${ifaces2}${iface} "
             fi
         done
@@ -40,7 +40,7 @@ if [ $# = 1 ]; then
 else
     selected=
     for iface in ${ifaces}; do
-        if [ X"$1" = X${iface} ]; then
+        if [ X"$1" = X"${iface}" ]; then
             selected=${iface}
         fi
     done
@@ -69,12 +69,12 @@ fi
 
 # MAC getter via sysfs
 mac_get() {
-    local iface=$1
+    local iface="$1"
 
     if [ "`cat /sys/class/net/${iface}/addr_len`" != 6 ]; then
         false
     else
-        cat /sys/class/net/${iface}/address
+        cat /sys/class/net/"${iface}"/address
     fi
 }
 
@@ -83,16 +83,16 @@ mac_get() {
 if [ -n "${ifaces}" ]; then
     for iface in ${ifaces}; do
 
-        if [ -e /sys/class/net/${iface}/phy80211 ]; then
-            echo "Wireless interface: ${iface}"
+        if iwdetect "${iface}"; then
+            echo "  Wireless interface: ${iface}"
         else
-            echo "Wired interface:    ${iface}"
+            echo "  Wired interface:    ${iface}"
         fi
 
         if [ -z "${mac}" ]; then
-            newmac=`mac_get ${iface} | cut -d: -f1-3`:`RANDFILE=/dev/null openssl rand -hex 3 | sed 's/^\(..\)\(..\)\(..\)$/\1:\2:\3/'`
+            newmac=`mac_get "${iface}" | cut -d: -f1-3`:`RANDFILE=/dev/null openssl rand -hex 3 | sed 's/^\(..\)\(..\)\(..\)$/\1:\2:\3/'`
         else
-            newmac=${mac}
+            newmac="${mac}"
         fi
 
         if [ ${#newmac} != 17 ]; then
@@ -100,9 +100,9 @@ if [ -n "${ifaces}" ]; then
             exit 1
         fi
 
-        ifconfig ${iface} down
-        ifconfig ${iface} hw ether ${newmac}
-        ifconfig ${iface} up
+        ifconfig "${iface}" down
+        ifconfig "${iface}" hw ether "${newmac}"
+        ifconfig "${iface}" up
     done
 
     if /etc/init.d/NetworkManager -q status; then
