@@ -81,13 +81,6 @@ if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
 fi
 
 
-sinfo "Applying temporary portage patches"
-# (#348367)
-jsw=/usr/portage/dev-java/java-service-wrapper/java-service-wrapper-3.3.3.ebuild
-spatch ${HOME}/patches/portage/java-service-wrapper.patch -p0
-ebuild ${jsw} manifest
-
-
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
