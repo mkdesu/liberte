@@ -135,6 +135,6 @@ start() {
 
     # Randomize endings of wireless interfaces MAC addresses
     ebegin Randomizing wireless MACs
-    mac-randomize wireless 1>/dev/null
+    mac-randomize wireless
     eend $?
 }
