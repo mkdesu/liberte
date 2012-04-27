@@ -32,6 +32,7 @@ imap_directory=
 imap_subsonly=1
 low_bandwidth=0
 generate_msgid=1
+generate_xmailer=0
 add_custom_header=0
 msgid_with_addr=0
 use_smtp_auth=0
