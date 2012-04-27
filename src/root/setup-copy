@@ -187,6 +187,10 @@ sinfo "Fixing Murrine themes for GTK-2"
 sed -i 's/_ratio\>/_shade/; /\<\(scrollbar_color\|gradients\)\>[[:blank:]]*=/d' \
     /usr/share/themes/{Murr*,NOX}/gtk-2.0/gtkrc
 
+sinfo "Fixing Ambiance/Radiance themes for GTK-3.2.3"
+sed -i 's/\([0-9]\)px/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
+truncate -s 0 /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{gtk-widgets-backdrop,apps/nautilus}.css
+
 
 # Any problem will cause a fatal error
 sinfo "Checking linking consistency"
