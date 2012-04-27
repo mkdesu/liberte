@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header$
 
-# Based on the ebuild from zugaina overlay:
+# Based on the ebuild from xmw overlay:
 # http://gpo.zugaina.org/app-accessibility/florence
 
 EAPI=4
@@ -40,7 +40,7 @@ DEPEND="${RDEPEND}
 DOCS="AUTHORS ChangeLog NEWS README"
 
 src_configure() {
-	econf --with-xkb \
+	econf \
 		$(use_with accessibility at-spi) \
 		$(use_with doc docs) \
 		$(use_with gnome panelapplet) \
