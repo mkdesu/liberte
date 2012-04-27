@@ -11,6 +11,7 @@ net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
 dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
+sys-apps/gawk                   -readline
 dev-lang/lua                    -readline
 dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline
