@@ -15,7 +15,12 @@ xhost -
 # xbacklight -set 100
 xset b off s 300 15 dpms 300 600 900
 xset r rate 250 50 m 3/2 0
-setxkbmap ${X11_KBD_LAYOUT:+-layout ${X11_KBD_LAYOUT}} ${X11_KBD_VARIANT:+-variant ${X11_KBD_VARIANT}} -option compose:ralt &
+
+if [ "${X11_KBD_LAYOUT}.${X11_KBD_VARIANT}" = us. ]; then
+    X11_KBD_COMPOSE=ralt
+fi
+setxkbmap ${X11_KBD_LAYOUT:+-layout ${X11_KBD_LAYOUT}} ${X11_KBD_VARIANT:+-variant ${X11_KBD_VARIANT}} \
+          ${X11_KBD_COMPOSE:+-option compose:${X11_KBD_COMPOSE}} &
 
 # Launch daemons
 # assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
