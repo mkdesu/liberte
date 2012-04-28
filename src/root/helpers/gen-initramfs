@@ -3,6 +3,7 @@
 # Kernel version
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
+[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
 
 
 # modules.fs:     per-filesystem module lists to load during init
