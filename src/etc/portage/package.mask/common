@@ -1,0 +1,2 @@
+# Unqualified dependency of net-wireless/iw pulls multi-slot libnl
+dev-libs/libnl:3
