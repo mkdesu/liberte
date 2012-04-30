@@ -98,7 +98,7 @@ if [ -e ${regexps} ]; then
         ./usr/local/boot/initrd-kexec.xz
 
     find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
-        ! -name 'libgucharmap.so.*' ! -name oui.txt -print0 \
+        ! -name 'libgucharmap*.so.*' ! -name oui.txt -print0 \
         | xargs -0 grep -liE "${regexps}"
 else
     echo "checkregexp file not found, skipping"

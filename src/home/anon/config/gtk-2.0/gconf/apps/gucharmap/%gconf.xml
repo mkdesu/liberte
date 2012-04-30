@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<gconf>
-	<entry name="height" mtime="1304956395" type="int" value="337"/>
-	<entry name="width" mtime="1304956395" type="int" value="450"/>
-	<entry name="last_char" mtime="1304956406" type="string">
-		<stringvalue>U+004C</stringvalue>
-	</entry>
-</gconf>

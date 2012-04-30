@@ -107,7 +107,6 @@ app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # GConf (+ gnome-keyring for nm-*)
-gnome-extra/gucharmap           gnome
 app-text/evince                 gnome
 net-misc/networkmanager-pptp    gnome
 net-misc/networkmanager-openvpn gnome
