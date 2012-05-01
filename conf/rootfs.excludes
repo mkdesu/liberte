@@ -167,8 +167,6 @@
 /usr/bin/sensors-conf-convert
 # gnome-base/libglade: old versions ui upgrade
 /usr/bin/libglade-convert
-# x11-libs/gtk+: glade -> xml conversion
-/usr/bin/gtk-builder-convert
 # net-misc/ntp: servers chain tracer, ntpq loop wrapper
 /usr/bin/ntptrace
 /usr/bin/ntp-wait

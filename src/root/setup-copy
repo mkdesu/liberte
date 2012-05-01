@@ -54,7 +54,6 @@ ebuilds="app-misc/ca-certificates
          net-im/pidgin
          sys-apps/lm_sensors
          sys-apps/portage
-         x11-libs/gtk+:2
          x11-libs/xcb-util-wm
          x11-wm/openbox"
 
@@ -72,11 +71,10 @@ sed -i 's/\${python_dep}//' ${ebuild_portage}
 # exiv2                    not needed                  (#398959)
 # libglade:                libglade-convert            (#398955)
 # librsvg:                 rsvg                        (#398951, fixed in 2.36.0)
-# gtk+:                    gtk-builder-convert         (#402905, fixed in 2.24.10-r1)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
 # openbox:                 openbox-xdg-autostart
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_gtk2} ${ebuild_exiv2} \
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_exiv2} \
                                          ${ebuild_gobjectintrospection} ${ebuild_librsvg}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
@@ -84,7 +82,7 @@ sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
 # Perl
 # pptpclient:     not needed when used by networkmanager-pptp
 # lm_sensors:     sensors-detect, sensors-conf-convert
-# obexftp:        not needed           (#398113)
+# obexftp:        not needed (#398113)
 sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient}
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
@@ -187,7 +185,7 @@ sinfo "Fixing Murrine themes for GTK-2"
 sed -i 's/_ratio\>/_shade/; /\<\(scrollbar_color\|gradients\)\>[[:blank:]]*=/d' \
     /usr/share/themes/{Murr*,NOX}/gtk-2.0/gtkrc
 
-sinfo "Fixing Ambiance/Radiance themes for GTK-3.2.3"
+sinfo "Fixing Ambiance/Radiance themes for GTK-3.2"
 sed -i 's/\([0-9]\)px/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 truncate -s 0 /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{gtk-widgets-backdrop,apps/nautilus}.css
 
