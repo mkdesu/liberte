@@ -14,6 +14,7 @@ export XDG_CACHE_HOME=${TMPDIR}/cache
 export SECURITY_HOME=${HOME}/persist/security
 
 export ASPELL_CONF="per-conf ${XDG_CONFIG_HOME}/aspell/aspell.conf; home-dir ${XDG_CONFIG_HOME}/aspell"
+export DCONF_PROFILE=${USER}
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
 export GNUPGHOME=${SECURITY_HOME}/pgp
 export INPUTRC=${XDG_CONFIG_HOME}/shell/inputrc

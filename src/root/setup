@@ -469,6 +469,11 @@ install -p -o anon -g legion -m 600 -t /home/anon/persist/security/pgp \
 chattr -f -a /tmp/.private || :
 
 
+sinfo "Creating dconf databases"
+find /etc/dconf/db -maxdepth 1 -type f -delete
+dconf update
+
+
 sinfo "Installing wrappers"
 ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
 

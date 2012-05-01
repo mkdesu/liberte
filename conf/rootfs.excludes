@@ -121,6 +121,7 @@
 /usr/lib/systemd/
 /var/www/
 /etc/*-
+/etc/dconf/db/*.d
 /etc/resolv.conf
 /etc/machine-id
 /etc/issue.logo

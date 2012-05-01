@@ -5,14 +5,14 @@ list_keys() {
     local path="$1" entry= prefix=
 
     if [ "${path}" = "${path%/}" ]; then
-        prefix="${path%/*}/"
+        prefix="${path%/*}"
         if [ "${prefix}" != "${lastprefix}" ]; then
-            [ -z "${lastprefix}" ] || echo
-            echo "# ${prefix}"
+            echo
+            echo "[${prefix#/}]"
             lastprefix="${prefix}"
         fi
 
-        echo -n "${path}="
+        echo -n "${path#${prefix}/}="
         dconf read "${path}"
     else
         for entry in `dconf list "${path}"`; do
@@ -21,4 +21,5 @@ list_keys() {
     fi
 }
 
+echo '# http://live.gnome.org/dconf/SystemAdministrators'
 list_keys /

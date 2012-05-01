@@ -25,6 +25,7 @@ export TZ=:UTC
 export XDG_CONFIG_HOME=${HOME}/config
 export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
 export XDG_CACHE_HOME=${TMPDIR}/cache
+export DCONF_PROFILE=${USER}
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
 export GSETTINGS_BACKEND=dconf
 
