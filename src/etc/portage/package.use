@@ -87,6 +87,7 @@ x11-themes/gtk-engines-murrine  -themes
 sys-apps/busybox                static savedconfig
 sys-kernel/linux-firmware       savedconfig
 sys-devel/gcc                   cxx
+sys-devel/binutils              cxx
 sys-fs/udev                     gudev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
