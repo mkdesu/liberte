@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+export TZ=:UTC
+
 cableid=cable-id
 cablesend=/usr/bin/cable-send
 dummyaddr=anonymous@liberte
