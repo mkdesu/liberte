@@ -152,8 +152,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
-    emerge -qepv @system
-    emerge -qe   @system
+    USE="-X -consolekit" emerge -qepv @system
+    USE="-X -consolekit" emerge -qe   @system
     rm -f ${protected}
     rebuild_locales
 

@@ -1,7 +1,7 @@
 2012-03-XX
   + 2012.1 release
 
-  * Kernel 3.2.2 with devtmpfs in initramfs
+  * Kernel 3.2.11 with devtmpfs in initramfs
   * Fixed memory wiping in KEXEC kernel
   * Removed almost all PaX protection exceptions
   * Fixed multilingual disk labels support for automount
@@ -29,8 +29,8 @@
   * Better support for VMware and VirtualBox virtualization
   * Better support for regular mailboxes in Claws-Mail
   * Better Bluetooth support
-  * Replaced Midori with Epiphany (also based on WebKit-GTK+)
-  * Replaced SCIM with uim
+  * Replaced Midori browser with Epiphany (also based on WebKit-GTK+)
+  * Replaced SCIM input methods manager with uim
   * Added gFTP file transfer client
   * Added uGet download manager
   * Replaced Xarchiver with File Roller
