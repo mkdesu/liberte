@@ -48,32 +48,28 @@ src_unpack() {
 	unzip -j -d ${P}/lib ${DISTDIR}/${I2P_MY_P}.zip lib/i2p.jar || die "failed to extract i2p.jar"
 }
 
-src_compile() {
-	emake || die "make failed"
-}
-
 src_install() {
 	# no mime types, so no need to inherit fdo-mime
-	emake DESTDIR="${D}" install                     || die "make install failed"
+	emake DESTDIR="${D}" install
 
-	doinitd  "${D}"/usr/share/cable/cabled           || die
-	doconfd  "${D}"/usr/share/cable/spawn-fcgi.cable || die
-	dosym    spawn-fcgi /etc/init.d/spawn-fcgi.cable || die
+	doinitd  "${D}"/usr/share/cable/cabled
+	doconfd  "${D}"/usr/share/cable/spawn-fcgi.cable
+	dosym    spawn-fcgi /etc/init.d/spawn-fcgi.cable
 
 	insinto  /etc/nginx
-	doins    "${D}"/usr/share/cable/nginx-cable.conf || die
-	fperms   600 ${INSDESTTREE}/nginx-cable.conf     || die
+	doins    "${D}"/usr/share/cable/nginx-cable.conf
+	fperms   600 ${INSDESTTREE}/nginx-cable.conf
 
-	rm -r    "${D}"/usr/share/cable
+	rm -r    "${D}"/usr/share/cable || die
 
 	# /srv/www(/cable)        drwx--x--x root  root
 	# /srv/www/cable/certs    d-wx--s--T root  nginx
 	# /srv/www/cable/(r)queue d-wx--s--T cable nginx
 	keepdir       /srv/www/cable/{certs,{,r}queue}
-	fperms  3310  /srv/www/cable/{certs,{,r}queue}   || die
-	fperms   711  /srv/www{,/cable}                  || die
-	fowners      :nginx /srv/www/cable/certs         || die "failed to change ownership"
-	fowners cable:nginx /srv/www/cable/{,r}queue     || die "failed to change ownership"
+	fperms  3310  /srv/www/cable/{certs,{,r}queue}
+	fperms   711  /srv/www{,/cable}
+	fowners      :nginx /srv/www/cable/certs
+	fowners cable:nginx /srv/www/cable/{,r}queue
 }
 
 pkg_postinst() {
@@ -93,11 +89,11 @@ pkg_postinst() {
 	elog ""
 	elog "Generate cables certificates and Tor/I2P keypairs for the user"
 	elog "    gen-cable-username"
-	elog "        copy CABLE_CERTS/certs/*.{pem,sig} to CABLE_PUB/cable/certs (group-readable)"
+	elog "        copy CABLE_CERTS/certs/*.pem  to CABLE_PUB/cable/certs (group-readable)"
 	elog "    gen-tor-hostname"
 	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by tor)"
 	elog "    gen-i2p-hostname"
-	elog "        copy CABLE_I2P/eepsite to /var/lib/i2p/router (readable only by i2p)"
+	elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by i2p)"
 	elog ""
 	elog "Once a cables username has been generated for the user:"
 	elog "    rename CABLE_PUB/cable to CABLE_PUB/<username>"
@@ -110,13 +106,12 @@ pkg_postinst() {
 	elog "    /etc/tor/torrc"
 	elog "        HiddenServiceDir  /var/lib/tor/hidden_service/"
 	elog "        HiddenServicePort 80 127.0.0.1:80"
-	elog "    /var/lib/i2p/router/i2ptunnel.config"
+	elog "    /var/lib/i2p/i2ptunnel.config"
 	elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
 	elog "        tunnel.X.targetHost=127.0.0.1"
 	elog "        tunnel.X.targetPort=80"
 	elog ""
-	elog "Finally, the user should configure the email client to run /usr/bin/cable-send"
-	elog "as a pipe for sending messages from addresses shown by"
-	elog "    cable-info (or see CABLE_CERTS/certs/username, CABLE_{TOR,I2P}/*/hostname)"
-	elog "See comments in /usr/bin/cable-send for /etc/sudoers entry suggestion."
+	elog "Finally, the user should configure the email client to run cable-send"
+	elog "as a pipe for sending messages from addresses shown by cable-info."
+	elog "See comments in /usr/bin/cable-send for suggested /etc/sudoers entry."
 }

@@ -23,7 +23,7 @@
   * setup.sh now supports "auto" mode, w/o unmounting and script copying
   * setup.sh is now more robust (MBR write fix, 64-bit-only systems warning)
 
-  * Cables communication now maintains repudiability
+  * Cables communication maintains perfect forward secrecy and repudiability
   * Added Open Virtualization bundle (OVA) (backported to 2011.2)
 
   * Better support for VMware and VirtualBox virtualization

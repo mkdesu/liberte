@@ -15,7 +15,7 @@ certsdir=${lmount}/security/cable/certs
 gentorhost=gen-tor-hostname
 geni2phost=gen-i2p-hostname
 genuser=gen-cable-username
-certdate=2012-03-27
+certdate=2012-05-09
 
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite
@@ -117,10 +117,10 @@ start() {
     if [ -e ${certsdir}/username ]; then
         ebegin Initializing cables directory
         username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
-        rsync -lptHS --safe-links --chmod=u=rw,g=r,o=                \
-              ${certsdir}/*.pem ${certsdir}/*.sig ${cableflag}/certs \
-            && mv -T ${cableflag} ${cablepub}/"${username}"          \
-            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/"  \
+        rsync -lptHS --safe-links --chmod=u=rw,g=r,o=               \
+              ${certsdir}/*.pem ${cableflag}/certs                  \
+            && mv -T ${cableflag} ${cablepub}/"${username}"         \
+            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" \
                       /etc/nginx/nginx-cable.conf
         eend $?
     fi
