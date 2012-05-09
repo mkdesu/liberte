@@ -5,7 +5,9 @@ export TZ=:UTC
 cableid=cable-id
 cablesend=/usr/bin/cable-send
 dummyaddr=anonymous@liberte
+
 confdir=${XDG_CONFIG_HOME}/claws-mail
+theme=/usr/share/claws-mail/themes/Gnome
 
 
 # Configure the Tor address if none is set
@@ -23,6 +25,11 @@ fi
 # Legacy configuration support: the path has changed twice
 if ! grep -q "^mail_command=${cablesend}\$" ${confdir}/accountrc; then
     sed -i "s:^\(mail_command=\).*:\1${cablesend}:" ${confdir}/accountrc
+fi
+
+# Legacy configuration support: the installed theme has changed
+if ! grep -q "^pixmap_theme_path=${theme}\$" ${confdir}/clawsrc; then
+    sed -i "s:^\(pixmap_theme_path=\).*:\1${theme}:" ${confdir}/clawsrc
 fi
 
 
