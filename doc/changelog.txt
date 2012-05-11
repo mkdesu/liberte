@@ -1,4 +1,4 @@
-2012-03-XX
+2012-05-11
   + 2012.1 release
 
   * Kernel 3.2.11 with devtmpfs in initramfs
