@@ -173,7 +173,7 @@ media-gfx/graphicsmagick
 media-sound/sox
 media-sound/vorbis-tools
 app-editors/gedit
-app-text/epdfview
+gnome-extra/gucharmap
 app-text/evince
 app-office/abiword
 app-office/gnumeric
