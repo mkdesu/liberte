@@ -9,9 +9,10 @@ sysmbr=/usr/share/syslinux/mbr_c.bin
 sysmbr2=/usr/lib/syslinux/mbr_c.bin
 mattrbin=mattrib
 
-# Directory for ldlinux.sys and bundled syslinux binary
+# Directories for ldlinux.sys and bundled syslinux binary
 sysdir=/liberte/boot/syslinux
 systmpdir=
+mntexec=
 
 # Filesystem types (for auto mode)
 fs_fat=4d44
@@ -143,6 +144,32 @@ udevprop() {
 }
 
 
+# 32-bit executability checker
+checkexec() {
+    local binary="$1"
+
+    # 32-bit: /lib/ld-linux.so.2, 64-bit: /lib/ld-linux-x86-64.so.2
+    if [ ! -e /lib/ld-linux.so.2 ]; then
+        echo "WARNING: it looks like 32-bit ELF binaries are unsupported on this system"
+    # Use test(1) from coreutils (it calls access(2), honoring MS_NOEXEC and MS_RDONLY)
+    elif [ ! -x "${binary}" ] || { [ -e /usr/bin/test ] && ! /usr/bin/test -x "${binary}"; }; then
+        echo "WARNING: executing bundled binaries will fail"
+
+        binary=`dirname "$(readlink -f "${binary}")"`
+        while ! mountpoint -q ${binary}; do
+            binary=`dirname "${binary}"`
+        done
+
+        if grep -q " ${binary} .*\<noexec\>" /proc/mounts; then
+            mntexec="${binary}"
+            echo "WARNING: ${mntexec} is mounted with noexec option"
+            echo "Remounting ${mntexec} with exec permissions"
+            mount -o remount,exec "${mntexec}"
+        fi
+    fi
+}
+
+
 # Check for wrong block device type (highly unlikely)
 devpath=`udevadm info -q path -n "${dev}"`
 devtype=`udevprop ${devpath} DEVTYPE`
@@ -201,16 +228,7 @@ if [ ${devfs} = fat ]; then
         mattrbin=${systmpdir}/mattrib
         export PATH=${systmpdir}:"${PATH}"
 
-        # 32-bit: /lib/ld-linux.so.2, 64-bit: /lib/ld-linux-x86-64.so.2
-        if [ ! -e /lib/ld-linux.so.2 ]; then
-            echo "WARNING: it looks like 32-bit ELF binaries are unsupported"
-        fi
-
-        # Use test(1) from coreutils (it calls access(2), honoring MS_NOEXEC and MS_RDONLY)
-        if [ ! -x ${sysbin} ] || { [ -e /usr/bin/test ] && ! /usr/bin/test -x ${sysbin}; }; then
-            echo "WARNING: executing bundled binaries will fail"
-            echo "(no 32-bit support, or `dirname ${systmpdir}` mounted noexec)"
-        fi
+        checkexec ${sysbin}
     fi
 
     # Create OTFE directory so that it can be hidden, too
@@ -238,7 +256,13 @@ if [ ${devfs} = fat ]; then
     export MTOOLS_SKIP_CHECK=1
     export MTOOLS_FAT_COMPATIBILITY=1
 
-    ${mattrbin} -i "${dev}" +h ::/liberte ::/otfe ::/EFI
+    ${mattrbin} -i "${dev}" +h ::/liberte ::/otfe
+    ${mattrbin} -i "${dev}" +h ::/EFI 2>/dev/null || :
+
+    if [ -n "${mntexec}" ]; then
+        echo "Remounting ${mntexec} with noexec option"
+        mount -o remount,noexec "${mntexec}"
+    fi
 
 elif [ ${devfs} = ext2 ]; then
 
@@ -259,11 +283,18 @@ elif [ ${devfs} = ext2 ]; then
 
         extbin=${systmpdir}/extlinux
         sysmbr=${systmpdir}/mbr_c.bin
+
+        checkexec ${extbin}
     fi
 
     # Install EXTLINUX
     echo "*** Installing EXTLINUX in ${devdir} ***"
     ${extbin} -i "${devdir}"${sysdir}/ext
+
+    if [ -n "${mntexec}" ]; then
+        echo "Remounting ${mntexec} with noexec option"
+        mount -o remount,noexec "${mntexec}"
+    fi
 
 else
     error "Internal error"
