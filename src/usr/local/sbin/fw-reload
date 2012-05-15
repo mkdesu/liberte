@@ -9,7 +9,7 @@ torports=80,443
 
 # VPN TCP/UDP server ports (PPTP, OpenVPN, Cisco) [uid=root]
 vpntports=https,imaps,1723,openvpn,10000
-vpnuports=openvpn,isakmp,ipsec-nat-t,10000
+vpnuports=openvpn,1149,isakmp,ipsec-nat-t,10000
 
 # Ports used by HotSpot registration pages [uid=nofw]
 hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
