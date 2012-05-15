@@ -5,6 +5,7 @@
 =app-emulation/virt-what-1.11*
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
+=dev-java/jamvm-1.5.4-r2
 =dev-java/java-service-wrapper-3.5.14*
 =sys-boot/efibootmgr-0.5.4*
 =sys-boot/grub-1.99*:2 **

@@ -43,7 +43,6 @@ sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
          app-mobilephone/obexftp
-         dev-java/jamvm
          dev-libs/gobject-introspection
          gnome-base/libglade
          gnome-base/librsvg
@@ -88,11 +87,9 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [debianutils]                     ca-certificates:  update-ca-certificates
 # [xcb-proto]                       xcb-util-wm:      not needed              (#398953, upstream)
-# [eclipse-ecj,gjdoc]               jamvm:            javac, javadoc symlinks (#371461)
 # [encodings,mkfontdir,mkfontscale] font-misc-meltho: not needed              (#312077)
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'  ${ebuild_xcbutilwm}
-sed -i 's:\<dev-java/gjdoc\>::; s:\<dev-java/eclipse-ecj\>::' ${ebuild_jamvm}
 sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":'  ${ebuild_fontmiscmeltho}
 
 # [gst-plugins-bad] gst-plugins-vp8: only libgstbasevideo-0.10.so is needed
