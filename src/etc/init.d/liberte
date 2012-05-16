@@ -63,7 +63,7 @@ start() {
 
 
         # Remount media root read-write (for non-loop/cd/dvd)
-        mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
+        get_bootparam 'readonly' || mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
         if [ ${mediaro} = 0 ]; then
             # -o iversion can not be appended in initramfs (Busybox: #4802)
             ebegin Remounting ${boot} read-write
