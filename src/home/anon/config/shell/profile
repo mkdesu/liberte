@@ -72,6 +72,10 @@ if [ -z "${NO_STARTX}" ]; then
             while ! startx; do
                 . ${XDG_CONFIG_HOME}/shell/locale
             done
+        elif [ -e /etc/X11/xorg.conf.new ]; then
+            echo '"Xorg -configure" failed; see /etc/X11/xorg.conf.new and'
+            echo '/var/log/Xorg.0.log for details. You may still attempt to'
+            echo 'start X server without a configuration file using "startx".'
         fi
 
         # Switch from silent splash mode VT (if any)
