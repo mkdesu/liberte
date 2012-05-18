@@ -1,10 +1,10 @@
---- /etc/init.d/htpdate	2011-12-22 05:14:10.000000000 +0000
-+++ /etc/init.d/htpdate.new	2012-01-26 07:06:04.000000000 +0000
-@@ -17,6 +17,7 @@
- 
- start() {
- 	checkconfig || return 1
-+	checkpath -q -d -m 750 -o htp:htp /var/run/htpdate
- 	ebegin "Starting htpdate"
- 	htpdate ${HTPDATE_OPTS} ${PROXY} ${SERVERS}
- 	eend $?
+--- /etc/init.d/htpdate	2012-05-18 01:19:25.000000000 +0000
++++ /etc/init.d/htpdate.new	2012-05-18 01:38:41.000000000 +0000
+@@ -13,3 +13,7 @@
+     need net
+     use dns logger
+ }
++
++start_pre() {
++    checkpath -q -d -m 750 -o htp:htp /var/run/htpdate
++}

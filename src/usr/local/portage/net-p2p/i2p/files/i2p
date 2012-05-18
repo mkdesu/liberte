@@ -1,33 +1,22 @@
 #!/sbin/runscript
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-description="Starts I2P service."
+description="I2P service"
 
+command=/usr/bin/wrapper
+command_args="/opt/i2p/wrapper.config wrapper.daemonize=FALSE"
+start_stop_daemon_args="-bm -u i2p"
 pidfile=/var/run/i2p.pid
 
 # cf. wrapper.jvm_exit.timeout
-timeout=65
-
-wrapper=/usr/bin/wrapper
-wrapper_cfg=/opt/i2p/wrapper.config
-
+retry=65
 
 depend() {
-	need net
+    need net
 }
 
-start() {
-	ebegin "Starting I2P"
-	checkpath -q -d -m 750 -o i2p:i2p /var/run/i2p
-	start-stop-daemon -S -q -u i2p -p ${pidfile} -bm -x ${wrapper} -- \
-		${wrapper_cfg} wrapper.daemonize=FALSE
-	eend $?
-}
-
-stop() {
-	ebegin "Stopping I2P"
-	start-stop-daemon -K -q -u i2p -p ${pidfile} -R ${timeout}
-	eend $?
+start_pre() {
+    checkpath -q -d -m 750 -o i2p:i2p /var/run/i2p
 }

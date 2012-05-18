@@ -1,9 +1,10 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
 EAPI="4"
 
+# no mime types, so no need to inherit fdo-mime
 inherit eutils
 
 DESCRIPTION="Secure and anonymous serverless email-like communication."
@@ -49,18 +50,13 @@ src_unpack() {
 }
 
 src_install() {
-	# no mime types, so no need to inherit fdo-mime
-	emake DESTDIR="${D}" install
+	default
 
-	doinitd  "${D}"/usr/share/cable/cabled
-	doconfd  "${D}"/usr/share/cable/spawn-fcgi.cable
+	doinitd  "${D}"/etc/cable/cabled
+	doconfd  "${D}"/etc/cable/spawn-fcgi.cable
+	rm       "${D}"/etc/cable/{cabled,spawn-fcgi.cable} || die
 	dosym    spawn-fcgi /etc/init.d/spawn-fcgi.cable
-
-	insinto  /etc/nginx
-	doins    "${D}"/usr/share/cable/nginx-cable.conf
-	fperms   600 ${INSDESTTREE}/nginx-cable.conf
-
-	rm -r    "${D}"/usr/share/cable || die
+	fperms   600   /etc/cable/nginx.conf
 
 	# /srv/www(/cable)        drwx--x--x root  root
 	# /srv/www/cable/certs    d-wx--s--T root  nginx
@@ -73,35 +69,22 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "Remember to add cabled and nginx to the default runlevel"
-	elog "    rc-update add cabled           default"
-	elog "    rc-update add nginx            default"
-	elog "    rc-update add spawn-fcgi.cable default"
-	elog ""
-	elog "You need to adjust the user-specific paths in:"
-	elog "    /usr/libexec/cable/suprofile (CABLE_MOUNT must be mountpoint or /)"
-	elog "    /etc/conf.d/spawn-fcgi.cable (CABLE_QUEUES should mirror suprofile)"
-	elog "    /etc/nginx/nginx-cable.conf  (root should mirror CABLE_PUB in suprofile)"
-	elog "and then set the nginx configuration"
-	elog "    ln -snf nginx-cable.conf /etc/nginx/nginx.conf"
-	elog "Note that CABLE_INBOX and CABLE_QUEUES/{queue,rqueue} directories"
-	elog "must be writable by 'cable' (create them if they don't exist)."
-	elog ""
-	elog "Generate cables certificates and Tor/I2P keypairs for the user"
+	elog "Remember to add cabled, nginx, and spawn-fcgi.cable to the default runlevel."
+	elog "You need to adjust the user-specific paths in /etc/cable/profile and set the"
+	elog "nginx configuration: ln -sf /etc/cable/nginx.conf /etc/nginx/nginx.conf"
+	elog "Generate cables certificates and Tor/I2P keypairs for the user:"
 	elog "    gen-cable-username"
 	elog "        copy CABLE_CERTS/certs/*.pem  to CABLE_PUB/cable/certs (group-readable)"
 	elog "    gen-tor-hostname"
-	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by tor)"
+	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by 'tor')"
 	elog "    gen-i2p-hostname"
-	elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by i2p)"
-	elog ""
+	elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by 'i2p')"
 	elog "Once a cables username has been generated for the user:"
 	elog "    rename CABLE_PUB/cable to CABLE_PUB/<username>"
 	elog "        <username> is located in CABLE_CERTS/certs/username"
-	elog "    /etc/nginx/nginx-cable.conf"
+	elog "    /etc/cable/nginx.conf"
 	elog "        replace each occurrence of CABLE with <username>"
 	elog "        uncomment the 'allow' line"
-	elog ""
 	elog "Configure Tor and I2P to forward HTTP connections to nginx:"
 	elog "    /etc/tor/torrc"
 	elog "        HiddenServiceDir  /var/lib/tor/hidden_service/"
@@ -110,7 +93,6 @@ pkg_postinst() {
 	elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
 	elog "        tunnel.X.targetHost=127.0.0.1"
 	elog "        tunnel.X.targetPort=80"
-	elog ""
 	elog "Finally, the user should configure the email client to run cable-send"
 	elog "as a pipe for sending messages from addresses shown by cable-info."
 	elog "See comments in /usr/bin/cable-send for suggested /etc/sudoers entry."

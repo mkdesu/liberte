@@ -1,29 +1,15 @@
 #!/sbin/runscript
-# Copyright 1999-2006 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+description="HTP time daemon"
+
+command=/usr/sbin/htpdate
+command_args="${HTPDATE_OPTS} ${PROXY} ${SERVERS}"
+pidfile=/var/run/htpdate.pid
+
 depend() {
-	need net
-	use dns logger
-}
-
-checkconfig() {
-	if [ -z "${SERVERS}" ] ; then
-		eerror "You need to set at least one http server to use in /etc/conf.d/htpdate"
-		return 1
-	fi
-}
-
-start() {
-	checkconfig || return 1
-	ebegin "Starting htpdate"
-	htpdate ${HTPDATE_OPTS} ${PROXY} ${SERVERS}
-	eend $?
-}
-
-stop() {
-	ebegin "Stopping htpdate"
-	start-stop-daemon --stop --quiet --pidfile /var/run/htpdate.pid
-	eend $?
+    need net
+    use dns logger
 }
