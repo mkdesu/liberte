@@ -16,5 +16,5 @@ media-fonts/urw-fonts-2.4.9
 # Gnuplot is an overkill, and is superficially integrated (sci-libs/libqalculate)
 sci-visualization/gnuplot-3.7
 
-# virtual/jre (gnu-classpath, unneeded)
+# virtual/jre (gnu-classpath (#416819))
 dev-java/sun-jre-bin-1.6.0
