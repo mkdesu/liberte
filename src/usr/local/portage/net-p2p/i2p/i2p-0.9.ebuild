@@ -9,12 +9,12 @@ EAPI="4"
 
 inherit eutils java-pkg-2 java-ant-2
 
-JETTY_V="5.1.15"
+JETTY_V="6.1.26"
 
 DESCRIPTION="I2P is an anonymous network."
 
 SRC_URI="http://mirror.i2p2.de/${PN}source_${PV}.tar.bz2
-	http://dist.codehaus.org/jetty/jetty-5.1.x/jetty-${JETTY_V}.tgz"
+	http://dist.codehaus.org/jetty/jetty-${JETTY_V}/jetty-${JETTY_V}.zip"
 HOMEPAGE="http://www.i2p2.de/"
 
 SLOT="0"
@@ -29,16 +29,16 @@ RDEPEND=">=virtual/jre-1.5
 pkg_setup() {
 	enewgroup i2p
 	enewuser  i2p -1 -1 /var/lib/i2p i2p
-	rmdir /var/lib/i2p 2>/dev/null || true
+	rmdir /var/lib/i2p 2>/dev/null || :
 }
 
 src_unpack() {
 	unpack "i2psource_${PV}.tar.bz2"
-	cp "${DISTDIR}/jetty-${JETTY_V}.tgz" -P "${S}/apps/jetty" || die
+	cp "${DISTDIR}/jetty-${JETTY_V}.zip" -P "${S}/apps/jetty" || die
 }
 
 src_compile() {
-	eant pkg || die
+	eant pkg
 }
 
 src_install() {
@@ -56,8 +56,8 @@ src_install() {
 	insinto /opt/i2p
 
 # 	Install files
-	doins ${S}/apps/i2psnark/jetty-i2psnark.xml ${S}/pkg-temp/blocklist.txt ${S}/apps/i2psnark/launch-i2psnark ${S}/pkg-temp/hosts.txt *.config || die
-	doexe eepget i2prouter ${S}/apps/i2psnark/launch-i2psnark runplain.sh || die
+	doins ${S}/apps/i2psnark/jetty-i2psnark.xml ${S}/pkg-temp/blocklist.txt ${S}/apps/i2psnark/launch-i2psnark ${S}/pkg-temp/hosts.txt *.config
+	doexe eepget i2prouter ${S}/apps/i2psnark/launch-i2psnark runplain.sh
 	dodoc history.txt LICENSE.txt INSTALL-headless.txt
 	doman man/*
 
