@@ -51,3 +51,6 @@ media-tv/cx18-firmware
 
 # edit-select-all-symbolic.svg (#410483)
 =x11-themes/gnome-icon-theme-symbolic-3.4.0*
+
+# Removes X dependencies
+=dev-libs/m17n-lib-1.6.3*

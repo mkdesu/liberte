@@ -1,7 +1,7 @@
 (define custom-activate-default-im-name? #t)
 (define custom-preserved-default-im-name 'm17n-ru-phonetic)
 (define default-im-name 'm17n-ru-phonetic)
-(define enabled-im-list '(anthy-utf8 byeoru latin m17n-fa-isiri m17n-fr-azerty m17n-en-ispell m17n-hi-itrans m17n-pa-itrans m17n-ta-itrans m17n-he-kbd m17n-si-wijesekera-preedit m17n-si-samanala m17n-si-wijesekera m17n-ar-kbd m17n-kk-kbd m17n-kk-arabic m17n-unicode m17n-latn-post m17n-sv-post m17n-th-tis820 m17n-th-pattachote m17n-th-kesmanee m17n-ru-kbd m17n-ru-phonetic m17n-ru-yawerty m17n-ua-kbd m17n-ka-kbd m17n-hy-kbd wb86 pyunihan viqr))
+(define enabled-im-list '(latin anthy-utf8 pyunihan wb86 byeoru viqr m17n-unicode m17n-latn-post m17n-ar-kbd m17n-fa-isiri m17n-fr-azerty m17n-he-kbd m17n-hi-itrans m17n-hy-kbd m17n-ka-kbd m17n-kk-arabic m17n-kk-kbd m17n-pa-itrans m17n-ru-kbd m17n-ru-phonetic m17n-ru-yawerty m17n-si-samanala m17n-si-wijesekera m17n-si-wijesekera-preedit m17n-sv-post m17n-ta-itrans m17n-th-kesmanee m17n-th-pattachote m17n-th-tis820 m17n-ua-kbd))
 (define enable-im-switch? #f)
 (define switch-im-key '("<Control>Shift_key" "<Shift>Control_key"))
 (define switch-im-key? (make-key-predicate '("<Control>Shift_key" "<Shift>Control_key")))

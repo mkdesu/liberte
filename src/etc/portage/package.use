@@ -1,6 +1,7 @@
 # X/Gtk/Qt/Tk/Curses/Image interface
 sys-apps/groff                  -X
 sys-process/psmisc              -X
+dev-libs/m17n-lib               -X
 media-gfx/fbida                 -X
 media-fonts/terminus-font       -X -pcf
 media-fonts/unifont             -X
