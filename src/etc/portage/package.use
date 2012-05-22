@@ -71,6 +71,7 @@ sys-fs/ntfs3g                   -udev
 net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
+dev-libs/libxml2                -lzma
 sys-apps/busybox                -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre

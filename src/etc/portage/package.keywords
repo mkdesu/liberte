@@ -17,7 +17,6 @@
 <net-misc/networkmanager-vpnc-0.8.5
 
 # GTK+ 3
-=app-i18n/uim-1.7.3*
 =x11-themes/light-themes-0.1.9.1*
 =www-client/epiphany-3.2.1
 =www-client/epiphany-extensions-3.2*
@@ -25,9 +24,6 @@
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.03.13.651368*
 =app-emulation/open-vm-tools-kmod-2012.03.13.651368*
-
-# Applications
-=net-irc/xchat-otr-0.3*
 
 # Firmware
 sys-apps/microcode-data
@@ -52,9 +48,6 @@ media-tv/cx18-firmware
 
 # Battery plugin fixes for recent sysfs ACPI
 =lxde-base/lxpanel-0.5.8-r1
-
-# /var/run/spawn-fcgi directory (#400899)
-=www-servers/spawn-fcgi-1.6.3*
 
 # edit-select-all-symbolic.svg (#410483)
 =x11-themes/gnome-icon-theme-symbolic-3.4.0*
