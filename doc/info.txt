@@ -51,7 +51,7 @@ glib-networking         gnutls                  gnutls          libsoup
 libsoup                 gnutls                  gnutls          gst-plugins-soup, totem, webkit-gtk
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi, uget
 neon                    ssl, gnutls             gnutls          audacious-plugins
-wget                    ssl                     ssl             portage, libqalculate(forex)
+wget                    ssl, gnutls             ssl             portage, libqalculate(forex)
 
 claws-mail              gnutls                  gnutls
 libetpan                ssl, gnutls             gnutls          claws-mail

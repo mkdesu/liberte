@@ -44,7 +44,6 @@ pkg_setup() {
 src_unpack() {
 	unpack ${P}.tar.gz
 	mv ${MY_P_PF}-* ${P}              || die "failed to recognize archive top directory"
-	find ${P} -path '*\.git*' -delete || die "failed to remove git files"
 
 	unzip -j -d ${P}/lib ${DISTDIR}/${I2P_MY_P}.zip lib/i2p.jar || die "failed to extract i2p.jar"
 }
