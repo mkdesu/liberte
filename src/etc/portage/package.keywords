@@ -11,6 +11,9 @@
 =sys-boot/grub-1.99*:2 **
 =app-cdr/cdrtools-3.01_alpha07*
 
+# JamVM is a JRE (#416819)
+=virtual/jre-1.5.0-r1
+
 # Network
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5

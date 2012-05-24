@@ -1,2 +1,5 @@
 # Unqualified dependency of net-wireless/iw pulls multi-slot libnl
 dev-libs/libnl:3
+
+# JamVM is only recognized by virtual/jre:1.5
+>=virtual/jre-1.6
