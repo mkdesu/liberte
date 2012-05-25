@@ -48,6 +48,7 @@ ebuilds="app-misc/ca-certificates
          gnome-base/librsvg
          media-fonts/font-misc-meltho
          media-gfx/exiv2
+         media-libs/vips
          media-plugins/gst-plugins-vp8
          net-dialup/pptpclient
          net-im/pidgin
@@ -87,9 +88,11 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [debianutils]                     ca-certificates:  update-ca-certificates
 # [xcb-proto]                       xcb-util-wm:      not needed              (#398953, upstream)
+# [liboil]                          vips:             not needed              (#416815)
 # [encodings,mkfontdir,mkfontscale] font-misc-meltho: not needed              (#312077)
 sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'  ${ebuild_xcbutilwm}
+sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'               ${ebuild_vips}
 sed -i 's:^inherit xorg-2$:SLOT="0":; s:^IUSE=""$:IUSE="X":'  ${ebuild_fontmiscmeltho}
 
 # [gst-plugins-bad] gst-plugins-vp8: only libgstbasevideo-0.10.so is needed
@@ -117,6 +120,11 @@ emerge -quDN @world
 
 sinfo "Compiling Lua scripts"
 find /usr/share/libquvi-scripts/lua -type f -name '*.lua' -exec luac -s -o {} {} \;
+
+
+sinfo "Configuring version-specific paths"
+nip2ver=`portageq best_version / media-gfx/nip2`
+mv /home/anon/.{nip2,${nip2ver#*/}}
 
 
 # Unmerge non-runtime dependencies (and cleanup the kernel directory)

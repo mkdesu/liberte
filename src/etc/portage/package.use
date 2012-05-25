@@ -98,6 +98,7 @@ dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
 app-office/abiword              gnome
 media-gfx/graphicsmagick        imagemagick
+media-libs/vips                 imagemagick
 www-servers/nginx               aio
 
 # Internationalization

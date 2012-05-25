@@ -3,6 +3,7 @@
 
   * Better handling of "readonly" boot parameter for some boot media
 
+  * Added VIPS image manipulation toolkit (including nip2 GUI)
   * Removed ePDFView
 
 

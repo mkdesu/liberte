@@ -26,3 +26,7 @@
 # Executables requiring development libraries
 /usr/bin/cairo-trace
 /usr/lib/cairo/libcairo-trace.*
+
+# Unnecessary libraries (verified with revdep-rebuild)
+# (#416817)
+/usr/lib/libvipsCC.so*

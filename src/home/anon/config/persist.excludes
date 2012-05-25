@@ -38,11 +38,13 @@
 /config/audacious/log
 /config/geeqie/history
 /config/gftp/gftp.log
+/config/nip2/recent_*
 # /config/purple/logs/
 
 # Transient directories
 /config/qalculate/tmp/
 /config/gftp/cache/
+/config/nip2/tmp/
 /config/local/webkit/
 /config/local/gvfs-metadata/
 /config/local/geeqie/metadata/

@@ -104,6 +104,9 @@
 /usr/share/games/eboard/themeconf.extras*
 /usr/share/games/eboard/[A-Z]*.png
 /usr/share/games/eboard/*[^1].wav
+/usr/share/nip2/compat/
+/usr/share/nip2/data/examples/
+/usr/share/nip2/data/HP5000_UVDuraImageGlossMaxQ.icc
 
 # Temporary directories
 /tmp/**
