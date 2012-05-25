@@ -36,7 +36,6 @@ output_buffer_size=500
 recurse_for_cover_depth=0
 filepopup_pixelsize=150
 filepopup_delay=20
-output_bit_depth=16
 sw_volume_left=100
 sw_volume_right=100
 generic_title_format=${?artist:${artist} - }${?album:${album} - }${title}
@@ -85,7 +84,7 @@ vis_position=0
 player_x=136
 player_y=206
 player_width=547
-player_height=230
+player_height=254
 multi_column_view=FALSE
 playlist_visible=TRUE
 infoarea_visible=TRUE
@@ -178,8 +177,7 @@ playlist_width=275
 playlist_height=232
 
 [statusicon]
-rclick_menu=0
-scroll_action=0
+close_to_tray=TRUE
 
 [CDDA]
 use_dae=TRUE
@@ -213,3 +211,38 @@ item_count=0
 
 [alsa]
 mixer-element=PCM
+
+[globalHotkey]
+Hotkey_0_key=173
+Hotkey_0_mask=0
+Hotkey_0_type=0
+Hotkey_0_event=0
+Hotkey_1_key=172
+Hotkey_1_mask=0
+Hotkey_1_type=0
+Hotkey_1_event=1
+Hotkey_2_key=209
+Hotkey_2_mask=0
+Hotkey_2_type=0
+Hotkey_2_event=2
+Hotkey_3_key=174
+Hotkey_3_mask=0
+Hotkey_3_type=0
+Hotkey_3_event=3
+Hotkey_4_key=171
+Hotkey_4_mask=0
+Hotkey_4_type=0
+Hotkey_4_event=4
+Hotkey_5_key=121
+Hotkey_5_mask=0
+Hotkey_5_type=0
+Hotkey_5_event=7
+Hotkey_6_key=123
+Hotkey_6_mask=0
+Hotkey_6_type=0
+Hotkey_6_event=8
+Hotkey_7_key=122
+Hotkey_7_mask=0
+Hotkey_7_type=0
+Hotkey_7_event=9
+NumHotkeys=8
