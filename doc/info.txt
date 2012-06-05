@@ -49,6 +49,7 @@ pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup
 libsoup                 gnutls                  gnutls          gst-plugins-soup, totem, webkit-gtk
+libmicrohttpd           gnutls                  -               cables
 curl                    ssl, gnutls, nss        gnutls          gnupg, fbreader, quvi, uget
 neon                    ssl, gnutls             gnutls          audacious-plugins
 wget                    ssl, gnutls             ssl             portage, libqalculate(forex)

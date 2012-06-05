@@ -16,7 +16,6 @@ unionfs /home unionfs dirs=/mnt/rwroot/home=rw:/mnt/live/home=ro,nosuid,nodev,iv
 
 # Empty writable directories
 tmpfs   /tmp  tmpfs   mode=1777,nosuid,nodev,noexec 0 0
-tmpfs   /srv  tmpfs   mode=0755,nosuid,nodev,noexec 0 0
 
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc

@@ -20,9 +20,6 @@ certdate=2012-05-09
 gtordir=/var/lib/tor/hidden_service
 gi2pdir=/var/lib/i2p/router/eepsite
 
-cablepub=/srv/www
-cableflag=${cablepub}/cable
-
 i2pnmplugin=/etc/NetworkManager/dispatcher.d/03-i2p
 
 depend() {
@@ -34,9 +31,7 @@ depend() {
 
     # Tor/I2P identities (if any) must be initialized before running NetworkManager/Tor/I2P
     # MAC randomization needs to occur before NetworkManager startup
-    # nginx www directory is initialized here
     before NetworkManager tor i2p
-    before nginx
 
     # Dependents wait indefinitely (important for parallel startup)
     keyword -timeout
@@ -108,24 +103,6 @@ start() {
     fi
 
 
-    ebegin Initializing /srv directory
-    rsync -aHAXS -x --delete-excluded ${live}${cablepub}/ ${cablepub}
-    eend $?
-
-
-    # Initialize public cables directory
-    if [ -e ${certsdir}/username ]; then
-        ebegin Initializing cables directory
-        username=`cat ${certsdir}/username | LC_ALL=C tr -cd '[:alnum:]'`
-        rsync -lptHS --safe-links --chmod=u=rw,g=r,o=               \
-              ${certsdir}/*.pem ${cableflag}/certs                  \
-            && mv -T ${cableflag} ${cablepub}/"${username}"         \
-            && sed -i "s/\<CABLE\>/${username}/; s/## allow/allow/" \
-                      /etc/cable/nginx.conf
-        eend $?
-    fi
-
-
     if get_bootparam 'i2p'; then
         einfo Enabling I2P
         chmod a+x ${i2pnmplugin}
@@ -137,4 +114,6 @@ start() {
     ebegin Randomizing wireless MACs
     mac-randomize wireless
     eend $?
+
+    :
 }

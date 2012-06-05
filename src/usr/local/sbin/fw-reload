@@ -86,9 +86,9 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # iptables -A OUTPUT -o lo -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
 
 # Hidden service server access only for Tor and I2P
-iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
-iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 80   -j ACCEPT
-iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 80   -j LOGREJECT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 9080 -j ACCEPT
+iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner i2p      --syn -d 127.0.0.1 --dport 9080 -j ACCEPT
+iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 9080 -j LOGREJECT
 
 # Privoxy access only for main user, HTP and cables daemon
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT

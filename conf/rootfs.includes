@@ -33,9 +33,6 @@
 /usr/share/audacious/Skins/Default/***
 /usr/share/games/eboard/Kingdom.png
 /usr/share/games/eboard/Diagram.png
-/var/tmp/nginx/
-/var/tmp/nginx/client/
-/var/tmp/nginx/fastcgi/
 
 # I2P
 /opt/i2p/wrapper.config

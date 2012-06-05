@@ -27,9 +27,7 @@ KEYWORDS="x86 amd64"
 IUSE=""
 DEPEND="app-arch/unzip
 	>=virtual/jdk-1.5"
-RDEPEND="www-servers/nginx[http,pcre,nginx_modules_http_access,nginx_modules_http_fastcgi,nginx_modules_http_gzip,nginx_modules_http_rewrite]
-	www-servers/spawn-fcgi
-	www-misc/fcgiwrap
+RDEPEND="net-libs/libmicrohttpd
 	mail-filter/procmail
 	net-misc/curl
 	dev-libs/openssl
@@ -52,46 +50,26 @@ src_install() {
 	default
 
 	doinitd  "${D}"/etc/cable/cabled
-	doconfd  "${D}"/etc/cable/spawn-fcgi.cable
-	rm       "${D}"/etc/cable/{cabled,spawn-fcgi.cable} || die
-	dosym    spawn-fcgi /etc/init.d/spawn-fcgi.cable
-	fperms   600   /etc/cable/nginx.conf
-
-	# /srv/www(/cable)        drwx--x--x root  root
-	# /srv/www/cable/certs    d-wx--s--T root  nginx
-	# /srv/www/cable/(r)queue d-wx--s--T cable nginx
-	keepdir       /srv/www/cable/{certs,{,r}queue}
-	fperms  3310  /srv/www/cable/{certs,{,r}queue}
-	fperms   711  /srv/www{,/cable}
-	fowners      :nginx /srv/www/cable/certs
-	fowners cable:nginx /srv/www/cable/{,r}queue
+	rm       "${D}"/etc/cable/cabled || die
 }
 
 pkg_postinst() {
-	elog "Remember to add cabled, nginx, and spawn-fcgi.cable to the default runlevel."
-	elog "You need to adjust the user-specific paths in /etc/cable/profile and set the"
-	elog "nginx configuration: ln -sf /etc/cable/nginx.conf /etc/nginx/nginx.conf"
+	elog "Remember to add 'cabled' to the default runlevel."
+	elog "You need to adjust the user-specific paths in /etc/cable/profile."
 	elog "Generate cables certificates and Tor/I2P keypairs for the user:"
 	elog "    gen-cable-username"
-	elog "        copy CABLE_CERTS/certs/*.pem  to CABLE_PUB/cable/certs (group-readable)"
 	elog "    gen-tor-hostname"
 	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by 'tor')"
 	elog "    gen-i2p-hostname"
 	elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by 'i2p')"
-	elog "Once a cables username has been generated for the user:"
-	elog "    rename CABLE_PUB/cable to CABLE_PUB/<username>"
-	elog "        <username> is located in CABLE_CERTS/certs/username"
-	elog "    /etc/cable/nginx.conf"
-	elog "        replace each occurrence of CABLE with <username>"
-	elog "        uncomment the 'allow' line"
-	elog "Configure Tor and I2P to forward HTTP connections to nginx:"
+	elog "Configure Tor and I2P to forward HTTP connections to cables daemon:"
 	elog "    /etc/tor/torrc"
 	elog "        HiddenServiceDir  /var/lib/tor/hidden_service/"
-	elog "        HiddenServicePort 80 127.0.0.1:80"
+	elog "        HiddenServicePort 80 127.0.0.1:9080"
 	elog "    /var/lib/i2p/i2ptunnel.config"
 	elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
 	elog "        tunnel.X.targetHost=127.0.0.1"
-	elog "        tunnel.X.targetPort=80"
+	elog "        tunnel.X.targetPort=9080"
 	elog "Finally, the user should configure the email client to run cable-send"
 	elog "as a pipe for sending messages from addresses shown by cable-info."
 	elog "See comments in /usr/bin/cable-send for suggested /etc/sudoers entry."

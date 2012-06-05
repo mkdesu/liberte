@@ -385,7 +385,7 @@ svcboot="consolefont irqbalance haveged metalog
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy
-            nginx spawn-fcgi.cable udev-postmount"
+            udev-postmount"
 svcshutdown="memwipe"
 delsvcboot="urandom swap bootmisc root mtab"
 delsvcdefault="netmount local"
@@ -452,7 +452,7 @@ useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
-for uid in i2p nginx; do
+for uid in i2p; do
     touch               /tmp/${uid}-ref
     chown ${uid}:${uid} /tmp/${uid}-ref
 done

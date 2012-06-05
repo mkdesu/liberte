@@ -52,7 +52,6 @@ else
           --exclude=/var/lib/i2p/          \
           --exclude=/var/lib/portage/      \
           --exclude=/usr/local/portage/    \
-          --exclude=/etc/nginx/            \
           --exclude=/etc/sudoers           \
           --exclude=/etc/sysctl.conf       \
           --exclude=/etc/polkit-1          \
@@ -62,14 +61,7 @@ else
         -C --exclude=.gitignore                          ${SRC}/root              ${LIVECD}
     ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/portage/gnupg ${LIVECD}/etc/portage
     ${RSYNC} --chmod=u=rwX,go=rX,Dg+s -i              -C ${SRC}/var/lib/portage   ${LIVECD}/var/lib
-    ${RSYNC} --chmod=u=rwX,go=   -i                   -C ${SRC}/etc/nginx         ${LIVECD}/etc
     ${RSYNC} --chmod=u=rwX,go=rX -i --delete --exclude=/portage/distfiles -C ${SRC}/usr/local/portage ${LIVECD}/usr/local
-
-    if [ -e ${LIVECD}/tmp/nginx-ref ]; then
-        chown -h --from=0:0 --reference=${LIVECD}/tmp/nginx-ref \
-              ${LIVECD}/var/log/nginx ${LIVECD}/var/tmp/nginx   \
-              ${LIVECD}/var/tmp/nginx/client ${LIVECD}/var/tmp/nginx/fastcgi
-    fi
 
     if [ -e ${LIVECD}/var/log/privoxy ]; then
         chown -hR --from=`stat -c %u:%g ${LIVECD}/var/log/privoxy` 0:0 ${LIVECD}/etc/privoxy
@@ -109,11 +101,6 @@ else
 
     if [ -e /etc/resolv.conf ]; then
         ${RSYNC} --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
-    fi
-
-    if [ -e ${LIVECD}/var/log/nginx ]; then
-        find ${LIVECD}/var/log/nginx -maxdepth 0         ! -perm 2750 -exec chmod 2750 {} \;
-        find ${LIVECD}/var/tmp/nginx -maxdepth 1 -type d ! -perm  750 -exec chmod  750 {} \;
     fi
 fi
 environment="${environment} PHASE=${PHASE}"

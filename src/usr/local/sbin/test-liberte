@@ -133,11 +133,11 @@ stest pass "Zero addresses in I2P RouterInfo"      i2pishidden
 
 
 # Cables communication service server access
-stest fail "Fetch CC service as root"                              curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
-stest fail "Fetch CC service as anon"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
-stest fail "Fetch CC service as nofw"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
-stest pass "Fetch CC service as tor"               sudo -n -u tor  curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
-stest pass "Fetch CC service as i2p"               sudo -n -u i2p  curl -fsSI -x "" 127.0.0.1/${ccuser}/request/ver
+stest fail "Fetch CC service as root"                              curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
+stest fail "Fetch CC service as anon"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
+stest fail "Fetch CC service as nofw"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
+stest pass "Fetch CC service as tor"               sudo -n -u tor  curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
+stest pass "Fetch CC service as i2p"               sudo -n -u i2p  curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
 
 # Cables communication ping
 stest pass "CC-ping @tor as anon"                  sudo -n -u anon cable-ping ${ccuser}@${cctor}

@@ -34,13 +34,13 @@ app-emulation/open-vm-tools     -X
 net-misc/curl                   gnutls
 net-libs/neon                   gnutls
 net-libs/libetpan               gnutls
+net-libs/libmicrohttpd          -ssl
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager         gnutls
 net-im/pidgin                   gnutls sasl
 dev-libs/cyrus-sasl             -crypt
 dev-libs/libevent               -ssl
 net-analyzer/netcat             -crypt
-www-servers/nginx               -ssl
 dev-libs/nettle                 -ssl
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
@@ -99,7 +99,6 @@ app-arch/p7zip                  rar
 app-office/abiword              gnome
 media-gfx/graphicsmagick        imagemagick
 media-libs/vips                 imagemagick
-www-servers/nginx               aio
 
 # Internationalization
 app-i18n/uim                    -linguas_*

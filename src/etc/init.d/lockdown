@@ -4,7 +4,6 @@ description="Arms boot media removal watchdog."
 
 boot=/mnt/boot
 
-cablepub=/srv/www
 lidevents=/var/run/lid-events
 
 launcher=/usr/local/sbin/poweroff-watchdog
