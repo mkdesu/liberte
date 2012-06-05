@@ -260,7 +260,6 @@ x11-apps/xlsfonts
 # SIL Arabic:     extended Arabic script, Scheherazade/Lateef
 # Farsi:          Persian script, Elham/Homa/Koodak/Nazli/Roya/Terafik/Titr
 # CLM Culmus:     Hebrew script, David/Frank Ruehl/Miriam(=Sans/Serif/Mono)/...
-# Meltho:         Syriac script, Serto.../Estrangelo.../East Syriac Adiabene
 # SIL Abyssinica: Ethiopic script
 # SIL Padauk:     all standard Myanmar characters [Graphite not supported]
 # WenQuanYi:      CJKV glyphs, Hei-Ti (Sans)
@@ -283,7 +282,6 @@ media-fonts/sil-arabicfonts
 media-fonts/farsi-fonts
 # media-fonts/kacst-fonts
 media-fonts/culmus
-media-fonts/font-misc-meltho
 media-fonts/sil-abyssinica
 # media-fonts/font-misc-ethiopic
 media-fonts/sil-padauk

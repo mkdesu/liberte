@@ -145,9 +145,6 @@
 /usr/share/tor/
 /usr/share/misc/*.ids.*
 /usr/share/smartmontools/*.h.*
-/usr/share/fonts/*/fonts.dir
-/usr/share/fonts/*/fonts.scale
-/usr/share/fonts/*/encodings.dir
 
 # I2P (lib directory is pruned)
 /opt/i2p/geoip/
