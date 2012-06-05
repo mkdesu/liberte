@@ -8,7 +8,7 @@ iwlwifi-2000-6.ucode
 iwlwifi-2030-6.ucode
 # (missing, but: IWL*_UCODE_API_MIN/OK)
 # iwlwifi-100-6.ucode
-# (1000-6, 6000g2[ab]-6 overlap w/ dedicated pkgs)
+# (1000-6, 6000g2a-6 overlap w/ dedicated pkgs)
 
 # BRCMSMAC
 brcm/bcm43xx-0.fw

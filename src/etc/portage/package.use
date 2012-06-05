@@ -14,6 +14,7 @@ dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
 sys-apps/gawk                   -readline
 dev-lang/lua                    -readline
+dev-libs/libpcre                -readline
 dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline
 dev-db/sqlite                   -readline
@@ -53,7 +54,6 @@ net-libs/glib-networking        -gnome
 media-video/totem               -youtube nsplugin
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
-media-video/gpac                -* aac mad vorbis
 media-plugins/gst-plugins-meta  dv lame theora vpx  a52 dts dvd mms mpeg  ffmpeg
 media-sound/mpg123              -mmx -sse -3dnow -3dnowext
 media-libs/libtheora            encode

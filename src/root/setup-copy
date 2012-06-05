@@ -330,7 +330,7 @@ sinfo "Removing invalid symlinks, dirs and files"
 find  /usr/i686-pc-linux-gnu -xtype l -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
 
-rm -r /etc/env.d/{05{binutils,gcc-i686-pc-linux-gnu},binutils,gcc,python}
+rm -r /etc/env.d/{05binutils,04gcc-i686-pc-linux-gnu,binutils,gcc,python}
 rm /etc/{init,conf,pam}.d/sshd
 
 rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,c89,c99,gcov} /lib/cpp
