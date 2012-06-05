@@ -31,6 +31,9 @@ modprobe msr
 
 
 # Build the report
+echo Version ...
+cp /etc/issue                          00-issue
+
 echo Architecture ...
 x86info -a                           > 01-x86
 sudo -n -u nobody x86info -a         > 01-x86-npriv
