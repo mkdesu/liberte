@@ -268,11 +268,6 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-# fuser: (#394443, fixed in psmisc-22.16)
-sinfo "Selectively disabling PAX"
-paxctl -m /bin/fuser
-
-
 # No sub-pixel rendering, since LCD / cable type is unknown
 sinfo "Configuring fontconfig"
 for fconf in \

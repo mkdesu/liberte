@@ -2,6 +2,7 @@
   + 2012.2 release
 
   * Better handling of "readonly" boot parameter for some boot media
+  * Last remaining executable PaX exception has been removed
 
   * Cables communicatioon is now self-contained, based on libmicrohttpd
 
