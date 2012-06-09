@@ -41,7 +41,7 @@ mount -t devtmpfs -o nosuid,noexec devtmpfs /dev
 
 
 # Parse kernel options
-param_cdroot='/dev/sd* /dev/sr* /dev/vd*'
+param_cdroot='/dev/sd* /dev/sr* /dev/vd* /dev/mmcblk*'
 param_cdroot_type=auto
 param_cdroot_flags=noatime
 for param in `cat /proc/cmdline`; do
@@ -96,7 +96,7 @@ while true; do
 
             # Skip if disk has at least one partition (heuristic)
             mediadevname=`basename ${mediadev}`
-            if ! ls /sys/block/${mediadevname}/${mediadevname}[0-9]* 1>/dev/null 2>&1; then
+            if ! ls /sys/block/${mediadevname}/${mediadevname}*/partition 1>/dev/null 2>&1; then
                 good_msg "Attempting to mount media: ${mediadev}"
 
                 # Unless the media is already in ro mode, write-protect it during mount
