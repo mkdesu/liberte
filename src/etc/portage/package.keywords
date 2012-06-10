@@ -46,9 +46,6 @@ net-wireless/atmel-firmware
 net-wireless/prism54-firmware
 media-tv/cx18-firmware
 
-# Fixes Gentoo bug (#394457)
-=app-portage/portage-utils-0.9
-
 # Battery plugin fixes for recent sysfs ACPI
 =lxde-base/lxpanel-0.5.8-r1
 
