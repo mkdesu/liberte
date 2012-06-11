@@ -16,7 +16,9 @@ Global {
     setdocktype=1
     setpartialstrut=1
     usefontcolor=1
+    fontsize=10
     fontcolor=#ffffff
+    usefontsize=0
     background=1
     backgroundfile=/usr/share/lxpanel/images/background.png
     iconsize=24
@@ -130,6 +132,20 @@ Plugin {
 }
 
 Plugin {
+    type = thermal
+    Config {
+        NormalColor=#00ff00
+        Warning1Color=#fff000
+        Warning2Color=#ff0000
+        CustomLevels=1
+        Warning1Temp=88
+        Warning2Temp=93
+        AutomaticSensor=1
+        Sensor=/sys/class/thermal/thermal_zone0/
+    }
+}
+
+Plugin {
     type = cpufreq
 }
 
@@ -144,6 +160,7 @@ Plugin {
         TooltipFmt=%A, %e-%b-%Y
         BoldFont=0
         IconOnly=0
+        CenterText=0
     }
 }
 

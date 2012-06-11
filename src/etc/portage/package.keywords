@@ -46,8 +46,8 @@ net-wireless/atmel-firmware
 net-wireless/prism54-firmware
 media-tv/cx18-firmware
 
-# Battery plugin fixes for recent sysfs ACPI
-=lxde-base/lxpanel-0.5.8-r1
+# Battery and thermal plugin fixes for recent sysfs ACPI
+=lxde-base/lxpanel-0.5.9*
 
 # edit-select-all-symbolic.svg (#410483)
 =x11-themes/gnome-icon-theme-symbolic-3.4.0*
