@@ -5,7 +5,6 @@ iwlwifi-100-5.ucode
 iwlwifi-105-6.ucode
 iwlwifi-135-6.ucode
 iwlwifi-2000-6.ucode
-iwlwifi-2030-6.ucode
 # (missing, but: IWL*_UCODE_API_MIN/OK)
 # iwlwifi-100-6.ucode
 # (1000-6, 6000g2a-6 overlap w/ dedicated pkgs)
