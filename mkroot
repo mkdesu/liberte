@@ -84,7 +84,7 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     for key in ${gpg_keys}; do
         org=`echo ${key} | cut -d: -f1`
         fpr=`echo ${key} | cut -d: -f2`
-        keyid=`echo -n ${fpr} | tail -c 8`
+        keyid=`echo -n ${fpr} | tail -c -8`
 
         if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
             if ! eval wget -nv --retry-connrefused                         \
