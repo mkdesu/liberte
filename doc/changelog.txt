@@ -8,6 +8,7 @@
   * Cables communicatioon is now self-contained, based on libmicrohttpd
 
   * Added VIPS image manipulation toolkit (including nip2 GUI)
+  * Added XInput calibrator
   * Removed ePDFView
 
 

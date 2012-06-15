@@ -10,6 +10,7 @@ dev-java/icedtea-bin            -X -cjk -alsa
 sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
 gnome-extra/libgsf              -gtk
+x11-apps/xinput_calibrator      -gtk
 dev-lang/python                 -ncurses -readline
 net-im/pidgin                   -ncurses
 sys-apps/gawk                   -readline
