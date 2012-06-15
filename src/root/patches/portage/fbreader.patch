@@ -1,0 +1,13 @@
+--- /usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild	2012-06-15 13:37:23.000000000 +0000
++++ /usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild.new	2012-06-15 13:48:57.000000000 +0000
+@@ -35,8 +35,8 @@
+ 	sed -i "s:^Name=E-book reader:Name=FBReader:" fbreader/desktop/desktop || die "sed failed"
+ 	sed -i "s:^Name\[ru\]=.*$:Name\[ru\]=FBReader:" fbreader/desktop/desktop || die "sed failed"
+ 	sed -i "s:^Icon=FBReader.png:Icon=FBReader:" fbreader/desktop/desktop || die "sed failed"
+-	sed -i "/^	LDFLAGS += -s$/ d" makefiles/config.mk || die "sed failed"
+-	sed -i "/^LDFLAGS =$/ d" makefiles/arch/desktop.mk || die "sed failed"
++	sed -i "s:^\(	CFLAGS +=\) -O3\$:\1 ${CXXFLAGS} `pkg-config --cflags fribidi`:" makefiles/config.mk || die "sed failed"
++	sed -i "s:^\(	LDFLAGS +=\) -s\$:\1 ${LDFLAGS}:" makefiles/config.mk || die "sed failed"
+ 
+ 	echo "TARGET_ARCH = desktop" > makefiles/target.mk
+ 	echo "LIBDIR = /usr/$(get_libdir)" >> makefiles/target.mk

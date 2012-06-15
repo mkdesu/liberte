@@ -81,6 +81,13 @@ if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
 fi
 
 
+sinfo "Applying temporary portage patches"
+# (417043)
+fbr=/usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild
+spatch ${HOME}/patches/portage/fbreader.patch -p0
+ebuild ${fbr} manifest
+
+
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
