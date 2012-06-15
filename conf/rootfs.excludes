@@ -136,6 +136,7 @@
 /etc/ca-certificates.conf
 /usr/lib/cracklib_dict.*
 /usr/share/sounds/alsa/
+/usr/share/ghostscript/*/Resource/CIDFSubst/
 /usr/local/bin/uname
 /usr/local/bin/file
 /usr/local/bin/x86_64-*
@@ -199,8 +200,6 @@
 /usr/share/gtksourceview-*/language-specs/convert.py
 # gnome-base/librsvg: a script superseded by rsvg-convert
 /usr/bin/rsvg
-# app-text/ghostscript-gpl: MS-produced postscript patcher
-/usr/bin/fixmswrd.pl
 # net-im/pidgin: non-separated dbus-python dependency
 /usr/bin/purple-remote
 /usr/bin/purple-url-handler
