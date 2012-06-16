@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "This file is a workaround for (#417437)."
+echo "It should be removed after app-crypt/gpa is built."
