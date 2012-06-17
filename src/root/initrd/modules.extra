@@ -17,6 +17,7 @@ usbhid
 
 # USB storage devices
 usb-storage
+xhci-hcd
 ehci-hcd
 uhci-hcd
 ohci-hcd
