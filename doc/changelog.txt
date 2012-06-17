@@ -3,6 +3,7 @@
 
   * Better handling of "readonly" boot parameter for some boot media
   * Better SD boot media support on some hardware
+  * Added USB 3.0 boot media support
   * Last remaining executable PaX exception has been removed
 
   * Cables communicatioon is now self-contained, based on libmicrohttpd
@@ -10,6 +11,7 @@
   * Added VIPS image manipulation toolkit (including nip2 GUI)
   * Added XInput calibrator
   * Removed ePDFView
+  * Fixed key retrieval in GNU Privacy Assistant
 
 
 2012-05-11
