@@ -147,7 +147,7 @@ if [ -n "${param_loop}" ]; then
     rootimg=${sboot}${param_loop}
 
     # If copying squashfs image to RAM, force read-only losetup
-    # (BusyBox does not do that automatically (Busybox: #4784))
+    # (BusyBox does not do that automatically (Busybox: #4784), fixed in git: 2012-06-21)
     if [ -n "${param_toram}" ]; then
         good_msg 'Copying filesystem image to RAM ...'
         rootimgram=${srwroot}/cache/root.sfs

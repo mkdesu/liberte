@@ -157,7 +157,6 @@ app-editors/hexedit
 app-editors/e3
 
 # Applications
-lxde-base/lxterminal
 x11-terms/sakura
 x11-misc/parcellite
 app-accessibility/florence
