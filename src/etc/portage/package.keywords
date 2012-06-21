@@ -1,5 +1,5 @@
 # TEXTRELs (#389471)
-=media-plugins/gst-plugins-ffmpeg-0.10.13-r1
+=media-plugins/gst-plugins-ffmpeg-0.10.13*
 
 # System (cdrtools: EFI platform support)
 =app-emulation/virt-what-1.11*

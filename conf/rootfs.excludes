@@ -240,5 +240,8 @@
 /usr/bin/gs
 /usr/bin/vp8_scalable_patterns
 /usr/bin/luac
+/usr/bin/ffmpeg
+/usr/bin/avconv
+/usr/share/avconv/
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat
