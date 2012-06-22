@@ -204,6 +204,7 @@ media-plugins/gst-plugins-x264
 media-plugins/gst-plugins-ximagesrc
 media-plugins/gst-plugins-xvid
 media-video/libav
+media-libs/libpostproc
 www-client/epiphany-extensions
 net-irc/xchat-otr
 x11-plugins/pidgin-otr
