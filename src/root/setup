@@ -226,6 +226,11 @@ sinfo "Removing unnecessary packages"
 emerge -qc --deselect=n
 
 
+sinfo "Performing package move updates"
+emaint -f moveinst
+emaint -f movebin
+
+
 sinfo "Updating Perl modules"
 perl-cleaner --ph-clean --modules -- -q
 
