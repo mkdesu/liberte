@@ -21,7 +21,8 @@ fs_ext=ef53
 
 if [ ! \( $# = 1 -o \( $# = 2 -a "$2" = nombr \) -o "$1" = automagic \) ]; then
     cat <<EOF
-This script installs SYSLINUX on a device with Liberté Linux.
+This script installs SYSLINUX or EXTLINUX on a device with
+Liberté Linux.
 
 You need the following installed.
 
@@ -118,21 +119,28 @@ fi
 
 
 # Check for pre-4.x Syslinux (without the -v switch)
-sysok=1
+sysok=0
+extok=0
 if ! ${sysbin} -v 1>/dev/null 2>&1; then
     echo "Syslinux v4+ not found, will use bundled binary"
-    sysok=0
 elif [ ! -e ${sysmbr}  -a  ! -e ${sysmbr2} ]; then
     echo "${sysmbr} or ${sysmbr2} not found, will use bundled Syslinux"
-    sysok=0
 else
     # Check for wrong Syslinux version (exact match required)
     havesysver=`${sysbin} -v 2>&1 | cut -d' ' -f2`
     if [ "${havesysver}" != ${sysver} ]; then
         echo "Syslinux v${havesysver} detected, need v${sysver}"
-        sysok=0
-    elif [ -e ${sysmbr2} ]; then
-        sysmbr=${sysmbr2}
+    else
+        sysok=1
+        if [ -e ${sysmbr2} ]; then
+            sysmbr=${sysmbr2}
+        fi
+
+        if ! ${extbin} -v 1>/dev/null 2>&1; then
+            echo "EXTLINUX not found, will use bundled binary if installing to ext[234]"
+        else
+            extok=1
+        fi
     fi
 fi
 
@@ -275,7 +283,7 @@ elif [ ${devfs} = ext2 ]; then
 
     if [ ! -e "${devdir}"${sysdir}/syslinux-x86.tbz ]; then
         error "Directory ${sysdir} not found or incorrect in ${devdir}"
-    elif [ ${sysok} = 0 ]; then
+    elif [ ${extok} = 0 ]; then
         echo "Using bundled 32-bit EXTLINUX binary and MBR"
 
         systmpdir=`mktemp -d`
