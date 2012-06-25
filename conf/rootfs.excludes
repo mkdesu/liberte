@@ -86,10 +86,8 @@
 /usr/bin/*-config
 /usr/bin/*-config-[0-9]*
 /usr/games/bin/*-config
-# /usr/lib/mesa/r[36]00_dri.*
 /usr/lib/mesa/*g_dri.*
 /usr/lib/dri/*g_dri.*
-/usr/lib/egl/pipe_*.*
 /usr/lib/VBoxOGL*.so
 /usr/share/consolefonts/**
 /usr/share/consoletrans/

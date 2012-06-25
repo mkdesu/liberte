@@ -182,8 +182,8 @@ mkovf --vs     ${param} -i "${distname}" -m "Virtual Appliance"
 # Add Guest OS (100 = Linux 2.6 (64-bit) in VirtualBox, required for x64 EFI)
 mkovf --os     ${param} -d "Linux 3.x" -m "Guest Operating System" --secID=100
 
-# Add virtual hardware section
-mkovf --virthw ${param} -p vmx-6 --instanceID=1 -n ${vhwname} \
+# Add virtual hardware section (vmx-08 for vmwgfx dri)
+mkovf --virthw ${param} -p "vmx-06 vmx-08" --instanceID=1 -n ${vhwname} \
                -m "Virtual Hardware Requirements"
 
 # Allocate CPUs

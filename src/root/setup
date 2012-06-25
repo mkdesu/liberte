@@ -184,7 +184,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     fi
 
 
-    # "make prepare" suffices for xf86-input-virtualbox, but not for xf86-video-virtualbox
+    # "make prepare" does not suffice for xf86-video-virtualbox
     sinfo "Compiling kernel"
     ${helpdir}/gen-kernel main
 
@@ -309,9 +309,6 @@ fi
 
 # http://www.x.org/wiki/GalliumStatus
 sinfo "Configuring Mesa, OpenGL and XvMC"
-# for mfam in r300 r600; do
-#     eselect mesa set ${mfam} gallium
-# done
 eselect mesa   set --auto
 eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11

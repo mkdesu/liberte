@@ -1,6 +1,9 @@
 2012-07-XX
   + 2012.3 release
 
+  * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
+  * Better support for VMware graphics virtualization
+
 
 2012-06-17
   + 2012.2 release

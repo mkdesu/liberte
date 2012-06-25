@@ -53,6 +53,7 @@ ebuilds="app-misc/ca-certificates
          net-im/pidgin
          sys-apps/lm_sensors
          sys-apps/portage
+         sys-libs/mtdev
          x11-libs/xcb-util-wm
          x11-wm/openbox"
 
@@ -67,7 +68,7 @@ done
 sed -i 's/\${python_dep}//' ${ebuild_portage}
 
 # Python
-# exiv2                    not needed                  (#398959)
+# exiv2                    not needed                  (#398959, fixed in 0.23)
 # libglade:                libglade-convert            (#398955)
 # librsvg:                 rsvg                        (#398951, fixed in 2.36.0)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
@@ -79,18 +80,20 @@ sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
 
 # Perl
-# pptpclient:     not needed when used by networkmanager-pptp
-# lm_sensors:     sensors-detect, sensors-conf-convert
-# obexftp:        not needed (#398113)
+# pptpclient:              not needed when used by networkmanager-pptp
+# lm_sensors:              sensors-detect, sensors-conf-convert
+# obexftp:                 not needed (#398113)
 sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient}
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
-# [debianutils]                     ca-certificates:  update-ca-certificates
-# [xcb-proto]                       xcb-util-wm:      not needed              (#398953, upstream)
-# [liboil]                          vips:             not needed              (#416815)
-sed -i 's:\<sys-apps/debianutils\>::' ${ebuild_cacertificates}
-sed -i 's:\<x11-proto/xcb-proto\>::'  ${ebuild_xcbutilwm}
-sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'               ${ebuild_vips}
+# [debianutils]            ca-certificates:  update-ca-certificates
+# [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
+# [linux-headers]          mtdev:            not needed              (#423495)
+# [liboil]                 vips:             not needed              (#416815)
+sed -i 's:\<sys-apps/debianutils\>::'                    ${ebuild_cacertificates}
+sed -i 's:\<x11-proto/xcb-proto\>::'                     ${ebuild_xcbutilwm}
+sed -i 's:>=sys-kernel/linux-headers-[^[:blank:]"]*\>::' ${ebuild_mtdev}
+sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'          ${ebuild_vips}
 
 # [gst-plugins-bad] gst-plugins-vp8: only libgstbasevideo-0.10.so is needed
 sed -i 's:>=media-libs/gst-plugins-bad-[^[:blank:]"]*::' ${ebuild_gstpluginsvp8}

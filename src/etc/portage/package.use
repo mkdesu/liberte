@@ -24,10 +24,9 @@ app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
 # Drivers
-# [temporarily disable gallium until r600 can be enabled w/o r300 due to llvm dependency]
-# [also modified: rootfs.excludes#r[36]00_dri.*, setup#eselect mesa]
-# [vbox dri conflicts w/ mprotect]
-media-libs/mesa                 shared-dricore -gallium -egl -llvm
+# [xf86-video-vmware requires mesa[xa]]
+# [xf86-video-virtualbox[dri] conflicts w/ mprotect]
+media-libs/mesa                 shared-dricore xa -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 
