@@ -85,6 +85,7 @@ app-crypt/gnupg
 app-crypt/mcrypt
 x11-misc/fpm2
 dev-libs/engine_pkcs11
+app-crypt/gnupg-pkcs11-scd
 app-crypt/ccid
 app-crypt/tpm-tools
 sys-apps/haveged
