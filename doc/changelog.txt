@@ -4,6 +4,8 @@
   * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
   * Better support for VMware graphics virtualization
 
+  * Added "blacklist" boot parameter for kernel modules blacklisting
+
   * Added optional PKCS#11 smart-cards support to GnuPG
 
 

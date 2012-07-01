@@ -49,6 +49,13 @@ for param in `cat /proc/cmdline`; do
 done
 
 
+# Handle blacklisted modules
+if [ -n "${param_blacklist}" ]; then
+    echo "${param_blacklist}" | tr , '\n' | sed 's/^/blacklist /' > /etc/modprobe.d/boot-blacklist.conf
+    cp -r /etc/modprobe.d ${srwroot}/etc/
+fi
+
+
 # Hotplugging is handled similarly in /sbin/hotplug (UEVENT_HELPER_PATH)
 good_msg 'Loading modules'
 
@@ -79,7 +86,7 @@ good_msg "Looking for the media"
 tested=' '
 waitmsg=0
 
-while true; do
+while :; do
     if [ ${waitmsg} = 1 ]; then
         warn_msg 'Waiting for the media ...'
         waitmsg=0

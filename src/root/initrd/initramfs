@@ -6,6 +6,7 @@ nod   dev/console    0600 0 0  c 5 1
 # Init scripts
 dir   etc            0755 0 0
 dir   sbin           0755 0 0
+dir   etc/modprobe.d 0755 0 0
 file  init              /root/initrd/init         0755 0 0
 file  etc/init.scripts  /root/initrd/init.scripts 0644 0 0
 file  etc/modules.fs    /root/initrd/modules.fs   0644 0 0

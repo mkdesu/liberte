@@ -24,12 +24,12 @@ start() {
                 # (VMware card is not enough, e.g., QEMU: "Hardware has no pitchlock")
                 if vmmouse_detect; then
                     einfo "Initializing VMware framebuffer"
-                    modprobe vmwgfx enable_fbdev=1
+                    modprobe -b vmwgfx enable_fbdev=1
                     eend $?
                 else
                     vesa_mode="${param#video=}"
                     einfo "Initializing VESA framebuffer: ${vesa_mode}"
-                    modprobe uvesafb mode_option="${vesa_mode}" mtrr=3 scroll=ywrap
+                    modprobe -b uvesafb mode_option="${vesa_mode}" mtrr=3 scroll=ywrap
                     eend $?
                 fi
             fi

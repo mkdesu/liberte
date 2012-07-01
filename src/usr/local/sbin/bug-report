@@ -26,8 +26,8 @@ exec 2> errors
 
 
 # Load modules for x86info / lsmsr
-modprobe cpuid
-modprobe msr
+modprobe -b cpuid
+modprobe -b msr
 
 
 # Build the report
