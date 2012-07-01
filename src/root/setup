@@ -82,7 +82,7 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (417043)
+# (#417043)
 fbr=/usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild
 spatch ${HOME}/patches/portage/fbreader.patch -p0
 ebuild ${fbr} manifest

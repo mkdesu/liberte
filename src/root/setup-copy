@@ -53,7 +53,6 @@ ebuilds="app-misc/ca-certificates
          net-im/pidgin
          sys-apps/lm_sensors
          sys-apps/portage
-         sys-libs/mtdev
          x11-libs/xcb-util-wm
          x11-wm/openbox"
 
@@ -88,11 +87,9 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [debianutils]            ca-certificates:  update-ca-certificates
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
-# [linux-headers]          mtdev:            not needed              (#423495)
 # [liboil]                 vips:             not needed              (#416815)
 sed -i 's:\<sys-apps/debianutils\>::'                    ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'                     ${ebuild_xcbutilwm}
-sed -i 's:>=sys-kernel/linux-headers-[^[:blank:]"]*\>::' ${ebuild_mtdev}
 sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'          ${ebuild_vips}
 
 # [gst-plugins-bad] gst-plugins-vp8: only libgstbasevideo-0.10.so is needed
