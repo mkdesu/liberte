@@ -80,6 +80,7 @@ sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
 x11-misc/xdg-utils              -perl
 gnome-extra/zenity              -compat
+dev-libs/m17n-lib               -spell
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
