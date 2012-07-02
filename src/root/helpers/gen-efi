@@ -24,16 +24,15 @@ consolefont=euro.pf2
 modules_core="normal configfile echo test true minicmd ls search gzio"
 modules_fs="part_msdos part_gpt iso9660 fat ext2 hfsplus loopback"
 modules_boot="boot linux halt reboot chain appleldr"
-modules_arch="cpuid loadbios efi_gop efi_uga fixvideo"
+modules_arch="cpuid loadbios gfxterm efi_gop efi_uga fixvideo"
 modules="${modules_core} ${modules_fs} ${modules_boot} ${modules_arch}"
 
 
-# Building a memdisk (see grub2-mkstandalone in grub-2.00)
+# Building a memdisk (see grub2-mkstandalone)
 memdisk() {
-    local out="$1" arch="$2" tag="$3" mods="$4"
+    local out="$1" arch="$2" mods="$3"
     local build=`mktemp -d`
     local libdir=/usr/lib/grub moddir=${build}/grub/${arch}
-    [ -e ${libdir}  ] || libdir=/lib/grub2 moddir=${build}/grub
     [ -n "${build}" ] || return 1
 
     # Iteratively include all dependent modules
@@ -49,22 +48,23 @@ memdisk() {
     done
 
     # Filter filesystems list, so that "search" doesn't try to load modules
-    # Filter command from minicmd overrides
+    # Filter commands from minicmd overrides
     mkdir -p ${moddir}
     cp -p ${libdir}/${arch}/*.lst ${moddir}
-    sed -ri "/^(`echo $mods | sed 's/ /|/g'`)\$/b; d" ${moddir}/fs.lst
-    sed -ri '/^\*(cat|help):/d'                       ${moddir}/command.lst
+    sed -ri "/^(`echo ${mods} | tr ' ' '|'`)\$/b; d" ${moddir}/fs.lst
+    sed -ri '/^\*(cat|help):/d'                      ${moddir}/command.lst
 
     # NOTE: localization files go into /grub/locale/*.mo
     mods=`echo "${mods}" | sed "s:.*:${libdir}/${arch}/&.mod:"`
     cp -p ${mods} ${moddir}
 
-    sed "s@PREFIX@/liberte@; s/\(efi_arch=\).*/\1${tag}/" ${templearlycfg} \
+    sed "s@PREFIX@/liberte@; s@VERSION@${LVERSION}@" ${templearlycfg} \
         > ${build}/grub/grub.cfg
 
     tar -cf ${build}/memdisk.tar -C ${build} grub
 
-    # NOTE: -p must come after -m
+    # NOTE: -C has no effect      (#424527)
+    # NOTE: -p must come after -m (#424521)
     grub2-mkimage -C xz -O ${arch} -m ${build}/memdisk.tar -p "(memdisk)/grub" \
                   -o ${out} memdisk tar
     rm -r ${build}
@@ -74,8 +74,8 @@ memdisk() {
 # Generate EFI binaries with modules in memdisk
 mkdir -p /boot${efidir}
 
-memdisk /boot${efidir}/${ia32name} i386-efi   IA32 "${modules}"
-memdisk /boot${efidir}/${x64name}  x86_64-efi x64  "${modules}"
+memdisk /boot${efidir}/${ia32name} i386-efi   "${modules}"
+memdisk /boot${efidir}/${x64name}  x86_64-efi "${modules}"
 
 
 # Copy gfxterm font
