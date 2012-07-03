@@ -21,7 +21,7 @@ consolefont=euro.pf2
 
 
 # Included modules (command.lst, partmap.lst, fs.lst, video.lst)
-modules_core="normal configfile echo test true minicmd ls search gzio"
+modules_core="normal configfile echo test true minicmd ls search"
 modules_fs="part_msdos part_gpt iso9660 fat ext2 hfsplus loopback"
 modules_boot="boot linux halt reboot chain appleldr"
 modules_arch="cpuid loadbios gfxterm efi_gop efi_uga fixvideo"

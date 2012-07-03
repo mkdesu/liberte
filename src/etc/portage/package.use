@@ -52,7 +52,7 @@ net-libs/glib-networking        -gnome
 # Multimedia
 # [ffmpeg/libav: encode-only flags: mp3 aac aacplus faac theora vorbis x264 xvid]
 media-video/totem               -youtube nsplugin
-virtual/ffmpeg                  -X -encode -truetype
+virtual/ffmpeg                  -X -encode -truetype -speex
 media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -hardcoded-tables  -speex -v4l
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
