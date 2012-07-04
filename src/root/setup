@@ -184,9 +184,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     fi
 
 
-    # "make prepare" does not suffice for xf86-video-virtualbox
-    sinfo "Compiling kernel"
-    ${helpdir}/gen-kernel main
+    sinfo "Preparing kernel"
+    ${helpdir}/gen-kernel prepare
 
 
     sinfo "Marking tree as ready for incremental builds"
@@ -481,28 +480,26 @@ sinfo "Installing wrappers"
 ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
 
 
-sinfo "Compiling main and KEXEC kernels"
-${helpdir}/gen-kernel
+sinfo "Building kernel modules"
+${helpdir}/gen-kernel modules
 
 
 sinfo "Creating initramfs image"
 ${helpdir}/gen-initramfs
 
 
-sinfo "Creating kexec initramfs image"
-/usr/src/linux-kexec/usr/gen_init_cpio ${HOME}/initrd/initramfs-kexec \
-    | xz -c -C crc32 > /usr/local/boot/initrd-kexec.xz
+sinfo "Building main and KEXEC kernels"
+${helpdir}/gen-kernel
 
 
 sinfo "Verifying XZ decompression memory requirements"
 kernxz=arch/x86/boot/compressed/vmlinux.bin.xz
 
 head -c -4 /usr/src/linux/${kernxz}          | xz -t -M $((2 * ${xzmem}))MiB
-xz -t -M ${xzmem}MiB /boot/initrd-x86.xz
-
 head -c -4 /usr/src/linux-kexec/${kernxz}    | xz -t -M $((2 * ${xzmem}))MiB
 head -c -4 /usr/src/linux-kexec-64/${kernxz} | xz -t -M $((2 * ${xzmem}))MiB
-xz -t -M ${xzmem}MiB /usr/local/boot/initrd-kexec.xz
+
+xz -t -M ${xzmem}MiB /usr/src/linux{,-kexec{,-64}}/usr/initramfs_data.cpio.xz
 
 
 sinfo "Kernel config differences:"

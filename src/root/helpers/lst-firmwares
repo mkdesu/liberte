@@ -4,7 +4,7 @@
 fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
 
 # initramfs image
-initrd=/boot/initrd-x86.xz
+initrd=/usr/src/linux/usr/initramfs_data.cpio.xz
 
 
 # serial_cs:          necessary firmware included by kernel automatically

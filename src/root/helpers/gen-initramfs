@@ -18,7 +18,7 @@ initramfs=${HOME}/initrd/initramfs
 stagedir=`mktemp -d`
 modlst=${stagedir}/modules.list
 initlst=${stagedir}/initramfs
-image=/boot/initrd-x86.xz
+image=/usr/local/addons/initrd/initrd-x86.cpio
 
 
 # Determine module names to add to initramfs (not necessarily canonical)
@@ -56,10 +56,8 @@ find ${stagedir} -mindepth 3 -type f \
     -printf 'file %P %p 0644 0 0\n' >> ${initlst}
 
 
-# Generate compressed initramfs (chmod due to GRKERNSEC_HIDESYM)
-/usr/src/linux-${kversion}/usr/gen_init_cpio ${initlst} \
-    | xz -c -C crc32 > ${image}
-chmod go= ${image}
+# Generate initramfs archive
+/usr/src/linux-${kversion}/usr/gen_init_cpio ${initlst} > ${image}
 
 
 rm -r ${stagedir}

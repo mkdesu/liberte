@@ -1,5 +1,12 @@
 #!/bin/sh -e
 
+# Parameter:
+#   + (none):  build and install main and kexec kernels
+#   + prepare: prepare main kernel for building external modules
+#   + modules: build and install main kernel modules and firmware
+cmd="$1"
+
+
 # Kernel version
 hsversion=`cat ${HOME}/config/kversion`
 kversion=${hsversion/-/-hardened-}
@@ -20,6 +27,7 @@ kexec64src=/usr/src/linux-kexec-64
 
 mainimg=/boot/kernel-x86.zi
 mainmod=/lib/modules/${kversion}
+initrd=/usr/local/addons/initrd/initrd-x86.cpio
 kexecimg=/usr/local/boot/kernel-kexec.zi
 kexec64img=/usr/local/boot/kernel-kexec-64.zi
 
@@ -37,24 +45,41 @@ rm -f ${kexecsrc}/${compile_h}
 rm -f ${kexec64src}/${compile_h}
 
 
-# Compile main kernel (chmod due to GRKERNSEC_HIDESYM)
-make -s ${makeopts} -C ${mainsrc} 2>/dev/null
-make -s ${makeopts} -C ${mainsrc} modules_install
+# Handle kernel preparation for building external modules
+if [ "${cmd}" = prepare ]; then
+    make -s ${makeopts} -C ${mainsrc} modules_prepare 2>/dev/null
+    exit
+elif [ "${cmd}" = modules ]; then
+    # bzImage is necessary for System.map (although initramfs may not exist yet,
+    # or is outdated), which is needed for module dependencies to be used by
+    # gen-initramfs; this also generates gen_init_cpio
+    if [ ! -e ${initrd} ]; then
+        touch ${initrd}
+    fi
+    make -s ${makeopts} -C ${mainsrc} bzImage 2>/dev/null
 
-rm ${mainmod}/{build,source}
-cp -a ${mainsrc}/${bzimage} ${mainimg}
-chmod go= ${mainimg} ${mainmod}
+    # Build main kernel modules (chmod due to GRKERNSEC_HIDESYM)
+    make -s ${makeopts} -C ${mainsrc} modules 2>/dev/null
+    make -s ${makeopts} -C ${mainsrc} modules_install
 
-
-# "main" argument is used before building @system
-if [ "$1" != main ]; then
-    # Compile KEXEC kernel
-    make -s ${makeopts} -C ${kexecsrc} 2>/dev/null
-    cp -a ${kexecsrc}/${bzimage}   ${kexecimg}
-
-
-    # Cross-compile 64-bit KEXEC kernel
-    # (x86_64-gcc is a wrapper, x86_64-{ar,ld,nm,objcopy} are symlinks)
-    make -s ${makeopts} -C ${kexec64src} ARCH=x86_64 CROSS_COMPILE=x86_64- 2>/dev/null
-    cp -a ${kexec64src}/${bzimage} ${kexec64img}
+    rm ${mainmod}/{build,source}
+    chmod go= ${mainmod}
+    exit
 fi
+
+
+# Build main kernel (chmod due to GRKERNSEC_HIDESYM)
+make -s ${makeopts} -C ${mainsrc} bzImage 2>/dev/null
+cp -a ${mainsrc}/${bzimage} ${mainimg}
+
+chmod go= ${mainimg}
+
+
+# Build KEXEC kernel
+make -s ${makeopts} -C ${kexecsrc} bzImage 2>/dev/null
+cp -a ${kexecsrc}/${bzimage} ${kexecimg}
+
+# Cross-compile 64-bit KEXEC kernel
+# (x86_64-gcc is a wrapper, x86_64-{ar,ld,nm,objcopy} are symlinks)
+make -s ${makeopts} -C ${kexec64src} ARCH=x86_64 CROSS_COMPILE=x86_64- bzImage 2>/dev/null
+cp -a ${kexec64src}/${bzimage} ${kexec64img}

@@ -56,6 +56,5 @@ exec ${qemu} -name "${title}" -m ${mem} -nodefaults          \
              -sdl -balloon virtio -vga cirrus -monitor vc    \
              -soundhw es1370 -net nic,model=virtio -net user \
              -kernel "${bootdir}/kernel-x86.zi"              \
-             -initrd "${bootdir}/initrd-x86.xz"              \
              -drive file="${bootdir}/root-x86.sfs,${cdrom}"  \
              -append "`echo ${params} $*`"

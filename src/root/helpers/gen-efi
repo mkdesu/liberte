@@ -28,7 +28,7 @@ modules_arch="cpuid loadbios gfxterm efi_gop efi_uga fixvideo"
 modules="${modules_core} ${modules_fs} ${modules_boot} ${modules_arch}"
 
 
-# Building a memdisk (see grub2-mkstandalone)
+# Building a memdisk (see grub2-mkstandalone (Savannah: #36772))
 memdisk() {
     local out="$1" arch="$2" mods="$3"
     local build=`mktemp -d`
@@ -63,8 +63,8 @@ memdisk() {
 
     tar -cf ${build}/memdisk.tar -C ${build} grub
 
-    # NOTE: -C has no effect      (#424527)
-    # NOTE: -p must come after -m (#424521)
+    # NOTE: -C has no effect      (#424527), (Savannah: #36770)
+    # NOTE: -p must come after -m (#424521), (Savannah: #36771)
     grub2-mkimage -C xz -O ${arch} -m ${build}/memdisk.tar -p "(memdisk)/grub" \
                   -o ${out} memdisk tar
     rm -r ${build}

@@ -1,6 +1,7 @@
 2012-07-XX
   + 2012.3 release
 
+  * Kernel image is now bundled with initramfs
   * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
   * Better support for VMware graphics virtualization
 

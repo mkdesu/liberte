@@ -88,14 +88,11 @@ sinfo "Build environment:"
 if [ -e ${regexps} ]; then
     regexps=`cat ${regexps} | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
 
-    grep   -iE "${regexps}"                                     \
-        /usr/src/linux/arch/*/boot/compressed/vmlinux.bin       \
-        /usr/src/linux-kexec/arch/*/boot/compressed/vmlinux.bin \
-        /usr/src/linux-kexec-64/arch/*/boot/compressed/vmlinux.bin
+    grep   -iE "${regexps}" \
+        /usr/src/linux{,-kexec{,-64}}/arch/*/boot/compressed/vmlinux.bin
 
     xzgrep -iE "${regexps}" \
-        ./boot/initrd-*.xz  \
-        ./usr/local/boot/initrd-kexec.xz
+        /usr/src/linux{,-kexec{,-64}}/usr/initramfs_data.cpio.xz
 
     find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
         ! -name 'libgucharmap*.so.*' ! -name oui.txt -print0 \
