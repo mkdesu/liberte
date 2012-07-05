@@ -14,16 +14,17 @@ kversion=${hsversion/-/-hardened-}
 
 
 # Build host anonymity
-export KBUILD_BUILD_VERSION=0
-export KBUILD_BUILD_TIMESTAMP=`date -u +%F`
-export KBUILD_BUILD_USER=liberte
-export KBUILD_BUILD_HOST=dee.su
+bver=KBUILD_BUILD_VERSION=0
+bts=KBUILD_BUILD_TIMESTAMP=`date -u +%F`
+buser=KBUILD_BUILD_USER=liberte
+bhost=KBUILD_BUILD_HOST=dee.su
 
 
 # Paths
-mainsrc=/usr/src/linux-${kversion}
-kexecsrc=/usr/src/linux-kexec
-kexec64src=/usr/src/linux-kexec-64
+kernsrc=/usr/src/linux-${kversion}
+mainobj=/usr/src/linux-main
+kexecobj=/usr/src/linux-kexec
+kexec64obj=/usr/src/linux-kexec-64
 
 mainimg=/boot/kernel-x86.zi
 mainmod=/lib/modules/${kversion}
@@ -37,17 +38,19 @@ compile_h=include/generated/compile.h
 
 # Make options
 makeopts=`portageq envvar MAKEOPTS`
+rmake="make -s ${makeopts} -C ${kernsrc} ${bver} ${bts} ${buser} ${bhost}"
+make="sudo -n -u bin ${rmake}"
 
 
 # Reset build version
-rm -f ${mainsrc}/${compile_h}
-rm -f ${kexecsrc}/${compile_h}
-rm -f ${kexec64src}/${compile_h}
+rm -f ${mainobj}/${compile_h}
+rm -f ${kexecobj}/${compile_h}
+rm -f ${kexec64obj}/${compile_h}
 
 
 # Handle kernel preparation for building external modules
 if [ "${cmd}" = prepare ]; then
-    make -s ${makeopts} -C ${mainsrc} modules_prepare 2>/dev/null
+    ${make} O=${mainobj} modules_prepare 2>/dev/null
     exit
 elif [ "${cmd}" = modules ]; then
     # bzImage is necessary for System.map (although initramfs may not exist yet,
@@ -56,11 +59,11 @@ elif [ "${cmd}" = modules ]; then
     if [ ! -e ${initrd} ]; then
         touch ${initrd}
     fi
-    make -s ${makeopts} -C ${mainsrc} bzImage 2>/dev/null
+    ${make}  O=${mainobj} bzImage 2>/dev/null
 
     # Build main kernel modules (chmod due to GRKERNSEC_HIDESYM)
-    make -s ${makeopts} -C ${mainsrc} modules 2>/dev/null
-    make -s ${makeopts} -C ${mainsrc} modules_install
+    ${make}  O=${mainobj} modules 2>/dev/null
+    ${rmake} O=${mainobj} modules_install
 
     rm ${mainmod}/{build,source}
     chmod go= ${mainmod}
@@ -69,17 +72,17 @@ fi
 
 
 # Build main kernel (chmod due to GRKERNSEC_HIDESYM)
-make -s ${makeopts} -C ${mainsrc} bzImage 2>/dev/null
-cp -a ${mainsrc}/${bzimage} ${mainimg}
+${make} O=${mainobj} bzImage 2>/dev/null
+cp ${mainobj}/${bzimage} ${mainimg}
 
 chmod go= ${mainimg}
 
 
 # Build KEXEC kernel
-make -s ${makeopts} -C ${kexecsrc} bzImage 2>/dev/null
-cp -a ${kexecsrc}/${bzimage} ${kexecimg}
+${make} O=${kexecobj} bzImage 2>/dev/null
+cp ${kexecobj}/${bzimage} ${kexecimg}
 
 # Cross-compile 64-bit KEXEC kernel
 # (x86_64-gcc is a wrapper, x86_64-{ar,ld,nm,objcopy} are symlinks)
-make -s ${makeopts} -C ${kexec64src} ARCH=x86_64 CROSS_COMPILE=x86_64- bzImage 2>/dev/null
-cp -a ${kexec64src}/${bzimage} ${kexec64img}
+${make} O=${kexec64obj} ARCH=x86_64 CROSS_COMPILE=x86_64- bzImage 2>/dev/null
+cp ${kexec64obj}/${bzimage} ${kexec64img}

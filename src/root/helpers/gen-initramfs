@@ -18,6 +18,8 @@ initramfs=${HOME}/initrd/initramfs
 stagedir=`mktemp -d`
 modlst=${stagedir}/modules.list
 initlst=${stagedir}/initramfs
+
+mainobj=/usr/src/linux-main
 image=/usr/local/addons/initrd/initrd-x86.cpio
 
 
@@ -45,7 +47,7 @@ for mod in `sort -u ${modlst}`; do
     mkdir -p     ${stagedir}`dirname ${mod}`
     cp -p ${mod} ${stagedir}`dirname ${mod}`
 done
-depmod -b ${stagedir} -e -F /usr/src/linux-${kversion}/System.map ${kversion}
+depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
 
 
 # Build complete initramfs file list
@@ -57,7 +59,7 @@ find ${stagedir} -mindepth 3 -type f \
 
 
 # Generate initramfs archive
-/usr/src/linux-${kversion}/usr/gen_init_cpio ${initlst} > ${image}
+${mainobj}/usr/gen_init_cpio ${initlst} > ${image}
 
 
 rm -r ${stagedir}
