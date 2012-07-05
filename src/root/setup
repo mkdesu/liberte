@@ -45,6 +45,11 @@ spatch() {
     rm -f /tmp/patch-rejects
 }
 
+patch_ebuild() {
+    spatch "$1" -p0
+    ebuild `awk '{print $2; exit}' "$1"` manifest
+}
+
 rebuild_locales() {
     grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen.new
     if cmp -s /etc/locale.gen{.new,}; then
@@ -83,9 +88,10 @@ fi
 
 sinfo "Applying temporary portage patches"
 # (#417043)
-fbr=/usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild
-spatch ${HOME}/patches/portage/fbreader.patch -p0
-ebuild ${fbr} manifest
+patch_ebuild ${HOME}/patches/portage/fbreader.patch
+# (#424816)
+patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
+patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
 
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then

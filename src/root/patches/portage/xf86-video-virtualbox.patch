@@ -1,0 +1,10 @@
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.12.ebuild	2012-07-05 03:24:57.000000000 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.12.ebuild	2012-07-05 03:25:31.000000000 +0000
+@@ -94,6 +94,7 @@
+ 		--disable-sdl-ttf \
+ 		--disable-pulse \
+ 		--disable-alsa \
++		--with-linux=${KV_OUT_DIR} \
+ 		--build-headless || die "configure failed"
+ 		source ./env.sh
+ }

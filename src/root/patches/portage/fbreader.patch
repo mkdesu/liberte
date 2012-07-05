@@ -1,5 +1,5 @@
 --- /usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild	2012-06-15 13:37:23.000000000 +0000
-+++ /usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild.new	2012-06-15 13:48:57.000000000 +0000
++++ /usr/portage/app-text/fbreader/fbreader-0.12.10.ebuild	2012-06-15 13:48:57.000000000 +0000
 @@ -35,8 +35,8 @@
  	sed -i "s:^Name=E-book reader:Name=FBReader:" fbreader/desktop/desktop || die "sed failed"
  	sed -i "s:^Name\[ru\]=.*$:Name\[ru\]=FBReader:" fbreader/desktop/desktop || die "sed failed"

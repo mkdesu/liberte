@@ -1,0 +1,10 @@
+--- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.12.ebuild	2012-07-05 02:56:59.000000000 +0000
++++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.12.ebuild	2012-07-05 02:57:36.000000000 +0000
+@@ -90,6 +90,7 @@
+ 		--disable-sdl-ttf \
+ 		--disable-pulse \
+ 		--disable-alsa \
++		--with-linux=${KV_OUT_DIR} \
+ 		--build-headless || die "configure failed"
+ }
+ 
