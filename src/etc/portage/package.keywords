@@ -21,6 +21,7 @@
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
+=net-wireless/reaver-1.4*
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.9.1*

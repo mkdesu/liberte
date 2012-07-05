@@ -99,6 +99,7 @@ sys-apps/ethtool
 net-wireless/rfkill
 net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
+net-wireless/reaver
 net-misc/networkmanager
 net-misc/networkmanager-pptp
 net-misc/networkmanager-openvpn

@@ -8,6 +8,7 @@
   * Added "blacklist" boot parameter for kernel modules blacklisting
 
   * Added optional PKCS#11 smart-cards support to GnuPG
+  * Added reaver-wps, a WiFi Protected Setup cracking tool
 
 
 2012-06-17
