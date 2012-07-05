@@ -21,6 +21,7 @@ initlst=${stagedir}/initramfs
 
 mainobj=/usr/src/linux-main
 image=/usr/local/addons/initrd/initrd-x86.cpio
+plug=/boot/initrd-x86.xz
 
 
 # Determine module names to add to initramfs (not necessarily canonical)
@@ -61,5 +62,8 @@ find ${stagedir} -mindepth 3 -type f \
 # Generate initramfs archive
 ${mainobj}/usr/gen_init_cpio ${initlst} > ${image}
 
-
 rm -r ${stagedir}
+
+
+# Generate migration path initrd plug
+${mainobj}/usr/gen_init_cpio /dev/null | xz -C crc32 -0 > ${plug}
