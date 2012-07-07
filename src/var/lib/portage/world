@@ -94,6 +94,7 @@ dev-java/jamvm
 
 # Network utilities
 net-analyzer/netcat
+net-analyzer/nethogs
 net-firewall/iptables
 sys-apps/ethtool
 net-wireless/rfkill
