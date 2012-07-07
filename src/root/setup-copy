@@ -64,7 +64,7 @@ done
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
-sed -i 's/\${python_dep}//' ${ebuild_portage}
+sed -i 's/\${python_dep}[^"]*//' ${ebuild_portage}
 
 # Python
 # exiv2                    not needed                  (#398959, fixed in 0.23)
