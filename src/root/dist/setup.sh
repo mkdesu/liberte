@@ -196,7 +196,7 @@ case "${devfs}" in
         echo "Detected FAT(32) filesystem, will install using SYSLINUX"
         devfs=fat
         ;;
-    ext2|ext3|ext4)
+    ext[234])
         echo "Detected ext[234] filesystem, will install using EXTLINUX"
         devfs=ext2
         ;;
@@ -297,7 +297,7 @@ elif [ ${devfs} = ext2 ]; then
 
     # Install EXTLINUX
     echo "*** Installing EXTLINUX in ${devdir} ***"
-    ${extbin} -i "${devdir}"${sysdir}/ext
+    ${extbin} -i "${devdir}"${sysdir}
 
     if [ -n "${mntexec}" ]; then
         echo "Remounting ${mntexec} with noexec option"

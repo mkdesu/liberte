@@ -31,7 +31,7 @@ distname=liberte-${version}
 
 # Derived paths
 logosvg=${src}/src/home/anon/config/images/liberte-logo-nofont.svg
-efiboot=${cdroot}/isolinux/efiboot.img
+efiboot=${cdroot}/boot/efiboot.img
 syslinux=${cdroot}/liberte/boot/syslinux/syslinux-x86.tbz
 
 ovfpath=${vmstage}/${distname}.ovf
@@ -149,7 +149,7 @@ test -e ${vmstage}/vpart/EFI/BOOT/BOOTx64.EFI
 vmware-mount -d ${vmstage}/vpart
 
 vmware-mount ${diskpath} 2 ${vmstage}/vpart
-test -e ${vmstage}/vpart/liberte/boot/syslinux/ext/ldlinux.sys
+test -e ${vmstage}/vpart/liberte/boot/syslinux/ldlinux.sys
 vmware-mount -d ${vmstage}/vpart
 
 

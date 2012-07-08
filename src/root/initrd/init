@@ -40,13 +40,16 @@ mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 mount -t devtmpfs -o nosuid,noexec devtmpfs /dev
 
 
-# Parse kernel options
-param_cdroot='/dev/sd* /dev/sr* /dev/vd* /dev/mmcblk*'
-param_cdroot_type=auto
-param_cdroot_flags=noatime
+# Parse kernel options, with sensible defaults
 for param in `cat /proc/cmdline`; do
-    eval param_${param%%[=.]*}=${param#*=} 2>/dev/null
+    eval param_${param%%[^a-z0-9_]*}=\"\${param#*=}\"
 done
+
+: ${param_cdroot:='/dev/sd* /dev/sr* /dev/vd* /dev/mmcblk*'}
+: ${param_loop:=/liberte/boot/root-x86.sfs}
+
+# Sets/validates param_cdroot_{type,flags}
+set_cdroot_type
 
 
 # Handle blacklisted modules
@@ -61,7 +64,7 @@ good_msg 'Loading modules'
 
 # Specify required filesystem modules (no autoloading on mount)
 # Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
-eval force_load=\"loop squashfs ehci-hcd \${force_load_"${param_cdroot_type}"}\"
+force_load="loop ${force_load_fs} ehci-hcd"
 
 oldmods=
 newmods=" ${force_load} "
@@ -110,10 +113,14 @@ while :; do
                 mediaro=`blockdev --getro ${mediadev} 2>/dev/null` || mediaro=1
                 [ ${mediaro} = 1 ] || blockdev --setro ${mediadev}
 
-                if mount -r -t ${param_cdroot_type} -o ${param_cdroot_flags} ${mediadev} ${sboot} >/dev/null 2>&1; then
+                if mount -r -t ${param_cdroot_type} -o "${param_cdroot_flags}" ${mediadev} ${sboot} >/dev/null 2>&1; then
                     # Check for the recognition file
-                    if [ -e ${sboot}${param_loop} ]; then
+                    if [ -e ${sboot}"${param_loop}" ]; then
                         good_msg "Media found on ${mediadev}"
+
+                        # Force 'toram' and readonly device mode on CD boot
+                        real_cdroot_type=`grep " ${sboot} " /proc/mounts | cut -d' ' -f3`
+                        [ "${real_cdroot_type}" != iso9660 ] || param_readonly=1 param_toram=1
 
                         [ ${mediaro} = 1 -o -n "${param_readonly}" ] || blockdev --setrw ${mediadev}
                         break 2
@@ -134,13 +141,32 @@ done
 test_success "find media to mount"
 
 
+# Determine fs type and remount with specific flags
+if [ ${had_cdroot_flags} = 0 -a "${real_cdroot_type}" != ${param_cdroot_type} ]; then
+    param_cdroot_type="${real_cdroot_type}" param_cdroot_flags=
+    set_cdroot_type
+
+    good_msg "Remounting ${mediadev} with ${param_cdroot_type}-specific flags"
+    umount ${sboot}
+    mount -r -t ${param_cdroot_type} -o "${param_cdroot_flags}" ${mediadev} ${sboot}
+fi
+
+
+# Unload unused filesystem modules
+for modname in `echo "${force_load_fs}" | tr - _`; do
+    if [ "`cat /sys/module/${modname}/refcnt 2>/dev/null`" = 0 ]; then
+        modprobe -r ${modname}
+    fi
+done
+
+
 # Setup the loopback mounts
 verifyroot() {
     local image="$1"
 
     if [ -n "${param_cdroot_hash}" ]; then
         good_msg 'Verifying filesystem image ...'
-        sfshash=`sha256sum ${image}`
+        sfshash=`sha256sum "${image}"`
         param_cdroot_hash=`echo "${param_cdroot_hash}" | tr A-F a-f`
 
         [ "${param_cdroot_hash}" = "${sfshash%% *}" ]
@@ -150,8 +176,11 @@ verifyroot() {
     fi
 }
 
-if [ -n "${param_loop}" ]; then
-    rootimg=${sboot}${param_loop}
+if [ "${param_loop}" != / ]; then
+    rootimg=${sboot}"${param_loop}"
+
+    # Let 'notoram' override 'toram' enforcement for CDs
+    [ -z "${param_notoram}" ] || param_toram=
 
     # If copying squashfs image to RAM, force read-only losetup
     # (BusyBox does not do that automatically (Busybox: #4784), fixed in git: 2012-06-21)
@@ -160,17 +189,18 @@ if [ -n "${param_loop}" ]; then
         rootimgram=${srwroot}/cache/root.sfs
 
         mkdir -m 700  ${srwroot}/cache
-        cp ${rootimg} ${rootimgram} || rm ${rootimgram}
+        cp "${rootimg}" ${rootimgram} || rm ${rootimgram}
         rootimg=${rootimgram}
 
         mount -o remount,ro ${srwroot}
     fi
 
-    verifyroot ${rootimg}
+    verifyroot "${rootimg}"
 
     # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
     good_msg 'Mounting SquashFS filesystem'
-    mount -r -t squashfs -o loop,nodev ${rootimg} ${slive}
+    modprobe -b squashfs
+    mount -r -t squashfs -o loop,${fs_flags_squashfs} "${rootimg}" ${slive}
     test_success 'mount compressed filesystem'
 
     [ -z "${param_toram}" ] || mount -o remount,rw ${srwroot}

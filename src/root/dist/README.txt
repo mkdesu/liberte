@@ -15,6 +15,11 @@ from USB drive in your computer BIOS, and give it
 precedence over regular hard disk boot. Or, you can
 enable the Multiboot menu in BIOS.
 
+Another option is to install Liberté to USB or SD media,
+but boot from a bootstrap CD, which then continues with
+USB/SD. This also allows to ensure that the booted kernel
+has not been corrupted by malware.
+
 NOTE: The USB stick needs to be formatted as FAT/FAT32.
 Older computers might be able to boot only FAT(16)-formatted
 USB keys - the corresponding BIOS boot option is typically

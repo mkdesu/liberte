@@ -2,11 +2,14 @@
   + 2012.3 release
 
   * Kernel image is now bundled with initramfs
+  * (U)EFI trusted boot chain beginning at EFI boot binaries
   * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
   * Better support for VMware graphics virtualization
 
+  * Simplified boot parameters handling, most are now omitted
   * Added "blacklist" boot parameter for kernel modules blacklisting
 
+  * Added small CD -> USB bootstrapping ISO image
   * Added optional PKCS#11 smart-cards support to GnuPG
   * Added reaver-wps, a WiFi Protected Setup cracking tool
 

@@ -42,24 +42,18 @@ rmake="make -s ${makeopts} -C ${kernsrc} ${bver} ${bts} ${buser} ${bhost}"
 make="sudo -n -u bin ${rmake}"
 
 
-# Reset build version
-rm -f ${mainobj}/${compile_h}
-rm -f ${kexecobj}/${compile_h}
-rm -f ${kexec64obj}/${compile_h}
-
-
 # Handle kernel preparation for building external modules
 if [ "${cmd}" = prepare ]; then
     ${make} O=${mainobj} modules_prepare 2>/dev/null
     exit
 elif [ "${cmd}" = modules ]; then
-    # bzImage is necessary for System.map (although initramfs may not exist yet,
+    # vmlinux is necessary for System.map (although initramfs may not exist yet,
     # or is outdated), which is needed for module dependencies to be used by
     # gen-initramfs; this also generates gen_init_cpio
     if [ ! -e ${initrd} ]; then
         touch ${initrd}
     fi
-    ${make}  O=${mainobj} bzImage 2>/dev/null
+    ${make}  O=${mainobj} vmlinux 2>/dev/null
 
     # Build main kernel modules (chmod due to GRKERNSEC_HIDESYM)
     ${make}  O=${mainobj} modules 2>/dev/null

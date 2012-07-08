@@ -41,7 +41,6 @@ gunzip ${sysroot}/${consolefont}.gz
 # Substitute and copy template
 cat ${templcfg}                           \
     | sed "/^##/d ;
-           s@PREFIX@/liberte@ ;
            s@VERSION@${LVERSION}@ ;
            s@CONSOLEFONT@${consolefont}@" \
     | iconv -f UTF-8 -t ${encoding}       \

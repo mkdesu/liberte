@@ -19,26 +19,18 @@ distroot=/mnt/boot
 distname=liberte-${LVERSION}
 zipfile=${distroot}/${distname}.zip
 isofile=${distroot}/${distname}.iso
+isobsfile=${distroot}/${distname}-bootstrap.iso
 
 efilabel=LIBERTE_EFI
-efiboot=${cdroot}/isolinux/efiboot.img
+efiboot=${cdroot}/boot/efiboot.img
 
+ziimage=${cdroot}/liberte/boot/kernel-x86.zi
 sqimage=${cdroot}/liberte/boot/root-x86.sfs
 sqsort=${live}/tmp/transient/pkg/squashfs.sort
 sqpseudo=${HOME}/config/rootfs.pseudo
 sqignore=${HOME}/config/rootfs.ignore
 
-luser=`id -u anon`
-lgroup=`id -g anon`
-
 sysver=`syslinux -v 2>&1 | cut -d' ' -f2`
-
-
-# See also /usr/local/sbin/ps-mount
-vfatflags=noatime,noexec,flush,iocharset=iso8859-1,utf8,uid=${luser},gid=${lgroup},umask=0177,dmask=077
-isofsflags=nosuid,nodev,iocharset=iso8859-1,utf8
-extflags=noatime,nosuid,nodev,acl,user_xattr
-hfspflags=noatime,nosuid,nodev,uid=${luser},gid=${lgroup},umask=077
 
 
 mibsize() {
@@ -79,6 +71,11 @@ rsync -aHS --delete-excluded ${live}/boot ${cdroot}/liberte
 mv ${cdroot}/liberte/boot/EFI ${cdroot}
 
 
+sinfo "Converting text files to DOS line endings"
+find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
+    -exec sed -i 's/$/\r/' {} \;
+
+
 # Using default block size of 128KiB
 # (chmod due to GRKERNSEC_HIDESYM)
 sinfo "Creating SquashFS image"
@@ -88,67 +85,69 @@ mksquashfs ${live} ${sqimage} -noappend -no-progress -no-exports \
     -pf ${sqpseudo} -sort ${sqsort} -ef ${sqignore}
 chmod go= ${sqimage}
 
-sfshash=`sha256sum ${sqimage}`
-sfshash="${sfshash%% *}"
-
 
 sinfo "Adapting Syslinux and GRUB configuration"
 
-sed -i "s/TAG //; s/ROOTFS/vfat/; s/FSFLAGS/${vfatflags}/; s/FSHASH/${sfshash}/" \
-    ${cdroot}/liberte/boot/syslinux/syslinux.cfg
-sed -i "s/FSHASH/${sfshash}/; s/VFATFLAGS/${vfatflags}/; s/EXTFLAGS/${extflags}/;
-        s/ISOFSFLAGS/${isofsflags}/; s/HFSPFLAGS/${hfspflags}/" \
-    ${cdroot}/liberte/boot/grub/grub.cfg
+fshash=`sha256sum ${sqimage}`
+sed -i "s/FSHASH/${fshash%% *}/"                  \
+    ${cdroot}/liberte/boot/syslinux/syslinux.cfg  \
+    ${cdroot}/liberte/boot/grub/grub.cfg          \
+    ${cdroot}/liberte/qemulate.sh
 
-# EXTLINUX config takes precedence over SYSLINUX one when in same directory
-mkdir ${cdroot}/liberte/boot/syslinux/ext
-cp -p ${live}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
-sed -i "s/TAG //; s/ROOTFS/ext4/; s/FSFLAGS/${extflags}/;  s/FSHASH/${sfshash}/" \
-    ${cdroot}/liberte/boot/syslinux/ext/extlinux.conf
+sha256sum ${cdroot}/liberte/boot/grub/* ${ziimage}  \
+    | sed "/\<grub\.\(cfg\|mf\)\>/d; s:${cdroot}::" \
+    > ${cdroot}/liberte/boot/grub/grub.mf
 
-# ISOLINUX doesn't support RockRidge/Joliet, so must replace '-' in filenames
-# (translation equivalent to mount's map=normal is still performed)
-cp -p ${live}/boot/syslinux/syslinux.cfg ${cdroot}/liberte/boot/syslinux/isolinux.cfg
-sed -i "s/TAG/[CD]/; s/ROOTFS/iso9660 readonly toram/; s/FSFLAGS/${isofsflags}/;
-        s/FSHASH/${sfshash}/; s/\(\(FONT\|LINUX\|INITRD\) [^-]*\)-/\1_/" \
-    ${cdroot}/liberte/boot/syslinux/isolinux.cfg
-
-mkdir ${cdroot}/isolinux
-cp -p ${cdroot}/liberte/boot/syslinux/isolinux.cfg ${cdroot}/isolinux/isolinux.cfg
-
-sed -i "s/FSHASH/${sfshash}/" ${cdroot}/liberte/qemulate.sh
-
-
-sinfo "Converting text files to DOS line endings"
-find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
-    -exec sed -i 's/$/\r/' {} \;
+grub1hash=`sha256sum ${cdroot}/liberte/boot/grub/grub.cfg`
+grub2hash=`sha256sum ${cdroot}/liberte/boot/grub/grub.mf`
+sed -i "s/replace_hash_\{50\}01/${grub1hash%% *}/ ; \
+        s/replace_hash_\{50\}02/${grub2hash%% *}/"  \
+    ${cdroot}/EFI/BOOT/*.EFI
 
 
 # UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
 # the use of conforming FAT partitions which do not use the ESP GUID."
-sinfo "Building binary distribution ${distname}.zip"
+sinfo "Building binary distribution ${zipfile##*/}"
 rm -f ${zipfile}
 (cd ${cdroot}; zip -r9 -q ${zipfile} EFI liberte)
+unzip -qt ${zipfile}
 
 
 # Add two extra 4K blocks (may need adjustment)
 sinfo "Creating EFI boot image for El-Torito"
+
+mkdir ${cdroot}/boot
 efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | cut -f1`
 truncate -s $(((efiblocks + 2) * 4))K ${efiboot}
+
 mkdosfs -n "${efilabel}" -I -f 1 -r 16 -R 1 ${efiboot}
 MTOOLS_SKIP_CHECK=1 mcopy -i ${efiboot} -smQ ${cdroot}/EFI ::
 
 
 # Hide root directories on Windows, and reset volume information
-sinfo "Creating ISO image ${distname}.iso"
-mkisofs -quiet -iso-level 2 -no-pad -sysid '' -V '' -A '' -R \
-    -no-emul-boot -boot-load-size 4 -boot-info-table         \
-    -c boot.cat -b liberte/boot/syslinux/isolinux.bin        \
-    -eltorito-alt-boot -no-emul-boot                         \
-    -eltorito-platform efi -b isolinux/efiboot.img           \
-    -hide boot.cat -hidden isolinux -hidden liberte -m EFI   \
-    -o ${isofile} ${cdroot}
+# Allow '-' in filenames, since ISOLINUX doesn't support RockRidge/Joliet
+# (translation equivalent to mount's map=normal is still performed)
+sinfo "Creating ISO image ${isofile##*/}"
+
+mkdir ${cdroot}/boot/syslinux
+cp -p ${cdroot}/liberte/boot/syslinux/syslinux.cfg \
+      ${cdroot}/boot/syslinux/syslinux.cfg
+
+set -- -quiet -iso-level 2 -relaxed-filenames -R -no-pad \
+       -sysid '' -V '' -A ''                             \
+       -no-emul-boot -boot-load-size 4 -boot-info-table  \
+       -c boot/eltorito.cat                              \
+       -b liberte/boot/syslinux/isolinux.bin             \
+       -eltorito-alt-boot -no-emul-boot                  \
+       -eltorito-platform efi -b boot/efiboot.img        \
+       -hidden boot -hidden liberte -m EFI
+mkisofs "$@" -o ${isofile} ${cdroot}
 isovfy ${isofile}
+
+
+sinfo "Creating ISO image ${isobsfile##*/}"
+mkisofs "$@" -m ${sqimage##*/} -o ${isobsfile} ${cdroot}
+isovfy ${isobsfile}
 
 
 echo "Disk usage: `du -s --apparent-size -B 1M ${cdroot} | cut -f1` MiB"
