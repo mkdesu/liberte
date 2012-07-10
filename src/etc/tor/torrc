@@ -41,3 +41,6 @@ SafeSocks            1
 #   too (whether as bridge relays or as normal relays), then we need to
 #   understand this threat better and learn how to mitigate it.
 ClientOnly           1
+
+## Bridges may be added below by /etc/init.d/identity
+UseBridges           0

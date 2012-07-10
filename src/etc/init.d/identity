@@ -6,6 +6,7 @@ luser=anon
 lmount=/home/${luser}/persist
 live=/mnt/live
 
+torrc=/etc/tor/torrc
 ltordir=${lmount}/security/tor/hidden_service
 li2pdir=${lmount}/security/i2p/eepsite
 certsdir=${lmount}/security/cable/certs
@@ -39,6 +40,26 @@ depend() {
 
 
 start() {
+    # Use Tor bridges if "bridges=IP[:port],..." boot option was specified
+    # (includes provisional support for IPv6; default port is 443)
+    bridges=`cat /proc/cmdline                                         \
+        | sed -nr 's/^(.*[[:blank:]])?bridges=([^[:blank:]]+).*$/\2/p' \
+        | LC_ALL=C tr -cd '[:xdigit:].:,[]' | tr , '\n'                \
+        | sed -r 's/^[[:xdigit:]]+:[[:xdigit:]:]*$/[&]/;               \
+                  s/(^[^:]*|])$/&:443/'`
+    if [ -n "${bridges}" ]  &&  grep -q '^UseBridges[[:blank:]]\+0\>' ${torrc}; then
+        ebegin Configuring Tor bridges
+        sed -i 's/^\(UseBridges[[:blank:]]\+\).*/\11/' ${torrc}
+        for bridge in ${bridges}; do
+            eindent
+            einfo "Bridge: ${bridge}"
+            echo  "Bridge  ${bridge}" >> ${torrc}
+            eoutdent
+        done
+        eend $?
+    fi
+
+
     # Create (small) Tor hidden service key + hostname, if they don't exist
     if [ ! -e ${ltordir} ]; then
         ebegin Initializing Tor hidden service directory
