@@ -4,24 +4,27 @@
 =media-libs/libpostproc-0.8.0*
 
 # System (cdrtools: EFI platform support)
+# app-emulation/virt-what       (#409237)
+# net-misc/connect              (#384471)
 =app-emulation/virt-what-1.11*
 =net-misc/connect-100*
 =app-admin/paxtest-0.9.9*
-=dev-java/jamvm-1.5.4-r2
-=dev-java/java-service-wrapper-3.5.14*
-=sys-boot/efibootmgr-0.5.4*
-=sys-boot/grub-2.00*:2
-=app-cdr/cdrtools-3.01_alpha07*
 =app-crypt/gnupg-pkcs11-scd-0.7.3*
 
-# JamVM is a JRE (#416819)
-=virtual/jre-1.5.0-r1
+# Boot process
+=sys-boot/grub-2.00*:2
+=app-cdr/cdrtools-3.01_alpha07*
+=sys-boot/efibootmgr-0.5.4*
 
 # Network
 <net-misc/networkmanager-openvpn-0.8.5
 <net-misc/networkmanager-pptp-0.8.5
 <net-misc/networkmanager-vpnc-0.8.5
 =net-wireless/reaver-1.4*
+
+# Java: JamVM is a JRE (#425618, #425624)
+=virtual/jre-1.5.0-r1
+=dev-java/jamvm-1.5.4-r2
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.9.1*
@@ -31,6 +34,18 @@
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.03.13.651368*
 =app-emulation/open-vm-tools-kmod-2012.03.13.651368*
+
+# Removes X dependencies
+=dev-libs/m17n-lib-1.6.3*
+
+# Battery and thermal plugin fixes for recent sysfs ACPI
+=lxde-base/lxpanel-0.5.9*
+
+# edit-select-all-symbolic.svg (#410483)
+=x11-themes/gnome-icon-theme-symbolic-3.4.0*
+
+# Split gnuplot dependency (#425622)
+=sci-libs/libqalculate-0.9.7*
 
 # Firmware
 sys-apps/microcode-data
@@ -49,12 +64,3 @@ net-wireless/rt2870-firmware
 net-wireless/rt61-firmware
 net-wireless/atmel-firmware
 media-tv/cx18-firmware
-
-# Battery and thermal plugin fixes for recent sysfs ACPI
-=lxde-base/lxpanel-0.5.9*
-
-# edit-select-all-symbolic.svg (#410483)
-=x11-themes/gnome-icon-theme-symbolic-3.4.0*
-
-# Removes X dependencies
-=dev-libs/m17n-lib-1.6.3*

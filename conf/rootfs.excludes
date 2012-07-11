@@ -120,7 +120,6 @@
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
 /usr/lib/systemd/
-/var/www/
 /etc/*-
 /etc/dconf/db/*.d
 /etc/resolv.conf

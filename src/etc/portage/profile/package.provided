@@ -13,8 +13,5 @@ media-fonts/font-sony-misc-0
 # Mostly unneeded (ghostscript-gpl <- graphicsmagick, libwmf <- abiword)
 media-fonts/urw-fonts-2.4.9
 
-# Gnuplot is an overkill, and is superficially integrated (sci-libs/libqalculate)
-sci-visualization/gnuplot-3.7
-
 # virtual/jre (gnu-classpath circular dependency (#421095))
 dev-java/diablo-jre-bin-1.6.0

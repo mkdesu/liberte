@@ -324,6 +324,23 @@ sinfo "Replacing laptop-mode drive-waking hdparm calls"
 sed -i 's/\<hdparm -[SW]\>/fast-&/' /usr/share/laptop-mode-tools/modules/hdparm
 
 
+# /run/lock prevents a dangling symlink
+sinfo "Initializing /run"
+rm -r /run
+mkdir -p -m 775 /run/lock
+chown root:uucp /run/lock
+
+
+sinfo "Setting sh (dash) and java (jamvm) symlinks"
+ln -sf dash                          /bin/sh
+ln -s  ../local/libexec/java.wrapper /usr/bin/java
+
+
+sinfo "Setting cables-related and /root permissions"
+chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
+chmod -R go= /root
+
+
 sinfo "Removing invalid symlinks, dirs and files"
 find  /usr/i686-pc-linux-gnu -xtype l -delete
 rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
@@ -340,11 +357,6 @@ rm /usr/share/eselect/modules/{binutils,kernel,news,profile}.eselect
 find / -xdev -xtype l -delete
 
 
-sinfo "Setting cables-related and /root permissions"
-chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
-chmod -R go= /root
-
-
 sinfo "Updating ld cache"
 eselect env update 2>/dev/null
 sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
@@ -352,20 +364,6 @@ sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /
 
 sinfo "Updating init scripts dependencies cache"
 rc-update -u
-
-
-# /run/lock is not strictly necessary, but prevents a dangling symlink
-sinfo "Migrating /var/run and /var/lock"
-rm -rf /run /var/run /var/lock
-mkdir -p -m 775 /run/lock
-chown root:uucp /run/lock
-ln -s  ../run      /var/run
-ln -s  ../run/lock /var/lock
-
-
-sinfo "Setting sh (dash) and java (jamvm) symlinks"
-ln -sf dash                          /bin/sh
-ln -s  ../local/libexec/java.wrapper /usr/bin/java
 
 
 # Spaces in entries are not handled, but it doesn't matter here
