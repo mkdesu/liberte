@@ -317,6 +317,9 @@ fi
 # http://www.x.org/wiki/GalliumStatus
 sinfo "Configuring Mesa, OpenGL and XvMC"
 eselect mesa   set --auto
+eselect mesa   set i915 classic
+eselect mesa   set sw   classic
+
 eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11
 
