@@ -21,6 +21,8 @@ mboot=${slive}/mnt/boot
 mlive=${slive}/mnt/live
 mrwroot=${slive}/mnt/rwroot
 
+rwrootsz=80%
+
 
 # External scripts
 . /etc/modules.fs
@@ -32,12 +34,14 @@ mount -t proc  proc  /proc
 echo 0 > /proc/sys/kernel/grsecurity/audit_mount
 mount -t sysfs sysfs /sys
 
-# Mount rwroot tmpfs directory (nosuid,... don't affect unionfs)
-mount -t tmpfs -o mode=700,nosuid,nodev,noexec tmpfs ${srwroot}
-mkdir -m 755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
+# Mount rwroot tmpfs directory (nosuid,... don't affect unionfs, but affect bind mounts)
+mount -t tmpfs -o mode=700,nosuid,nodev,noexec,size=${rwrootsz} tmpfs ${srwroot}
+mkdir -m  755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
+mkdir -m 1777 ${srwroot}/tmp
 
 # Mount devtmpfs filesystem (noexec: (#92921))
 mount -t devtmpfs -o nosuid,noexec devtmpfs /dev
+ln -s ../tmp /dev/shm
 
 
 # Parse kernel options, with sensible defaults

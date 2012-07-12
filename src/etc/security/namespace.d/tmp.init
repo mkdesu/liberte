@@ -1,14 +1,18 @@
 #!/usr/local/sbin/privsh -e
 
+polysz=10%
+
 poly="$1"
 instance="$2"
 new="$3"
 user="$4"
 
 
+# NOTE: changing mount options does not work if mountpoint
+#       is bind-type, and is listed in /etc/fstab
 if [ "${new}" = 1 ]; then
-    /bin/chgrp -h 0 "${poly}"
-    /bin/mount -o remount,nosuid,nodev,noexec "${poly}"
+    /bin/umount "${poly}"
+    /bin/mount -t tmpfs -o nosuid,nodev,noexec,size=${polysz} tmpfs "${poly}"
 else
     echo "WARNING: non-new polyinstantiation directory" 1>&2
 fi

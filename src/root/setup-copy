@@ -331,6 +331,12 @@ mkdir -p -m 775 /run/lock
 chown root:uucp /run/lock
 
 
+sinfo "Symlinking /var/tmp and disabling /dev/shm mount"
+rm -r /var/tmp
+ln -s ../tmp /var/tmp
+sed -i 's/\<tmpfs\>/disabled/' /etc/init.d/devfs
+
+
 sinfo "Setting sh (dash) and java (jamvm) symlinks"
 ln -sf dash                          /bin/sh
 ln -s  ../local/libexec/java.wrapper /usr/bin/java

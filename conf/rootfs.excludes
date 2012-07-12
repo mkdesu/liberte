@@ -108,7 +108,6 @@
 
 # Temporary directories
 /tmp/**
-/var/tmp/**
 /var/cache/**
 /var/log/*.log
 /usr/local/addons/

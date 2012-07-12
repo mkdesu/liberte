@@ -1,21 +1,23 @@
 # Mounted by initramfs:
-# /, /mnt{/boot,/live=/,/restrict/rwroot}
+# /, /mnt{/boot,/live=/,/restrict/rwroot}, /dev (+ /dev/shm symlink)
 
 # Mounted by init.sh:
-# /proc, /run, /lib/rc/init.d
+# (if not mounted for /run; fstab is consulted)
+# /proc, /run, /lib/rc/init.d (< openrc-0.10)
 
 # Mounted by init.d services (before localmount):
+# (if not mounted; fstab is consulted except for /sys/*)
 # sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...}}}
 # udev-mount: /dev
 # devfs:      /dev{/pts,/shm}
+
+# Empty writable directories (/mnt/rwroot's mountpoint options)
+/mnt/rwroot/tmp /tmp none bind 0 0
 
 # Unionfs subdirectories mounted into ro /
 unionfs /etc  unionfs dirs=/mnt/rwroot/etc=rw:/mnt/live/etc=ro,nosuid,nodev,iversion        0 0
 unionfs /var  unionfs dirs=/mnt/rwroot/var=rw:/mnt/live/var=ro,nosuid,nodev,noexec,iversion 0 0
 unionfs /home unionfs dirs=/mnt/rwroot/home=rw:/mnt/live/home=ro,nosuid,nodev,iversion      0 0
-
-# Empty writable directories
-tmpfs   /tmp  tmpfs   mode=1777,nosuid,nodev,noexec 0 0
 
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc
