@@ -44,7 +44,8 @@ make="sudo -n -u bin ${rmake}"
 
 # Handle kernel preparation for building external modules
 if [ "${cmd}" = prepare ]; then
-    ${make} O=${mainobj} modules_prepare 2>/dev/null
+    # sudo might not be available at this stage
+    su - -s /bin/sh bin -c "${rmake} O=${mainobj} modules_prepare" 2>/dev/null
     exit
 elif [ "${cmd}" = modules ]; then
     # vmlinux is necessary for System.map (although initramfs may not exist yet,
