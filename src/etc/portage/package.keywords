@@ -22,9 +22,8 @@
 <net-misc/networkmanager-vpnc-0.8.5
 =net-wireless/reaver-1.4*
 
-# Java: JamVM is a JRE (#425618, #425624)
+# Java: JamVM is a JRE (#425618)
 =virtual/jre-1.5.0-r1
-=dev-java/jamvm-1.5.4-r2
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.9.1*
