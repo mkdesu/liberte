@@ -231,6 +231,7 @@ x11-apps/xcmsdb
 x11-apps/xbacklight
 x11-misc/xcalib
 x11-apps/xgamma
+x11-misc/redshift
 
 # (session)
 x11-apps/xinit

@@ -13,6 +13,7 @@
   * Added small CD -> USB bootstrapping ISO image
   * Added optional PKCS#11 smart-cards support to GnuPG
   * Added reaver-wps, a WiFi Protected Setup cracking tool
+  * Added Redshift, a screen color temperature adjuster
 
 
 2012-06-17
