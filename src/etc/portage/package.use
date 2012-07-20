@@ -62,8 +62,8 @@ media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 dev-java/gnu-classpath          gstreamer
 
-# Unnecessary functionality
-sys-apps/portage                -xattr
+# Unnecessary functionality (portage: (#346749))
+sys-apps/portage                -xattr python2
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
