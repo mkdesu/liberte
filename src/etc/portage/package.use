@@ -33,8 +33,6 @@ app-emulation/open-vm-tools     -X
 
 # Networking, including SSL/TLS
 # (epiphany: +networkmanager requires >=net-misc/networkmanager-0.8.997)
-net-misc/curl                   gnutls
-net-libs/neon                   gnutls
 net-libs/libetpan               gnutls
 net-libs/libmicrohttpd          -ssl
 net-wireless/wpa_supplicant     -ssl  gnutls
