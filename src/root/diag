@@ -15,7 +15,7 @@ comm -23 <(sed -n 's/^[=<]\(.*\)-[0-9].*/\1/; /^[^#]/p' ${keyworded} | sort) \
 
 
 sinfo "Unincluded firmware:"
-NEWLINE=true eix 'ucode|firmware|microcode' -\* --testing \
+NEWLINE=true eix -sr '\<(ucode|firmware|microcode)\>' -\* --testing \
     --format '{!installed}<bestversion*:NAMEVERSION>\t <description>{}'
 
 
