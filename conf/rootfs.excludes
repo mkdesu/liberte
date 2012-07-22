@@ -233,6 +233,7 @@
 /usr/bin/gdk*pixbuf*source
 /usr/bin/g-ir-*
 /usr/bin/glsl_compiler
+/usr/bin/dbus-binding-tool
 /usr/bin/gs
 /usr/bin/vp8_scalable_patterns
 /usr/bin/luac
