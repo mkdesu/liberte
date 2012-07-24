@@ -8,11 +8,11 @@ stage3 and portage snapshots
 webrsync and portage packages
   + http://distfiles.gentoo.org
   + http://mirrors.kernel.org/gentoo
-  [/etc/make.conf]
+  [/etc/portage/make.conf]
 
 rsync
   + disabled
-  [/etc/make.conf]
+  [/etc/portage/make.conf]
 
 HKP(S)
   + https://zimmermann.mayfirst.org/pks/lookup [mkroot]
