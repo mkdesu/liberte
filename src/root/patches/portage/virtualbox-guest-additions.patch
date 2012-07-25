@@ -1,6 +1,16 @@
---- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.12.ebuild	2012-07-05 02:56:59.000000000 +0000
-+++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.12.ebuild	2012-07-05 02:57:36.000000000 +0000
-@@ -90,6 +90,7 @@
+--- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.18.ebuild	2012-07-25 02:14:27.000000000 +0000
++++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.18.ebuild	2012-07-25 02:19:08.000000000 +0000
+@@ -81,6 +81,9 @@
+ 				"${WORKDIR}/${mdir}/${vboxheader}"
+ 		done
+ 	done
++
++	# Fix split kernels includes
++	sed -i 's@\<kernelpath\>\(.*/generated\>\)@VBOX_LINUX_SRC\1@' "${S}"/Config.kmk
+ }
+ 
+ src_configure() {
+@@ -90,6 +93,7 @@
  		--disable-sdl-ttf \
  		--disable-pulse \
  		--disable-alsa \
