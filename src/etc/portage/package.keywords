@@ -50,7 +50,7 @@
 
 # Firmware
 sys-apps/microcode-data
-sys-kernel/amd-ucode
+sys-firmware/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 net-wireless/ar9271-firmware
