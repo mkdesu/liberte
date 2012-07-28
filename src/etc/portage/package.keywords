@@ -23,7 +23,7 @@
 =net-wireless/reaver-1.4*
 
 # GTK+ 3
-=x11-themes/light-themes-0.1.9.1*
+=x11-themes/light-themes-0.1.11*
 =www-client/epiphany-3.2.1
 =www-client/epiphany-extensions-3.2*
 

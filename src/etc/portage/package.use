@@ -83,7 +83,6 @@ app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
-x11-themes/gtk-engines-murrine  -themes
 
 # Extra functionality
 sys-boot/syslinux               -custom-cflags

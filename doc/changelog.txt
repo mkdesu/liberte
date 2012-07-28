@@ -15,6 +15,7 @@
   * Added reaver-wps, a WiFi Protected Setup cracking tool
   * Added Redshift, a screen color temperature adjuster
   * Disabled GnuPG-S/MIME autoimport of expired certificates
+  * GTK-2 and GTK-3 themes are now uniform
 
 
 2012-06-17
