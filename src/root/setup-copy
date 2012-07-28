@@ -182,11 +182,6 @@ if [ -e /usr/bin/run-java-tool  -o  -e /usr/bin/java-config ]; then
 fi
 
 
-# (#376201)
-sinfo "Fixing Murrine themes for GTK-2"
-sed -i '/\<scrollbar_color\>[[:blank:]]*=/d' \
-    /usr/share/themes/Murrina*/gtk-2.0/gtkrc
-
 sinfo "Fixing Ambiance/Radiance themes for GTK-3.2"
 sed -i 's/\([0-9]\)px/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 truncate -s 0 /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{gtk-widgets-backdrop,apps/{nautilus,gnome-panel}}.css
