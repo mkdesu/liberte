@@ -12,6 +12,14 @@ if [ -z "$1" ]; then
 fi
 
 
+# Launch in a separate mount namespace
+if [ unshare != "$1" ]; then
+    exec unshare -m -- "$0" unshare "$@"
+else
+    shift
+fi
+
+
 # Variables
 SRC=`dirname $0`/src
 RSYNC="rsync -rlptOHS"
@@ -118,23 +126,23 @@ else
     tty=
 fi
 for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; do
-    mount -B ${dir} ${LIVECD}${dir}
+    mount -nB ${dir} ${LIVECD}${dir}
 done
-mount -rB -o remount ${LIVECD}/proc
+mount -nrB -o remount ${LIVECD}/proc
 
 if [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
-    mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
-    mount -rB -o remount ${LIVECD}/usr/portage
+    mount -nB ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
+    mount -nrB -o remount ${LIVECD}/usr/portage
 fi
 
 if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    mount -B /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
+    mount -nB /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
 fi
 
 if [ ${PHASE} = image ]; then
     mkdir -p ${LIVECD}/../dist
-    mount -B ${LIVECD}/../copy ${LIVECD}/mnt/live
-    mount -B ${LIVECD}/../dist ${LIVECD}/mnt/boot
+    mount -nB ${LIVECD}/../copy ${LIVECD}/mnt/live
+    mount -nB ${LIVECD}/../dist ${LIVECD}/mnt/boot
 fi
 
 
@@ -150,25 +158,26 @@ if [ ${retval} != 0 ]; then
 fi
 
 
+# Unnecessary with unshare -m, but stale processes might hold the mounts
 sinfo "Unmounting system directories"
 
 if [ ${PHASE} = image ]; then
-    umount ${LIVECD}/mnt/live
-    umount ${LIVECD}/mnt/boot
+    umount -n ${LIVECD}/mnt/live
+    umount -n ${LIVECD}/mnt/boot
 fi
 
 if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    umount ${LIVECD}/usr/portage/distfiles
+    umount -n ${LIVECD}/usr/portage/distfiles
 fi
 
 if [ -d ${LIVECD}/usr/portage  -a  ${PHASE} = copy ]; then
-    umount ${LIVECD}/usr/portage
+    umount -n ${LIVECD}/usr/portage
 fi
 
 for dir in ${tty} /dev/pts /dev/ptmx /dev/urandom /dev/random /dev/null /proc; do
-    umount -l ${LIVECD}${dir}
+    umount -nl ${LIVECD}${dir}
 done
-# Condition is false for empty ${tty} and for block-device ${tty} (i.e., mounted in another session)
+# Condition is false for empty ${tty} and for block-device ${tty} (i.e., unmount failed)
 if [ -f ${LIVECD}${tty} ]; then
     rm ${LIVECD}${tty}
 fi
