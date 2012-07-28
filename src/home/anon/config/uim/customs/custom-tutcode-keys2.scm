@@ -16,3 +16,5 @@
 (define tutcode-mazegaki-relimit-left-key? (make-key-predicate '("<IgnoreShift><")))
 (define tutcode-mazegaki-relimit-right-key '("<IgnoreShift>>"))
 (define tutcode-mazegaki-relimit-right-key? (make-key-predicate '("<IgnoreShift>>")))
+(define tutcode-verbose-stroke-key '(" "))
+(define tutcode-verbose-stroke-key? (make-key-predicate '(" ")))
