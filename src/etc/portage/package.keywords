@@ -45,9 +45,6 @@
 # Split gnuplot dependency (#425622)
 =sci-libs/libqalculate-0.9.7*
 
-# Unnecessary icons (#427156)
-=x11-misc/redshift-1.7*
-
 # Firmware
 sys-apps/microcode-data
 sys-firmware/amd-ucode
