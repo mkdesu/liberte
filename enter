@@ -126,23 +126,23 @@ else
     tty=
 fi
 for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; do
-    mount -nB ${dir} ${LIVECD}${dir}
+    mount -B ${dir} ${LIVECD}${dir}
 done
-mount -nrB -o remount ${LIVECD}/proc
+mount -rB -o remount ${LIVECD}/proc
 
 if [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
-    mount -nB ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
-    mount -nrB -o remount ${LIVECD}/usr/portage
+    mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
+    mount -rB -o remount ${LIVECD}/usr/portage
 fi
 
 if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    mount -nB /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
+    mount -B /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
 fi
 
 if [ ${PHASE} = image ]; then
     mkdir -p ${LIVECD}/../dist
-    mount -nB ${LIVECD}/../copy ${LIVECD}/mnt/live
-    mount -nB ${LIVECD}/../dist ${LIVECD}/mnt/boot
+    mount -B ${LIVECD}/../copy ${LIVECD}/mnt/live
+    mount -B ${LIVECD}/../dist ${LIVECD}/mnt/boot
 fi
 
 
@@ -151,8 +151,9 @@ echo "${environment}" | tr ' ' '\n' | sed 's/^/    /'
 
 
 sinfo "Launching chrooted shell in ${LIVECD}"
-retval=0
-env -i ${environment} "${setarch}" i686 "${chroot}" ${LIVECD} /bin/bash -l "$@" || retval=$?
+set +e
+env -i ${environment} "${setarch}" i686 "${chroot}" ${LIVECD} /bin/bash -l "$@"
+retval=$?
 if [ ${retval} != 0 ]; then
     sinfo "Failed."
 fi
@@ -162,20 +163,20 @@ fi
 sinfo "Unmounting system directories"
 
 if [ ${PHASE} = image ]; then
-    umount -n ${LIVECD}/mnt/live
-    umount -n ${LIVECD}/mnt/boot
+    umount ${LIVECD}/mnt/live
+    umount ${LIVECD}/mnt/boot
 fi
 
 if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    umount -n ${LIVECD}/usr/portage/distfiles
+    umount ${LIVECD}/usr/portage/distfiles
 fi
 
 if [ -d ${LIVECD}/usr/portage  -a  ${PHASE} = copy ]; then
-    umount -n ${LIVECD}/usr/portage
+    umount ${LIVECD}/usr/portage
 fi
 
 for dir in ${tty} /dev/pts /dev/ptmx /dev/urandom /dev/random /dev/null /proc; do
-    umount -nl ${LIVECD}${dir}
+    umount -l ${LIVECD}${dir}
 done
 # Condition is false for empty ${tty} and for block-device ${tty} (i.e., unmount failed)
 if [ -f ${LIVECD}${tty} ]; then
