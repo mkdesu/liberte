@@ -1,0 +1,151 @@
+diff --git a/ChangeLog b/ChangeLog
+index 9a55c97..8a8ff36 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,3 +1,9 @@
++2012-08-01 Maxim Kammerer <mk@dee.su>
++
++  * added i386 support
++  * sbattach: fix OpenSSL_add_all_digests() warning
++  * image: fix padlen initialization warning
++
+ 2012-06-28 b537e74 Jeremy Kerr <jeremy.kerr@canonical.com>
+ 
+   * Version 0.3
+diff --git a/image.c b/image.c
+index f8ee1d6..7ce43b2 100644
+--- a/image.c
++++ b/image.c
+@@ -73,6 +73,17 @@ static uint16_t __pehdr_u16(char field[])
+ #define pehdr_u32(f) __pehdr_u32(f + BUILD_ASSERT_OR_ZERO(sizeof(f) == 4))
+ #define pehdr_u16(f) __pehdr_u16(f + BUILD_ASSERT_OR_ZERO(sizeof(f) == 2))
+ 
++#define MA_AOUTHDR_SIZE(image)                                        \
++	((pehdr_u16((image)->pehdr->f_magic) == IMAGE_FILE_MACHINE_AMD64) \
++	 ? sizeof(PEPAOUTHDR) : sizeof(PEAOUTHDR))
++
++#define MA_AOUTHDR(image, field) MA_AOUTHDR_M(, image, field)
++
++#define MA_AOUTHDR_M(macro, image, field)                             \
++	((pehdr_u16((image)->pehdr->f_magic) == IMAGE_FILE_MACHINE_AMD64) \
++	 ? macro(((PEPAOUTHDR *)(image)->aouthdr)->field)                 \
++	 : macro(((PEAOUTHDR *)(image)->aouthdr)->field))
++
+ static int image_pecoff_parse(struct image *image)
+ {
+ 	char nt_sig[] = {'P', 'E', 0, 0};
+@@ -111,34 +122,36 @@ static int image_pecoff_parse(struct image *image)
+ 		return -1;
+ 	}
+ 
+-	if (pehdr_u16(image->pehdr->f_magic) != AMD64MAGIC) {
+-		fprintf(stderr, "Invalid PE header magic for x86_64\n");
++	if (pehdr_u16(image->pehdr->f_magic) != IMAGE_FILE_MACHINE_AMD64 &&
++			pehdr_u16(image->pehdr->f_magic) != IMAGE_FILE_MACHINE_I386) {
++		fprintf(stderr, "Invalid PE header magic for i386 / x86_64\n");
+ 		return -1;
+ 	}
+ 
+-	if (pehdr_u16(image->pehdr->f_opthdr) != sizeof(*image->aouthdr)) {
++	if (pehdr_u16(image->pehdr->f_opthdr) != MA_AOUTHDR_SIZE(image)) {
+ 		fprintf(stderr, "Invalid a.out header size\n");
+ 		return -1;
+ 	}
+ 
+ 	if (image->size < sizeof(*image->doshdr) + sizeof(*image->pehdr)
+-			+ sizeof(*image->aouthdr)) {
++			+ MA_AOUTHDR_SIZE(image)) {
+ 		fprintf(stderr, "file is too small for a.out header\n");
+ 		return -1;
+ 	}
+ 
+ 	/* a.out header directly follows PE header */
+-	image->aouthdr = (void *)(image->pehdr+1);
++	image->aouthdr = image->pehdr+1;
+ 
+-	if (image->aouthdr->standard.magic[0] != 0x0b ||
+-			image->aouthdr->standard.magic[1] != 0x02) {
++	if (MA_AOUTHDR(image, standard.magic[0]) != 0x0b ||
++			MA_AOUTHDR(image, standard.magic[1]) !=
++				((pehdr_u16(image->pehdr->f_magic) == IMAGE_FILE_MACHINE_AMD64) ? 0x02 : 0x01)) {
+ 		fprintf(stderr, "Invalid a.out machine type\n");
+ 		return -1;
+ 	}
+ 
+-	image->data_dir = (void *)image->aouthdr->DataDirectory;
++	image->data_dir = (void *)MA_AOUTHDR(image, DataDirectory);
+ 	image->data_dir_sigtable = &image->data_dir[DATA_DIR_CERT_TABLE];
+-	image->checksum = (uint32_t *)image->aouthdr->CheckSum;
++	image->checksum = (uint32_t *)MA_AOUTHDR(image, CheckSum);
+ 
+ 	image->cert_table_size = image->data_dir_sigtable->size;
+ 	if (image->cert_table_size)
+@@ -147,7 +160,7 @@ static int image_pecoff_parse(struct image *image)
+ 		image->cert_table = NULL;
+ 
+ 	image->sections = pehdr_u16(image->pehdr->f_nscns);
+-	image->scnhdr = (void *)(image->aouthdr+1);
++	image->scnhdr = image->aouthdr + MA_AOUTHDR_SIZE(image);
+ 
+ 	return 0;
+ }
+@@ -232,7 +245,7 @@ int image_find_regions(struct image *image)
+ 	size_t bytes;
+ 
+ 	gap_warn = 0;
+-	align = pehdr_u32(image->aouthdr->FileAlignment);
++	align = MA_AOUTHDR_M(pehdr_u32, image, FileAlignment);
+ 
+ 	/* now we know where the checksum and cert table data is, we can
+ 	 * construct regions that need to be signed */
+@@ -267,7 +280,7 @@ int image_find_regions(struct image *image)
+ 				(void *)image->data_dir_sigtable
+ 					+ sizeof(struct data_dir_entry),
+ 				image->buf +
+-				pehdr_u32(image->aouthdr->SizeOfHeaders));
++				MA_AOUTHDR_M(pehdr_u32, image, SizeOfHeaders));
+ 	regions[2].name = "datadir[CERT]->headers";
+ 	bytes += regions[2].size;
+ 
+@@ -377,7 +390,7 @@ int image_hash_sha256(struct image *image, uint8_t digest[])
+ int image_write(struct image *image, const char *filename)
+ {
+ 	struct cert_table_header cert_table_header;
+-	int fd, rc, len, padlen;
++	int fd, rc, len, padlen = 0;
+ 	bool is_signed;
+ 	uint8_t pad[8];
+ 
+diff --git a/image.h b/image.h
+index 261d400..2ba4f83 100644
+--- a/image.h
++++ b/image.h
+@@ -37,7 +37,6 @@
+ #include <bfd.h>
+ #define DO_NOT_DEFINE_LINENO
+ 
+-#include "coff/x86_64.h"
+ #include "coff/external.h"
+ #include "coff/pe.h"
+ 
+@@ -56,7 +55,7 @@ struct image {
+ 	uint32_t	*checksum;
+ 	struct external_PEI_DOS_hdr *doshdr;
+ 	struct external_PEI_IMAGE_hdr *pehdr;
+-	PEPAOUTHDR	*aouthdr;
++	void	*aouthdr;
+ 	struct data_dir_entry *data_dir;
+ 	struct data_dir_entry *data_dir_sigtable;
+ 	struct external_scnhdr *scnhdr;
+diff --git a/sbattach.c b/sbattach.c
+index 3d565f1..d1f3a29 100644
+--- a/sbattach.c
++++ b/sbattach.c
+@@ -46,6 +46,7 @@
+ 
+ #include <openssl/pkcs7.h>
+ #include <openssl/err.h>
++#include <openssl/evp.h>
+ 
+ #include <ccan/talloc/talloc.h>
+ #include <ccan/read_write_all/read_write_all.h>

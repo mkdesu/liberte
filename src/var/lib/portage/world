@@ -83,6 +83,7 @@ net-misc/ssh-askpass-fullscreen
 sys-fs/cryptsetup
 app-crypt/gnupg
 app-crypt/mcrypt
+app-crypt/sbsigntool
 x11-misc/fpm2
 dev-libs/engine_pkcs11
 app-crypt/gnupg-pkcs11-scd
