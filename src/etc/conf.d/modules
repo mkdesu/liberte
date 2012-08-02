@@ -20,11 +20,6 @@ modules="${modules} pciehp"
 # modules="${modules} acpi-cpufreq"
 
 
-# LED target support for iptables
-# (not autoloaded when supplying -j LED)
-modules="${modules} xt_LED"
-
-
 # Modules can be loaded and assigned a different name for later reference
 # modules="dummy:dummy1"
 
