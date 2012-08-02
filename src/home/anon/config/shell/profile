@@ -22,7 +22,7 @@ export MCRYPTRC=${XDG_CONFIG_HOME}/misc/mcryptrc
 export RANDFILE=${TMPDIR}/openssl.rnd
 
 # X11 configuration dirs
-export XSESSION=${XDG_CONFIG_HOME}/x11/xsession
+export XSESSION=../../..${XDG_CONFIG_HOME}/x11/xsession
 export XENVIRONMENT=${XDG_CONFIG_HOME}/x11/Xdefaults
 export XUSERFILESEARCHPATH=${XDG_CONFIG_HOME}/x11/app/%N
 export XAUTHORITY=${TMPDIR}/Xauthority

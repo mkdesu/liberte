@@ -1,5 +1,3 @@
-#!/bin/sh
-
 # XDG autostart list:
 # sed -n 's/^Exec=[[:blank:]]*//p' /etc/xdg/autostart/*.desktop
 
