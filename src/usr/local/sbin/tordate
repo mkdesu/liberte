@@ -7,7 +7,10 @@ export LC_ALL=C
 
 
 # inotify timeout handles race conditions
-inotifytimeout=60
+# NOTE: overlayfs (v13) has no file-level inotify support,
+#       but directory-level events work, which is enough for
+#       Tor, which writes and renames temporary files
+inotifytimeout=15
 dirwait=15
 
 tordir=/var/lib/tor/data
