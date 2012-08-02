@@ -34,7 +34,7 @@ RDEPEND="net-libs/libmicrohttpd
 	>=virtual/jre-1.5
 	gnome-extra/zenity"
 
-pkg_preinst() {
+pkg_setup() {
 	enewgroup cable
 	enewuser  cable -1 -1 -1 cable
 }

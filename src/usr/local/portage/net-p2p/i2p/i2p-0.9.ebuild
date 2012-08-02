@@ -26,7 +26,7 @@ DEPEND=">=virtual/jdk-1.5
 RDEPEND=">=virtual/jre-1.5
 	dev-java/java-service-wrapper"
 
-pkg_preinst() {
+pkg_setup() {
 	enewgroup i2p
 	enewuser  i2p -1 -1 /var/lib/i2p i2p
 	rmdir /var/lib/i2p 2>/dev/null || :
