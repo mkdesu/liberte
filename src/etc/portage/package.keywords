@@ -1,8 +1,3 @@
-# TEXTRELs (#389471)
-=media-plugins/gst-plugins-ffmpeg-0.10.13*
-=media-video/libav-0.8.2*
-=media-libs/libpostproc-0.8.0*
-
 # System (cdrtools: EFI platform support)
 # app-emulation/virt-what       (#409237)
 # net-misc/connect              (#384471)
