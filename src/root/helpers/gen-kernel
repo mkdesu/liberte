@@ -33,7 +33,7 @@ kexecimg=/usr/local/boot/kernel-kexec.zi
 kexec64img=/usr/local/boot/kernel-kexec-64.zi
 
 bzimage=arch/x86/boot/bzImage
-compile_h=include/generated/compile.h
+fwpath=/usr/local/addons/shipped-fw
 
 
 # Make options
@@ -58,7 +58,7 @@ elif [ "${cmd}" = modules ]; then
 
     # Build main kernel modules (chmod due to GRKERNSEC_HIDESYM)
     ${make}  O=${mainobj} modules 2>/dev/null
-    ${rmake} O=${mainobj} modules_install
+    ${rmake} O=${mainobj} INSTALL_FW_PATH=${fwpath} modules_install
 
     rm ${mainmod}/{build,source}
     chmod go= ${mainmod}
