@@ -1,4 +1,4 @@
-# virtual/mta (sudo, gnupg)
+# virtual/mta (sudo, gnupg, procmail)
 mail-mta/ssmtp-0
 
 # virtual/mailx (smartmontools)
@@ -10,7 +10,7 @@ app-text/opensp-0
 # Unneeded (app-i18n/uim (#404463))
 media-fonts/font-sony-misc-0
 
-# Mostly unneeded (ghostscript-gpl <- graphicsmagick, libwmf <- abiword)
+# Mostly unneeded (ghostscript-gpl)
 media-fonts/urw-fonts-2.4.9
 
 # virtual/jre (gnu-classpath circular dependency (#421095))
