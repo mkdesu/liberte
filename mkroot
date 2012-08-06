@@ -160,11 +160,6 @@ if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
     sinfo "Extracting stage3 to ${LIVECD}/src"
     tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude './dev/*'
 
-    touch ${LIVECD}/src/dev/null   ${LIVECD}/src/dev/ptmx \
-          ${LIVECD}/src/dev/random ${LIVECD}/src/dev/urandom
-    ln -s /proc/self/fd ${LIVECD}/src/dev/
-    mkdir ${LIVECD}/src/dev/pts    ${LIVECD}/src/dev/.udev
-
 
     sinfo "Extracting portage to ${LIVECD}/src/usr"
     tar -xpSjf ${LIVECD}/mirror/portage/portage-latest.tar.bz2 -C ${LIVECD}/src/usr

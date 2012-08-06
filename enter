@@ -120,13 +120,18 @@ tty=`tty`
 
 sinfo "Mounting system directories"
 
-if [ "${tty#/dev/pts/}" = "${tty}" ]; then
-    touch ${LIVECD}${tty}
-else
-    tty=
-fi
-for dir in /proc /dev/null /dev/random /dev/urandom /dev/ptmx /dev/pts ${tty}; do
-    mount -B ${dir} ${LIVECD}${dir}
+[ "${tty#/dev/pts/}" = "${tty}" ] || tty=
+[ -L ${LIVECD}/dev/fd ] || ln -sfT /proc/self/fd ${LIVECD}/dev/fd
+
+for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts ${tty}; do
+    if [ ! -e ${LIVECD}${mp} ]; then
+        if   [ -d ${mp} ]; then
+            mkdir -m 755 ${LIVECD}${mp}
+        elif [ -e ${mp} ]; then
+            touch ${LIVECD}${mp}
+        fi
+    fi
+    mount -B ${mp} ${LIVECD}${mp}
 done
 mount -rB -o remount ${LIVECD}/proc
 
@@ -175,8 +180,8 @@ if [ -d ${LIVECD}/usr/portage  -a  ${PHASE} = copy ]; then
     umount ${LIVECD}/usr/portage
 fi
 
-for dir in ${tty} /dev/pts /dev/ptmx /dev/urandom /dev/random /dev/null /proc; do
-    umount -l ${LIVECD}${dir}
+for mp in ${tty} /dev/pts /dev/ptmx /dev/tty /dev/urandom /dev/random /dev/null /proc; do
+    umount -l ${LIVECD}${mp}
 done
 # Condition is false for empty ${tty} and for block-device ${tty} (i.e., unmount failed)
 if [ -f ${LIVECD}${tty} ]; then
