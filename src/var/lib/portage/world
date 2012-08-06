@@ -8,6 +8,7 @@ media-fonts/terminus-font         # TEMP
 app-portage/gentoolkit            # (explicit unmerge in setup-copy)
 app-portage/portage-utils         # TEMP
 app-portage/eix                   # TEMP
+dev-util/patchutils               # TEMP
 
 # LiveCD tools
 sys-apps/kexec-tools
