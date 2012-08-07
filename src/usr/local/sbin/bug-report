@@ -93,6 +93,7 @@ done
 
 echo X System logs ...
 cp /etc/X11/xorg.conf                  15-xorg.conf
+cp /etc/X11/xorg.conf.new              15-xorg.conf.new
 cp /var/log/Xorg.0.log                 15-xorg.log
 cp /var/log/Xorg.0.log.old             15-xorg-prev.log
 cp /tmp/.private/anon/xsession.log     16-xsession.log
