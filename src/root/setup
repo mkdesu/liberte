@@ -540,4 +540,8 @@ sinfo "Generating EFI GRUB configuration"
 ${helpdir}/gen-efi
 
 
+sinfo "Generating test Secure Boot test certificates"
+${helpdir}/gen-sb-cert test
+
+
 sinfo "Done."

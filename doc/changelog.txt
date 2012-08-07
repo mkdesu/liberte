@@ -2,7 +2,8 @@
   + 2012.3 release
 
   * Kernel image is now bundled with initramfs
-  * (U)EFI trusted boot chain beginning at EFI boot binaries
+  * EFI boot binaries are signed for Secure Boot
+  * (U)EFI trusted boot chain continues from EFI boot binaries
   * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
   * Better support for VMware graphics virtualization
 

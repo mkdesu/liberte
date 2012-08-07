@@ -23,6 +23,7 @@ isobsfile=${distroot}/${distname}-bootstrap.iso
 
 efilabel=LIBERTE_EFI
 efiboot=${cdroot}/boot/efiboot.img
+efisbpfx=/usr/local/addons/secureboot/Liberte-SecureBoot
 
 ziimage=${cdroot}/liberte/boot/kernel-x86.zi
 sqimage=${cdroot}/liberte/boot/root-x86.sfs
@@ -103,6 +104,17 @@ grub2hash=`sha256sum ${cdroot}/liberte/boot/grub/grub.mf`
 sed -i "s/replace_hash_\{50\}01/${grub1hash%% *}/ ; \
         s/replace_hash_\{50\}02/${grub2hash%% *}/"  \
     ${cdroot}/EFI/BOOT/*.EFI
+
+
+sinfo "Signing EFI GRUB images"
+
+cp -p ${efisbpfx}-CA.der ${cdroot}/EFI/
+for efiimg in ${cdroot}/EFI/BOOT/*.EFI; do
+    sbsign   --cert ${efisbpfx}-Cert-1.crt --key ${efisbpfx}-Cert-1.key \
+             --output ${efiimg}.signed ${efiimg}
+    sbverify --cert ${efisbpfx}-CA.crt ${efiimg}.signed
+    mv ${efiimg}.signed ${efiimg}
+done
 
 
 # UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
