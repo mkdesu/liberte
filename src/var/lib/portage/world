@@ -24,7 +24,7 @@ net-wireless/b43-firmware:b43legacy
 net-wireless/ar9271-firmware
 net-wireless/ipw2100-firmware
 net-wireless/ipw2200-firmware
-net-wireless/iwl1000-ucode
+sys-firmware/iwl1000-ucode
 net-wireless/iwl2030-ucode
 net-wireless/iwl3945-ucode
 net-wireless/iwl4965-ucode
