@@ -108,7 +108,7 @@ else
     fi
 
     if [ -e /etc/resolv.conf ]; then
-        ${RSYNC} --chmod=u=rw,go=r   -i /etc/resolv.conf       ${LIVECD}/etc
+        ${RSYNC} -L --chmod=u=rw,go=r -i /etc/resolv.conf ${LIVECD}/etc
     fi
 fi
 environment="${environment} PHASE=${PHASE}"
