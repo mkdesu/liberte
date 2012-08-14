@@ -40,11 +40,11 @@ awk '/UTF-8/ && !/^iw_IL/ && !/^pap_AN/                                     \
     { match($1, /^([a-z]+)_([A-Z]+)\y(.*@([^.]*))?/, a);                    \
       printf "%s %s ", a[2], "__" a[1] "_" a[2] (a[4]=="" ? "" : "@" a[4]); \
       print $1 }' ${i18nlst}                                                \
-    | sed "${ccrep}${lcrep}" | sort | tr '\n' ' ' > ${i18nmenu}
+    | sed "${ccrep}${lcrep}" | sort > ${i18nmenu}
 
 # "Antarctica" Antarctica/McMurdo "McMurdo Station, Ross Island"
 awk -F '\t' '/^[^#]/ { printf "%s %s \"%s\"\n", $1, $3, $4 }' ${tzs} \
-    | sed "${ccrep}"         | sort | tr '\n' ' ' > ${tzmenu}
+    | sed "${ccrep}"         | sort > ${tzmenu}
 
 
 # Add keyboard layout pseudo-countries to the replacement list
@@ -57,4 +57,10 @@ ccrepext="${ccrep}"'s/^ARA\>/"Arabic"/;s/^BRAI\>/"Braille"/;s/^EPO\>/"Esperanto"
     sed '1,/^! variant$/d; /^! /q' ${kbds} \
         | sed -nr 's/^[[:blank:]]*([^!][^[:blank:]]*)[[:blank:]]+([^[:blank:]]+):[[:blank:]]+(.*)/\2 \2.\1 "\3"/p'
 )   | awk '{ $1 = toupper($1); print; }'   \
-    | sed "${ccrepext}"      | sort | tr '\n' ' ' > ${kbdmenu}
+    | sed "${ccrepext}"      | sort > ${kbdmenu}
+
+
+# Verify quoted entries
+sed -n '/^"[^"]\+" "[^"]\+" [[:alnum:]@._-]\+$/b;         q 1' ${i18nmenu}
+sed -n '/^"[^"]\+" [[:alpha:]/_-]\+ "[^"]*"$/b;           q 1' ${tzmenu}
+sed -n '/^"[^"]\+" [a-z/_]\+\.[[:alnum:]_-]* "[^"]\+"$/b; q 1' ${kbdmenu}
