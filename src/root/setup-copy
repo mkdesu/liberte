@@ -53,8 +53,7 @@ ebuilds="app-misc/ca-certificates
          net-im/pidgin
          sys-apps/lm_sensors
          sys-apps/portage
-         x11-libs/xcb-util-wm
-         x11-wm/openbox"
+         x11-libs/xcb-util-wm"
 
 # /usr/portage is bind-mounted ro
 for ebuild in ${ebuilds}; do
@@ -72,11 +71,9 @@ sed -i 's/[^"]*\${python_dep\(_ssl\)\?}[^"]*//' ${ebuild_portage}
 # librsvg:                 rsvg                        (#398951, fixed in 2.36.0)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
-# openbox:                 openbox-xdg-autostart
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_exiv2} \
                                          ${ebuild_gobjectintrospection} ${ebuild_librsvg}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
-sed -i 's:\<dev-python/pyxdg\>::'        ${ebuild_openbox}
 
 # Perl
 # pptpclient:              not needed when used by networkmanager-pptp

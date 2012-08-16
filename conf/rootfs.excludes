@@ -157,8 +157,6 @@
 /sbin/sln
 
 # Perl and Python scripts
-# x11-wm/openbox: XDG autostart functionality
-/usr/libexec/openbox-xdg-autostart
 # sys-apps/lm_sensors: sensors detection and config file helper
 /usr/sbin/sensors-detect
 /usr/bin/sensors-conf-convert
