@@ -240,3 +240,4 @@
 /usr/share/avconv/
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat
+/usr/lib/xorg/modules/drivers/nv_drv.so

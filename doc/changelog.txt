@@ -1,10 +1,12 @@
-2012-07-XX
+2012-08-XX
   + 2012.3 release
 
+  * Kernel 3.4.7 with overlayfs instead of Unionfs
   * Kernel image is now bundled with initramfs
   * EFI boot binaries are signed for Secure Boot
   * (U)EFI trusted boot chain continues from EFI boot binaries
   * Xorg server 1.12 and Mesa 8.0 with Gallium3D for Radeon cards
+  * Nouveau driver is used for Nvidia cards
   * Better support for VMware graphics virtualization
 
   * Simplified boot parameters handling, most are now omitted

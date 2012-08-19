@@ -3,5 +3,5 @@ rc_need="!savecache"
 
 # Do not remount read-only on shutdown:
 #   /           - ro squashfs
-#   /mnt/live   - ro squashfs bind unionfs branches
+#   /mnt/live   - ro squashfs bind overlayfs branches
 # no_umounts="/:/mnt/live"

@@ -34,10 +34,18 @@ mount -t proc  proc  /proc
 echo 0 > /proc/sys/kernel/grsecurity/audit_mount
 mount -t sysfs sysfs /sys
 
-# Mount rwroot tmpfs directory (nosuid,... don't affect unionfs, but affect bind mounts)
+# Mount rwroot tmpfs directory
+# overlayfs behavior wrt. noexec,nosuid,nodev:
+#   + [no]exec, [no]suid: lowerdir / upperdir options at mount-time
+#   + nodev:              overlayfs mount option
+# (however, nodev still affects bind mounts)
 mount -t tmpfs -o mode=700,nosuid,nodev,noexec,size=${rwrootsz} tmpfs ${srwroot}
 mkdir -m  755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
 mkdir -m 1777 ${srwroot}/tmp
+
+# /etc and /home can be allowed to exec new/modified executables:
+# mount -o bind         ${srwroot}/etc ${srwroot}/etc
+# mount -o remount,exec ${srwroot}/etc
 
 # Mount devtmpfs filesystem (noexec: (#92921))
 mount -t devtmpfs -o nosuid,noexec devtmpfs /dev

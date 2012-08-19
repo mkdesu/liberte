@@ -1,6 +1,6 @@
 # Do not unmount:
 #   /mnt/boot   - ro on boot, must be ro before shutdown
-#   /mnt/live   - ro squashfs bind unionfs branches
-#   /mnt/rwroot - rw tmpfs         unionfs branches
-#   /etc        - rw unionfs  into ro /
+#   /mnt/live   - ro squashfs  bind overlayfs branches
+#   /mnt/rwroot - rw tmpfs          overlayfs branches
+#   /etc        - rw overlayfs into ro /
 no_umounts="/mnt/boot:/mnt/live:/mnt/rwroot:/etc"

@@ -126,12 +126,11 @@ ACLs and extended attributes
 ============================
 
 ACLS
-  + ACL changes propagate to tmpfs via UnionFS, but the inode must already
-    exist in tmpfs (apparently, a bug in UnionFS)
-  + ACL reads propagate to SquashFS, which supports xattrs and ACLs
+  + ACL changes propagate to tmpfs via overlayfs
+  + ACL reads can propagate to SquashFS, which supports xattrs and ACLs
 
 Extended attributes
-  + xattrs are not supported by tmpfs
+  + user xattrs are not supported by tmpfs
   + xattr change requests propagate to the underlying (ro) SquashFS
   + xattr reads propagate to SquashFS, which supports xattrs
 

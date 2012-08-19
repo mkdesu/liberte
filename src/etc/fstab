@@ -14,10 +14,10 @@
 # Empty writable directories (/mnt/rwroot's mountpoint options)
 /mnt/rwroot/tmp /tmp none bind 0 0
 
-# Unionfs subdirectories mounted into ro /
-unionfs /etc  unionfs dirs=/mnt/rwroot/etc=rw:/mnt/live/etc=ro,nosuid,nodev,iversion        0 0
-unionfs /var  unionfs dirs=/mnt/rwroot/var=rw:/mnt/live/var=ro,nosuid,nodev,noexec,iversion 0 0
-unionfs /home unionfs dirs=/mnt/rwroot/home=rw:/mnt/live/home=ro,nosuid,nodev,iversion      0 0
+# Overlayed subdirectories mounted into ro /
+overlayfs /etc  overlayfs nodev,lowerdir=/mnt/live/etc,upperdir=/mnt/rwroot/etc   0 0
+overlayfs /var  overlayfs nodev,lowerdir=/mnt/live/var,upperdir=/mnt/rwroot/var   0 0
+overlayfs /home overlayfs nodev,lowerdir=/mnt/live/home,upperdir=/mnt/rwroot/home 0 0
 
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc

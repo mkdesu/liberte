@@ -1,0 +1,72 @@
+--- linux-3.4.7-pax/arch/x86/boot/header.S	2012-05-21 12:10:09.268048874 +0200
++++ linux-3.4.7-pax/arch/x86/boot/header.S	2012-08-03 23:52:40.570620833 +0200
+@@ -375,7 +375,11 @@
+ pref_address:		.quad ____LOAD_PHYSICAL_ADDR	# preferred load addr
+ 
+ #define ZO_INIT_SIZE	(ZO__end - ZO_startup_32 + ZO_z_extract_offset)
++#if defined(CONFIG_X86_32) && defined(CONFIG_PAX_KERNEXEC)
++#define VO_INIT_SIZE	(VO__end - VO__text - __PAGE_OFFSET - ____LOAD_PHYSICAL_ADDR)
++#else
+ #define VO_INIT_SIZE	(VO__end - VO__text)
++#endif
+ #if ZO_INIT_SIZE > VO_INIT_SIZE
+ #define INIT_SIZE ZO_INIT_SIZE
+ #else
+--- linux-3.4.7-pax/arch/x86/platform/efi/efi_stub_32.S	2012-05-21 12:10:09.796048903 +0200
++++ linux-3.4.7-pax/arch/x86/platform/efi/efi_stub_32.S	2012-08-06 13:14:35.823038121 +0200
+@@ -38,12 +38,24 @@
+ 	 * The mapping of lower virtual memory has been created in prelog and
+ 	 * epilog.
+ 	 */
++#ifdef CONFIG_PAX_KERNEXEC
+ 	movl	$(__KERNEXEC_EFI_DS), %edx
+ 	mov	%edx, %ds
+ 	mov	%edx, %es
+ 	mov	%edx, %ss
+-	ljmp $(__KERNEXEC_EFI_CS),$1f-__PAGE_OFFSET
++	addl	$2f,(1f)
++	ljmp	*(1f)
++
++__INITDATA
++1:	.long __LOAD_PHYSICAL_ADDR, __KERNEXEC_EFI_CS
++.previous
++
++2:
++	subl	$2b,(1b)
++#else
++	jmp	1f-__PAGE_OFFSET
+ 1:
++#endif
+ 
+ 	/*
+ 	 * 2. Now on the top of stack is the return
+@@ -90,12 +102,16 @@
+ 	 * 8. Now restore the virtual mode from flat mode by
+ 	 * adding EIP with PAGE_OFFSET.
+ 	 */
+-	ljmp $(__KERNEL_CS),$1f+__PAGE_OFFSET
+-1:
++#ifdef CONFIG_PAX_KERNEXEC
+ 	movl	$(__KERNEL_DS), %edx
+ 	mov	%edx, %ds
+ 	mov	%edx, %es
+ 	mov	%edx, %ss
++	ljmp	$(__KERNEL_CS),$1f
++#else
++	jmp	1f+__PAGE_OFFSET
++#endif
++1:
+ 
+ 	/*
+ 	 * 9. Balance the stack. And because EAX contain the return value,
+--- linux-3.4.7/arch/x86/pci/i386.c	2012-05-21 11:32:58.231927701 +0200
++++ linux-3.4.7-pax/arch/x86/pci/i386.c	2012-08-06 12:38:41.943153420 +0200
+@@ -57,7 +57,7 @@ static struct pcibios_fwaddrmap *pcibios
+ {
+ 	struct pcibios_fwaddrmap *map;
+ 
+-	WARN_ON(!spin_is_locked(&pcibios_fwaddrmap_lock));
++	WARN_ON_SMP(!spin_is_locked(&pcibios_fwaddrmap_lock));
+ 
+ 	list_for_each_entry(map, &pcibios_fwaddrmappings, list)
+ 		if (map->dev == dev)

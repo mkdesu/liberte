@@ -21,9 +21,10 @@ iwlwifi-100-5.ucode
 iwlwifi-105-6.ucode
 iwlwifi-135-6.ucode
 iwlwifi-2000-6.ucode
-# (missing, but: IWL*_UCODE_API_MIN/OK)
-# iwlwifi-100-6.ucode
-# (1000-6, 6000g2a-6 overlap w/ dedicated pkgs)
+
+# MWIFIEX
+# (missing)
+mrvl/pcie8766_uapsta.bin
 
 # MWL8K
 mwl8k/helper_8366.fw
@@ -58,21 +59,12 @@ BT3CPCC.bin
 # (missing)
 bfubase.frm
 
-# BT_MRVL_SDIO
-mrvl/sd8787_uapsta.bin
-# (missing)
-mrvl/sd8797_uapsta.bin
-sd8688.bin
-sd8688_helper.bin
-
 
 # --- WiMAX ---
 
 # WIMAX_I2400M_USB
 i2400m-fw-usb-1.5.sbcf
 i6050-fw-usb-1.5.sbcf
-# (missing)
-i2400m-fw-sdio-1.3.sbcf
 
 
 # --- Ethernet ---
@@ -87,7 +79,7 @@ adaptec/starfire_tx.bin
 
 # BNX2
 bnx2/bnx2-mips-06-6.2.1.fw
-bnx2/bnx2-mips-09-6.2.1a.fw
+bnx2/bnx2-mips-09-6.2.1b.fw
 bnx2/bnx2-rv2p-06-6.0.15.fw
 bnx2/bnx2-rv2p-09-6.0.17.fw
 bnx2/bnx2-rv2p-09ax-6.0.17.fw

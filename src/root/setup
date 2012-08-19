@@ -10,6 +10,8 @@ xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
 
+kpatches=${HOME}/patches/kernel-patches.sha256
+
 i2phostsurl=https://www.i2p2.de/hosts.txt
 i2phosts=/opt/i2p/hosts.txt
 netdbdir=/tmp/netDb
@@ -116,13 +118,17 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
 
     sinfo "Downloading kernel patches"
-    wget -N -q -P /usr/local/portage/distfiles `awk '/^# URL / { print $3 }' \
-        ${HOME}/patches/kernel-patches.sha256`
+    for url in `sed -n 's/^# URL //p' ${kpatches}`; do
+        urldest=`sed -n "\@^# URL ${url}@{n; s/.*  //p}" ${kpatches}`
+        ${noroot} curl -k -sSfg --compressed "${url}" > "${urldest}"
+        sed -i '/^diff --git /,/^-- /{/^-- /d; b}; d' "${urldest}"
+    done
     sha256sum --quiet -c ${HOME}/patches/kernel-patches.sha256
 
 
     sinfo "Applying kernel patches"
-    spatch /usr/local/portage/distfiles/unionfs-2.5.11_for_3.2.2.diff.gz -d /usr/src/linux-${kversion} -p1
+    spatch /usr/local/portage/distfiles/overlayfs.v13-3.4-rc7.patch -d /usr/src/linux-${kversion} -p1
+    spatch ${HOME}/patches/pax-linux-3.4.7-test27-29-diff.patch     -d /usr/src/linux-${kversion} -p1
 
 
     # Filter locales before remerging libc
@@ -422,7 +428,7 @@ done
 rc-update -u
 
 
-# (lastlog is not sparse on unionfs, wtmp has no growth limit)
+# (lastlog is not sparse on overlayfs, wtmp has no growth limit)
 sinfo "Disabling non-rotating logs"
 ln -sf /dev/null /var/log/ConsoleKit/history
 ln -sf /dev/null /var/log/lastlog
