@@ -433,7 +433,8 @@ rm -f  /var/log/wtmp
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
 #                    + stop/restart PolicyKit permissions + lid events
 # "plugdev"   group: ModemManager control PolicyKit permissions;
-#                    wireless/bluetooth rfkill switch
+#                    + NetworkManager modify system connections
+#                    + wireless/bluetooth rfkill switch
 # "lp"        group: D-Bus communication with bluetoothd
 # ["uucp"]    group: access to RFCOMM devices (e.g., obexftp)
 # "games"     group: prevent games complaining about not keeping scores
@@ -540,7 +541,7 @@ sinfo "Generating EFI GRUB configuration"
 ${helpdir}/gen-efi
 
 
-sinfo "Generating test Secure Boot test certificates"
+sinfo "Generating Secure Boot test certificates"
 ${helpdir}/gen-sb-cert test
 
 

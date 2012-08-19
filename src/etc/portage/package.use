@@ -32,11 +32,10 @@ x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 
 # Networking, including SSL/TLS
-# (epiphany: +networkmanager requires >=net-misc/networkmanager-0.8.997)
 net-libs/libetpan               gnutls
 net-libs/libmicrohttpd          -ssl
 net-wireless/wpa_supplicant     -ssl  gnutls
-net-misc/networkmanager         gnutls
+net-misc/networkmanager         gnutls -nss
 net-im/pidgin                   gnutls sasl
 dev-libs/cyrus-sasl             -crypt
 dev-libs/libevent               -ssl
@@ -44,7 +43,7 @@ net-analyzer/netcat             -crypt
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
 app-i18n/uim                    -ssl
-www-client/epiphany             -nss -networkmanager
+www-client/epiphany             -nss
 net-libs/glib-networking        -gnome
 
 # Multimedia

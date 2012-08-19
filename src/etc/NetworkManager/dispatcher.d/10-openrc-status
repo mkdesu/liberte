@@ -1,0 +1,4 @@
+# The OpenRC status script provided by Gentoo is disabled,
+# since it is a rather heavy hack, which may also interfere
+# with, e.g., mac-randomize.
+# (#252137)

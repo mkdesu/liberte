@@ -80,7 +80,7 @@ else
 
     if [ -e ${LIVECD}/etc/polkit-1/localauthority ]; then
         ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C \
-            ${SRC}/etc/polkit-1/localauthority/* ${LIVECD}/etc/polkit-1/localauthority
+            ${SRC}/etc/polkit-1/localauthority/30-site.d ${LIVECD}/etc/polkit-1/localauthority
     fi
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons

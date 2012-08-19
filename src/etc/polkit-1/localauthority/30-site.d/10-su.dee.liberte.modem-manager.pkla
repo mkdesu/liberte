@@ -1,6 +1,0 @@
-[ModemManager Permissions]
-Identity=unix-group:plugdev
-Action=org.freedesktop.ModemManager.*
-ResultAny=no
-ResultInactive=no
-ResultActive=yes
