@@ -40,6 +40,7 @@
 /config/geeqie/history
 /config/gftp/gftp.log
 /config/nip2/recent_*
+/config/parcellite/history
 # /config/purple/logs/
 
 # Transient directories
