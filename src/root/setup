@@ -240,6 +240,7 @@ emerge -qc --deselect=n
 
 
 sinfo "Performing package move updates"
+emaint -c world
 emaint -f moveinst
 emaint -f movebin
 
