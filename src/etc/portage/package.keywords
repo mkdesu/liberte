@@ -1,3 +1,6 @@
+# Kernel
+=sys-kernel/hardened-sources-3.4*
+
 # System
 # app-emulation/virt-what       (#409237)
 # net-misc/connect              (#384471)
@@ -12,9 +15,6 @@
 =sys-boot/efibootmgr-0.5.4*
 
 # Network
-<net-misc/networkmanager-openvpn-0.8.5
-<net-misc/networkmanager-pptp-0.8.5
-<net-misc/networkmanager-vpnc-0.8.5
 =net-wireless/reaver-1.4*
 
 # GTK+ 3
@@ -43,11 +43,11 @@ sys-firmware/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 net-wireless/ar9271-firmware
-net-wireless/iwl2030-ucode
-net-wireless/iwl5000-ucode
-net-wireless/iwl5150-ucode
-net-wireless/iwl6005-ucode
-net-wireless/iwl6030-ucode
+sys-firmware/iwl2030-ucode
+sys-firmware/iwl5000-ucode
+sys-firmware/iwl5150-ucode
+sys-firmware/iwl6005-ucode
+sys-firmware/iwl6030-ucode
 net-wireless/rt2860-firmware
 net-wireless/rt2870-firmware
 net-wireless/rt61-firmware
