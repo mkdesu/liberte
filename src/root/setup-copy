@@ -115,6 +115,11 @@ sinfo "Recompiling build-dependent packages"
 emerge -quDN @world
 
 
+# (#432020)
+# sinfo "Creating NSS databases"
+# make -C /var/db > /dev/null
+
+
 sinfo "Compiling Lua scripts"
 find /usr/share/libquvi-scripts/lua -type f -name '*.lua' -exec luac -s -o {} {} \;
 
