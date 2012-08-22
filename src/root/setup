@@ -120,6 +120,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     sinfo "Downloading kernel patches"
     for url in `sed -n 's/^# URL //p' ${kpatches}`; do
         urldest=`sed -n "\@^# URL ${url}@{n; s/.*  //p}" ${kpatches}`
+        mkdir -p "${urldest%/*}"
         ${noroot} curl -k -sSfg --compressed "${url}" > "${urldest}"
         sed -i '/^diff --git /,/^-- /{/^-- /d; b}; d' "${urldest}"
     done
