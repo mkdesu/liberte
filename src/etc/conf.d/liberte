@@ -7,9 +7,9 @@ OTFESIZE=1/4
 
 # Encryption cipher + block mode, key size,
 # and key setup / volume key digest hash
-OTFECIPHER=aes-xts-plain
-OTFEKEYSIZE=256
-OTFEHASH=sha256
+OTFECIPHER=aes-xts-plain64
+OTFEKEYSIZE=512
+OTFEHASH=sha512
 
 # LVM partition name
 # (also used by otfe-resize)

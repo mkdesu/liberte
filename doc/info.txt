@@ -73,8 +73,8 @@ Encryption
 ==========
 
 LUKS
-  + AES-256 / XTS
-  + SHA-256 LUKS header hashing
+  + AES-256 / XTS (w/ double key size)
+  + SHA-512 LUKS header hashing
   + OTFE-compatible
 
 mcrypt
