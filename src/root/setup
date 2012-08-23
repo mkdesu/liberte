@@ -121,7 +121,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     for url in `sed -n 's/^# URL //p' ${kpatches}`; do
         urldest=`sed -n "\@^# URL ${url}@{n; s/.*  //p}" ${kpatches}`
         mkdir -p "${urldest%/*}"
-        ${noroot} curl -k -sSfg --compressed "${url}" > "${urldest}"
+        su - -s /bin/sh nobody -c "curl -k -sSfg --compressed \"${url}\"" > "${urldest}"
         sed -i '/^diff --git /,/^-- /{/^-- /d; b}; d' "${urldest}"
     done
     sha256sum --quiet -c ${HOME}/patches/kernel-patches.sha256
