@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright 1999-2012 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+# $Header: $
+
+# A simple service script without activity tracking, provided
+# that /etc/NetworkManager/dispatcher.d/10-openrc-status is also
+# disabled. (#252137)
+description="NetworkManager daemon."
+
+command=/usr/sbin/NetworkManager
+pidfile=/var/run/NetworkManager.pid
+command_args="--pid-file=${pidfile}"
+
+depend() {
+    need dbus
+    provide net
+}
