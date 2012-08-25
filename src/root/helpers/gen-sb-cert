@@ -63,6 +63,8 @@ if [ ! -e ${sbdir} ]; then
     openssl x509 -in ${sb_ca}.crt   -outform DER -out ${sb_ca}.der
     openssl x509 -in ${sb_sign}.crt -outform DER -out ${sb_sign}.der
 
+    chmod go= ${sb_ca}.key ${sb_sign}.key
+
     rm -f ${RANDFILE}
     mv -T ${sbdirtmp} ${sbdir}
 fi
