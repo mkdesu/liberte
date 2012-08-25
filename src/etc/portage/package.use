@@ -111,5 +111,6 @@ app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Quirks
-# (gnome-doc-utils bdep)
+# (gnome-doc-utils bdep, libsoup circular dep)
 dev-libs/libxml2                python               # TEMP
+net-libs/libproxy               -networkmanager      # TEMP
