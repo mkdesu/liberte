@@ -37,6 +37,9 @@
 # Split gnuplot dependency (#425622)
 =sci-libs/libqalculate-0.9.7*
 
+# Stable fails to build (#432766)
+=dev-libs/opensc-0.12.2*
+
 # Firmware
 sys-apps/microcode-data
 sys-firmware/amd-ucode

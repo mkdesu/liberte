@@ -7,8 +7,6 @@
 # revdep-rebuild -p -L '.*\<libltdl\.so.*'
 /usr/lib/GraphicsMagick-[0-9]**.la
 /usr/lib/mpg123/*.la
-/usr/lib/*opensc*.la
-/usr/lib/*pkcs11*.la
 
 # Include fontconfig and gstreamer cache
 /var/cache/fontconfig/***
