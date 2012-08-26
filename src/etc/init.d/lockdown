@@ -44,6 +44,15 @@ start() {
     fi
 
 
+    # Unblock [wifi wimax wwan], block [bluetooth uwb gps fm]
+    if [ -e /dev/rfkill ]; then
+        ebegin Blocking all radios except Wi-Fi
+        rfkill block all
+        rfkill unblock wifi && rfkill unblock wwan && rfkill unblock wimax
+        eend $?
+    fi
+
+
     # See also: /etc/acpi/default.sh
     if [ ! -e ${lidevents} ]; then
         ebegin Creating closed lid indicator
