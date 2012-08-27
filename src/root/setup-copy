@@ -103,7 +103,7 @@ for ebuild in ${!ebuild_*}; do
 done
 rm -f /var/cache/edb/vdb_*.pickle
 
-# [gettext] coreutils, nano, powertop, cdrtools: not needed (#398983, #398975, #398977, #410501)
+# [gettext] coreutils, nano, powertop, cdrtools: not needed (#398983, #398975 (fixed in 2.3.1-r2), #398977, #410501)
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 # java-config wrappers are superfluous for minimal VMs (and require Python)

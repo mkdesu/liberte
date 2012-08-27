@@ -94,8 +94,11 @@ patch_ebuild ${HOME}/patches/portage/fbreader.patch
 # (#424816)
 patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
-# (#432770)
-patch_ebuild ${HOME}/patches/portage/opensc.patch
+# (restore removed unstable ebuild)
+khs=/usr/portage/sys-kernel/hardened-sources/hardened-sources-3.4.5.ebuild
+cp -a ${khs} ${khs/3.4.5/3.4.7}
+sed -i 's/="6"/="8"/' ${khs/3.4.5/3.4.7}
+ebuild ${khs/3.4.5/3.4.7} manifest
 
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
