@@ -67,6 +67,7 @@ sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
 sys-fs/ntfs3g                   -udev
+app-crypt/gnupg                 -usb
 net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2

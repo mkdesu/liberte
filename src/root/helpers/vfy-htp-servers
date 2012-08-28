@@ -4,6 +4,7 @@
 export LC_ALL=C
 
 # SERVERS contains list of HTP servers
+# NOTE: contains just "google.com" during fresh build
 . /etc/conf.d/htpdate
 
 # Time discrepancy tolerance and connection retries per server

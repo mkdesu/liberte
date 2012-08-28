@@ -442,7 +442,6 @@ ln -sf /dev/null /var/log/lastlog
 rm -f  /var/log/wtmp
 
 
-# Root password good for maintenance before /etc/init.d/local.start is in charge
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
 #                    + stop/restart PolicyKit permissions + lid events
 # "plugdev"   group: ModemManager control PolicyKit permissions;

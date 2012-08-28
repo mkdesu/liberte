@@ -31,5 +31,5 @@
 # (#416817)
 /usr/lib/libvipsCC.so*
 
-# app-crypt/gpa build-time workaround (#417437)
+# app-crypt/gpa build-time workaround (#417437, fixed in 0.9.3)
 /usr/libexec/gpgkeys_ldap
