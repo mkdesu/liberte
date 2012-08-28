@@ -1,2 +1,3 @@
-# Unqualified dependency of net-wireless/iw pulls multi-slot libnl
+# Unqualified dependencies of net-wireless/iw and net-wireless/crda
+# pull multi-slot libnl
 dev-libs/libnl:3
