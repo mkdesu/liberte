@@ -1,5 +1,5 @@
---- htpdate.c	2008-10-13 19:04:08.000000000 +0000
-+++ htpdate.c	2012-02-11 20:32:02.000000000 +0000
+--- htpdate.c	2012-08-29 11:17:21.000000000 +0000
++++ htpdate.c	2012-08-29 11:43:03.000000000 +0000
 @@ -30,6 +30,18 @@
  	http://www.gnu.org/copyleft/gpl.html
  */
@@ -8,7 +8,7 @@
 +	Modifications by mk@dee.su:
 +
 +	+ Set the time once able to do so, even if not in first poll cycle
-+	+ Ignore 503 proxy responses (Forwarding failed)
++	+ Ignore error responses (usually by proxies)
 +	+ Better error handling during communication
 +	+ Buffer overflow prevention when copying Date: header contents
 +	+ Added -T <tagfile> option to specify output file with initial time step
@@ -43,8 +43,8 @@
  		/* Look for the line that contains Date: */
 -		if ( (pdate = strstr(buffer, "Date: ")) != NULL ) {
 -			strncpy(remote_time, pdate + 11, 24);
-+		if ( strstr(buffer, " 503 Forwarding failure") != NULL ) {
-+			printlog( 1, "Ignoring proxy response" );
++		if ( strncmp(buffer, "HTTP/1.1 2", 10) != 0  &&  strncmp(buffer, "HTTP/1.1 3", 10) != 0 ) {
++			printlog( 1, "Ignoring error/proxy response" );
 +		} else if ( (pdate = strstr(buffer, "\nDate: ")) != NULL  &&  buffer+BUFFERSIZE - pdate > 12 + 24 ) {
 +			strncpy(remote_time, pdate + 12, 24);
  
