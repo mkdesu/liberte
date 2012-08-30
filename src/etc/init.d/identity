@@ -132,9 +132,13 @@ start() {
 
 
     # Randomize endings of wireless interfaces MAC addresses
-    ebegin Randomizing wireless MACs
-    mac-randomize wireless
-    eend $?
+    if ! get_bootparam 'noanon'; then
+        ebegin Randomizing wireless MACs
+        mac-randomize wireless
+        eend $?
+    else
+        ewarn Skipping wireless MACs randomization
+    fi
 
     :
 }

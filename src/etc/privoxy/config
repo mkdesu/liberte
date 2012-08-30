@@ -22,8 +22,6 @@ enforce-blocks  0
 buffer-limit    4096
 
 forward-socks5  /                       127.0.0.1:9050  .
-forward-socks5  check.torproject.org    127.0.0.1:9050  .
-forward-socks5  torcheck.xenobite.eu    127.0.0.1:9050  .
 forward-socks5  .onion                  127.0.0.1:9050  .
 forward-socks5  .exit                   127.0.0.1:9050  .
 

@@ -5,6 +5,7 @@ description="Restores and saves user configuration."
 luser=anon
 lmount=/home/${luser}/persist
 persist=persistence
+profile=
 
 depend() {
     # need OTFE mount
@@ -16,9 +17,10 @@ start() {
         # Extract configuration archive, if present
         if get_bootparam 'nosettings'; then
             ewarn Skipping persistent configuration extraction
-        elif [ -e ${lmount}/settings/config.tar.xz ]; then
+        else
             ebegin Restoring persistent configuration: ${lmount}/settings
-            sudo -n -u ${luser} ${persist} restore ${lmount}/settings
+            ! get_bootparam 'noanon' || profile=noanon
+            sudo -n -u ${luser} ${persist} restore ${lmount}/settings ${profile}
             eend $?
         fi
     else
@@ -34,7 +36,8 @@ stop() {
         else
             # ${lmount}/settings is created in identity service for the first time
             ebegin Saving configuration: ${lmount}/settings
-            sudo -n -u ${luser} ${persist} save ${lmount}/settings
+            ! get_bootparam 'noanon' || profile=noanon
+            sudo -n -u ${luser} ${persist} save ${lmount}/settings ${profile}
             eend $?
         fi
     else

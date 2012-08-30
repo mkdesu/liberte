@@ -20,6 +20,19 @@ i2ptports=https,8887,9000:31000,1024:65535
 # LED blinking delay
 leddelay=500
 
+# Usage profile (supported: noanon)
+profile=/var/run/usage-profile
+
+
+# For "noanon" usage profile, move all rights of ${nofw} to ${luser},
+# and allow DNS for "root" (easier VPN setup)
+if grep -qs '^noanon$' ${profile}; then
+    nofw=${luser}
+    hotspot=1:65535
+    vpntports=domain,${vpntports}
+    vpnuports=domain,${vpnuports}
+fi
+
 
 # Default policies
 iptables -P INPUT   DROP
@@ -132,6 +145,12 @@ iptables -A OUTPUT -p udp                              --sport bootpc --dport bo
 iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn --dport domain -j ACCEPT
 
+# In "noanon" profile, Privoxy can use DNS
+if [ ${luser} = ${nofw} ]; then
+    iptables -A OUTPUT -p udp -m owner --uid-owner privoxy       --dport domain -j ACCEPT
+    iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn --dport domain -j ACCEPT
+fi
+
 # VPN connections (root-initiated)
 iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT
 iptables -A OUTPUT -p udp -m owner --uid-owner root          -m multiport --dports ${vpnuports} -j ACCEPT
@@ -141,6 +160,11 @@ iptables -A OUTPUT -p tcp -m owner --uid-owner tor     --syn -m multiport --dpor
 
 # HTTP(S) (including HotSpot ports) communication for non-firewalled user
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn -m multiport --dports ${hotspot}   -j ACCEPT
+
+# In "noanon" profile, Privoxy can access same ports as main user
+if [ ${luser} = ${nofw} ]; then
+    iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn -m multiport --dports ${hotspot}   -j ACCEPT
+fi
 
 # I2P user communication via Tor's transparent proxy
 # https://trac.torproject.org/projects/tor/wiki/doc/TransparentProxy

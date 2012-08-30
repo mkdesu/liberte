@@ -12,6 +12,7 @@
   * Simplified boot parameters handling, most are now omitted
   * Added "blacklist" boot parameter for kernel modules blacklisting
   * Added "bridges" boot parameter for specifying Tor bridges
+  * Added "gentoo=noanon" boot parameter for non-anonymous usage mode
   * More rigorous Wi-Fi and Bluetooth (un)blocked states on boot
 
   * Added small CD -> USB bootstrapping ISO image

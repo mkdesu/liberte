@@ -16,6 +16,9 @@ depend() {
 
     # using /var/run
     after bootmisc
+
+    # fw-reload needs /var/run/usage-profile
+    before iptables
 }
 
 start() {
@@ -49,6 +52,15 @@ start() {
         ebegin Blocking all radios except Wi-Fi
         rfkill block all
         rfkill unblock wifi && rfkill unblock wwan && rfkill unblock wimax
+        eend $?
+    fi
+
+
+    # Support non-anonymous mode
+    if get_bootparam 'noanon'; then
+        ewarn Non-anonymous profile has been selected via boot options
+        ebegin Initializing non-anonymous profile
+        init-profile 'noanon'
         eend $?
     fi
 

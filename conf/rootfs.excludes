@@ -120,7 +120,6 @@
 /home/anon/persist/security/pgp/*~
 /usr/lib/systemd/system/
 /etc/*-
-/etc/dconf/db/*.d
 /etc/resolv.conf
 /etc/machine-id
 /etc/issue.logo

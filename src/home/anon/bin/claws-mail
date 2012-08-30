@@ -9,6 +9,9 @@ dummyaddr=anonymous@liberte
 confdir=${XDG_CONFIG_HOME}/claws-mail
 theme=/usr/share/claws-mail/themes/Gnome
 
+torify=torify
+profile=/var/run/usage-profile
+
 
 # Configure the Tor address if none is set
 if grep -q "^address=${dummyaddr}\$" ${confdir}/accountrc \
@@ -41,4 +44,8 @@ fi
 
 
 # Run via torify for users who want additional "regular" accounts
-exec torify /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"
+if grep -qs '^noanon$' ${profile}; then
+    torify=
+fi
+
+exec ${torify} /usr/bin/claws-mail --alternate-config-dir ${confdir} 2>/dev/null "$@"

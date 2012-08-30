@@ -12,7 +12,7 @@ export TMPDIR=${TMPDIR:-/tmp/.private/${USER}}
 
 
 if [ $# -lt 2 ]; then
-    echo "$0 <save|restore> <persist directory>"
+    echo "$0 <save|restore> <persist directory> [profile]"
     exit 1
 fi
 
@@ -20,8 +20,9 @@ fi
 # Variables
 op="$1"
 setdir="$2"
+profile="$3"
 savedir=${HOME}/config
-settings="${setdir}"/config.tar.xz
+settings="${setdir}"/config"${profile:+-${profile}}".tar.xz
 livecd=/mnt/live
 
 
@@ -53,12 +54,9 @@ if [ "${op}" = save ]; then
 
 elif [ "${op}" = restore ]; then
 
-    if [ ! -e "${settings}" ]; then
-        echo "${settings} doesn't exist"
-        exit 1
+    if [ -e "${settings}" ]; then
+        bsdtar -xpSf "${settings}" -C ${HOME}
     fi
-
-    bsdtar -xpSf "${settings}" -C ${HOME}
 
 else
     echo "Operation \"${op}\" is not supported"
