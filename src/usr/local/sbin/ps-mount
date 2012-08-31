@@ -44,15 +44,24 @@ else
     fi
 
     # Checking whether device is in fstab (except root fs), or is mounted
-    DEVLINKS=" ${DEVLINKS}"
+    DEVLINKS=" ${DEVLINKS} "
     fstab_check() {
         if [ -n "${FSTAB_NAME}" ]; then
             echo fstab
         else
+            local rootdevs=`awk '/^\// { print $1 }' /etc/fstab`
+            local mdev
+
+            for mdev in ${rootdevs}; do
+                if [ ${mdev} = "${DEVNAME}" -o -z "${DEVLINKS/* ${mdev} */}" ]; then
+                    echo fstab
+                    return
+                fi
+            done
+
             # /proc/mounts contains only device names
             # (no UUID or LABEL, but may contain symlinks)
-            local rootdevs=`awk '/^\// { print $1 }' /proc/mounts`
-            local mdev
+            rootdevs=`awk '/^\// { print $1 }' /proc/mounts`
 
             for mdev in ${rootdevs}; do
                 if [ ${mdev} = "${DEVNAME}" -o -z "${DEVLINKS/* ${mdev} */}" ]; then
@@ -192,9 +201,9 @@ else
         fi
     # For "change" action (non-fuse-generated), a line is replaced,
     # but label is not changed
-    elif [ "${ACTION}" = change -a "${DISK_MEDIA_CHANGE}" = 1 ]; then
-        # Update if present in autofs, and is a filesystem
-        if [ -z "${autodevs/* ${DEVNAME} */}" -a -n "${ID_FS_TYPE}" ]; then
+    elif [ "${ACTION}" = change -a \( "${DISK_MEDIA_CHANGE}" = 1 -o -n "${DM_NAME}" \) ]; then
+        # Update if present in autofs or is a non-existing device, and is a filesystem
+        if [ \( -z "${autodevs/* ${DEVNAME} */}" -o "${fscheck}" != mtab \) -a -n "${ID_FS_TYPE}" ]; then
             remove_entry keeplabel
             add_entry
             reload_autofs
