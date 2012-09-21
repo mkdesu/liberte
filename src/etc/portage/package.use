@@ -93,6 +93,7 @@ sys-kernel/linux-firmware       savedconfig
 sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
 sys-fs/udev                     gudev
+sys-apps/util-linux             udev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive

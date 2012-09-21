@@ -1,5 +1,5 @@
---- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.18.ebuild	2012-07-25 02:24:36.000000000 +0000
-+++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.18.ebuild	2012-07-25 02:25:33.000000000 +0000
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.22.ebuild	2012-07-25 02:24:36.000000000 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.1.22.ebuild	2012-07-25 02:25:33.000000000 +0000
 @@ -86,6 +86,9 @@
  	if gcc-specs-now ; then
  		epatch "${FILESDIR}/${PN}-link-lazy.patch"

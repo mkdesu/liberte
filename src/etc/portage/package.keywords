@@ -8,7 +8,7 @@
 
 # Boot process (cdrtools: EFI platform support)
 =sys-boot/grub-2.00*:2
-=app-cdr/cdrtools-3.01_alpha07*
+=app-cdr/cdrtools-3.01_alpha08*
 =sys-boot/efibootmgr-0.5.4*
 
 # Network
@@ -22,8 +22,6 @@
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.05.21*
 =app-emulation/open-vm-tools-kmod-2012.05.21*
-=app-emulation/virtualbox-guest-additions-4.1.18*
-=x11-drivers/xf86-video-virtualbox-4.1.18*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*

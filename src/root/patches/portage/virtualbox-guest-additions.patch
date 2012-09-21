@@ -1,5 +1,5 @@
---- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.18.ebuild	2012-07-25 02:14:27.000000000 +0000
-+++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.18.ebuild	2012-07-25 02:19:08.000000000 +0000
+--- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.22.ebuild	2012-07-25 02:14:27.000000000 +0000
++++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.1.22.ebuild	2012-07-25 02:19:08.000000000 +0000
 @@ -81,6 +81,9 @@
  				"${WORKDIR}/${mdir}/${vboxheader}"
  		done
