@@ -101,6 +101,7 @@ dev-java/gnu-classpath          xml
 app-arch/p7zip                  rar
 app-office/abiword              gnome
 app-text/evince                 gnome
+media-gfx/ufraw                 gnome contrast timezone
 media-gfx/graphicsmagick        imagemagick
 media-libs/vips                 imagemagick
 

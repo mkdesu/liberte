@@ -1,6 +1,8 @@
 2012-10-XX
   + 2012.4 release
 
+  * Added UFRaw, a RAW images viewer and converter
+
 
 2012-09-01
   + 2012.3 release
