@@ -337,18 +337,9 @@ eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11
 
 
-# The piciids/usbids sites are notorious for various failures
-sinfo "Updating PCI, USB, SMART and I2P hosts databases"
-
-update-pciids -q     || echo "update-pciids failed (ignoring)"
-update-usbids -q     || echo "update-usbids failed (ignoring)"
+sinfo "Updating SMART and I2P hosts databases"
 
 update-smart-drivedb || echo "update-smart-drivedb failed (ignoring)"
-
-if [ ! -e /usr/share/misc/pci.ids  -o  ! -e /usr/share/misc/usb.ids ]; then
-    echo "Do PCI/USB IDs lists use compressed format exclusively?"
-    exit 1
-fi
 
 # zzz @ #i2p-dev: hosts.txt in the source tree is the same or newer
 if ${noroot} curl -k -sSfg --compressed ${i2phostsurl} > ${i2phosts}.new; then
@@ -359,7 +350,7 @@ else
 fi
 
 
-sinfo "Verifying PCI, USB, SMART and I2P hosts databases"
+sinfo "Verifying SMART and I2P hosts databases"
 ${noroot} ${helpdir}/vfy-databases
 
 

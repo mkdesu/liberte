@@ -4,24 +4,14 @@ export LC_ALL=C
 
 
 # Regular expressions (extended)
-pciids_regexp='^([[:xdigit:]]{4}|\t(\t[[:xdigit:]]{4} )?[[:xdigit:]]{4}|(C |\t\t?)[[:xdigit:]]{2})  [^[:cntrl:]]{0,320}$|^#[[:blank:][:graph:]]{0,320}$|^$'
-usbids_regexp='^((AT|HID|R|BIAS|PHY|HUT|L|HCC|VT) |\t)[[:xdigit:]]{1,4}  [^[:cntrl:]]{0,320}$'
 i2phosts_regexp='^[[:alnum:].-]{1,63}.i2p=[[:alnum:]~-]{512}AAAA[[:blank:]]?$'
 
 
 # Paths
-pciids=/usr/share/misc/pci.ids
-usbids=/usr/share/misc/usb.ids
-
 drivedb=/usr/share/smartmontools/drivedb.h
 tmpdb=/tmp/drivedb.h
 
 i2phosts=/opt/i2p/hosts.txt
-
-
-# Verify PCI/USB IDs
-awk --posix "! /${pciids_regexp}/                  { print; exit 1 }" ${pciids}
-awk --posix "! /${pciids_regexp}|${usbids_regexp}/ { print; exit 1 }" ${usbids}
 
 
 # Verify SMART database (also, given directly to smartctl during update)
