@@ -20,7 +20,6 @@ symbol_sp24t_sec_fw
 iwlwifi-100-5.ucode
 iwlwifi-105-6.ucode
 iwlwifi-135-6.ucode
-iwlwifi-2000-6.ucode
 
 # MWIFIEX
 # (missing)

@@ -34,6 +34,7 @@ sys-firmware/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43-fwcutter
 net-wireless/ar9271-firmware
+sys-firmware/iwl2000-ucode
 sys-firmware/iwl2030-ucode
 sys-firmware/iwl5000-ucode
 sys-firmware/iwl5150-ucode
