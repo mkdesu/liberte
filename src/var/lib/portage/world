@@ -94,6 +94,7 @@ app-crypt/tpm-tools
 sys-apps/haveged
 virtual/jre:1.5
 dev-java/jamvm
+dev-libs/libelf
 
 # Network utilities
 net-analyzer/netcat
