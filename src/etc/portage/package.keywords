@@ -26,9 +26,6 @@
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*
 
-# edit-select-all-symbolic.svg (#410483)
-=x11-themes/gnome-icon-theme-symbolic-3.4.0*
-
 # Split gnuplot dependency (#425622)
 =sci-libs/libqalculate-0.9.7*
 
