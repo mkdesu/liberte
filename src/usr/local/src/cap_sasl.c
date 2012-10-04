@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <glib/gbase64.h>
+#include <glib.h>
 
 #include <xchat/xchat-plugin.h>
 
