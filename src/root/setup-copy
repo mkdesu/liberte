@@ -45,7 +45,6 @@ ebuilds="app-misc/ca-certificates
          app-mobilephone/obexftp
          dev-libs/gobject-introspection
          gnome-base/libglade
-         gnome-base/librsvg
          media-gfx/exiv2
          media-libs/vips
          media-plugins/gst-plugins-vp8
@@ -69,11 +68,10 @@ sed -i 's/[^"]*\${python_dep\(_ssl\)\?}[^"]*//' ${ebuild_portage}
 # Python
 # exiv2                    not needed                  (#398959, fixed in 0.23)
 # libglade:                libglade-convert            (#398955)
-# librsvg:                 rsvg                        (#398951, fixed in 2.36.0)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
 sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_exiv2} \
-                                         ${ebuild_gobjectintrospection} ${ebuild_librsvg}
+                                         ${ebuild_gobjectintrospection}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 
 # Perl
