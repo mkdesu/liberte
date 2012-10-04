@@ -29,6 +29,9 @@
 # Split gnuplot dependency (#425622)
 =sci-libs/libqalculate-0.9.7*
 
+# Compilation issues (#437232, #408427)
+=net-misc/proxychains-3.1_p20110225*
+
 # Firmware
 sys-firmware/amd-ucode
 net-wireless/b43-firmware

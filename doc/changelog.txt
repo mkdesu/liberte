@@ -2,6 +2,7 @@
   + 2012.4 release
 
   * Added UFRaw, a RAW images viewer and converter
+  * Added proxychains, a heterogeneous chaining proxyfier
 
 
 2012-09-01

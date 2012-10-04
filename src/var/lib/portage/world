@@ -115,6 +115,7 @@ gnome-extra/nm-applet
 net-misc/htpdate
 net-misc/tor
 net-misc/connect
+net-misc/proxychains
 net-misc/whois
 net-p2p/i2p
 net-proxy/torsocks
