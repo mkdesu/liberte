@@ -58,7 +58,7 @@ media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 dev-java/gnu-classpath          gstreamer
 
-# Unnecessary functionality (portage: (#346749))
+# Unnecessary functionality (portage: (#346749), geoclue: (#416331))
 sys-apps/portage                -xattr python2
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
@@ -84,6 +84,7 @@ app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
+app-misc/geoclue                -*
 
 # Extra functionality
 sys-boot/syslinux               -custom-cflags

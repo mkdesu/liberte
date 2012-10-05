@@ -141,6 +141,8 @@
 /usr/share/tor/
 /usr/share/misc/*.ids.*
 /usr/share/smartmontools/*.h.*
+# (Geoclue providers are disabled)
+/usr/share/geoclue-providers/**
 
 # I2P (lib directory is pruned)
 /opt/i2p/geoip/
