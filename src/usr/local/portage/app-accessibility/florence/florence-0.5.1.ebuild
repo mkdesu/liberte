@@ -39,6 +39,11 @@ DEPEND="${RDEPEND}
 	doc? ( gnome-base/libgnome )"
 DOCS="AUTHORS ChangeLog NEWS README"
 
+src_prepare() {
+	default
+	epatch "${FILESDIR}"/glib-2.32.patch
+}
+
 src_configure() {
 	econf \
 		$(use_with accessibility at-spi) \
