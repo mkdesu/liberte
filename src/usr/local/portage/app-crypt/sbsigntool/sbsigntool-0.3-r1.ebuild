@@ -8,7 +8,7 @@ inherit autotools eutils
 
 DESCRIPTION="Utilities for signing and verifying files for UEFI Secure Boot"
 HOMEPAGE="http://packages.ubuntu.com/quantal/sbsigntool"
-SRC_URI="http://archive.ubuntu.com/ubuntu/pool/universe/s/sbsigntool/${PN}_${PV}.orig.tar.gz"
+SRC_URI="https://launchpad.net/ubuntu/+archive/primary/+files/${PN}_${PV}.orig.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
