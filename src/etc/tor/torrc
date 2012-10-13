@@ -29,8 +29,9 @@ HiddenServicePort    80 127.0.0.1:9080
 ## connections somewhat.
 ReachableAddresses   *:80, *:443
 
-## Reject resolved DNS connections
-SafeSocks            1
+## Do not reject resolved DNS connections
+## (otherwise proxychains fails)
+SafeSocks            0
 
 # Do not relay. From Tor FAQ:
 #   Three different research papers describe ways to identify the relays in a
