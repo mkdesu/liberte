@@ -492,8 +492,7 @@ dconf update
 
 
 sinfo "Installing wrappers"
-ln -sf ../local/libexec/proxyresolv.wrapper    /usr/bin/proxyresolv
-ln -sf ../local/libexec/vmmouse_detect.wrapper /usr/bin/vmmouse_detect
+ln -sf ../local/libexec/proxyresolv.wrapper /usr/bin/proxyresolv
 
 
 sinfo "Building kernel modules"

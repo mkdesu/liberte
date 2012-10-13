@@ -1,6 +1,8 @@
 2012-10-XX
   + 2012.4 release
 
+  * Better support for QEMU mouse virtualization
+
   * Added UFRaw, a RAW images viewer and converter
   * Added proxychains, a heterogeneous chaining proxyfier
 

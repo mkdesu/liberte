@@ -20,9 +20,10 @@ start() {
             # Support only video= parameters without driver:/output: qualification
             # /usr/src/linux/Documentation/fb/modedb.txt
             if [ "${param}" != "${param#video=}" -a "${param}" = "${param#*:}" ]; then
-                # Use our vmmouse_detect wrapper to detect VMware
+                # Use virt-what to detect VMware
                 # (VMware card is not enough, e.g., QEMU: "Hardware has no pitchlock")
-                if vmmouse_detect; then
+                vm=`virt-what 2>/dev/null`
+                if [ "${vm}" = vmware ]; then
                     einfo "Initializing VMware framebuffer"
                     modprobe -b vmwgfx enable_fbdev=1
                     eend $?

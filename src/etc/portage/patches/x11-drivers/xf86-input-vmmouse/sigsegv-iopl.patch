@@ -1,0 +1,14 @@
+--- a/tools/vmmouse_detect.c
++++ b/tools/vmmouse_detect.c
+@@ -47,6 +47,11 @@ main(void)
+    signal(SIGSEGV, segvCB);
+ 
+ #if defined __i386__ || defined __x86_64__ 
++   /*
++    * To access i/o ports above 0x3ff, we need to be in iopl(3).
++    */
++
++   iopl(3);
+    if (VMMouseClient_Enable()) {
+       VMMouseClient_Disable();
+       return 0;
