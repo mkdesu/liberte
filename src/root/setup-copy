@@ -188,9 +188,8 @@ if [ -e /usr/bin/run-java-tool  -o  -e /usr/bin/java-config ]; then
 fi
 
 
-sinfo "Fixing Ambiance/Radiance themes for GTK-3.2"
-sed -i 's/\([0-9]\)px/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
-truncate -s 0 /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{gtk-widgets-backdrop,apps/{nautilus,gnome-panel}}.css
+sinfo "Fixing Ambiance/Radiance themes"
+sed -ri '/\<(text|icon)-shadow:/ s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 
 
 # Any problem will cause a fatal error
