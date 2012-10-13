@@ -4,10 +4,10 @@ export LC_ALL=C
 
 
 # Fetch URL and parameters
-netdburl=https://netdb.i2p2.de/
+netdburl=https://euve5653.vserver.de/netDb/
 
 maxnetdblst=2000
-maxfetches=50
+maxfetches=5
 maxnetdb=100
 
 
