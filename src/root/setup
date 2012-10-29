@@ -71,10 +71,8 @@ if [ ${PHASE} != src ]; then
 fi
 
 
-# Intentionally fail if there is there are multiple hardened profiles
 sinfo "Setting a hardened profile"
-hardened=`eselect profile list | awk '{ print $2 }' | grep '^hardened/' | grep -v /selinux`
-eselect profile set ${hardened}
+eselect profile set hardened/linux/x86
 
 echo ">sys-kernel/hardened-sources-${hsversion}" > /etc/portage/package.mask/kernel
 rm -f /etc/portage/savedconfig/*/*-[0-9]*
