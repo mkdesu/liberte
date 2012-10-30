@@ -20,7 +20,7 @@ else
     mounts=/var/run/auto.media
 
     # Mount options (permissions: rw-r----- / rwx--x---)
-    supported=" ext2 ext3 ext4 vfat msdos ntfs iso9660 udf hfs hfsplus vmhgfs vboxsf "
+    supported=" ext2 ext3 ext4 vfat msdos ntfs ntfs-3g iso9660 udf hfs hfsplus vmhgfs vboxsf "
     luser=anon
     lgroup=legion
     opts_common=noatime,nosuid,nodev,noexec
@@ -140,12 +140,12 @@ else
             msdos)
                 type="vfat,${opts_vfat}"
                 ;;
-            ntfs)
-                type="${ID_FS_TYPE}-3g,${opts_ntfs}"
+            ntfs|ntfs-3g)
+                type="ntfs-3g,${opts_ntfs}"
 
                 # Possibly make mount point read-only for NTFS (e.g., hibernated Windows)
                 if ! ntfs-3g.probe -w "${DEVNAME}"; then
-                    type="${ID_FS_TYPE}-3g,${opts_ntfs_ro}"
+                    type="ntfs-3g,${opts_ntfs_ro}"
                 fi
                 ;;
             *)

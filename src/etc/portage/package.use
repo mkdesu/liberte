@@ -66,7 +66,6 @@ media-libs/libsndfile           minimal
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
-sys-fs/ntfs3g                   -udev
 app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
 net-libs/neon                   -pkcs11
