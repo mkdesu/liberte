@@ -20,6 +20,9 @@
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.05.21*
 =app-emulation/open-vm-tools-kmod-2012.05.21*
+=app-emulation/virtualbox-guest-additions-4.2.4*
+=x11-drivers/xf86-video-virtualbox-4.2.4*
+=dev-util/kbuild-0.1.9998_pre20120806*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*
