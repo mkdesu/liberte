@@ -27,6 +27,9 @@ case "${profile}" in
         sed -i 's/\<socks5\>/none/'                   /home/anon/config/purple/prefs.xml
         sed -i 's/\(\<auto_ip\>.*\)\<0\>/\11/'        /home/anon/config/purple/prefs.xml
 
+        # GnuPG: replace .onion keyserver
+        sed -i 's/^keyserver\>/# &/; s/^# \[noanon\] //' /home/anon/config/pgp/gpg.conf
+
         # Epiphany: replace default homepage and .onion search bookmarks
         sed -i 's/\<browser\.html\>/browser-noanon.html/;
                 s@http://3g2upl4pq6kufc4m.onion@https://duckduckgo.com@' \
