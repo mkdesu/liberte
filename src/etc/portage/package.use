@@ -20,16 +20,17 @@ dev-libs/libpcre                -readline
 dev-libs/libxml2                -readline
 sci-visualization/gnuplot       -readline
 dev-db/sqlite                   -readline
-media-libs/jasper               -opengl
 app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
 # Drivers
 # [xf86-video-vmware requires mesa[xa]]
 # [xf86-video-virtualbox[dri] conflicts w/ mprotect]
-media-libs/mesa                 shared-dricore xa -egl -llvm
+# [xf86-video-mach64: (#443952)]
+media-libs/mesa                 xa -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
+x11-base/xorg-drivers           -video_cards_mach64
 
 # Networking, including SSL/TLS
 net-libs/libetpan               gnutls
@@ -71,6 +72,7 @@ net-firewall/iptables           -netlink
 net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
+x11-libs/libXfont               -bzip2
 dev-libs/libxml2                -lzma
 sys-apps/busybox                -pam
 net-misc/openvpn                -pam
@@ -94,6 +96,7 @@ sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
 sys-fs/udev                     gudev
 sys-apps/util-linux             udev
+x11-drivers/xf86-video-ati      udev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive

@@ -3,11 +3,11 @@
 
 # Mounted by init.sh:
 # (if not mounted for /run; fstab is consulted)
-# /proc, /run, /lib/rc/init.d (< openrc-0.10)
+# /proc, /run
 
 # Mounted by init.d services (before localmount):
 # (if not mounted; fstab is consulted except for /sys/*)
-# sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...}}}
+# sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...,/openrc}}}
 # udev-mount: /dev
 # devfs:      /dev{/pts,/shm}
 

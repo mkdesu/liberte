@@ -104,7 +104,7 @@ for ebuild in ${!ebuild_*}; do
 done
 rm -f /var/cache/edb/vdb_*.pickle
 
-# [gettext] coreutils, nano, powertop, cdrtools: not needed (#398983, #398975 (fixed in 2.3.1-r2), #398977, #410501)
+# [gettext] coreutils, powertop, cdrtools: not needed (#398983, #398977, #410501)
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 # java-config wrappers are superfluous for minimal VMs (and require Python)
@@ -307,12 +307,6 @@ for jar in /opt/i2p/lib/*.jar /opt/i2p/webapps/*.war; do
 done
 
 
-# (#400921, #398931)
-sinfo "Fixing init.d services Bash-dependent checks"
-sed -i 's/\<need[[:blank:]]\+root\>/use root/; s/-w "\$RC_LIBEXECDIR"/-z 1/' \
-       /etc/init.d/{consolefont,keymaps,termencoding}
-
-
 sinfo "Creating specialized Xorg driver directories"
 mkdir /usr/lib/xorg/modules/drivers.{native,vesa,fbdev}
 ln    /usr/lib/xorg/modules/drivers{/*.so,.native}
@@ -368,10 +362,6 @@ find / -xdev -xtype l -delete
 sinfo "Updating ld cache"
 eselect env update 2>/dev/null
 sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
-
-
-sinfo "Updating init scripts dependencies cache"
-rc-update -u
 
 
 # Spaces in entries are not handled, but it doesn't matter here

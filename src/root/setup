@@ -403,7 +403,7 @@ svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
             nscd autofs NetworkManager privoxy
             udev-postmount"
 svcshutdown="memwipe"
-delsvcboot="urandom swap bootmisc root mtab"
+delsvcboot="urandom swap swapfiles bootmisc root mtab"
 delsvcdefault="netmount local"
 delsvcshutdown="savecache"
 
