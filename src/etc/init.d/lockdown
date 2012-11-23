@@ -4,8 +4,6 @@ description="Arms boot media removal watchdog."
 
 boot=/mnt/boot
 
-lidevents=/var/run/lid-events
-
 launcher=/usr/local/sbin/poweroff-watchdog
 pidfile=/var/run/poweroff-watchdog.pid
 
@@ -61,15 +59,6 @@ start() {
         ewarn Non-anonymous profile has been selected via boot options
         ebegin Initializing non-anonymous profile
         init-profile 'noanon'
-        eend $?
-    fi
-
-
-    # See also: /etc/acpi/default.sh
-    if [ ! -e ${lidevents} ]; then
-        ebegin Creating closed lid indicator
-        checkpath -q -d -m 750 -o root:wheel ${lidevents}
-        touch ${lidevents}/close.flag
         eend $?
     fi
 }

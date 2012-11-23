@@ -387,7 +387,7 @@ sed "s@VERSION@${LVERSION}@" ${HOME}/config/issue > /etc/issue
 
 
 sinfo "Patching init scripts"
-initpatches="inittab system-auth autofs iptables htpdate"
+initpatches="inittab system-auth autofs iptables"
 for p in ${initpatches}; do
     spatch ${HOME}/patches/${p}.patch -p0
 done
