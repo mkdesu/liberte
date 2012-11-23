@@ -34,7 +34,7 @@
 =net-misc/proxychains-3.1_p20110225*
 
 # Library-only Javascript for PolKit (#437520)
-=dev-lang/spidermonkey-1.8.5-r2
+=dev-lang/spidermonkey-1.8.7-r1
 
 # Firmware
 sys-firmware/amd-ucode

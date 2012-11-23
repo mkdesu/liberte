@@ -298,6 +298,11 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
+# (#444446)
+sinfo "Re-enabling PaX for incorrectly marked executables"
+paxctl -ze /usr/lib/polkit-1/polkitd
+
+
 # No sub-pixel rendering, since LCD / cable type is unknown
 sinfo "Configuring fontconfig"
 for fconf in \
