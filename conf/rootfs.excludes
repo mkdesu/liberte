@@ -49,6 +49,7 @@
 /usr/share/aclocal/
 /usr/share/baselayout/
 /usr/share/awk/
+/usr/share/et/
 /usr/share/florence/**.rnc
 /usr/share/florence/svg11/
 /usr/share/getopt/
@@ -218,6 +219,8 @@
 /usr/bin/modeline2fb
 # sys-apps/pcsc-lite: LD_PRELOAD=/usr/lib/libpcscspy.so wrapper
 /usr/bin/pcsc-spy
+# dev-libs/nspr: error table compiler
+/usr/bin/compile-et.pl
 
 # OpenSSH server
 /etc/ssh/sshd_config
@@ -230,6 +233,7 @@
 /usr/bin/gdk*pixbuf*source
 /usr/bin/g-ir-*
 /usr/bin/glsl_compiler
+/usr/bin/compile_et
 /usr/bin/dbus-binding-tool
 /usr/bin/gs
 /usr/bin/vp8_scalable_patterns
@@ -239,4 +243,3 @@
 /usr/share/avconv/
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat
-/usr/lib/xorg/modules/drivers/nv_drv.so

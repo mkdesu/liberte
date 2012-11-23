@@ -33,6 +33,9 @@
 # Compilation issues (#437232, #408427)
 =net-misc/proxychains-3.1_p20110225*
 
+# Library-only Javascript for PolKit (#437520)
+=dev-lang/spidermonkey-1.8.5-r2
+
 # Firmware
 sys-firmware/amd-ucode
 net-wireless/b43-firmware

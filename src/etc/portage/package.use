@@ -30,7 +30,7 @@ x11-themes/light-themes         gtk3
 media-libs/mesa                 xa -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
-x11-base/xorg-drivers           -video_cards_mach64
+x11-base/xorg-drivers           -video_cards_nv -video_cards_mach64
 
 # Networking, including SSL/TLS
 net-libs/libetpan               gnutls
@@ -64,6 +64,7 @@ sys-apps/portage                -xattr python2
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
+dev-lang/spidermonkey           minimal
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
