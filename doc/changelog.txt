@@ -2,6 +2,9 @@
   + 2012.4 release
 
   * Better support for QEMU mouse virtualization
+  * Xorg server 1.13
+
+  * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
 
   * Added UFRaw, a RAW images viewer and converter
   * Added proxychains, a heterogeneous chaining proxyfier

@@ -308,10 +308,11 @@ done
 
 
 sinfo "Creating specialized Xorg driver directories"
-mkdir /usr/lib/xorg/modules/drivers.{native,vesa,fbdev}
+mkdir /usr/lib/xorg/modules/drivers.{native,vesa,fbdev,modesetting}
 ln    /usr/lib/xorg/modules/drivers{/*.so,.native}
 mv    /usr/lib/xorg/modules/drivers{.native/vesa_drv.so,.vesa}
 mv    /usr/lib/xorg/modules/drivers{.native/fbdev_drv.so,.fbdev}
+mv    /usr/lib/xorg/modules/drivers{.native/modesetting_drv.so,.modesetting}
 
 
 sinfo "Replacing laptop-mode drive-waking hdparm calls"

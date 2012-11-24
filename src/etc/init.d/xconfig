@@ -69,6 +69,9 @@ start() {
         elif get_bootparam 'xfb'; then
             ewarn Forcing framebuffer X server driver
             xorgdrvtype=fbdev
+        elif get_bootparam 'xkms'; then
+            ewarn Forcing modesetting X server driver
+            xorgdrvtype=modesetting
         fi
         mount -rB ${xorgdrv}.${xorgdrvtype} ${xorgdrv}
 
