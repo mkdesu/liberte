@@ -85,7 +85,8 @@ start() {
         fi
         umount ${xorgdrv}
 
-        if [ -e ${xorgdir}/xorg.conf.new ]  &&  ! grep -q 'Configuration failed' ${xorglog}; then
+        # Empty last line means no section writing was stopped in the middle
+        if [ -e ${xorgdir}/xorg.conf.new ]  &&  [ "`tail -1 ${xorgdir}/xorg.conf.new`" = "" ]; then
             mv ${xorgdir}/xorg.conf.new ${xorgdir}/xorg.conf
 
             # Turn off text cursor on vt3 (cf. xserverrc)
