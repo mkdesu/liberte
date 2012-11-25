@@ -1,6 +1,0 @@
-[ConsoleKit Permissions]
-Identity=unix-group:wheel
-Action=org.freedesktop.consolekit.system.stop;org.freedesktop.consolekit.system.stop-multiple-users;org.freedesktop.consolekit.system.restart;org.freedesktop.consolekit.system.restart-multiple-users
-ResultAny=no
-ResultInactive=yes
-ResultActive=yes

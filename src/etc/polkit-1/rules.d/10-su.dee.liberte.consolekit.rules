@@ -1,0 +1,7 @@
+// Let local users in wheel group stop and restart the system
+polkit.addRule(function(action, subject) {
+    if (/^org\.freedesktop\.consolekit\.system\.(stop|stop-multiple-users|restart|restart-multiple-users)$/.test(action.id)
+        &&  subject.isInGroup("wheel")  &&  subject.local) {
+        return polkit.Result.YES;
+    }
+});

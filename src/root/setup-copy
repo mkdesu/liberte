@@ -340,8 +340,15 @@ ln -s  ../local/libexec/java.wrapper /usr/bin/java
 sinfo "Setting cables-related and /root permissions"
 chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
 chmod -R go= /root
+
 # (#431920)
 chmod go=u-w /var/log/wimax
+
+# (#444734)
+chown root:polkitd /etc/polkit-1/rules.d
+chmod 750          /etc/polkit-1/rules.d
+chown root:root    {/etc,/usr/share}/polkit-1/rules.d/* /usr/share/polkit-1/rules.d
+chmod 644          {/etc,/usr/share}/polkit-1/rules.d/*
 
 
 sinfo "Removing invalid symlinks, dirs and files"
