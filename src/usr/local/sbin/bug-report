@@ -75,7 +75,7 @@ cp /proc/mounts                        10-mnt
 cp /var/run/auto.media                 10-autos
 
 
-for dev in `find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b -exec readlink -f {} \;`; do
+for dev in `find /dev/disk/by-id ! -name '*-part[0-9]*' -xtype b -exec readlink -f {} \; | sort -u`; do
     hdparm -iI   "${dev}"            > 11-ide-`basename "${dev}"`
     # NOTE: may hang on USB key
     # sdparm -a    "${dev}"            > 11-scsi-`basename "${dev}"`

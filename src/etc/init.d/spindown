@@ -19,14 +19,14 @@ start() {
     fi
 
     # Put ATA/SCSI drives into quiet mode
-    # /dev/disk/by-path should contain only physical devices
+    # /dev/disk/by-path does not cover all physical devices (some lack ID_PATH)
     # NOTE: hdparm -M and -y do not wake up disks from standby
-    if [ -e /dev/disk/by-path ]; then
+    if [ -e /dev/disk/by-id ]; then
         ebegin Enabling drive acoustic and standby modes
         eindent
 
-        devs=`find /dev/disk/by-path ! -name '*-part[0-9]*' -xtype b \
-                                     -exec readlink -f {} \;`
+        devs=`find /dev/disk/by-id ! -name '*-part[0-9]*' -xtype b \
+                                   -exec readlink -f {} \; | sort -u`
         for dev in ${devs}; do
             if hdparm -q -M 128 "${dev}" 2>/dev/null; then
                 einfo "Quiet mode:   ${dev}"
