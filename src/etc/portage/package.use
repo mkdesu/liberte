@@ -95,6 +95,7 @@ sys-apps/busybox                static savedconfig
 sys-kernel/linux-firmware       savedconfig
 sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
+virtual/udev                    gudev
 sys-fs/udev                     gudev
 sys-apps/util-linux             udev
 x11-drivers/xf86-video-ati      udev

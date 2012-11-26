@@ -13,12 +13,14 @@ SRC_URI="https://launchpad.net/ubuntu/+archive/primary/+files/${PN}_${PV}.orig.t
 LICENSE="GPL-3"
 SLOT="0"
 KEYWORDS="x86 amd64"
-IUSE=""
+IUSE="test"
 
 RDEPEND="dev-libs/openssl"
-DEPEND="${RDEPEND}"
+DEPEND="${RDEPEND}
+	sys-boot/gnu-efi"
 
 src_prepare() {
-	epatch "${FILESDIR}"/sbsigntool-0.3-support-i386.patch
+	sed -i 's@^\(EFI_ARCH=\$(uname -m\))$@\1 | sed s/i686/ia32/)@' "${S}"/configure.ac
+	eautoreconf
 	default
 }
