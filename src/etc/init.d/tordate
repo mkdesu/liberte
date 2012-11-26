@@ -2,7 +2,8 @@
 
 description="Sets date from Tor consensus and handles Tor/I2P restarts."
 
-daemon=/usr/local/sbin/tordate
+command=/usr/local/sbin/tordate
+start_stop_daemon_args="-bm"
 pidfile=/var/run/tordate.pid
 
 depend() {
@@ -10,16 +11,4 @@ depend() {
     need   localmount
 
     before NetworkManager tor i2p
-}
-
-start() {
-    ebegin "Starting tordate"
-    start-stop-daemon -S -q -p ${pidfile} -bm -x ${daemon} --
-    eend $?
-}
-
-stop() {
-    ebegin "Stopping tordate"
-    start-stop-daemon -K -q -p ${pidfile}
-    eend $?
 }

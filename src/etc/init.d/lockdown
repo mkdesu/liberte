@@ -38,7 +38,7 @@ start() {
     if mountpoint -q ${boot}; then
         ebegin Arming power-off on boot media removal
         mediadev=/dev/block/`mountpoint -d ${boot}`
-        start-stop-daemon -S -q -p ${pidfile} -bm -x ${launcher} -- ${mediadev}
+        start-stop-daemon -S -p ${pidfile} -bm -x ${launcher} -- ${mediadev}
         eend $?
     else
         ewarn Skipping boot media removal watchdog
@@ -67,7 +67,7 @@ stop() {
     # Disarm the poweroff watchdog
     if [ -e ${pidfile} ]; then
         ebegin Disarming power-off on boot media removal
-        start-stop-daemon -K -q -p ${pidfile}
+        start-stop-daemon -K -p ${pidfile}
         eend $?
     fi
 }
