@@ -39,7 +39,6 @@ net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager         gnutls -nss
 net-im/pidgin                   gnutls sasl
 dev-libs/cyrus-sasl             -crypt
-dev-libs/libevent               -ssl
 net-analyzer/netcat             -crypt
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl

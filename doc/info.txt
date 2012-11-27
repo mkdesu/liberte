@@ -41,7 +41,7 @@ libarchive              ssl                     ssl
 opensc                  ssl                     ssl
 
 tor                     ssl                     ssl
-libevent                ssl                     -               tor
+libevent                ssl                     ssl             tor
 aircrack-ng             ssl                     ssl
 
 networkmanager          gnutls, nss             gnutls
