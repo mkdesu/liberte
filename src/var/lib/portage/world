@@ -35,6 +35,7 @@ sys-firmware/iwl6000-ucode
 sys-firmware/iwl6005-ucode
 sys-firmware/iwl6030-ucode
 sys-firmware/iwl6050-ucode
+net-wireless/i2400m-fw
 net-wireless/rt2860-firmware
 net-wireless/rt2870-firmware
 net-wireless/carl9170-firmware

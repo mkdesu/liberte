@@ -58,13 +58,6 @@ BT3CPCC.bin
 bfubase.frm
 
 
-# --- WiMAX ---
-
-# WIMAX_I2400M_USB
-i2400m-fw-usb-1.5.sbcf
-i6050-fw-usb-1.5.sbcf
-
-
 # --- Ethernet ---
 
 # ACENIC
