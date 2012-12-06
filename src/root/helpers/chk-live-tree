@@ -35,8 +35,7 @@ find . -type l ! -xtype f ! -xtype d
 
 sinfo "Archives:"
 find . -type f  \( -name '*.gz' -o -name '*.bz2' -o -name '*.Z' \
-           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.[jw]ar' \) \
-        ! -path './opt/i2p/lib/*' ! -path './opt/i2p/webapps/*'
+           -o -name '*.lzma' -o -name '*.xz' -o -name '*.zip' -o -name '*.[jw]ar' \)
 
 sinfo "Sources:"
 find . -name '*.h' -o \( -name '*.inc' ! -path './usr/share/keymaps/*' \) \

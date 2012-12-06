@@ -18,20 +18,22 @@ I2P_MY_P=i2pupdate_${I2P_PV}
 
 # GitHub URI can refer to a tagged download or the master branch
 SRC_URI="https://github.com/mkdesu/cables/tarball/v${PV} -> ${P}.tar.gz
-         http://mirror.i2p2.de/${I2P_MY_P}.zip
-         http://launchpad.net/i2p/trunk/${I2P_PV}/+download/${I2P_MY_P}.zip"
+         i2p? (
+             http://mirror.i2p2.de/${I2P_MY_P}.zip
+             http://launchpad.net/i2p/trunk/${I2P_PV}/+download/${I2P_MY_P}.zip
+         )"
 
 SLOT="0"
 KEYWORDS="x86 amd64"
+IUSE="i2p"
 
-IUSE=""
 DEPEND="app-arch/unzip
-	>=virtual/jdk-1.5"
+	i2p? ( >=virtual/jdk-1.5 )"
 RDEPEND="net-libs/libmicrohttpd
 	mail-filter/procmail
 	net-misc/curl
 	dev-libs/openssl
-	>=virtual/jre-1.5
+	i2p? ( >=virtual/jre-1.5 )
 	gnome-extra/zenity"
 
 pkg_setup() {
@@ -41,9 +43,19 @@ pkg_setup() {
 
 src_unpack() {
 	unpack ${P}.tar.gz
-	mv ${MY_P_PF}-* ${P}              || die "failed to recognize archive top directory"
+	mv ${MY_P_PF}-* ${P} || die "failed to recognize archive top directory"
 
-	unzip -j -d ${P}/lib ${DISTDIR}/${I2P_MY_P}.zip lib/i2p.jar || die "failed to extract i2p.jar"
+	if use i2p; then
+		unzip -j -d ${P}/lib ${DISTDIR}/${I2P_MY_P}.zip lib/i2p.jar || die "failed to extract i2p.jar"
+	fi
+}
+
+src_prepare() {
+	if ! use i2p; then
+		export MAKEOPTS+=" NOI2P=1"
+	fi
+
+	default
 }
 
 src_install() {
@@ -60,16 +72,21 @@ pkg_postinst() {
 	elog "    gen-cable-username"
 	elog "    gen-tor-hostname"
 	elog "        copy CABLE_TOR/hidden_service to /var/lib/tor (readable only by 'tor')"
-	elog "    gen-i2p-hostname"
-	elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by 'i2p')"
-	elog "Configure Tor and I2P to forward HTTP connections to cables daemon:"
+	if use i2p; then
+		elog "    gen-i2p-hostname"
+		elog "        copy CABLE_I2P/eepsite        to /var/lib/i2p (readable only by 'i2p')"
+	fi
+	elog "Configure Tor to forward HTTP connections to cables daemon:"
 	elog "    /etc/tor/torrc"
 	elog "        HiddenServiceDir  /var/lib/tor/hidden_service/"
 	elog "        HiddenServicePort 80 127.0.0.1:9080"
-	elog "    /var/lib/i2p/i2ptunnel.config"
-	elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
-	elog "        tunnel.X.targetHost=127.0.0.1"
-	elog "        tunnel.X.targetPort=9080"
+	if use i2p; then
+		elog "Configure I2P similarly:"
+		elog "    /var/lib/i2p/i2ptunnel.config"
+		elog "        tunnel.X.privKeyFile=eepsite/eepPriv.dat"
+		elog "        tunnel.X.targetHost=127.0.0.1"
+		elog "        tunnel.X.targetPort=9080"
+	fi
 	elog "Finally, the user should configure the email client to run cable-send"
 	elog "as a pipe for sending messages from addresses shown by cable-info."
 	elog "See comments in /usr/bin/cable-send for suggested /etc/sudoers entry."

@@ -12,11 +12,6 @@ protected="/etc/._cfg????_locale.gen"
 
 kpatches=${HOME}/patches/kernel-patches.sha256
 
-i2phostsurl=https://www.i2p2.de/hosts.txt
-i2phosts=/opt/i2p/hosts.txt
-netdbdir=/tmp/netDb
-netdbdst=/var/lib/i2p/router/netDb
-
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -340,43 +335,6 @@ eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11
 
 
-sinfo "Updating SMART and I2P hosts databases"
-
-update-smart-drivedb || echo "update-smart-drivedb failed (ignoring)"
-
-# zzz @ #i2p-dev: hosts.txt in the source tree is the same or newer
-if ${noroot} curl -k -sSfg --compressed ${i2phostsurl} > ${i2phosts}.new; then
-    mv ${i2phosts}{.new,}
-else
-    echo "I2P hosts.txt update failed (ignoring)"
-    rm -f ${i2phosts}.new
-fi
-
-
-sinfo "Verifying SMART and I2P hosts databases"
-${noroot} ${helpdir}/vfy-databases
-
-
-# Skip update of a recent netDb
-sinfo "Creating initial netDb for I2P"
-
-if [ "`find ${netdbdst} -maxdepth 0 -mtime -1 2>/dev/null`" = ${netdbdst} ]; then
-    echo "I2P netDb was updated less than 24h ago, skipping"
-elif ! ${noroot} ${helpdir}/gen-netdb; then
-    if [ -e ${netdbdst} ]; then
-        echo "I2P netDb update failed (ignoring)"
-    else
-        echo "Could not retrieve I2P netDb list"
-        exit 1
-    fi
-else
-    chown -R i2p:i2p ${netdbdir}
-    chmod -R go=     ${netdbdir}
-    rm -rf         ${netdbdst}
-    mv ${netdbdir} ${netdbdst}
-fi
-
-
 sinfo "Verifying HTP servers"
 ${noroot} ${helpdir}/vfy-htp-servers
 
@@ -472,11 +430,6 @@ usermod -G legion                                  cable
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
-
-for uid in i2p; do
-    touch               /tmp/${uid}-ref
-    chown ${uid}:${uid} /tmp/${uid}-ref
-done
 
 
 sinfo "Initializing a secondary PGP keyring"

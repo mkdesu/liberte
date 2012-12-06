@@ -1,6 +1,6 @@
 #!/sbin/runscript
 
-description="Sets date from Tor consensus and handles Tor/I2P restarts."
+description="Sets date from Tor consensus and handles Tor restarts."
 
 command=/usr/local/sbin/tordate
 start_stop_daemon_args="-bm"
@@ -10,5 +10,5 @@ depend() {
     # need /var
     need   localmount
 
-    before NetworkManager tor i2p
+    before NetworkManager tor
 }

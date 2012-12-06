@@ -25,10 +25,11 @@ forward-socks5  /                       127.0.0.1:9050  .
 forward-socks5  .onion                  127.0.0.1:9050  .
 forward-socks5  .exit                   127.0.0.1:9050  .
 
-forward         .i2p                    127.0.0.1:4444
-forward         .i2p:443                127.0.0.1:4445
-forward         *AAAA/                  127.0.0.1:4444
-forward         *AAAA:443/              127.0.0.1:4445
+# (Example extension for I2P proxy)
+# forward         .i2p                    127.0.0.1:4444
+# forward         .i2p:443                127.0.0.1:4445
+# forward         *AAAA/                  127.0.0.1:4444
+# forward         *AAAA:443/              127.0.0.1:4445
 
 forward         127.0.0.1/              .
 forward         localhost/              .

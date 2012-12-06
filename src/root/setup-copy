@@ -107,9 +107,6 @@ rm -f /var/cache/edb/vdb_*.pickle
 # [gettext] coreutils, powertop, cdrtools: not needed (#398983, #398977, #410501)
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
-# java-config wrappers are superfluous for minimal VMs (and require Python)
-echo dev-java/java-config-2.1.11 >> /etc/portage/profile/package.provided
-
 
 # This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"
@@ -179,11 +176,6 @@ fi
 
 if [ -e /usr/bin/gettext ]; then
     sinfo "Failed to discard gettext dependencies"
-    false
-fi
-
-if [ -e /usr/bin/run-java-tool  -o  -e /usr/bin/java-config ]; then
-    sinfo "Failed to discard Java dependencies"
     false
 fi
 
@@ -294,17 +286,9 @@ gunzip `find /usr/share/consolefonts -name '*.gz'` \
 
 gunzip /usr/share/gedit-2/plugins/taglist/*.gz
 
-rezip  /usr/gnu-classpath-[0-9]*/share/classpath/glibj.zip
-rezip  /usr/lib/jamvm/classes.zip
-
 rezip  /usr/share/zlibrary/hyphenationPatterns.zip
 rezip  /usr/share/zlibrary/languagePatterns.zip
 regzip /usr/share/zlibrary/unicode.xml.gz
-
-rezip /usr/share/java-service-wrapper/lib/wrapper.jar
-for jar in /opt/i2p/lib/*.jar /opt/i2p/webapps/*.war; do
-    rezip ${jar}
-done
 
 
 sinfo "Creating specialized Xorg driver directories"
@@ -332,9 +316,8 @@ ln -s ../tmp /var/tmp
 sed -i 's/\<tmpfs\>/disabled/' /etc/init.d/devfs
 
 
-sinfo "Setting sh (dash) and java (jamvm) symlinks"
-ln -sf dash                          /bin/sh
-ln -s  ../local/libexec/java.wrapper /usr/bin/java
+sinfo "Setting sh (dash) symlink"
+ln -sf dash /bin/sh
 
 
 sinfo "Setting cables-related and /root permissions"

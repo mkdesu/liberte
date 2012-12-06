@@ -67,12 +67,6 @@
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
 /usr/share/gtk-[0-9]*/demo/
-/usr/share/gnu-classpath-[0-9]*/
-/usr/gnu-classpath-[0-9]*/include/
-/usr/gnu-classpath-[0-9]*/bin/
-/usr/gnu-classpath-[0-9]*/share/classpath/tools.zip
-/usr/lib/jamvm/bin/
-/usr/lib/jamvm/lib/tools.jar
 
 # Static libraries and libtool files
 /lib/**.a
@@ -144,15 +138,6 @@
 /usr/share/smartmontools/*.h.*
 # (Geoclue providers are disabled)
 /usr/share/geoclue-providers/**
-
-# I2P (lib directory is pruned)
-/opt/i2p/geoip/
-/opt/i2p/eepsite/
-/opt/i2p/docs/
-/opt/i2p/webapps/
-/opt/i2p/lib/**
-/opt/i2p/*.config
-/opt/i2p/*i2psnark*
 
 # Statically linked binaries (and symlinks)
 /sbin/ldconfig

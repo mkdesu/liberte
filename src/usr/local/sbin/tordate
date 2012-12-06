@@ -18,15 +18,12 @@ consensus=${tordir}/cached-consensus
 uvconsensus=${tordir}/unverified-consensus
 descriptors=${tordir}/cached-descriptors
 
-htpdir=/var/run/htpdate
-htpflag=${htpdir}/timeset.flag
-
 tag=tordate
 datere='[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
 
 
-# ${tordir} and ${htpdir} must exist for inotifywaits below
-while [ ! -e ${tordir} -o ! -e ${htpdir} ]; do
+# ${tordir} must exist for inotifywaits below
+while [ ! -e ${tordir} ]; do
     sleep ${dirwait}
 done
 
@@ -91,26 +88,6 @@ ${vendcons}"
 
         fi
 
-    fi
-
-fi
-
-
-# At the cost of a miniscule race condition probability, do not restart I2P
-# when tordate service is run again for some reason.
-if [ -e ${htpflag} ]; then
-    logger -p 6 -t ${tag} "HTP has already set the time"
-else
-
-    # Wait for the HTP flag file, which indicates that correct time has been set
-    while [ ! -e ${htpflag} ]; do
-        inotifywait -qq -t ${inotifytimeout} -e create ${htpdir} || :
-    done
-
-    # I2P is unreliable with correcting internal clock after time change
-    if /etc/init.d/i2p -q status; then
-        logger -p 6 -t ${tag} "Restarting I2P service"
-        /etc/init.d/i2p -qs restart
     fi
 
 fi

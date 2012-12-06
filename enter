@@ -57,7 +57,6 @@ else
           --exclude=/root/                 \
           --exclude=/home/anon/            \
           --exclude=/home/nofw/            \
-          --exclude=/var/lib/i2p/          \
           --exclude=/var/lib/portage/      \
           --exclude=/usr/local/portage/    \
           --exclude=/etc/sudoers           \
@@ -100,12 +99,6 @@ else
 
     ${RSYNC} --chmod=u=rwX,go=   -i --delete-excluded -C ${SRC}/home/nofw ${LIVECD}/home
     chown -hR --from=0:0 2102:9001 ${LIVECD}/home/nofw
-
-    ${RSYNC} --chmod=u=rwX,go=   -i --delete \
-          --exclude=/i2p/router/netDb/                -C ${SRC}/var/lib/i2p ${LIVECD}/var/lib
-    if [ -e ${LIVECD}/tmp/i2p-ref ]; then
-        chown -hR --from=0:0 --reference=${LIVECD}/tmp/i2p-ref ${LIVECD}/var/lib/i2p
-    fi
 
     if [ -e /etc/resolv.conf ]; then
         ${RSYNC} -L --chmod=u=rw,go=r -i /etc/resolv.conf ${LIVECD}/etc

@@ -34,8 +34,8 @@ if [ `id -u` != 0  -o  `id -g` != 0 ]; then
     exit 1
 fi
 
-if ! /etc/init.d/tor -q status || ! /etc/init.d/i2p -q status || ! /etc/init.d/cabled -q status; then
-    echo "Tor, I2P and cables daemons must be running"
+if ! /etc/init.d/tor -q status || ! /etc/init.d/cabled -q status; then
+    echo "Tor and cables daemons must be running"
     exit 1
 fi
 
@@ -44,11 +44,9 @@ webhost=torproject.org
 webip=38.229.72.16
 
 onionhost=3g2upl4pq6kufc4m.onion
-i2phost=www.i2p2.i2p/
 
 ccuser=`cat /home/anon/persist/security/cable/certs/username`
 cctor=`cat /home/anon/persist/security/tor/hidden_service/hostname`
-cci2p=`cat /home/anon/persist/security/i2p/eepsite/hostname`
 
 
 # Check that wireless MAC addresses were changed
@@ -64,20 +62,17 @@ done
 # Clearnet access via HTTP/SOCKS/direct
 stest fail "Fetch .org via HTTP proxy as root"                     curl -fsSI -x 127.0.0.1:8118                ${webhost}
 stest fail "Fetch .org via HTTP proxy as nofw"     sudo -n -u nofw curl -fsSI -x 127.0.0.1:8118                ${webhost}
-stest fail "Fetch .org via HTTP proxy as i2p"      sudo -n -u i2p  curl -fsSI -x 127.0.0.1:8118                ${webhost}
 stest pass "Fetch .org via HTTP proxy as anon"     sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${webhost}
 stest pass "Fetch .org via HTTP proxy as cable"    sudo -n -u cable curl -fsSI -x 127.0.0.1:8118               ${webhost}
 stest pass "Fetch .org via HTTP proxy as htp"      sudo -n -u htp  curl -fsSI -x 127.0.0.1:8118                ${webhost}
 stest fail "Fetch .org via SOCKS proxy as root"                    curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy as nofw"    sudo -n -u nofw curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
-stest fail "Fetch .org via SOCKS proxy as i2p"     sudo -n -u i2p  curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy as cable"   sudo -n -u cable curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy as htp"     sudo -n -u htp  curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest pass "Fetch .org via SOCKS proxy as anon"    sudo -n -u anon curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest pass "Fetch .org via SOCKS proxy as privoxy" sudo -n -u privoxy curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy w/ local DNS as root"                 curl -fsSI --socks5 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy w/ local DNS as nofw" sudo -n -u nofw curl -fsSI --socks5 127.0.0.1:9050 ${webhost}
-stest fail "Fetch .org via SOCKS proxy w/ local DNS as i2p"  sudo -n -u i2p  curl -fsSI --socks5 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy w/ local DNS as anon" sudo -n -u anon curl -fsSI --socks5 127.0.0.1:9050 ${webhost}
 stest fail "Fetch .org via SOCKS proxy w/ local DNS as privoxy" sudo -n -u privoxy curl -fsSI --socks5 127.0.0.1:9050 ${webhost}
 
@@ -90,11 +85,6 @@ stest fail "Fetch .org w/o proxy as tor"           sudo -n -u tor  curl -fsSI -x
 # Darknet access via HTTP/SOCKS
 stest pass "Fetch .onion via HTTP  proxy as anon"  sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${onionhost}
 stest pass "Fetch .onion via SOCKS proxy as anon"  sudo -n -u anon curl -fsSI --socks5-hostname 127.0.0.1:9050 ${onionhost}
-stest pass "Fetch .i2p   via HTTP  proxy as anon"  sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${i2phost}
-
-stest fail "Fetch .i2p   via I2P   proxy as root"                  curl -fsSI -x 127.0.0.1:4444                ${i2phost}
-stest pass "Fetch .i2p   via I2P   proxy as anon"  sudo -n -u anon curl -fsSI -x 127.0.0.1:4444                ${i2phost}
-stest pass "Fetch .i2p   via I2P   proxy as privoxy" sudo -n -u privoxy curl -fsSI -x 127.0.0.1:4444           ${i2phost}
 
 # Clearnet IP access via HTTP/SOCKS/direct
 stest pass "Fetch IP via HTTP proxy as anon"       sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${webip}
@@ -106,12 +96,6 @@ stest fail "Fetch IP w/o proxy as privoxy"         sudo -n -u privoxy curl -fsSI
 stest pass "Fetch IP w/o proxy as tor"             sudo -n -u tor  curl -fsSI -x ""                            ${webip}
 stest pass "Fetch IP w/o proxy as nofw"            sudo -n -u nofw curl -fsSI -x ""                            ${webip}
 
-# Transparent proxy access
-stest fail "Fetch .org w/o proxy as i2p"           sudo -n -u i2p  curl -fsSI -x ""                            ${webhost}
-stest fail "Fetch https:.org w/o proxy as i2p"     sudo -n -u i2p  curl -fsSI -x "" -k                         https://${webhost}
-stest fail "Fetch IP w/o proxy as i2p"             sudo -n -u i2p  curl -fsSI -x ""                            ${webip}
-stest pass "Fetch https:IP w/o proxy as i2p"       sudo -n -u i2p  curl -fsSI -x "" -k                         https://${webip}
-
 
 # Tor control port access
 stest fail "Access Tor control port as root"                       nc -q 0 127.0.0.1 9051
@@ -120,50 +104,34 @@ stest pass "Access Tor control port as tor"        sudo -n -u tor  nc -q 0 127.0
 stest pass "Invoke tor-ctrl"                       sudo -n -u tor  tor-ctrl status
 
 
-# I2P hidden IP
-i2pishidden() {
-    local i2pjar=/opt/i2p/lib/i2p.jar
-    local rinfoclass=net.i2p.data.RouterInfo
-    local rinfo=/var/lib/i2p/router/router.info
-
-    sudo -n -u i2p java -Xmx16M -cp ${i2pjar} ${rinfoclass} ${rinfo} | grep -q "^[[:blank:]]*Addresses: #: 0$"
-}
-
-stest pass "Zero addresses in I2P RouterInfo"      i2pishidden
-
-
 # Cables communication service server access
 stest fail "Fetch CC service as root"                              curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
 stest fail "Fetch CC service as anon"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
 stest fail "Fetch CC service as nofw"              sudo -n -u anon curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
 stest pass "Fetch CC service as tor"               sudo -n -u tor  curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
-stest pass "Fetch CC service as i2p"               sudo -n -u i2p  curl -fsSI -x "" 127.0.0.1:9080/${ccuser}/request/ver
 
 # Cables communication ping
 stest pass "CC-ping @tor as anon"                  sudo -n -u anon cable-ping ${ccuser}@${cctor}
-stest pass "CC-ping @i2p as anon"                  sudo -n -u anon cable-ping ${ccuser}@${cci2p}
 
 # Cables communication mail sending
 ccsend() {
     local desc="$1"
     local from="$2"
     local to1="$3"
-    local to2="$4"
 
     cable-send <<EOF
 From: Anon Anon <${from}>
-To: Anon Anon <${to1}>, Anon Anon <${to2}>
+To: Anon Anon <${to1}>
 Subject: Test (${desc})
 
 Test
 EOF
 }
 
-stest pass "Send cable to self (Tor -> Tor, I2P)" ccsend "Tor -> Tor, I2P" ${ccuser}@${cctor} ${ccuser}@${cctor} ${ccuser}@${cci2p}
-stest pass "Send cable to self (I2P -> Tor, I2P)" ccsend "I2P -> Tor, I2P" ${ccuser}@${cci2p} ${ccuser}@${cctor} ${ccuser}@${cci2p}
-stest fail "Bogus cable host"                     ccsend "Bogus"           ${ccuser}@bogus    ${ccuser}@${cctor}
-stest fail "Bogus cable username"                 ccsend "Bogus"           ${ccuser}@${cctor} bogus@${cctor}
-echo "NOTE: 8 messages should be delivered to user mailbox"
+stest pass "Send cable to self (Tor -> Tor)" ccsend "Tor -> Tor" ${ccuser}@${cctor} ${ccuser}@${cctor}
+stest fail "Bogus cable host"                ccsend "Bogus"      ${ccuser}@bogus    ${ccuser}@${cctor}
+stest fail "Bogus cable username"            ccsend "Bogus"      ${ccuser}@${cctor} bogus@${cctor}
+echo "NOTE: 2 messages should be delivered to user mailbox"
 
 
 # Done

@@ -93,8 +93,6 @@ app-crypt/gnupg-pkcs11-scd
 app-crypt/ccid
 app-crypt/tpm-tools
 sys-apps/haveged
-virtual/jre:1.5
-dev-java/jamvm
 dev-libs/libelf
 
 # Network utilities
@@ -118,7 +116,6 @@ net-misc/tor
 net-misc/connect
 net-misc/proxychains
 net-misc/whois
-net-p2p/i2p
 net-proxy/torsocks
 net-proxy/privoxy
 net-mail/cables

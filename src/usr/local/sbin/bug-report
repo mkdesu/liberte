@@ -99,12 +99,6 @@ cp /var/log/Xorg.0.log.old             15-xorg-prev.log
 cp /tmp/.private/anon/xsession.log     16-xsession.log
 cp /tmp/.private/anon/xsession.log.old 16-xsession-prev.log
 
-echo I2P logs ...
-cp /var/log/i2p/wrapper.log            17-i2p-wrapper.log
-cp /var/log/i2p/wrapper.log.1          17-i2p-wrapper-prev.log
-cp /var/log/i2p/router-0.log           17-i2p-router.log
-cp /var/log/i2p/router-1.log           17-i2p-router-next.log
-
 
 # Make errors fatal again
 set -e
