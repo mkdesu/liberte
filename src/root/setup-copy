@@ -319,8 +319,8 @@ ln -s ../tmp /var/tmp
 sed -i 's/\<tmpfs\>/disabled/' /etc/init.d/devfs
 
 
-sinfo "Setting sh (dash) symlink"
-ln -sf dash /bin/sh
+sinfo "Setting dash as POSIX shell"
+eselect sh set dash
 
 
 sinfo "Setting cables-related and /root permissions"
