@@ -86,10 +86,10 @@ stest fail "Fetch .org w/o proxy as tor"           sudo -n -u tor  curl -fsSI -x
 stest pass "Fetch .onion via HTTP  proxy as anon"  sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${onionhost}
 stest pass "Fetch .onion via SOCKS proxy as anon"  sudo -n -u anon curl -fsSI --socks5-hostname 127.0.0.1:9050 ${onionhost}
 
-# Clearnet IP access via HTTP/SOCKS/direct
+# Clearnet IP access via HTTP/SOCKS/direct (SOCKS4=fail <-> SafeSocks=1)
 stest pass "Fetch IP via HTTP proxy as anon"       sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${webip}
 stest pass "Fetch IP via SOCKS proxy as anon"      sudo -n -u anon curl -fsSI --socks5-hostname 127.0.0.1:9050 ${webip}
-stest fail "Fetch IP via SOCKS4 proxy as anon"     sudo -n -u anon curl -fsSI --socks4          127.0.0.1:9050 ${webip}
+stest pass "Fetch IP via SOCKS4 proxy as anon"     sudo -n -u anon curl -fsSI --socks4          127.0.0.1:9050 ${webip}
 stest fail "Fetch IP w/o proxy as root"                            curl -fsSI -x ""                            ${webip}
 stest fail "Fetch IP w/o proxy as anon"            sudo -n -u anon curl -fsSI -x ""                            ${webip}
 stest fail "Fetch IP w/o proxy as privoxy"         sudo -n -u privoxy curl -fsSI -x ""                         ${webip}
