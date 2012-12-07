@@ -7,11 +7,9 @@
 
 # Browsing
 /config/gnome2/epiphany/cookies.sqlite
-/config/gnome2/epiphany/ephy-history.xml
+/config/gnome2/epiphany/ephy-history.db
 /config/gnome2/epiphany/ephy-bookmarks.xml
-/config/gnome2/epiphany/ephy-favicon-cache.xml
 /config/gnome2/epiphany/session_crashed.xml
-/config/gnome2/epiphany/favicon_cache/
 
 # Mail
 /config/claws-mail/menurc
@@ -47,6 +45,7 @@
 /config/qalculate/tmp/
 /config/gftp/cache/
 /config/nip2/tmp/
+/config/local/epiphany/
 /config/local/webkit/
 /config/local/gvfs-metadata/
 /config/local/geeqie/metadata/

@@ -1,7 +1,12 @@
-#!/bin/sh
+#!/bin/sh -e
 
 export TZ=:UTC
 
+homepage=file:///home/anon/info/browser.html
+if [ $# != 0 ]; then
+    homepage=
+fi
+
 # Use --new-window to override --new-tab (-n), which does
 # not seem to interfere with any other options (like -b)
-exec /usr/bin/epiphany -n "$@"
+exec /usr/bin/epiphany -n ${homepage} "$@"

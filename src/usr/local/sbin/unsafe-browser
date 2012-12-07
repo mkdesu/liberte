@@ -36,4 +36,4 @@ export GST_REGISTRY_UPDATE=no
 
 
 # Run Epiphany
-exec epiphany
+exec epiphany -p file:///home/nofw/info/warning.html

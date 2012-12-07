@@ -31,8 +31,8 @@ case "${profile}" in
         sed -i 's/^keyserver\>/# &/; s/^# \[noanon\] //' /home/anon/config/pgp/gpg.conf
 
         # Epiphany: replace default homepage and .onion search bookmarks
-        sed -i 's/\<browser\.html\>/browser-noanon.html/;
-                s@http://3g2upl4pq6kufc4m.onion@https://duckduckgo.com@' \
+        cp  /home/anon/info/browser-noanon.html /home/anon/info/browser.html
+        sed -i 's@http://3g2upl4pq6kufc4m.onion@https://duckduckgo.com@' \
             /etc/dconf/db/anon.d/db.ini                                  \
             /home/anon/config/gnome2/epiphany/bookmarks.rdf
 

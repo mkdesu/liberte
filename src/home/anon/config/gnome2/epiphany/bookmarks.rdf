@@ -10,6 +10,7 @@
         <rdf:li rdf:resource="https://ixquick.com"/>
         <rdf:li rdf:resource="https://en.wikipedia.org"/>
         <rdf:li rdf:resource="http://www.thefreedictionary.com"/>
+        <rdf:li rdf:resource="file:///home/anon/info/browser.html"/>
       </rdf:Seq>
     </items>
   </channel>
@@ -42,5 +43,9 @@
     <link>http://www.thefreedictionary.com</link>
     <ephy:smartlink>http://www.thefreedictionary.com/%s</ephy:smartlink>
     <dc:subject>Search Engines</dc:subject>
+  </item>
+  <item rdf:about="file:///home/anon/info/browser.html">
+    <title>Safe Browser</title>
+    <link>file:///home/anon/info/browser.html</link>
   </item>
 </rdf:RDF>

@@ -14,8 +14,8 @@
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.11*
-=www-client/epiphany-3.2.1
-=www-client/epiphany-extensions-3.2*
+=www-client/epiphany-3.4.3*
+=www-client/epiphany-extensions-3.4*
 
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.05.21*
