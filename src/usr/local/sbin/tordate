@@ -14,9 +14,9 @@ inotifytimeout=15
 dirwait=15
 
 tordir=/var/lib/tor/data
-consensus=${tordir}/cached-consensus
-uvconsensus=${tordir}/unverified-consensus
-descriptors=${tordir}/cached-descriptors
+consensus=${tordir}/cached-microdesc-consensus
+uvconsensus=${tordir}/unverified-microdesc-consensus
+descriptors=${tordir}/cached-microdescs.new
 
 tag=tordate
 datere='[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] [0-9][0-9]:[0-9][0-9]:[0-9][0-9]'
@@ -91,3 +91,7 @@ ${vendcons}"
     fi
 
 fi
+
+
+# Prevent error message when stopping the service (#380073)
+/etc/init.d/tordate -qs zap
