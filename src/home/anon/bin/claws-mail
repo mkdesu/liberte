@@ -5,6 +5,7 @@ export TZ=:UTC
 cableid=cable-id
 cablesend=/usr/bin/cable-send
 dummyaddr=anonymous@liberte
+undefined="undefined"
 
 confdir=${XDG_CONFIG_HOME}/claws-mail
 theme=/usr/share/claws-mail/themes/Gnome
@@ -14,14 +15,16 @@ profile=/var/run/usage-profile
 
 
 # Configure the Tor address if none is set
-if grep -q "^address=${dummyaddr}\$" ${confdir}/accountrc \
-    && username=`${cableid} user 2>/dev/null`; then
-
+if grep -q "^address=${dummyaddr}\$" ${confdir}/accountrc; then
+    username=`${cableid} user`
     torhost=`${cableid} tor`
-    echo "Resetting account address to ${username}@${torhost}"
 
-    sed -i "s/^\(address=\)${dummyaddr}\$/\1${username}@${torhost}/" \
-        ${confdir}/accountrc
+    if [ "${username}" != "${undefined}"  -a  "${torhost}" != "${undefined}" ]; then
+        echo "Resetting account address to ${username}@${torhost}"
+
+        sed -i "s/^\(address=\)${dummyaddr}\$/\1${username}@${torhost}/" \
+            ${confdir}/accountrc
+    fi
 fi
 
 
