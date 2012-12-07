@@ -37,7 +37,6 @@ net-libs/libmicrohttpd          -ssl
 net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager         gnutls -nss
 net-im/pidgin                   gnutls sasl
-dev-libs/cyrus-sasl             -crypt
 net-analyzer/netcat             -crypt
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
