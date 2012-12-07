@@ -51,7 +51,7 @@ cctor=`cat /home/anon/persist/security/tor/hidden_service/hostname`
 
 # Check that wireless MAC addresses were changed
 for netdev in /sys/class/net/*; do
-    if iwdetect "${netdev}" && [ -e "${netdev}"/phy80211 ]; then
+    if iwconfig "${netdev}" 1>/dev/null 2>&1 && [ -e "${netdev}"/phy80211 ]; then
         wmachw=`cat "${netdev}"/phy80211/macaddress`
         wmac=`cat "${netdev}"/address`
         stest pass "Changed MAC: `basename ${netdev}`" [ ${#wmachw} = ${#wmac} -a "${wmachw}" != "${wmac}" ]

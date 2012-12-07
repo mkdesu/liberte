@@ -28,7 +28,7 @@ if [ $# = 1 ]; then
     if [ X"$1" = Xwireless ]; then
         ifaces2=
         for iface in ${ifaces}; do
-            if iwdetect "${iface}"; then
+            if iwconfig "${iface}" 1>/dev/null 2>&1; then
                 ifaces2="${ifaces2}${iface} "
             fi
         done
@@ -83,7 +83,7 @@ mac_get() {
 if [ -n "${ifaces}" ]; then
     for iface in ${ifaces}; do
 
-        if iwdetect "${iface}"; then
+        if iwconfig "${iface}" 1>/dev/null 2>&1; then
             echo "  Wireless interface: ${iface}"
         else
             echo "  Wired interface:    ${iface}"
