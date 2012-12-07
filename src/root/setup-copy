@@ -107,6 +107,9 @@ rm -f /var/cache/edb/vdb_*.pickle
 # [gettext] coreutils, powertop, cdrtools: not needed (#398983, #398977, #410501)
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
+# eclass inherit issue (#446251)
+echo media-libs/gst-plugins-bad-0.10.22 >> /etc/portage/profile/package.provided
+
 
 # This recompiles packages with TEMP flags in package.use
 sinfo "Recompiling build-dependent packages"
