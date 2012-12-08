@@ -3,6 +3,7 @@
 
   * Better support for QEMU mouse virtualization
   * Xorg server 1.13
+  * Firewire SBP-2 module is blacklisted to prevent Firewire RAM access
 
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
   * More robust Xorg autoconfiguration
