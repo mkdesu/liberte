@@ -24,10 +24,13 @@ depend() {
 # Prompt to print before password requests
 eprompt() {
     local stars=`echo "$@" | sed 's/./-/g'`
+    local keymap=`. /etc/conf.d/keymaps; echo \"${keymap}\" | tr '[:lower:]' '[:upper:]'`
     echo
     einfo "${stars}"
     einfo "$@"
-    einfo "Keyboard map: `. /etc/conf.d/keymaps; echo \"${keymap}\" | tr '[:lower:]' '[:upper:]'`"
+    einfo "Keyboard map: ${keymap} (or use left/right-click to c&p)"
+    einfo "  ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz"
+    einfo "  0123456789  ()[]{}<>|/\\  +-*=_~  .,:;?!   @#$%^&  \"\`'"
     einfo "${stars}"
     echo
 }

@@ -6,6 +6,7 @@
 
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
   * More robust Xorg autoconfiguration
+  * Added ASCII virtual keyboard table for OTFE password entry
 
   * Added UFRaw, a RAW images viewer and converter
   * Added proxychains, a heterogeneous chaining proxyfier
