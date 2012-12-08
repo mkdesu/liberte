@@ -76,9 +76,9 @@ net-fs/autofs
 # System / security utilities
 sys-apps/gradm
 app-shells/dash
+app-admin/eselect-sh
 app-admin/metalog
 app-admin/sudo
-app-admin/eselect-sh
 lxde-base/lxpolkit
 app-misc/hatools
 sys-apps/paxctl
@@ -94,7 +94,6 @@ app-crypt/gnupg-pkcs11-scd
 app-crypt/ccid
 app-crypt/tpm-tools
 sys-apps/haveged
-dev-libs/libelf
 
 # Network utilities
 net-analyzer/netcat
@@ -212,8 +211,6 @@ media-plugins/gst-plugins-speex
 media-plugins/gst-plugins-x264
 media-plugins/gst-plugins-ximagesrc
 media-plugins/gst-plugins-xvid
-media-video/libav
-media-libs/libpostproc
 www-client/epiphany-extensions
 net-irc/xchat-otr
 x11-plugins/pidgin-otr
