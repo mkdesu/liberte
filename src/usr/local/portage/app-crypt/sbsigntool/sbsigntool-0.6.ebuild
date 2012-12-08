@@ -12,15 +12,21 @@ SRC_URI="https://launchpad.net/ubuntu/+archive/primary/+files/${PN}_${PV}.orig.t
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="x86 amd64"
-IUSE="test"
+KEYWORDS="~x86 ~amd64"
+IUSE=""
+RESTRICT="x86? ( test )"
 
 RDEPEND="dev-libs/openssl"
 DEPEND="${RDEPEND}
 	sys-boot/gnu-efi"
 
 src_prepare() {
-	sed -i 's@^\(EFI_ARCH=\$(uname -m\))$@\1 | sed s/i686/ia32/)@' "${S}"/configure.ac
+	# need correct /usr/include/efi/${efi_arch} on include path
+	efi_arch=${ARCH}
+	use x86   && efi_arch=ia32
+	use amd64 && efi_arch=x86_64
+	sed -i "s/^\(EFI_ARCH\)=.*/\1=${efi_arch}/" "${S}"/configure.ac
+
 	eautoreconf
 	default
 }
