@@ -5,7 +5,8 @@ nofw=nofw
 cable=cable
 
 # ReachableAddresses ports in /etc/tor/torrc [uid=tor]
-torports=80,443
+# (allow high ports in order to support most bridges)
+torports=80,443,1024:65535
 
 # VPN TCP/UDP server ports (PPTP, OpenVPN, Cisco) [uid=root]
 vpntports=https,imaps,1723,openvpn,10000

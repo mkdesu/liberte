@@ -118,6 +118,7 @@ net-misc/connect
 net-misc/proxychains
 net-misc/whois
 net-proxy/torsocks
+net-proxy/obfsproxy
 net-proxy/privoxy
 net-mail/cables
 

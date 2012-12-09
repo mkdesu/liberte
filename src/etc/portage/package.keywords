@@ -13,6 +13,7 @@
 
 # Network
 =net-wireless/reaver-1.4*
+=net-proxy/obfsproxy-0.1.4*
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.11*

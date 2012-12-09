@@ -3,7 +3,7 @@ User tor
 
 PIDFile              /var/run/tor/tor.pid
 Log notice syslog
-#Log notice file     /var/log/tor/tor.log
+# Log notice file     /var/log/tor/tor.log
 
 ## "SocksPort 0" for server-only setup
 SocksListenAddress   127.0.0.1

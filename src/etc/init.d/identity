@@ -44,11 +44,19 @@ start() {
                   s/(^[^:]*|])$/&:443/'`
     if [ -n "${bridges}" ]  &&  grep -q '^UseBridges[[:blank:]]\+0\>' ${torrc}; then
         ebegin Configuring Tor bridges
-        sed -i 's/^\(UseBridges[[:blank:]]\+\).*/\11/' ${torrc}
+        sed -i 's/^\(UseBridges[[:blank:]]\+\).*/\11/; s/^ReachableAddresses\>/# &/' ${torrc}
+
+        transport=
+        if get_bootparam 'obfs'; then
+            echo 'ClientTransportPlugin obfs2 exec /usr/bin/obfsproxy --managed' >> ${torrc}
+            transport="obfs2 "
+        fi
+
         for bridge in ${bridges}; do
             eindent
-            einfo "Bridge: ${bridge}"
-            echo  "Bridge  ${bridge}" >> ${torrc}
+            einfo "Bridge: ${transport}${bridge}"
+            echo  "Bridge  ${transport}${bridge}" >> ${torrc}
+            echo  "ReachableAddresses  ${bridge}" >> ${torrc}
             eoutdent
         done
         eend $?
