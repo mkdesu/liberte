@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<gconf>
-	<entry name="opacity" mtime="1316745686" type="float" value="100"/>
-	<entry name="resizable" mtime="1316746151" type="bool" value="false"/>
-	<entry name="zoom" mtime="1316746263" type="float" value="15"/>
-	<entry name="ypos" mtime="1316746430" type="int" value="20"/>
-	<entry name="xpos" mtime="1316746434" type="int" value="138"/>
-</gconf>

@@ -19,6 +19,7 @@
 =x11-themes/light-themes-0.1.11*
 =www-client/epiphany-3.4.3*
 =www-client/epiphany-extensions-3.4*
+=app-accessibility/florence-0.6.0*
 
 # Guest virtualization
 =app-emulation/open-vm-tools-2012.05.21*
