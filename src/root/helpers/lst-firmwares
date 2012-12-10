@@ -7,7 +7,7 @@ fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
 initrd=/usr/src/linux-main/usr/initramfs_data.cpio.xz
 
 
-# b43, b43legacy:     net-wireless/b43-firmware
+# b43, b43legacy:     net-wireless/b43[legacy]-firmware
 # atmel,at76c50x-usb: net-wireless/atmel-firmware
 for fw in $(strings -a -n 10                                   \
               $(find /lib/modules -name '*.ko'                 \

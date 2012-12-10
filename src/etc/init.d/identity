@@ -48,6 +48,7 @@ start() {
 
         transport=
         if get_bootparam 'obfs'; then
+            # (Tor: #5018)
             echo 'ClientTransportPlugin obfs2 exec /usr/bin/obfsproxy --managed' >> ${torrc}
             transport="obfs2 "
         fi

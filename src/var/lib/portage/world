@@ -20,7 +20,7 @@ sys-apps/microcode-data
 sys-firmware/amd-ucode
 x11-drivers/radeon-ucode
 net-wireless/b43-firmware
-net-wireless/b43-firmware:b43legacy
+net-wireless/b43legacy-firmware
 net-wireless/ar9271-firmware
 net-wireless/ipw2100-firmware
 net-wireless/ipw2200-firmware
