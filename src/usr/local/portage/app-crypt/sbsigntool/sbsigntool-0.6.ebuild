@@ -2,9 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=4
-
-inherit autotools eutils
+EAPI="4"
 
 DESCRIPTION="Utilities for signing and verifying files for UEFI Secure Boot"
 HOMEPAGE="http://packages.ubuntu.com/quantal/sbsigntool"
@@ -12,21 +10,25 @@ SRC_URI="https://launchpad.net/ubuntu/+archive/primary/+files/${PN}_${PV}.orig.t
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~x86 ~amd64"
+KEYWORDS="~amd64 ~x86"
 IUSE=""
-RESTRICT="x86? ( test )"
+#RESTRICT="x86? ( test )"
 
-RDEPEND="dev-libs/openssl"
+RDEPEND="dev-libs/openssl
+	sys-apps/util-linux"
 DEPEND="${RDEPEND}
-	sys-boot/gnu-efi"
+	sys-apps/help2man
+	sys-boot/gnu-efi
+	virtual/pkgconfig"
 
 src_prepare() {
-	# need correct /usr/include/efi/${efi_arch} on include path
-	efi_arch=${ARCH}
-	use x86   && efi_arch=ia32
-	use amd64 && efi_arch=x86_64
-	sed -i "s/^\(EFI_ARCH\)=.*/\1=${efi_arch}/" "${S}"/configure.ac
-
-	eautoreconf
-	default
+	local iarch
+	case ${ARCH} in
+		ia64)  iarch=ia64 ;;
+		x86)   iarch=ia32 ;;
+		amd64) iarch=x86_64 ;;
+		*)     die "unsupported architecture: ${ARCH}" ;;
+	esac
+	sed -i "/^EFI_ARCH=/s:=.*:=${iarch}:" configure
+	sed -i "s/-m64$/& -march=x86-64/" tests/Makefile.am
 }

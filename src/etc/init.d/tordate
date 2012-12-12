@@ -3,7 +3,7 @@
 description="Sets date from Tor consensus and handles Tor restarts."
 
 command=/usr/local/sbin/tordate
-start_stop_daemon_args="-bm"
+command_background="true"
 pidfile=/var/run/tordate.pid
 
 depend() {
