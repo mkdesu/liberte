@@ -55,7 +55,7 @@ ${prefix}/lid-xlock & LIDXLOCK_PID=$!
 syndaemon -d -t -k -i 2 &
 
 # Launch clipboard, NetworkManager and Bluetooth applets (use tray -> after panel)
-parcellite &
+# parcellite &
 nm-applet --sm-disable &
 bluetooth-applet &
 
