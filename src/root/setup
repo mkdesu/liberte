@@ -293,7 +293,7 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-# (#444446)
+# (#444446, fixed in polkit-0.109)
 sinfo "Re-enabling PaX for incorrectly marked executables"
 paxctl -ze /usr/lib/polkit-1/polkitd
 
