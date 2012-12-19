@@ -121,7 +121,6 @@
 /etc/skel/
 /etc/locale.gen
 /etc/timezone
-/etc/tlsdate/
 /etc/sgml/
 /etc/ca-certificates/
 /etc/ca-certificates.conf

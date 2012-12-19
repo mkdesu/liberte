@@ -22,11 +22,11 @@ HKP(S)
   + [alt: x-hkp://pool.sks-keyservers.net]
   + [alt: x-hkp://keys.gnupg.net]
 
+tlsdate
+  + www.google.com
+
 NTP [disabled]
   + [0-3].pool.ntp.org
-
-HTP
-  + {google,msn,yahoo,facebook,myspace}.com
 
 
 

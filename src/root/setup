@@ -335,10 +335,6 @@ eselect opengl set xorg-x11
 eselect xvmc   set xorg-x11
 
 
-sinfo "Verifying HTP servers"
-${noroot} ${helpdir}/vfy-htp-servers
-
-
 # /usr/local/share/ca-certificates is implicitly trusted
 sinfo "Refreshing trusted certificates list"
 find -L /etc/ssl/certs -maxdepth 1 -type l -delete
@@ -361,7 +357,7 @@ sinfo "Configuring start-up services"
 svcsysinit="udev"
 svcboot="consolefont irqbalance haveged metalog
          iptables consolekit lockdown fbinit"
-svcdefault="liberte identity cabled persist xconfig vmconfig spindown tordate
+svcdefault="liberte identity cabled persist xconfig vmconfig spindown
             acpid smartd laptop_mode gpm
             nscd autofs NetworkManager privoxy
             udev-postmount"
@@ -428,7 +424,6 @@ usermod -G wheel,plugdev,lp,games,vmware,vboxguest anon
 usermod -G legion                                  cable
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
-useradd -c htpdate -d /dev/null -s /sbin/nologin -r htp  || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
 

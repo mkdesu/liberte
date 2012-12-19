@@ -15,7 +15,8 @@ depend() {
     # using /var/run
     after bootmisc
 
-    # fw-reload needs /var/run/usage-profile
+    # fw-reload needs /var/run/usage-profile,
+    # and also extracts IPs from /etc/hosts
     before iptables
 }
 

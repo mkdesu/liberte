@@ -4,3 +4,7 @@
 
 # hostname, dnsdomainname, hostname -f
 127.0.0.1	liberte.local liberte
+
+# tlsdate IPs
+# TODO: IP rotation (in /etc/init.d/lockdown)
+74.125.136.104	www.google.com

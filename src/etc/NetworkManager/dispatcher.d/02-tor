@@ -11,7 +11,7 @@ case ${action} in
         # changing IPs/interfaces well
         if ! /etc/init.d/tor -q status; then
             logger -p 6 -t nm.dispatch "Starting Tor service (${iface})"
-            /etc/init.d/tor -q start
+            /etc/init.d/tor -qS start
         else
             logger -p 6 -t nm.dispatch "Restarting Tor service (${iface})"
             /etc/init.d/tor -qs restart

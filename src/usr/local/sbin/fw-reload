@@ -4,6 +4,11 @@ luser=anon
 nofw=nofw
 cable=cable
 
+# Assumes the actual IP is in /etc/hosts (cf. /etc/conf.d/tlsdated)
+# Using "nobody" instead of a dedicated user (#447018)
+tlsdate=nobody
+tlsdateip=www.google.com
+
 # ReachableAddresses ports in /etc/tor/torrc [uid=tor]
 # (allow high ports in order to support most bridges)
 torports=80,443,1024:65535
@@ -92,10 +97,9 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 9080 -j ACCEPT
 iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 9080 -j LOGREJECT
 
-# Privoxy access only for main user, HTP and cables daemon
+# Privoxy access only for main user and cables daemon
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${luser} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner ${cable} --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
-iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner htp      --syn -d 127.0.0.1 --dport 8118 -j ACCEPT
 iptables -A OUTPUT       -p tcp                               --syn -d 127.0.0.1 --dport 8118 -j LOGREJECT
 
 # Tor access via SOCKS only for main user and Privoxy
@@ -128,6 +132,9 @@ if [ ${luser} = ${nofw} ]; then
     iptables -A OUTPUT -p udp -m owner --uid-owner privoxy       --dport domain -j ACCEPT
     iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn --dport domain -j ACCEPT
 fi
+
+# Time synchronization via tlsdate
+iptables -A OUTPUT -p tcp -m owner --uid-owner ${tlsdate} --syn -d ${tlsdateip} --dport https   -j ACCEPT
 
 # VPN connections (root-initiated)
 iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT
