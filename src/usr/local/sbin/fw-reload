@@ -5,8 +5,7 @@ nofw=nofw
 cable=cable
 
 # Assumes the actual IP is in /etc/hosts (cf. /etc/conf.d/tlsdated)
-# Using "nobody" instead of a dedicated user (#447018)
-tlsdate=nobody
+tlsdate=tlsdate
 tlsdateip=www.google.com
 
 # ReachableAddresses ports in /etc/tor/torrc [uid=tor]
