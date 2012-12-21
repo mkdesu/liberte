@@ -25,11 +25,10 @@ x11-themes/light-themes         gtk3
 # Drivers
 # [xf86-video-vmware requires mesa[xa]]
 # [xf86-video-virtualbox[dri] conflicts w/ mprotect]
-# [xf86-video-mach64: (#443952)]
 media-libs/mesa                 xa -egl -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
-x11-base/xorg-drivers           -video_cards_nv -video_cards_mach64
+x11-base/xorg-drivers           -video_cards_nv
 
 # Networking, including SSL/TLS
 net-libs/libetpan               gnutls
