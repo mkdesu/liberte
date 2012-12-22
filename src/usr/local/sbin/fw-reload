@@ -21,6 +21,7 @@ hotspot=http,https,webcache,tproxy,3128,3660,8088,11523,58080,1024:65535
 
 # LED blinking delay
 leddelay=500
+ledexclude='backlight|touchpad|thinklight|illumination'
 
 # Usage profile (supported: noanon)
 profile=/var/run/usage-profile
@@ -159,8 +160,16 @@ iptables -A OUTPUT  -j LOGREJECT
 # --- LED blinking ---
 
 # Assign "drop" trigger to any unused leds
-for ledtrigger in /sys/class/leds/*/trigger; do
-    if grep -qs '\[none\]' "${ledtrigger}"; then
-        echo netfilter-drop > "${ledtrigger}"
+set +e
+
+leds=/sys/class/leds
+find ${leds} -mindepth 1 -maxdepth 1 -regextype posix-egrep \
+             ! -iregex ${leds}/".*(${ledexclude}).*" -printf '%P\n' 2>/dev/null | \
+while read led; do
+    if grep -qs '\[none\]' ${leds}/"${led}"/trigger; then
+        echo "  LED for packets drops: ${led}"
+        echo netfilter-drop > ${leds}/"${led}"/trigger
     fi
 done
+
+:
