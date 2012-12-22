@@ -1,22 +1,15 @@
 # Exclusions: copy -> clean
 
 # Documentation directories
-/usr/share/doc/
 /usr/share/man/
 /usr/share/info/
+/usr/share/doc/
 /usr/share/gtk-doc/
-/usr/share/nano/man-html/
 /usr/share/gnumeric/[0-9]*/doc
 # (no gnome-extra/yelp with "-gnome")
 /usr/share/omf/
 /usr/share/gnome/
-/usr/share/gnome-control-center/
-/usr/share/control-center-[0-9]*/
 /usr/share/gdm/
-/usr/local/man
-/usr/**/share/doc/
-/usr/**/share/man/
-/usr/**/share/info/
 
 # Portage directories
 /usr/portage/
@@ -24,19 +17,19 @@
 /var/db/pkg/
 /usr/lib/pkgconfig/
 /usr/share/pkgconfig/
-/usr/share/*/package.env
 /var/lib/portage/
 /var/lib/gentoo/
-/var/lib/layman/
 /etc/portage/
-/etc/make.*
 /etc/env.d/
 /etc/ld.so.conf*
 /etc/sandbox.d/
 /var/log/portage/
 /var/log/sandbox/
-/var/log/news/
 /usr/share/eselect/modules/env.eselect
+/usr/share/eselect/modules/binutils.eselect
+/usr/share/eselect/modules/kernel.eselect
+/usr/share/eselect/modules/news.eselect
+/usr/share/eselect/modules/profile.eselect
 
 # Sources and development tools
 /usr/include/
@@ -50,32 +43,24 @@
 /usr/share/baselayout/
 /usr/share/awk/
 /usr/share/et/
-/usr/share/florence/**.rnc
+/usr/share/florence/*.rnc
 /usr/share/florence/svg11/
 /usr/share/getopt/
 /usr/share/gir-[0-9]*/
 /usr/share/gobject-introspection-[0-9]*/
-/usr/share/gnuplot/
 /usr/share/i18n/
 /usr/share/icu/
-/usr/share/lsof/
 /usr/share/NetworkManager/
-/usr/share/ntp/
 /usr/share/openrc/
 /usr/share/openvpn/
 /usr/share/readline/
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
-/usr/share/gtk-[0-9]*/demo/
 
 # Static libraries and libtool files
-/lib/**.a
-/lib/**.la
 /usr/lib/**.a
 /usr/lib/**.la
-/usr/**/lib/**.a
-/usr/**/lib/**.la
-/usr/lib/tclConfig.sh
+/usr/lib/*crt*.o
 
 # Pruned files and directories (see rootfs.includes)
 /usr/bin/*-config
@@ -109,7 +94,6 @@
 
 # Miscellaneous
 .keep*
-.empty_on_purpose
 /root/**
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
@@ -129,9 +113,7 @@
 /usr/share/ghostscript/*/Resource/CIDFSubst/
 /usr/local/bin/uname
 /usr/local/bin/file
-/usr/local/bin/x86_64-*
-/mnt/floppy/
-/mnt/cdrom/
+/usr/local/bin/x86_64-gcc
 # (GeoIP is not used in Tor setup)
 /usr/share/tor/
 /usr/share/misc/*.ids.*
@@ -149,9 +131,6 @@
 /usr/bin/sensors-conf-convert
 # gnome-base/libglade: old versions ui upgrade
 /usr/bin/libglade-convert
-# net-misc/ntp: servers chain tracer, ntpq loop wrapper
-/usr/bin/ntptrace
-/usr/bin/ntp-wait
 # dev-util/strace: nice strace output
 /usr/bin/strace-graph
 # app-text/aspell: old dictionaries import
@@ -161,8 +140,6 @@
 /usr/bin/c_rehash
 /etc/ssl/misc/CA.pl
 /etc/ssl/misc/tsget
-# media-libs/gd: raster fonts converter
-/usr/bin/bdftogd
 # sys-libs/glibc: malloc debugging
 /usr/bin/mtrace
 # dev-libs/glib: C source code manipulation
@@ -228,3 +205,7 @@
 /usr/share/avconv/
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat
+/usr/lib/tclConfig.sh
+/usr/sbin/fix_libtool_files.sh
+/usr/share/gcc-data/fixlafiles.awk
+/usr/bin/c[89]9

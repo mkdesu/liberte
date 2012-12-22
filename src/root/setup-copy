@@ -1,8 +1,5 @@
 #!/bin/bash -e
 
-helpdir=${HOME}/helpers
-
-
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
 }
@@ -122,61 +119,15 @@ nip2ver=`portageq best_version / media-gfx/nip2`
 mv /home/anon/.{nip2,${nip2ver#*/}}
 
 
-# Unmerge non-runtime dependencies (and cleanup the kernel directory)
-sinfo "Unmerging build and temporary dependencies"
-emerge -qc --with-bdeps n
-
-
-sinfo "Copying gcc shared libs"
-rsync -aHS `find /usr/lib/gcc -name '*.so' -o -name '*.so.*'` /usr/lib/
-ldconfig
-
+sinfo "Keeping gcc/libtool shared libs"
+sed -i '\:^... /usr/lib/gcc/.*\.so\>:d'    /var/db/pkg/sys-devel/gcc-[0-9]*/CONTENTS
+sed -i '\:^... /usr/lib/libltdl.*\.so\>:d' /var/db/pkg/sys-devel/libtool-[0-9]*/CONTENTS
 echo sys-devel/libtool-2.2.10 >> /etc/portage/profile/package.provided
-sed -i '\:/usr/lib/libltdl\>:d' /var/db/pkg/sys-devel/libtool-*/CONTENTS
 
 
-# Unmerge some packages that are listed in the system profile
-# No package can be emerged afterwards
-sinfo "Unmerging development packages"
-
-emerge -qC \
-    sys-devel/make      \
-    sys-devel/gnuconfig \
-    sys-devel/patch     \
-    \
-    sys-devel/gcc       \
-    sys-devel/binutils  \
-    \
-    virtual/os-headers       \
-    sys-kernel/linux-headers \
-    sys-apps/busybox         \
-    \
-    virtual/man         \
-    sys-apps/man        \
-    sys-apps/man-pages  \
-    sys-apps/texinfo
-
-rm -rf /usr/share/{binutils-data,gcc-data}/
-rm -f /usr/lib/{?,}crt?.o
-
-
-sinfo "Unmerging orphaned packages"
+sinfo "Unmerging build and temporary dependencies"
+mv /etc/portage/profile/packages{.off,}
 emerge -qc --with-bdeps n
-
-
-if [ -e /usr/bin/perl ]; then
-    sinfo "Failed to discard Perl dependencies"
-    false
-fi
-
-if [ -e /usr/bin/gettext ]; then
-    sinfo "Failed to discard gettext dependencies"
-    false
-fi
-
-
-sinfo "Fixing Ambiance/Radiance themes"
-sed -ri '/\<(text|icon)-shadow:/ s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 
 
 # Any problem will cause a fatal error
@@ -184,7 +135,7 @@ sinfo "Checking linking consistency"
 revdep-rebuild -qi
 
 
-# Unmerge portage utilities (revdep-rebuild is unavailable afterwards)
+# revdep-rebuild is unavailable after this point
 sinfo "Unmerging portage tools"
 emerge -qC app-portage/gentoolkit
 
@@ -194,24 +145,26 @@ dbpython=`mktemp -d`
 mv /var/db/pkg/dev-lang/python-* ${dbpython}
 
 
+# Will fail if there are still Python dependencies
 sinfo "Unmerging orphaned packages"
 emerge -qc --with-bdeps n
 
-if [ -e /usr/sbin/python-updater  -o  -e /usr/bin/python-wrapper ]; then
-    sinfo "Failed to discard Python dependencies"
-    false
-fi
-
-ln -sf python3 /usr/bin/python
+ln -s python3 /usr/bin/python-wrapper
 
 
-# Unmerge packages that other package depend upon, but are not needed
-# ("emerge -c" cannot be used afterwards)
 # Dependencies:
-# sandbox        - xz-utils, pax-utils
-# portage        - python, sandbox, pax-utils, rsync
-sinfo "Unmerging unnecessary packages"
+# sandbox: -
+# portage: [python], sandbox, pax-utils
+sinfo "Unmerging portage sandbox"
 emerge -qC sys-apps/sandbox
+
+
+sinfo "Removing development files"
+rm /etc/env.d/{??binutils,??gcc-i686-pc-linux-gnu}
+rm /lib/cpp /usr/bin/cc
+for f in /usr/bin/i686-pc-linux-gnu-*; do
+    rm ${f} /usr/bin/${f#/usr/bin/i686-pc-linux-gnu-}
+done
 
 
 sinfo "Updating environment"
@@ -219,18 +172,17 @@ env-update
 
 
 sinfo "Unmerging portage"
-sed -i '\:^... /usr/lib/portage/:d' /var/db/pkg/sys-apps/`echo ${ebuild_portage} | sed 's:.*/::; s:\.ebuild$::'`/CONTENTS
+sed -i '\:^... /usr/lib/portage/:d' /var/db/pkg/`echo ${ebuild_portage%.ebuild} | cut -d/ -f5,7`/CONTENTS
 FEATURES="${FEATURES} -sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>/dev/null
 rm -r /usr/lib/portage/
 
 
 sinfo "Actually removing Python"
 rm -f `awk '! /^dir / { print $2 }' ${dbpython}/python-*/CONTENTS`
-rm -r /usr/lib/python*/
+rm -r /usr/lib/python*/ /usr/include/python*/
 rm -r ${dbpython}
 
 
-# Done here because cache may be recreated after "src" phase
 sinfo "Trimming icons directories and cache"
 for theme in /usr/share/icons/*/index.theme; do
     find `dirname ${theme}` -maxdepth 1 \( -name '[5-9][0-9]x*' -o -name '[1-9][0-9][0-9]x*' \) -exec rm -r {} \;
@@ -264,15 +216,14 @@ sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
     /usr/share/applications/mimeinfo.cache
 
 
-# QuickTime (MP4) prevents HTML5 <video> from working
+sinfo "Generating GIO modules cache"
+gio-querymodules /usr/lib/gio/modules
+
+
 sinfo "Generating GStreamer cache"
 rm -rf /var/cache/gstreamer
 /usr/bin/gst-inspect* 1>/dev/null
 chmod -R go=u,go-w /var/cache/gstreamer
-
-
-sinfo "Generating GIO modules cache"
-gio-querymodules /usr/lib/gio/modules
 
 
 sinfo "Uncompressing selected files"
@@ -294,60 +245,24 @@ mv    /usr/lib/xorg/modules/drivers{.native/fbdev_drv.so,.fbdev}
 mv    /usr/lib/xorg/modules/drivers{.native/modesetting_drv.so,.modesetting}
 
 
-sinfo "Replacing laptop-mode drive-waking hdparm calls"
-sed -i 's/\<hdparm -[SW]\>/fast-&/' /usr/share/laptop-mode-tools/modules/hdparm
-
-
-# /run/lock prevents a dangling symlink
-sinfo "Initializing /run"
-rm -r /run
-mkdir -p -m 775 /run/lock
-chown root:uucp /run/lock
-
-
 sinfo "Symlinking /var/tmp and disabling /dev/shm mount"
 rm -r /var/tmp
 ln -s ../tmp /var/tmp
 sed -i 's/\<tmpfs\>/disabled/' /etc/init.d/devfs
 
 
-sinfo "Setting dash as POSIX shell"
-eselect sh set dash
-
-
 sinfo "Setting cables-related and /root permissions"
 chmod 710 /home/anon{,/persist{,/security{,/cable},/mail,/cables}}
 chmod -R go= /root
 
-# (#431920)
-chmod go=u-w /var/log/wimax
 
-# (#444734)
-chown root:polkitd /etc/polkit-1/rules.d
-chmod 750          /etc/polkit-1/rules.d
-chown root:root    {/etc,/usr/share}/polkit-1/rules.d/* /usr/share/polkit-1/rules.d
-chmod 644          {/etc,/usr/share}/polkit-1/rules.d/*
-
-
-sinfo "Removing invalid symlinks, dirs and files"
-find  /usr/i686-pc-linux-gnu -xtype l -delete
-rmdir /usr/i686-pc-linux-gnu/{bin,lib,}
-
-rm -r /etc/env.d/{05binutils,04gcc-i686-pc-linux-gnu,binutils,gcc,python}
-rm /etc/{init,conf,pam}.d/sshd
-
-rm /usr/bin/{{i686-pc-linux-gnu-,}{gcc,g++,c++,cpp},cc,c89,c99,gcov} /lib/cpp
-rm /usr/sbin/fix_libtool_files.sh
-
-rm /usr/bin/{kernel,profile,python}-config
-rm /usr/share/eselect/modules/{binutils,kernel,news,profile}.eselect
-
+sinfo "Removing invalid symlinks"
 find / -xdev -xtype l -delete
 
 
 sinfo "Updating ld cache"
 eselect env update 2>/dev/null
-sed -i '/^export \(CONFIG_PROTECT\(_MASK\)\?\|MANPATH\|INFOPATH\|CVS_RSH\)=/d' /etc/profile.env
+sed -i '/ CONFIG_PROTECT\(_MASK\)\?[ =]/d' /etc/{profile,csh}.env
 
 
 # Spaces in entries are not handled, but it doesn't matter here

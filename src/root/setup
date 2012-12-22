@@ -293,9 +293,28 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
+sinfo "Fixing Ambiance/Radiance themes"
+sed -ri '/\<(text|icon)-shadow:/ s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
+
+
 # (#444446, fixed in polkit-0.109)
 sinfo "Re-enabling PaX for incorrectly marked executables"
 paxctl -ze /usr/lib/polkit-1/polkitd
+
+
+sinfo "Fixing miscellaneous directory permissions"
+# (#431920)
+chmod go=u-w /var/log/wimax
+
+# (#444734)
+chown root:polkitd /etc/polkit-1/rules.d
+chmod 750          /etc/polkit-1/rules.d
+chown root:root    {/etc,/usr/share}/polkit-1/rules.d/* /usr/share/polkit-1/rules.d
+chmod 644          {/etc,/usr/share}/polkit-1/rules.d/*
+
+
+sinfo "Setting dash as POSIX shell"
+eselect sh set dash
 
 
 # No sub-pixel rendering, since LCD / cable type is unknown
@@ -326,13 +345,12 @@ fi
 
 
 # http://www.x.org/wiki/GalliumStatus
-sinfo "Configuring Mesa, OpenGL and XvMC"
+sinfo "Configuring Mesa and OpenGL"
 eselect mesa   set --auto
 eselect mesa   set i915 classic
 eselect mesa   set sw   classic
 
 eselect opengl set xorg-x11
-eselect xvmc   set xorg-x11
 
 
 # /usr/local/share/ca-certificates is implicitly trusted
@@ -383,11 +401,21 @@ done
 rc-update -u
 
 
+# /run/lock prevents a dangling symlink
+sinfo "Initializing /run"
+find /run -mindepth 1 ! -path /run/lock -delete
+install -d -g uucp -m 775 /run/lock
+
+
 # (lastlog is not sparse on overlayfs, wtmp has no growth limit)
 sinfo "Disabling non-rotating logs"
 ln -sf /dev/null /var/log/ConsoleKit/history
 ln -sf /dev/null /var/log/lastlog
 rm -f  /var/log/wtmp
+
+
+sinfo "Replacing laptop-mode drive-waking hdparm calls"
+sed -i 's/\<hdparm -[SW]\>/fast-&/' /usr/share/laptop-mode-tools/modules/hdparm
 
 
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)

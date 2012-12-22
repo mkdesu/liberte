@@ -1,0 +1,13 @@
+-*sys-devel/gcc
+-*sys-devel/binutils
+
+-*sys-devel/make
+-*sys-devel/gnuconfig
+-*>=sys-devel/patch-2.6.1
+
+-*virtual/os-headers
+-*sys-apps/busybox
+
+-*virtual/man
+-*sys-apps/man-pages
+-*sys-apps/texinfo

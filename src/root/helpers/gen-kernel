@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 # Parameter:
 #   + (none):  build and install main and kexec kernels
