@@ -47,7 +47,6 @@ ebuilds="app-misc/ca-certificates
          gnome-base/libglade
          media-gfx/exiv2
          media-libs/vips
-         media-plugins/gst-plugins-vp8
          net-dialup/pptpclient
          net-im/pidgin
          net-misc/proxychains
@@ -93,10 +92,6 @@ sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'          ${ebuild_vips}
 sed -i 's:>=sys-kernel/linux-headers-[^[:blank:]"]*\>::' ${ebuild_wimax}
 sed -i 's:\<net-dns/bind-tools\>::'                      ${ebuild_proxychains}
 
-# [gst-plugins-bad] gst-plugins-vp8: only libgstbasevideo-0.10.so is needed
-sed -i 's:>=media-libs/gst-plugins-bad-[^[:blank:]"]*::' ${ebuild_gstpluginsvp8}
-sed -i '\:/usr/lib/libgstbasevideo\>:d' /var/db/pkg/media-libs/gst-plugins-bad-*/CONTENTS
-
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}
     ebuild ${ebuild} manifest
@@ -106,9 +101,6 @@ rm -f /var/cache/edb/vdb_*.pickle
 
 # [gettext] coreutils, powertop, cdrtools: not needed (#398983, #398977 (fixed in 2.2-r1), #410501)
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
-
-# eclass inherit issue (#446251)
-echo media-libs/gst-plugins-bad-0.10.22 >> /etc/portage/profile/package.provided
 
 
 # This recompiles packages with TEMP flags in package.use
