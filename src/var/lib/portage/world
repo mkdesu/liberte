@@ -102,7 +102,6 @@ net-firewall/iptables
 sys-apps/ethtool
 net-wireless/crda
 net-wireless/rfkill
-net-wireless/madwifi-ng-tools
 net-wireless/aircrack-ng
 net-wireless/reaver
 net-misc/networkmanager
