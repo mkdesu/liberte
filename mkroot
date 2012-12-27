@@ -9,8 +9,8 @@ sinfo() {
 
 
 # Must have root directory as an argument
-if [ -z "$1"  -o  \( -n "$2" -a "$2" != fresh -a "$2" != copy -a "$2" != clean \) ]; then
-    echo "$0 <livecd root> [fresh|copy|clean]"
+if [ -z "$1"  -o  \( -n "$2" -a "$2" != fresh \) ]; then
+    echo "$0 <livecd root> [fresh]"
     exit 1
 fi
 
@@ -29,147 +29,133 @@ gpg_wwwserver='https://zimmermann.mayfirst.org/pks/lookup?op=get&search=0x${fpr}
 gpg_keys=`sed '/^#/d; /^$/d; s/ //g' ${FROM}/conf/pubkeys`
 
 
-# Copying and pruning
-if [ "$2" = copy ]; then
-    sinfo "Copying ${LIVECD}/src to ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded               \
-        --include-from=${FROM}/conf/rootfs.includes    \
-        --exclude-from=${FROM}/conf/rootfs-cp.excludes \
-        ${LIVECD}/src/ ${LIVECD}/copy | head -n 20
-
-    sinfo "Done."
-    exit
-elif [ "$2" = clean ]; then
-    sinfo "Pruning ${LIVECD}/copy"
-    rsync -aHAXS -x -i --delete-excluded               \
-        --include-from=${FROM}/conf/rootfs.includes    \
-        --exclude-from=${FROM}/conf/rootfs.excludes    \
-        --exclude-from=${FROM}/conf/rootfs-cp.excludes \
-        ${LIVECD}/copy/ ${LIVECD}/copy | head
-
-    sinfo "Done."
+if [ "$2" != fresh  -a  -d ${LIVECD}/src ]; then
+    sinfo "Skipping overwrite of ${LIVECD}/src (use \"fresh\")"
     exit
 fi
 
 
 # Extract stage3 + portage snapshot to fresh directory
-if [ "$2" = fresh  -o  ! -d ${LIVECD}/src ]; then
-    # Download stage3 + portage snapshot
-    mkdir -p ${LIVECD}/mirror/stage3 ${LIVECD}/mirror/portage ${LIVECD}/mirror/keys
-    mkdir -p -m 700 ${LIVECD}/mirror/gnupg
+# Download stage3 + portage snapshot
+mkdir -p ${LIVECD}/mirror/stage3 ${LIVECD}/mirror/portage ${LIVECD}/mirror/keys
+mkdir -p -m 700 ${LIVECD}/mirror/gnupg
 
-    # latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
-    sinfo "Fetching latest-stage3.txt"
-    wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3.txt
-    stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt`
-    stage3file=`basename ${stage3}`
+sinfo "Testing security labels and user xattrs support"
+touch ${LIVECD}/mirror/fs-test
+if ! setcap cap_net_raw+i  ${LIVECD}/mirror/fs-test || \
+   ! setfattr -n user.test ${LIVECD}/mirror/fs-test; then
+    echo "Filesystem does not support extended attributes."
+    echo "Try ext4 with EXT4_FS_SECURITY and -o user_xattr"
+    exit 1
+fi
+rm ${LIVECD}/mirror/fs-test
 
-    # If a new stage3 is available, remove old mirrors
-    if [ ! -e ${LIVECD}/mirror/stage3/${stage3file} ]; then
-        rm -f ${LIVECD}/mirror/stage3/stage3-i686-*.tar.bz2*
+
+# latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
+sinfo "Fetching latest-stage3.txt"
+wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3.txt
+stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt`
+stage3file=`basename ${stage3}`
+
+# If a new stage3 is available, remove old mirrors
+if [ ! -e ${LIVECD}/mirror/stage3/${stage3file} ]; then
+    rm -f ${LIVECD}/mirror/stage3/stage3-i686-*.tar.bz2*
+fi
+
+
+sinfo "Downloading ${stage3file}"
+wget -c -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
+    ${stage3base}/${stage3}.CONTENTS ${stage3base}/${stage3}
+
+sinfo "Downloading portage-latest.tar.bz2"
+wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
+
+
+sinfo "Fetching PGP public keys and verifying fingerprints"
+cp ${FROM}/conf/certs/mfpl.crt ${LIVECD}/mirror/keys
+
+for key in ${gpg_keys}; do
+    org=`echo ${key} | cut -d: -f1`
+    fpr=`echo ${key} | cut -d: -f2`
+    keyid=`echo -n ${fpr} | tail -c -8`
+
+    if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
+        if ! eval wget -nv --retry-connrefused                         \
+                       --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
+                       -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"; then
+            echo "Warning: Failed to fetch ${org}-${keyid}.asc, copying from cache"
+            cp ${FROM}/conf/certs/${org}-${keyid}.asc ${LIVECD}/mirror/keys
+        fi
     fi
 
+    if type gpg 1>/dev/null 2>&1; then
+        gpg -q --homedir ${LIVECD}/mirror/gnupg --no-default-keyring \
+            --keyring ${org}.gpg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
 
-    sinfo "Downloading ${stage3file}"
-    wget -c -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
-        ${stage3base}/${stage3}.CONTENTS ${stage3base}/${stage3}
-
-    sinfo "Downloading portage-latest.tar.bz2"
-    wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
-
-
-    sinfo "Fetching PGP public keys and verifying fingerprints"
-    cp ${FROM}/conf/certs/mfpl.crt ${LIVECD}/mirror/keys
-
-    for key in ${gpg_keys}; do
-        org=`echo ${key} | cut -d: -f1`
-        fpr=`echo ${key} | cut -d: -f2`
-        keyid=`echo -n ${fpr} | tail -c -8`
-
-        if [ ! -e ${LIVECD}/mirror/keys/${org}-${keyid}.asc ]; then
-            if ! eval wget -nv --retry-connrefused                         \
-                           --ca-certificate=${LIVECD}/mirror/keys/mfpl.crt \
-                           -O ${LIVECD}/mirror/keys/${org}-${keyid}.asc \"${gpg_wwwserver}\"; then
-                echo "Warning: Failed to fetch ${org}-${keyid}.asc, copying from cache"
-                cp ${FROM}/conf/certs/${org}-${keyid}.asc ${LIVECD}/mirror/keys
-            fi
+        fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --keyring ${org}.gpg \
+                  --fingerprint --with-colons 0x${fpr} | sed -n '/^fpr:/p' | cut -d: -f10`
+        if [ ${fpr} != "${fpr2}" ]; then
+            echo "Fingerprint mismatch: [${fpr}] != [${fpr2}]"
+            exit 1
         fi
+    else
+        sinfo "*** No GnuPG, skipping fingerprint verification: ${org}-${keyid}"
+    fi
+done
 
-        if type gpg 1>/dev/null 2>&1; then
-            gpg -q --homedir ${LIVECD}/mirror/gnupg --no-default-keyring \
-                --keyring ${org}.gpg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
 
-            fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --keyring ${org}.gpg \
-                      --fingerprint --with-colons 0x${fpr} | sed -n '/^fpr:/p' | cut -d: -f10`
-            if [ ${fpr} != "${fpr2}" ]; then
-                echo "Fingerprint mismatch: [${fpr}] != [${fpr2}]"
-                exit 1
-            fi
-        else
-            sinfo "*** No GnuPG, skipping fingerprint verification: ${org}-${keyid}"
+if type gpg 1>/dev/null 2>&1; then
+    sinfo "Verifying keyrings"
+    for keyring in `echo "${gpg_keys}" | cut -d: -f1 | sort -u`; do
+        keyids=`gpg -q -k --homedir ${LIVECD}/mirror/gnupg --keyring ${keyring}.gpg \
+                    --fingerprint --with-colons | sed -n '/^fpr:/p' | cut -d: -f10 | sort`
+        expids=`echo "${gpg_keys}" | sed -n "/^${keyring}:/p" | cut -d: -f2 | sort`
+
+        if [ "${keyids}" != "${expids}" ]; then
+            echo "Unexpected public keys in keyring ${keyring}.gpg"
+            exit 1
         fi
     done
 
 
-    if type gpg 1>/dev/null 2>&1; then
-        sinfo "Verifying keyrings"
-        for keyring in `echo "${gpg_keys}" | cut -d: -f1 | sort -u`; do
-            keyids=`gpg -q -k --homedir ${LIVECD}/mirror/gnupg --keyring ${keyring}.gpg \
-                        --fingerprint --with-colons | sed -n '/^fpr:/p' | cut -d: -f10 | sort`
-            expids=`echo "${gpg_keys}" | sed -n "/^${keyring}:/p" | cut -d: -f2 | sort`
-
-            if [ "${keyids}" != "${expids}" ]; then
-                echo "Unexpected public keys in keyring ${keyring}.gpg"
-                exit 1
-            fi
-        done
+    sinfo "Verifying stage3 and portage PGP signatures"
+    gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
+        --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
+    gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
+        --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2.gpgsig \
+                 ${LIVECD}/mirror/portage/portage-latest.tar.bz2
+else
+    sinfo "*** No GnuPG, skipping stage3, portage and HKPS CA certificate verification"
+fi
 
 
-        sinfo "Verifying stage3 and portage PGP signatures"
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
-            --verify ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
-        gpg -q --homedir ${LIVECD}/mirror/gnupg --trust-model always --keyring gentoo.gpg \
-            --verify ${LIVECD}/mirror/portage/portage-latest.tar.bz2.gpgsig \
-                     ${LIVECD}/mirror/portage/portage-latest.tar.bz2
-    else
-        sinfo "*** No GnuPG, skipping stage3, portage and HKPS CA certificate verification"
-    fi
+sinfo "Verifying stage3 SHA512 digests"
+sed -i '6,7d; 10,11d' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
+(cd ${LIVECD}/mirror/stage3; sha512sum -c ${stage3file}.DIGESTS.asc)
 
 
-    sinfo "Verifying stage3 SHA512 digests"
-    sed -i '6,7d; 10,11d' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
-    (cd ${LIVECD}/mirror/stage3; sha512sum -c ${stage3file}.DIGESTS.asc)
-
-
-    if tar --version | grep -q '(GNU tar)'; then
-        sinfo "Verifying stage3 files list"
-        LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
-        cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
-               ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
-        rm     ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
-    else
-        sinfo "*** No GNU tar, skipping stage3 files list verification"
-    fi
+if tar --version | grep -q '(GNU tar)'; then
+    sinfo "Verifying stage3 files list"
+    LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+    cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
+           ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+    rm     ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+else
+    sinfo "*** No GNU tar, skipping stage3 files list verification"
+fi
 
 
 	sinfo "Removing ${LIVECD}/src"
-    rm -rf --one-file-system ${LIVECD}/src
-    mkdir -m 755 ${LIVECD}/src
+rm -rf --one-file-system ${LIVECD}/src
+mkdir -m 755 ${LIVECD}/src
 
 
-    sinfo "Extracting stage3 to ${LIVECD}/src"
-    tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude './dev/*'
+sinfo "Extracting stage3 to ${LIVECD}/src"
+tar -xpSjf ${LIVECD}/mirror/stage3/${stage3file} -C ${LIVECD}/src --exclude './dev/*'
 
 
-    sinfo "Extracting portage to ${LIVECD}/src/usr"
-    tar -xpSjf ${LIVECD}/mirror/portage/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
-
-    uidgid=`grep '^portage:' ${LIVECD}/src/etc/passwd | cut -d: -f3,4`
-    mkdir -m 2775   ${LIVECD}/src/usr/portage/distfiles
-    chown ${uidgid} ${LIVECD}/src/usr/portage/distfiles
-else
-    sinfo "Skipping overwrite of ${LIVECD}/src (use \"fresh\")"
-fi
+sinfo "Extracting portage to ${LIVECD}/src/usr"
+tar -xpSjf ${LIVECD}/mirror/portage/portage-latest.tar.bz2 -C ${LIVECD}/src/usr
 
 
 sinfo "Done."

@@ -209,3 +209,4 @@
 /usr/sbin/fix_libtool_files.sh
 /usr/share/gcc-data/fixlafiles.awk
 /usr/bin/c[89]9
+/usr/bin/sudoedit

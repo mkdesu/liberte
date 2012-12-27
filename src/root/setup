@@ -408,6 +408,7 @@ install -d -g uucp -m 775 /run/lock
 
 
 # (lastlog is not sparse on overlayfs, wtmp has no growth limit)
+# /var/run/utmp is created in bootmisc (which is disabled)
 sinfo "Disabling non-rotating logs"
 ln -sf /dev/null /var/log/ConsoleKit/history
 ln -sf /dev/null /var/log/lastlog
@@ -453,6 +454,15 @@ usermod -G legion                                  cable
 
 useradd -c nscd    -d /dev/null -s /sbin/nologin -r nscd || [ $? = 9 ]
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
+
+
+sinfo "Minimizing SUID bits in favor of POSIX.1e capabilities"
+sed -n '/^\//p' ${HOME}/config/rootfs.nosuid | while read file caps; do
+    chmod a-s "${file}"
+    if [ -n "${caps}" ]; then
+        setcap "${caps}" "${file}"
+    fi
+done
 
 
 sinfo "Initializing a secondary PGP keyring"

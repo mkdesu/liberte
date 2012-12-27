@@ -30,28 +30,22 @@ sinfo "Downloading and extracting stage3 and portage snapshots"
 ${SRC}/mkroot ${LIVECD} $2
 
 # If "fresh" parameter is passed, rebuilds system from scratch
-sinfo "Installing packages"
+sinfo "Installing packages and configuring system"
 ${SRC}/enter ${LIVECD} -c "./setup $2"
 
 # Reverse emerge rewriting /etc files during full build
-sinfo "Restoring configuration files"
-${SRC}/enter ${LIVECD} -c true
-
 # Destructive operations are done on ${LIVECD}/copy
-sinfo "Synchronizing to a temporary copy"
-${SRC}/mkroot ${LIVECD} copy
+sinfo "Restoring configuration and copying the live tree"
+${SRC}/enter ${LIVECD} -c "./mkimage copy"
 
 # Cleans up ${LIVECD}/copy from inside
 sinfo "Uninstalling development packages"
 ${SRC}/enter ${LIVECD} copy -c ./setup-copy
 
 # Cleans up ${LIVECD}/copy from outside
-sinfo "Pruning the temporary copy"
-${SRC}/mkroot ${LIVECD} clean
-
 # Builds "liberte" dir in ${LIVECD}/dist to deploy
 sinfo "Mastering deployment directory"
-${SRC}/enter ${LIVECD} image -c ./mkimage
+${SRC}/enter ${LIVECD} -c ./mkimage
 
 # OK to copy "liberte" dir and run setup.sh
 sinfo "Done: ZIP archive in ${LIVECD}/dist"

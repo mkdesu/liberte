@@ -2,7 +2,11 @@
 # Patterns should not disturb unmerges
 # (aggregates with exclusions for copy -> clean)
 
-# Bind-mount /usr/portage and /usr/portage/distfiles
+# Bind-mounts (see "enter" script)
+/dev/**
+/proc/**
+/mnt/boot/**
+/mnt/live/**
 /usr/portage/**
 
 # Sources

@@ -7,7 +7,7 @@ sinfo() {
 
 # Must have root directory as an argument
 if [ -z "$1" ]; then
-    echo "$0 <livecd root> [copy|image] [-c shell command...]"
+    echo "$0 <livecd root> [copy] [-c 'shell command']"
     exit 1
 fi
 
@@ -38,10 +38,6 @@ done
 if [ "$2" = copy ]; then
     PHASE=$2
     LIVECD=$1/${PHASE}
-    shift 2
-elif [ "$2" = image ]; then
-    PHASE=$2
-    LIVECD=$1/src
     shift 2
 else
     PHASE=src
@@ -109,6 +105,7 @@ environment="${environment} PHASE=${PHASE}"
 setarch=`which setarch`
 chroot=`which chroot`
 tty=`tty`
+mounted=
 
 
 sinfo "Mounting system directories"
@@ -125,22 +122,17 @@ for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts $
         fi
     fi
     mount -B ${mp} ${LIVECD}${mp}
+    mounted="${LIVECD}${mp} ${mounted}"
 done
 mount -rB -o remount ${LIVECD}/proc
 
-if [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
-    mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
-    mount -rB -o remount ${LIVECD}/usr/portage
-fi
-
-if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    mount -B /usr/portage/distfiles ${LIVECD}/usr/portage/distfiles
-fi
-
-if [ ${PHASE} = image ]; then
-    mkdir -p ${LIVECD}/../dist
+if   [ ${PHASE} = src ]; then
+    mkdir -p -m 755 ${LIVECD}/../copy ${LIVECD}/../dist
     mount -B ${LIVECD}/../copy ${LIVECD}/mnt/live
     mount -B ${LIVECD}/../dist ${LIVECD}/mnt/boot
+elif [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
+    mount -B ${LIVECD}/../src/usr/portage ${LIVECD}/usr/portage
+    mount -rB -o remount ${LIVECD}/usr/portage
 fi
 
 
@@ -160,22 +152,14 @@ fi
 # Unnecessary with unshare -m, but stale processes might hold the mounts
 sinfo "Unmounting system directories"
 
-if [ ${PHASE} = image ]; then
-    umount ${LIVECD}/mnt/live
-    umount ${LIVECD}/mnt/boot
-fi
-
-if [ -d /usr/portage/distfiles  -a  -d ${LIVECD}/usr/portage/distfiles ]; then
-    umount ${LIVECD}/usr/portage/distfiles
-fi
-
-if [ -d ${LIVECD}/usr/portage  -a  ${PHASE} = copy ]; then
+if   [ ${PHASE} = src ]; then
+    umount ${LIVECD}/mnt/live ${LIVECD}/mnt/boot
+elif [ ${PHASE} = copy  -a  -d ${LIVECD}/usr/portage ]; then
     umount ${LIVECD}/usr/portage
 fi
 
-for mp in ${tty} /dev/pts /dev/ptmx /dev/tty /dev/urandom /dev/random /dev/null /proc; do
-    umount -l ${LIVECD}${mp}
-done
+umount -l ${mounted}
+
 # Condition is false for empty ${tty} and for block-device ${tty} (i.e., unmount failed)
 if [ -f ${LIVECD}${tty} ]; then
     rm ${LIVECD}${tty}

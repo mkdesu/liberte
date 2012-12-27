@@ -10,16 +10,12 @@ sinfo() {
 
 # Variables
 helpdir=${HOME}/helpers
-nosuid=${HOME}/config/rootfs.nosuid
 
 live=/mnt/live
-cdroot=/mnt/boot/cdroot
-distroot=/mnt/boot
+rootfspfx=${HOME}/config/rootfs
 
-distname=liberte-${LVERSION}
-zipfile=${distroot}/${distname}.zip
-isofile=${distroot}/${distname}.iso
-isobsfile=${distroot}/${distname}-bootstrap.iso
+cdroot=/mnt/boot/cdroot
+imagepfx=/mnt/boot/liberte-${LVERSION}
 
 efilabel=LIBERTE_EFI
 efiboot=${cdroot}/boot/efiboot.img
@@ -28,8 +24,6 @@ efisbpfx=/usr/local/addons/secureboot/Liberte-SecureBoot
 ziimage=${cdroot}/liberte/boot/kernel-x86.zi
 sqimage=${cdroot}/liberte/boot/root-x86.sfs
 sqsort=${live}/tmp/transient/pkg/squashfs.sort
-sqpseudo=${HOME}/config/rootfs.pseudo
-sqignore=${HOME}/config/rootfs.ignore
 
 sysver=`syslinux -v 2>&1 | cut -d' ' -f2`
 
@@ -40,8 +34,25 @@ mibsize() {
 }
 
 
-sinfo "Removing unnecessary SUID bits"
-chmod a-s `sed -n "s:^/:${live}&:p" ${nosuid}`
+if [ "$1" = copy ]; then
+    # Relies on 755 mode of .../{copy,/dist}
+    # (copied over to .../copy/mnt/{live,boot})
+    sinfo "Creating temporary copy"
+    rsync -aHAXS -x -i --delete-excluded        \
+        --include-from=${rootfspfx}.includes    \
+        --exclude-from=${rootfspfx}-cp.excludes \
+        / ${live} | head
+    sinfo "Done."
+    exit
+fi
+
+
+sinfo "Pruning the temporary copy"
+rsync -aHAXS -x -i --delete-excluded        \
+    --include-from=${rootfspfx}.includes    \
+    --exclude-from=${rootfspfx}.excludes    \
+    --exclude-from=${rootfspfx}-cp.excludes \
+    ${live}/ ${live} | head
 
 
 # Check the live tree
@@ -81,9 +92,12 @@ find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
 # (chmod due to GRKERNSEC_HIDESYM)
 sinfo "Creating SquashFS image"
 
-mksquashfs ${live} ${sqimage} -noappend -no-progress -no-exports \
-    -always-use-fragments -no-xattrs -comp xz -Xbcj x86          \
-    -pf ${sqpseudo} -sort ${sqsort} -ef ${sqignore}
+# NOTE: POSIX ACLs are not supported by SquashFS
+#       Non-PaX user xattrs are not supported by tmpfs
+mksquashfs ${live} ${sqimage}                \
+    -noappend -no-progress -no-exports       \
+    -always-use-fragments -comp xz -Xbcj x86 \
+    -sort ${sqsort} -ef ${rootfspfx}.ignore
 chmod go= ${sqimage}
 
 
@@ -119,10 +133,10 @@ done
 
 # UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
 # the use of conforming FAT partitions which do not use the ESP GUID."
-sinfo "Building binary distribution ${zipfile##*/}"
-rm -f ${zipfile}
-(cd ${cdroot}; zip -r9 -q ${zipfile} EFI liberte)
-unzip -qt ${zipfile}
+sinfo "Building binary distribution ${imagepfx##*/}.zip"
+rm -f ${imagepfx}.zip
+(cd ${cdroot}; zip -r9 -q ${imagepfx}.zip EFI liberte)
+unzip -qt ${imagepfx}.zip
 
 
 # Add two extra 4K blocks (may need adjustment)
@@ -139,7 +153,7 @@ MTOOLS_SKIP_CHECK=1 mcopy -i ${efiboot} -smQ ${cdroot}/EFI ::
 # Hide root directories on Windows, and reset volume information
 # Allow '-' in filenames, since ISOLINUX doesn't support RockRidge/Joliet
 # (translation equivalent to mount's map=normal is still performed)
-sinfo "Creating ISO image ${isofile##*/}"
+sinfo "Creating ISO image ${imagepfx##*/}.iso"
 
 mkdir ${cdroot}/boot/syslinux
 cp -p ${cdroot}/liberte/boot/syslinux/syslinux.cfg \
@@ -153,18 +167,18 @@ set -- -quiet -iso-level 2 -relaxed-filenames -R -no-pad \
        -eltorito-alt-boot -no-emul-boot                  \
        -eltorito-platform efi -b boot/efiboot.img        \
        -hidden boot -hidden liberte -m EFI
-mkisofs "$@" -o ${isofile} ${cdroot}
-isovfy ${isofile}
+mkisofs "$@" -o ${imagepfx}.iso ${cdroot}
+isovfy ${imagepfx}.iso
 
 
-sinfo "Creating ISO image ${isobsfile##*/}"
-mkisofs "$@" -m ${sqimage##*/} -o ${isobsfile} ${cdroot}
-isovfy ${isobsfile}
+sinfo "Creating ISO image ${imagepfx##*/}-bootstrap.iso"
+mkisofs "$@" -m ${sqimage##*/} -o ${imagepfx}-bootstrap.iso ${cdroot}
+isovfy ${imagepfx}-bootstrap.iso
 
 
 echo "Disk usage: `du -s --apparent-size -B 1M ${cdroot} | cut -f1` MiB"
-echo "ZIP size:   `mibsize ${zipfile}` MiB"
-echo "ISO size:   `mibsize ${isofile}` MiB"
+echo "ZIP size:   `mibsize ${imagepfx}.zip` MiB"
+echo "ISO size:   `mibsize ${imagepfx}.iso` MiB"
 
 
 sinfo "Done."

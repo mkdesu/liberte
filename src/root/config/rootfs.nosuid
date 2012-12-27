@@ -2,11 +2,17 @@
 /bin/passwd
 /usr/bin/gpasswd
 
+# Switching groups is unnecessary
+/usr/bin/newgrp
+
 # Administrative dbs entries editing is unnecessary
 /usr/bin/chfn
 /usr/bin/chsh
 /usr/bin/chage
 /usr/bin/expiry
+
+# Inter-user tty messages are unnecessary
+/usr/bin/write
 
 # pt_chown is not used with devpts
 /usr/lib/misc/glibc/pt_chown
@@ -31,3 +37,7 @@
 /usr/bin/cdda2wav
 /usr/bin/readcd
 /usr/sbin/rscsi
+
+# POSIX.1e capabilities
+/sbin/unix_chkpwd cap_dac_read_search+ep
+/bin/ping         cap_net_raw+ep

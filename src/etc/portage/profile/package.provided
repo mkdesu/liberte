@@ -1,5 +1,5 @@
 # virtual/mta (sudo, gnupg, procmail)
-mail-mta/ssmtp-0
+mail-mta/nullmailer-0
 
 # virtual/mailx (smartmontools)
 mail-client/mailx-0

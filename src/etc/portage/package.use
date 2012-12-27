@@ -71,6 +71,7 @@ media-libs/freetype             -bzip2
 x11-libs/libXfont               -bzip2
 dev-libs/libxml2                -lzma
 sys-apps/busybox                -pam
+sys-apps/gradm                  -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
 dev-lang/tcl                    -threads
