@@ -84,7 +84,7 @@ fi
 sinfo "Applying temporary portage patches"
 # (#417043)
 patch_ebuild ${HOME}/patches/portage/fbreader.patch
-# (#424816)
+# (#424816, VirtualBox: #11335)
 patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
 # (restore removed unstable ebuild)
@@ -306,7 +306,7 @@ sinfo "Fixing miscellaneous directory permissions"
 # (#431920)
 chmod go=u-w /var/log/wimax
 
-# (#444734)
+# (#444734, FreeDesktop: #58787)
 chown root:polkitd /etc/polkit-1/rules.d
 chmod 750          /etc/polkit-1/rules.d
 chown root:root    {/etc,/usr/share}/polkit-1/rules.d/* /usr/share/polkit-1/rules.d
