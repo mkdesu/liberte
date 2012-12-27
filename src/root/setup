@@ -172,8 +172,9 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     # Rely on timezone-data ebuild updating /etc/localtime
     sinfo "Compiling system"
-    USE="-X -consolekit" emerge -qepv @system
-    USE="-X -consolekit" emerge -qe   @system
+    touch /tmp/system-build
+    USE="-X -consolekit" emerge -qeupv @system
+    USE="-X -consolekit" emerge -qeu   @system
     rm -f ${protected}
     rebuild_locales
 
@@ -188,13 +189,13 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     sinfo "Checking for non-rebuilt packages"
     orphans=`find /var/db/pkg -mindepth 3 -maxdepth 3 -name BUILD_TIME           \
         ! -path  /var/db/pkg/sys-kernel/hardened-sources-${hsversion}/BUILD_TIME \
-        ! -newer /var/db/pkg/sys-kernel/hardened-sources-${hsversion}/BUILD_TIME \
-        -printf '%h\n' | sed s:/var/db/pkg/:: | sort`
+        ! -newer /tmp/system-build -printf '%h\n' | sed s:/var/db/pkg/:: | sort`
     if [ -n "${orphans}" ]; then
         sinfo "The following packages were not rebuilt"
         echo "${orphans}"
         exit 1
     fi
+    rm /tmp/system-build
 
 
     sinfo "Preparing kernel"
