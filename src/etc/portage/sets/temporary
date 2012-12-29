@@ -1,0 +1,21 @@
+# Temporary dependencies
+# (removed in setup-copy)
+
+# Kernel sources and patching tools
+sys-kernel/hardened-sources
+dev-util/patchutils
+
+# Syslinux bootloader
+sys-boot/syslinux
+
+# GRUB bootloader and fonts
+sys-boot/grub
+media-fonts/terminus-font
+
+# Squashfs and boot image creation
+sys-fs/squashfs-tools
+sys-fs/mtools
+
+# Portage tools
+app-portage/portage-utils
+app-portage/eix

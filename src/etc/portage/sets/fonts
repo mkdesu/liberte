@@ -1,0 +1,63 @@
+# Truetype fonts
+
+# Inconsolata:    extremely good Latin monospace terminal font
+media-fonts/inconsolata
+
+# DejaVu:         comprehensive Sans/Serif/Mono
+media-fonts/dejavu
+# media-fonts/libertine-ttf
+# media-fonts/freefont-ttf
+
+# SIL Charis:     comprehensive Roman/Cyrillic optimized for printing
+media-fonts/sil-charis
+# SIL Gentium:    very readable Latin/Greek
+media-fonts/sil-gentium
+# SIL Arabic:     extended Arabic script, Scheherazade/Lateef
+media-fonts/sil-arabicfonts
+
+# Farsi:          Persian script, Elham/Homa/Koodak/Nazli/Roya/Terafik/Titr
+media-fonts/farsi-fonts
+# media-fonts/kacst-fonts
+
+# CLM Culmus:     Hebrew script, David/Frank Ruehl/Miriam(=Sans/Serif/Mono)/...
+media-fonts/culmus
+
+# SIL Abyssinica: Ethiopic script
+media-fonts/sil-abyssinica
+# media-fonts/font-misc-ethiopic
+
+# SIL Padauk:     all standard Myanmar characters [Graphite not supported]
+media-fonts/sil-padauk
+
+# WenQuanYi:      CJKV glyphs, Hei-Ti (Sans)
+media-fonts/wqy-zenhei
+# media-fonts/arphicfonts
+# media-fonts/ja-ipafonts
+# media-fonts/umeplus-fonts
+# media-fonts/baekmuk-fonts
+
+# Lohit:          Hindi script, Assamese/Bengali/Gujarati/Hindi/Kannada/Konkani/Kashmiri/Maithili/Malayalam/Marathi/Nepali/Oriya/Punjabi/Sindhi/Tamil/Telugu
+media-fonts/lohit-fonts
+
+# Bangla:         Bengali script, Akaash/Ani/Likhan/Mitra Mono/Mukti Narrow
+media-fonts/free-bangla-font
+
+# ThaiFonts:      Thai script, Garuda/Kinnari/Loma/Norasi/Umpush/Waree/Purisa/Sawasdee/Tlwg
+media-fonts/thaifonts-scalable
+
+# Khmer OS:       Khmer script (Cambodia), Battambang/Bokor/Content/Fasthand/Freehand/Metal Chrieng/Muol/Siemreap/System
+media-fonts/khmer
+
+# TibMachUni:     Tibetan, Dzongkha and Ladakhi scripts
+media-fonts/tibetan-machine-font
+
+# LKLUG:          [Extra] Sinhala (Sri Lanka) script
+media-fonts/ttf-sinhala-lklug
+
+# Mv:             [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas
+media-fonts/mcst-dhivehi-fonts
+
+# [Cham:          www.ling.hawaii.edu/~uhdoc/champa/chamHI.ttf, incorrect codepoints]
+
+# Essays1743:     Nice decorative Latin font
+media-fonts/essays1743

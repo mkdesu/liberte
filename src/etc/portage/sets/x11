@@ -1,0 +1,70 @@
+# X11 (a subset of xorg-x11 metapackage)
+x11-base/xorg-server
+
+# Configuration
+x11-apps/xset
+x11-apps/setxkbmap
+x11-apps/xmodmap
+x11-apps/xrdb
+x11-apps/xcmsdb
+x11-apps/xbacklight
+x11-misc/xcalib
+x11-apps/xgamma
+x11-misc/redshift
+
+# Session
+x11-apps/xinit
+x11-apps/xauth
+x11-apps/xhost
+
+# Server queries
+x11-apps/xdpyinfo
+x11-apps/xdriinfo
+x11-apps/xwininfo
+x11-apps/xvinfo
+x11-apps/mesa-progs
+x11-apps/xev
+
+# Clients management
+# x11-apps/appres
+# x11-apps/listres
+x11-apps/xprop
+x11-apps/xlsclients
+x11-apps/xkill
+
+# Utilities
+x11-apps/xinput
+x11-apps/xinput_calibrator
+x11-apps/xrefresh
+x11-apps/xsetroot
+x11-apps/xlsfonts
+
+# Extras (recommended by media-libs/mesa)
+media-libs/libtxc_dxtn
+
+
+# Window management
+x11-wm/openbox
+x11-apps/transset
+x11-misc/xcompmgr
+x11-misc/wmctrl
+x11-misc/stalonetray
+lxde-base/lxpanel
+lxde-base/lxshortcut
+lxde-base/lxtask
+
+# Extended configuration
+lxde-base/lxrandr
+lxde-base/lxinput
+lxde-base/lxappearance
+x11-misc/obconf
+
+# Internationalization
+app-i18n/uim
+
+# X11 themes
+x11-themes/xcursor-neutral
+x11-themes/light-themes
+x11-themes/gnome-icon-theme
+x11-themes/sound-theme-freedesktop
+x11-themes/claws-mail-themes

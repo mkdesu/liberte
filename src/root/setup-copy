@@ -32,7 +32,8 @@ fi
 
 
 sinfo "Cleaning up portage configuration"
-sed -i /TEMP/d /var/lib/portage/world /etc/portage/package.use
+sed -i '/^@temporary$/d' /etc/portage/sets/all
+rm /etc/portage/package.use/temporary
 
 
 # The dependency patches below are intended for depclean

@@ -181,9 +181,11 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     sinfo "Removing non-system packages"
     mv /var/lib/portage/world{,.off}
+    mv /var/lib/portage/world_sets{,.off}
     echo sys-kernel/hardened-sources > /var/lib/portage/world
-    emerge -qc
+    emerge -qc --deselect=n
     mv /var/lib/portage/world{.off,}
+    mv /var/lib/portage/world_sets{.off,}
 
 
     sinfo "Checking for non-rebuilt packages"

@@ -1,0 +1,52 @@
+# Firmware
+
+# CPUs
+sys-apps/microcode-data
+sys-firmware/amd-ucode
+
+# GPUs
+x11-drivers/radeon-ucode
+
+# Wi-Fi
+net-wireless/b43-firmware
+net-wireless/b43legacy-firmware
+net-wireless/ar9271-firmware
+net-wireless/ipw2100-firmware
+net-wireless/ipw2200-firmware
+sys-firmware/iwl1000-ucode
+sys-firmware/iwl2000-ucode
+sys-firmware/iwl2030-ucode
+sys-firmware/iwl3945-ucode
+sys-firmware/iwl4965-ucode
+sys-firmware/iwl5000-ucode
+sys-firmware/iwl5150-ucode
+sys-firmware/iwl6000-ucode
+sys-firmware/iwl6005-ucode
+sys-firmware/iwl6030-ucode
+sys-firmware/iwl6050-ucode
+net-wireless/rt2860-firmware
+net-wireless/rt2870-firmware
+net-wireless/carl9170-firmware
+net-wireless/rt61-firmware
+net-wireless/rt73-firmware
+net-wireless/atmel-firmware
+net-wireless/zd1201-firmware
+net-wireless/zd1211-firmware
+net-wireless/prism54-firmware
+
+# WiMAX
+net-wireless/i2400m-fw
+
+# Bluetooth
+net-wireless/bluez-firmware
+
+# DVB
+media-tv/ivtv-firmware
+media-tv/cx18-firmware
+
+# Firmware w/o specialized packages
+# (see /etc/portage/savedconfig/sys-kernel/linux-firmware)
+sys-kernel/linux-firmware
+
+# media-sound/alsa-firmware
+# media-tv/linuxtv-dvb-firmware

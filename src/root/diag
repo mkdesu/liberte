@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-keyworded=/etc/portage/package.keywords
+keyworded=/etc/portage/package.accept_keywords
 linuxfw=/etc/portage/savedconfig/sys-kernel/linux-firmware
 
 

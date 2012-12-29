@@ -1,0 +1,12 @@
+# Temporary build-time dependencies
+# (commented out in setup-copy)
+@temporary
+
+@basic
+@firmware
+
+@x11
+@fonts
+
+@apps
+@games
