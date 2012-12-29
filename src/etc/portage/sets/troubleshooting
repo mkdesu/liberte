@@ -1,0 +1,5 @@
+# Troubleshooting utilities
+# (can be disabled in release)
+
+app-admin/paxtest
+dev-util/strace

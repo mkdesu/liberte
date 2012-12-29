@@ -1,6 +1,7 @@
 # Temporary build-time dependencies
 # (commented out in setup-copy)
 @temporary
+@temporary-late
 
 @basic
 @firmware
@@ -10,3 +11,5 @@
 
 @apps
 @games
+
+@troubleshooting

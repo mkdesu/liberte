@@ -61,7 +61,7 @@ done
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
-sed -i 's/[^"]*\${python_dep\(_ssl\)\?}[^"]*//' ${ebuild_portage}
+sed -i 's/[^"]*\(\${python_dep\(_ssl\)\?}\|\<xattr?\)[^"]*//' ${ebuild_portage}
 
 # Python
 # exiv2                    not needed                  (#398959, fixed in 0.23)
@@ -136,18 +136,15 @@ sinfo "Checking linking consistency"
 revdep-rebuild -qi
 
 
-# revdep-rebuild is unavailable after this point
-sinfo "Unmerging portage tools"
-emerge -qC app-portage/gentoolkit
-
-
 sinfo "Faking Python removal"
 dbpython=`mktemp -d`
 mv /var/db/pkg/dev-lang/python-* ${dbpython}
 
 
 # Will fail if there are still Python dependencies
+# revdep-rebuild is unavailable after this point
 sinfo "Unmerging orphaned packages"
+sed -i '/^@temporary-late$/d' /etc/portage/sets/all
 emerge -qc --with-bdeps n
 
 ln -s python3 /usr/bin/python-wrapper

@@ -1,0 +1,4 @@
+# Temporary dependencies
+# (removed in setup-copy at late stage)
+
+app-portage/gentoolkit

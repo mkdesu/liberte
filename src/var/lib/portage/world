@@ -1,11 +1,1 @@
-# See /var/lib/portage/world_sets and
-# /etc/portage/sets for the rest
-
-# Late temporary dependencies
-# (explicit unmerge in setup-copy)
-app-portage/gentoolkit
-
-# Troubleshooting
-# (can be removed in release)
-app-admin/paxtest
-dev-util/strace
+# See /var/lib/portage/world_sets and /etc/portage/sets

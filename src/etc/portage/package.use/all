@@ -54,8 +54,7 @@ media-plugins/gst-plugins-meta  dv lame theora vpx  a52 dts dvd mms mpeg  ffmpeg
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 
-# Unnecessary functionality (portage: (#346749), geoclue: (#416331))
-sys-apps/portage                -xattr python2
+# Unnecessary functionality (geoclue: (#416331))
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
@@ -83,6 +82,7 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
 app-misc/geoclue                -*
+app-emulation/qemu              -aio -alsa -bluetooth -smartcard -curl -ncurses -vhost-net -vnc
 
 # Extra functionality
 sys-boot/syslinux               -custom-cflags
