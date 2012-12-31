@@ -130,13 +130,13 @@ fi
 
 
 sinfo "Verifying stage3 SHA512 digests"
-sed -i '6,7d; 10,11d' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
+sed -i '/^# WHIRLPOOL HASH$/{N; s/.*/\n/}' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
 (cd ${LIVECD}/mirror/stage3; sha512sum -c ${stage3file}.DIGESTS.asc)
 
 
 if tar --version | grep -q '(GNU tar)'; then
     sinfo "Verifying stage3 files list"
-    LC_ALL=C tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
+    LC_ALL=en_US.UTF-8 tar --utc -tjvf ${LIVECD}/mirror/stage3/${stage3file} > ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
     cmp -s ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS \
            ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
     rm     ${LIVECD}/mirror/stage3/${stage3file}.CONTENTS.actual
