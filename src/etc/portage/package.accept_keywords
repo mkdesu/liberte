@@ -40,9 +40,6 @@
 # Hardened compilation issues (#444246)
 =sys-boot/gnu-efi-3.0s*
 
-# Compilation issues (#443952)
-=x11-drivers/xf86-video-mach64-6.9.4*
-
 # Firmware
 sys-firmware/amd-ucode
 net-wireless/b43-firmware
