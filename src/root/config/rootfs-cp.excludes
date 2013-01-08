@@ -32,6 +32,7 @@
 /usr/lib/cairo/libcairo-trace.*
 
 # Unnecessary libraries (verified with revdep-rebuild)
-# (#416817, #444248)
+# (#177402, #416817, #444248)
+/usr/lib/libunrar.so*
 /usr/lib/libvipsCC.so*
 /usr/lib/libchromeXvMC*.so*

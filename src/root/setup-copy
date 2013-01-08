@@ -97,7 +97,7 @@ for ebuild in ${!ebuild_*}; do
 done
 rm -f /var/cache/edb/vdb_*.pickle
 
-# [gettext] coreutils, powertop, cdrtools: not needed (#398983, #398977 (fixed in 2.2-r1), #410501)
+# [gettext] coreutils, powertop: not needed (#398983, #398977 (fixed in 2.2-r1)))
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 
