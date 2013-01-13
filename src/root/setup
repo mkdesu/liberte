@@ -82,8 +82,6 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (#417043)
-patch_ebuild ${HOME}/patches/portage/fbreader.patch
 # (#424816, VirtualBox: #11335)
 patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch

@@ -30,7 +30,6 @@
 
 # Miscellaneous
 /config/audacious/plugin-registry
-/config/fbreader/*.db
 
 # Logs
 /config/uim/dict/*-history
@@ -47,7 +46,6 @@
 /config/nip2/tmp/
 /config/local/epiphany/
 /config/local/webkit/
-/config/local/gvfs-metadata/
 /config/local/geeqie/metadata/
 /config/local/geeqie/trash/
 /config/local/Trash/
