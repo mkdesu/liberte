@@ -230,10 +230,6 @@ gunzip `find /usr/share/consolefonts -name '*.gz'` \
 
 gunzip /usr/share/gedit-2/plugins/taglist/*.gz
 
-rezip  /usr/share/zlibrary/hyphenationPatterns.zip
-rezip  /usr/share/zlibrary/languagePatterns.zip
-regzip /usr/share/zlibrary/unicode.xml.gz
-
 
 sinfo "Creating specialized Xorg driver directories"
 mkdir /usr/lib/xorg/modules/drivers.{native,vesa,fbdev,modesetting}
