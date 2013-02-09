@@ -50,15 +50,16 @@ virtual/ffmpeg                  -X -encode -truetype -speex
 media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -hardcoded-tables  -speex -v4l
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
-media-plugins/gst-plugins-meta  dv lame theora vpx  a52 dts dvd mms mpeg  ffmpeg
+media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 
-# Unnecessary functionality (geoclue: (#416331))
+# Unnecessary functionality (geoclue: (#416331), irqbalance: (#456238))
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
 dev-lang/spidermonkey           minimal
+sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
@@ -82,9 +83,11 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
 app-misc/geoclue                -*
+sys-apps/irqbalance             -numa
 app-emulation/qemu              -aio -alsa -bluetooth -smartcard -curl -ncurses -vhost-net -vnc
 
 # Extra functionality
+# (ppp[ipv6]: #440696)
 sys-boot/syslinux               -custom-cflags
 sys-boot/grub                   -custom-cflags
 sys-apps/busybox                static savedconfig
@@ -95,6 +98,7 @@ virtual/udev                    gudev
 sys-fs/udev                     gudev
 sys-apps/util-linux             udev
 x11-drivers/xf86-video-ati      udev
+media-plugins/gst-plugins-v4l2  udev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive
@@ -104,6 +108,7 @@ app-text/evince                 gnome
 media-gfx/ufraw                 gnome contrast timezone
 media-gfx/graphicsmagick        imagemagick
 media-libs/vips                 imagemagick
+net-dialup/ppp                  ipv6
 
 # Internationalization
 app-i18n/uim                    -linguas_*

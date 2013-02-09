@@ -99,7 +99,7 @@ if [ -e ${regexps} ]; then
         /usr/src/linux-{main,kexec{,-64}}/usr/initramfs_data.cpio.xz
 
     find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
-        ! -name 'libgucharmap*.so.*' ! -name oui.txt -print0 \
+        ! -name 'libgucharmap*.so.*' ! -name oui.txt ! -name iab.txt -print0 \
         | xargs -0 grep -liE "${regexps}"
 else
     echo "checkregexp file not found, skipping"

@@ -378,8 +378,7 @@ svcboot="consolefont irqbalance haveged metalog
          iptables consolekit lockdown fbinit"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown
             acpid smartd laptop_mode gpm
-            nscd autofs NetworkManager privoxy
-            udev-postmount"
+            nscd autofs NetworkManager privoxy"
 svcshutdown="memwipe"
 delsvcboot="urandom swap swapfiles bootmisc root mtab"
 delsvcdefault="netmount local"

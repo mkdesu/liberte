@@ -55,13 +55,10 @@ mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
 # mail-client/claws-mail-fancy (depends: webkit-gtk:2)
 media-plugins/gst-plugins-meta
-media-plugins/gst-plugins-cdio
 media-plugins/gst-plugins-jpeg
 media-plugins/gst-plugins-libpng
 media-plugins/gst-plugins-speex
-media-plugins/gst-plugins-x264
 media-plugins/gst-plugins-ximagesrc
-media-plugins/gst-plugins-xvid
 www-client/epiphany-extensions
 net-irc/xchat-otr
 x11-plugins/pidgin-otr

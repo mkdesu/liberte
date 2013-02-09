@@ -47,6 +47,7 @@ for mod in `sort -u ${modlst}`; do
     mkdir -p     ${stagedir}`dirname ${mod}`
     cp -p ${mod} ${stagedir}`dirname ${mod}`
 done
+cp /lib/modules/${kversion}/modules.{builtin,order} ${stagedir}/lib/modules/${kversion}
 depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
 
 

@@ -7,3 +7,9 @@ dev-libs/elfutils
 
 # Prefer media-video/libav + media-libs/libpostproc
 media-video/ffmpeg
+
+# Prefer media-plugins/gst-plugins-cdio
+media-plugins/gst-plugins-cdparanoia
+
+# (#448228)
+>=sys-auth/polkit-0.110
