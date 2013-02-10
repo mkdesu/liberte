@@ -1,0 +1,11 @@
+--- /usr/portage/sys-firmware/amd-ucode/amd-ucode-2012.09.10.ebuild	2012-10-24 18:28:15.000000000 +0000
++++ /usr/portage/sys-firmware/amd-ucode/amd-ucode-2012.09.10.ebuild	2013-02-10 01:59:54.873719663 +0000
+@@ -10,7 +10,7 @@
+ 
+ DESCRIPTION="AMD Family 10h, 11h and 14h microcode patch data"
+ HOMEPAGE="http://www.amd64.org/support/microcode.html"
+-SRC_URI="http://www.amd64.org/pub/microcode/${MY_P}.tar"
++SRC_URI="http://pkgs.fedoraproject.org/repo/pkgs/microcode_ctl/amd-ucode-2012-09-10.tar/559bc355d3799538584add80df2996f0/${MY_P}.tar http://www.amd64.org/pub/microcode/${MY_P}.tar"
+ 
+ LICENSE="amd-ucode"
+ SLOT="0"
