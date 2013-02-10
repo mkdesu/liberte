@@ -130,8 +130,8 @@ fi
 
 
 sinfo "Verifying stage3 SHA512 digests"
-sed -i '/^# WHIRLPOOL HASH$/{N; s/.*/\n/}' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc
-(cd ${LIVECD}/mirror/stage3; sha512sum -c ${stage3file}.DIGESTS.asc)
+sed '/^# WHIRLPOOL HASH$/{N; s/.*/\n/}' ${LIVECD}/mirror/stage3/${stage3file}.DIGESTS.asc \
+    | (cd ${LIVECD}/mirror/stage3; sha512sum -c)
 
 
 if tar --version | grep -q '(GNU tar)'; then
