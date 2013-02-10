@@ -111,7 +111,7 @@
 /usr/lib/cracklib_dict.*
 /usr/share/sounds/alsa/
 /usr/share/ghostscript/*/Resource/CIDFSubst/
-/usr/local/bin/uname
+/usr/local/bin/uname*
 /usr/local/bin/file
 /usr/local/bin/x86_64-gcc
 # (GeoIP is not used in Tor setup)

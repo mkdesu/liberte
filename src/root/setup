@@ -92,6 +92,9 @@ patch_ebuild ${HOME}/patches/portage/amd-ucode.patch
 
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
+    sinfo "Compiling uname wrapper"
+    gcc -ansi -Wall -pedantic -O2 -s -o /usr/local/bin/uname /usr/local/src/uname.c
+
     # Kernel sources should be present when sys-fs/udev is compiled
     # Maintainer note: after non-fresh kernel update+compile, do
     # emerge -q1 dev-libs/klibc sys-apps/v86d
