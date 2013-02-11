@@ -51,13 +51,8 @@ media-fonts/khmer
 # TibMachUni:     Tibetan, Dzongkha and Ladakhi scripts
 media-fonts/tibetan-machine-font
 
-# LKLUG:          [Extra] Sinhala (Sri Lanka) script
-media-fonts/ttf-sinhala-lklug
-
-# Mv:             [Extra] Dhivehi (Maldives) script, Elaaf/MAG Round/Lady Luck/Sehga/Galan/Iyyu/GroupX Avas
-media-fonts/mcst-dhivehi-fonts
-
-# [Cham:          www.ling.hawaii.edu/~uhdoc/champa/chamHI.ttf, incorrect codepoints]
+# LKLUG:          Sinhala (Sri Lanka) script
+media-fonts/lklug
 
 # Essays1743:     Nice decorative Latin font
 media-fonts/essays1743
