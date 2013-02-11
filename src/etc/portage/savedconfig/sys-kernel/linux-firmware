@@ -2,6 +2,7 @@
 
 # ATH9K_HTC
 htc_7010.fw
+htc_9271.fw
 
 # BRCMSMAC
 brcm/bcm43xx-0.fw
@@ -35,6 +36,24 @@ mwl8k/fmimage_8687.fw
 mwl8k/helper_8363.fw
 mwl8k/fmimage_8363.fw
 
+# RT61PCI
+rt2661.bin
+rt2561.bin
+rt2561s.bin
+
+# RT73USB
+rt73.bin
+
+# RT2800PCI
+rt2860.bin
+# rt3090.bin
+# rt3290.bin
+
+# RT2800USB
+rt2870.bin
+# rt3070.bin
+# rt3071.bin
+
 # RTL8192{CE,CU,SE,DE}
 rtlwifi/rtl8192cfw.bin
 rtlwifi/rtl8192cufw.bin
@@ -56,6 +75,13 @@ BT3CPCC.bin
 # BT_HCIBTUSB
 # (missing)
 bfubase.frm
+
+
+# --- WiMAX ---
+
+# WIMAX_I2400M_USB
+i2400m-fw-usb-1.5.sbcf
+i6050-fw-usb-1.5.sbcf
 
 
 # --- Ethernet ---
@@ -142,6 +168,22 @@ radeon/RV770_pfp.bin
 radeon/RV770_me.bin
 radeon/RS780_pfp.bin
 radeon/RS780_me.bin
+
+
+# --- Video ---
+
+# VIDEO_CX18
+v4l-cx23418-apu.fw
+v4l-cx23418-cpu.fw
+v4l-cx23418-dig.fw
+
+# VIDEO_IVTV
+v4l-cx25840.fw
+# (missing)
+v4l-cx2341x-dec.fw
+v4l-cx2341x-enc.fw
+v4l-pvrusb2-24xxx-01.fw
+v4l-pvrusb2-29xxx-01.fw
 
 
 # --- Miscellaneous ---

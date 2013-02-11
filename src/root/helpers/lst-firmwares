@@ -24,7 +24,7 @@ done
 strings -a -n 10 $(find /lib/modules -name '*.ko')    \
     | sed -n 's/^firmware=//p' | sort -u              \
     | comm -13 - <(sed -n '/^[^#]/p' ${fwlst} | sort) \
-    | sed '/^brcm\/bcm43xx/d'                         \
+    | sed '/^brcm\/bcm43xx/d; /^v4l-/d'               \
     | sed 's/^/unneeded: /'
 
 

@@ -44,14 +44,9 @@
 sys-firmware/amd-ucode
 net-wireless/b43-firmware
 net-wireless/b43legacy-firmware
-net-wireless/ar9271-firmware
 sys-firmware/iwl2000-ucode
 sys-firmware/iwl2030-ucode
 sys-firmware/iwl5150-ucode
 sys-firmware/iwl6005-ucode
 sys-firmware/iwl6030-ucode
-net-wireless/rt2860-firmware
-net-wireless/rt2870-firmware
-net-wireless/rt61-firmware
 net-wireless/atmel-firmware
-media-tv/cx18-firmware
