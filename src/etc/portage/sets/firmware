@@ -31,7 +31,7 @@ net-wireless/prism54-firmware
 net-wireless/carl9170-firmware
 
 # Bluetooth
-net-wireless/bluez-firmware
+sys-firmware/bluez-firmware
 
 # Firmware w/o specialized packages
 # (see /etc/portage/savedconfig/sys-kernel/linux-firmware)
