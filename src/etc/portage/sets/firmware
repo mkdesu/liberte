@@ -8,8 +8,8 @@ sys-firmware/amd-ucode
 x11-drivers/radeon-ucode
 
 # Wi-Fi
-net-wireless/b43-firmware
-net-wireless/b43legacy-firmware
+sys-firmware/b43-firmware
+sys-firmware/b43legacy-firmware
 sys-firmware/ipw2100-firmware
 sys-firmware/ipw2200-firmware
 sys-firmware/iwl1000-ucode
@@ -23,7 +23,7 @@ sys-firmware/iwl6000-ucode
 sys-firmware/iwl6005-ucode
 sys-firmware/iwl6030-ucode
 sys-firmware/iwl6050-ucode
-net-wireless/atmel-firmware
+sys-firmware/atmel-firmware
 sys-firmware/zd1201-firmware
 sys-firmware/zd1211-firmware
 net-wireless/prism54-firmware

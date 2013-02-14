@@ -42,11 +42,10 @@
 
 # Firmware
 sys-firmware/amd-ucode
-net-wireless/b43-firmware
-net-wireless/b43legacy-firmware
+sys-firmware/b43-firmware
+sys-firmware/b43legacy-firmware
 sys-firmware/iwl2000-ucode
 sys-firmware/iwl2030-ucode
 sys-firmware/iwl5150-ucode
 sys-firmware/iwl6005-ucode
 sys-firmware/iwl6030-ucode
-net-wireless/atmel-firmware
