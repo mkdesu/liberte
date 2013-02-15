@@ -47,7 +47,6 @@ ebuilds="app-misc/ca-certificates
          media-libs/vips
          net-dialup/pptpclient
          net-im/pidgin
-         net-misc/proxychains
          net-wireless/wimax
          sys-apps/lm_sensors
          sys-apps/portage
@@ -83,12 +82,10 @@ sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
 # [liboil]                 vips:             not needed              (#416815)
 # [linux-headers]          wimax:            not needed              (#431988)
-# [bind-tools]             proxychains:      not needed              (proxyresolv -> tor-resolve)
 sed -i 's:\<sys-apps/debianutils\>::'                    ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'                     ${ebuild_xcbutilwm}
 sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'          ${ebuild_vips}
 sed -i 's:>=sys-kernel/linux-headers-[^[:blank:]"]*\>::' ${ebuild_wimax}
-sed -i 's:\<net-dns/bind-tools\>::'                      ${ebuild_proxychains}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}

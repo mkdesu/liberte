@@ -1,4 +1,0 @@
-#!/bin/sh -e
-
-unset LD_PRELOAD
-exec tor-resolve "$@"

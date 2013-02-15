@@ -480,10 +480,6 @@ find /etc/dconf/db -maxdepth 1 -type f -delete
 dconf update
 
 
-sinfo "Installing wrappers"
-ln -sf ../local/libexec/proxyresolv.wrapper /usr/bin/proxyresolv
-
-
 sinfo "Building kernel modules"
 ${helpdir}/gen-kernel modules
 
