@@ -17,10 +17,12 @@ prism_sta_fw.bin
 symbol_sp24t_prim_fw
 symbol_sp24t_sec_fw
 
-# IWLWIFI
+# IWL{3945,4965,WIFI}
 iwlwifi-100-5.ucode
 iwlwifi-105-6.ucode
 iwlwifi-135-6.ucode
+iwlwifi-3945-2.ucode
+iwlwifi-4965-2.ucode
 
 # MWIFIEX
 # (missing)
