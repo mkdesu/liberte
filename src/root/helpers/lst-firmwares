@@ -6,23 +6,29 @@ fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
 # initramfs image
 initrd=/usr/src/linux-main/usr/initramfs_data.cpio.xz
 
+# Kernel version
+hsversion=`cat ${HOME}/config/kversion`
+kversion=${hsversion/-/-hardened-}
+[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
 
-# b43, b43legacy:     net-wireless/b43[legacy]-firmware
-# atmel,at76c50x-usb: net-wireless/atmel-firmware
-for fw in $(strings -a -n 10                                   \
-              $(find /lib/modules -name '*.ko'                 \
-                     ! -name b43.ko   ! -name b43legacy.ko     \
-                     ! -name atmel.ko ! -name at76c50x-usb.ko) \
-              | sed -n 's/^firmware=//p' | sort -u); do
+
+# Firmware requested by kernel modules
+fwfiles=$(modinfo -k ${kversion} -F firmware \
+    $(find /lib/modules -name '*.ko' -printf '%f\n' | sed 's/\.ko$//') \
+    | sort -u)
+
+for fw in ${fwfiles}; do
     if [ ! -e /lib/firmware/${fw} ] && ! grep -q "^${fw}\$" ${fwlst}; then
-        echo ${fw}
+        # atmel, at76c50x-usb: sys-firmware/atmel-firmware
+        if [[ !(${fw} =~ atmel_at76c50[45].*\.bin) ]]; then
+            echo ${fw}
+        fi
     fi
 done
 
 
 # Check for unneeded linux-firmware entries
-strings -a -n 10 $(find /lib/modules -name '*.ko')    \
-    | sed -n 's/^firmware=//p' | sort -u              \
+echo ${fwfiles} | tr ' ' '\n'                         \
     | comm -13 - <(sed -n '/^[^#]/p' ${fwlst} | sort) \
     | sed '/^brcm\/bcm43xx/d; /^v4l-/d'               \
     | sed 's/^/unneeded: /'
