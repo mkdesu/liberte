@@ -51,6 +51,7 @@ media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -
 media-sound/sox                 encode
 media-plugins/audacious-plugins lame libsamplerate mms mtp
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
+media-libs/gst-plugins-base             theora
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
 

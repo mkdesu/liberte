@@ -54,11 +54,11 @@ mail-client/claws-mail-acpi-notifier
 mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
 # mail-client/claws-mail-fancy (depends: webkit-gtk:2)
-media-plugins/gst-plugins-meta
-media-plugins/gst-plugins-jpeg
-media-plugins/gst-plugins-libpng
-media-plugins/gst-plugins-speex
-media-plugins/gst-plugins-ximagesrc
+media-plugins/gst-plugins-meta:0.10
+media-plugins/gst-plugins-jpeg:0.10
+media-plugins/gst-plugins-libpng:0.10
+media-plugins/gst-plugins-speex:0.10
+media-plugins/gst-plugins-ximagesrc:0.10
 www-client/epiphany-extensions
 net-irc/xchat-otr
 x11-plugins/pidgin-otr
