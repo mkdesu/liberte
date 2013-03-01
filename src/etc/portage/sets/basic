@@ -10,7 +10,6 @@ sys-apps/hdparm
 sys-apps/sdparm
 sys-apps/smartmontools
 sys-apps/dcfldd
-virtual/eject
 app-arch/libarchive
 app-arch/pigz
 app-arch/pbzip2
