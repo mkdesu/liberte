@@ -24,7 +24,6 @@ sys-firmware/iwl6050-ucode
 sys-firmware/atmel-firmware
 sys-firmware/zd1201-firmware
 sys-firmware/zd1211-firmware
-net-wireless/prism54-firmware
 # (in >=linux-firmware-20130114)
 net-wireless/carl9170-firmware
 
