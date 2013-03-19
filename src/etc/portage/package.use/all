@@ -66,6 +66,7 @@ sys-apps/usbutils               -zlib
 sys-fs/lvm2                     -static-libs
 app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
+net-misc/tlsdate                -dbus
 net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
