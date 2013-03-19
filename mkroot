@@ -46,6 +46,7 @@ if ! setcap cap_net_raw+i  ${LIVECD}/mirror/fs-test || \
    ! setfattr -n user.test ${LIVECD}/mirror/fs-test; then
     echo "Filesystem does not support extended attributes."
     echo "Try ext4 with EXT4_FS_SECURITY and -o user_xattr"
+    echo "(make sure attr / libpcap are installed)"
     exit 1
 fi
 rm ${LIVECD}/mirror/fs-test
