@@ -123,7 +123,7 @@ iptables -A OUTPUT -p udp                              --sport bootpc --dport bo
 # iptables -A OUTPUT -p udp                              --sport ntp    --dport ntp    -j ACCEPT
 
 # DNS use for NTP server [disabled, resolves as root] and non-firewalled user.
-# NOTE: uid-owner does not work for dns with nscd (disabled in /etc/nscd.conf)
+# NOTE: uid-owner does not work for dns with nscd
 iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn --dport domain -j ACCEPT
 
