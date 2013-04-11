@@ -298,11 +298,6 @@ sinfo "Fixing Ambiance/Radiance themes"
 sed -ri '/\<(text|icon)-shadow:/ s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 
 
-# (#444446, fixed in polkit-0.109)
-sinfo "Re-enabling PaX for incorrectly marked executables"
-paxctl -ze /usr/lib/polkit-1/polkitd
-
-
 sinfo "Fixing miscellaneous directory permissions"
 # (#431920)
 chmod go=u-w /var/log/wimax

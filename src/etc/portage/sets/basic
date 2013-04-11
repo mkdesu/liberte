@@ -32,7 +32,6 @@ app-admin/metalog
 app-admin/sudo
 lxde-base/lxpolkit
 app-misc/hatools
-sys-apps/paxctl
 x11-misc/alock
 net-misc/ssh-askpass-fullscreen
 sys-fs/cryptsetup

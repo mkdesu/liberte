@@ -11,3 +11,6 @@
 -*virtual/man
 -*sys-apps/man-pages
 -*sys-apps/texinfo
+
+-*sys-apps/elfix
+-*sys-apps/paxctl
