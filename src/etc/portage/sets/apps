@@ -43,7 +43,7 @@ mail-client/claws-mail
 app-crypt/gpa
 sci-calculators/qalculate-gtk
 www-client/epiphany
-net-irc/xchat
+net-irc/hexchat
 net-im/pidgin
 net-ftp/gftp
 www-client/uget
@@ -60,6 +60,5 @@ media-plugins/gst-plugins-libpng:0.10
 media-plugins/gst-plugins-speex:0.10
 media-plugins/gst-plugins-ximagesrc:0.10
 www-client/epiphany-extensions
-net-irc/xchat-otr
 x11-plugins/pidgin-otr
 x11-plugins/pidgin-libnotify

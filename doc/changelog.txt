@@ -16,6 +16,7 @@
   * Added proxychains, a heterogeneous chaining proxyfier
   * Removed experimental I2P support and JamVM
   * Removed FBReader due to its transition to Qt
+  * Replaced XChat with HexChat
 
 
 2012-09-01

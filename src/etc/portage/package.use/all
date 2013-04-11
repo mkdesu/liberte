@@ -42,6 +42,7 @@ dev-libs/opensc                 -ssl
 app-i18n/uim                    -ssl
 www-client/epiphany             -nss
 net-libs/glib-networking        -gnome
+net-irc/hexchat                 libproxy
 
 # Multimedia
 # [ffmpeg/libav: encode-only flags: mp3 aac aacplus faac theora vorbis x264 xvid]
