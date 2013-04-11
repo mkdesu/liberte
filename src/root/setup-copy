@@ -43,10 +43,10 @@ ebuilds="app-misc/ca-certificates
          app-mobilephone/obexftp
          dev-libs/gobject-introspection
          gnome-base/libglade
-         media-gfx/exiv2
          media-libs/vips
          net-dialup/pptpclient
          net-im/pidgin
+         net-misc/vpnc
          net-wireless/wimax
          sys-apps/lm_sensors
          sys-apps/portage
@@ -63,19 +63,18 @@ done
 sed -i 's/[^"]*\(\${python_dep\(_ssl\)\?}\|\<xattr?\)[^"]*//' ${ebuild_portage}
 
 # Python
-# exiv2                    not needed                  (#398959, fixed in 0.23)
 # libglade:                libglade-convert            (#398955)
 # gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
 # pidgin:                  purple-{url-handler,remote} (#398961)
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_exiv2} \
-                                         ${ebuild_gobjectintrospection}
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_gobjectintrospection}
 sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 
 # Perl
 # pptpclient:              not needed when used by networkmanager-pptp
 # lm_sensors:              sensors-detect, sensors-conf-convert
+# vpnc:                    pcf2vpnc
 # obexftp:                 not needed (#398113)
-sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient}
+sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
 sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [debianutils]            ca-certificates:  update-ca-certificates
