@@ -5,7 +5,7 @@
 # the lid, and closing the lid in such cases is rare anyway.
 
 
-# Touched by /etc/acpi/default.sh on each lid close ACPI event
+# Touched by /etc/acpi/events/lid-close on each lid close ACPI event
 lidflag=/var/run/lid-events/close.flag
 pid=
 
