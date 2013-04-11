@@ -61,6 +61,7 @@ sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
 dev-lang/spidermonkey           minimal
+sys-apps/util-linux             -suid
 sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
