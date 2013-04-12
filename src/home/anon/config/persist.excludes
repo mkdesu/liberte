@@ -44,6 +44,7 @@
 /config/qalculate/tmp/
 /config/gftp/cache/
 /config/nip2/tmp/
+/config/emelfm2/*.save
 /config/local/epiphany/
 /config/local/webkit/
 /config/local/geeqie/metadata/

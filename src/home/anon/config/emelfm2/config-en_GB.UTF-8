@@ -1,4 +1,4 @@
-# emelFM2 (v 0.7.5)
+# emelFM2 (v 0.8.1)
 
 # This is the emelFM2 configuration data file.
 # It will be overwritten each time the program is run!
@@ -12,9 +12,9 @@ advanced-config=false
 # reload config on external change
 auto-refresh-config=false
 # document containing usage advice
-usage-help-doc=/usr/share/doc/emelfm2-0.7.5/USAGE
+usage-help-doc=/usr/share/doc/emelfm2-0.8.1/USAGE
 # document containing configuration advice
-config-help-doc=/usr/share/doc/emelfm2-0.7.5/CONFIGURATION
+config-help-doc=/usr/share/doc/emelfm2-0.8.1/CONFIGURATION
 # warn about running processes when shutting down
 session-end-warning=true
 # running commands survive shutdown
@@ -235,33 +235,33 @@ object files||
 anycase-filetypes=false
 # plugins
 plugins=<
-true|true|_Glob..|plugin_glob_48.png|Select items matching a specified pattern|e2p_glob.so|
-false|false|_Select same|plugin_selmatch_48.png||e2p_selmatch.so|
-	false|false|_Whole||Select items whose whole name matches a selected item in the other pane|?.so|0-selmatch
-	false|false|_Partial||Select items whose name partially matches a selected item in the other pane|?.so|1-selmatch
-false|false|_Tag|plugin_tag_48.png||e2p_tag.so|
-	false|false|_Tag||Log the selected item(s) in active pane|?.so|0-tag
-	false|false|_Retag||Re-select any logged item(s) in active pane|?.so|1-tag
-true|true|For _each..|plugin_foreach_48.png|Execute an entered command on each selected item separately|e2p_for_each.so|
-true|true|_Rename..|plugin_rename_48.png|Rename item(s), using wildcards or regular-expressions|e2p_rename.so|
-true|true|_Find..|plugin_find_48.png|Find and list items, using detailed criteria|e2p_find.so|
-true|true|_Pack..|plugin_pack_48.png|Build an archive containing the selected item(s)|e2p_pack.so|
-true|false|_Unpack|plugin_unpack_48.png|Unpack archive (tar, tar.gz, tar.bz2, zip, 7z, rar, arj, zoo) into a temporary directory|e2p_unpack.so|
-true|true|Copy _names|plugin_clip_48.png|Copy path or name of each selected item to the clipboard|e2p_names_clip.so|
-false|false|_Copy|plugin_copy_48.png||e2p_cpbar.so|
-	false|false|_Copy||Copy selected item(s), with displayed progress details|?.so|0-cpbar
-	false|false|Copy with _times||Copy selected item(s), with preserved time-properties and displayed progress details|?.so|1-cpbar
-false|false|_Move|plugin_move_48.png|Move selected item(s), with displayed progress details|e2p_mvbar.so|
-false|false|Change _times..|plugin_timeset_48.png|Change any of the time properties of selected items|e2p_times.so|
-false|false|C_ompare|plugin_dircmp_48.png|Select active-pane items which are duplicated in the other pane|e2p_dircmp.so|
-false|false|_Access|plugin_acl_48.png||e2p_acl.so|
-	false|false|Change _ACLs..||Change extended permissions of selected items|?.so|0-acl
-	false|false|_Replicate||Recursively apply ACLs of selected items to matching items in the other pane|?.so|1-acl
-false|false|_Configure..|plugin_config_48.png|Export or import configuration data|e2p_config.so|
-false|false|C_lone..|plugin_clone_48.png|Copy selected item(s), each with new name, to the current directory|e2p_clone.so|
-false|false|_View||Open the first selected item with the emelFM2 text-file viewer|e2p_view.so|
-false|false|Extension _sort|plugin_extsort_48.png|Sort the active file pane by filename extension|e2p_sort_by_ext.so|
-true|true|_Disk usage|plugin_du_48.png|Calculate the disk usage of selected item(s)|e2p_du.so|
+true|true|_Glob..|plugin_glob_48.png|Select items matching a specified pattern|e2p_glob.so||glob0.8.1
+false|false|_Select same|plugin_selmatch_48.png||e2p_selmatch.so||
+	false|false|_Whole||Select items whose whole name matches a selected item in the other pane|||0-selmatch0.8.1
+	false|false|_Partial||Select items whose name partially matches a selected item in the other pane|||1-selmatch0.8.1
+false|false|_Tag|plugin_tag_48.png||e2p_tag.so||
+	false|false|_Tag||Log the selected item(s) in active pane|||0-tag0.8.1
+	false|false|_Retag||Re-select any logged item(s) in active pane|||1-tag0.8.1
+true|true|For _each..|plugin_foreach_48.png|Execute an entered command on each selected item separately|e2p_for_each.so||for_each0.8.1
+true|true|_Rename..|plugin_rename_48.png|Rename item(s), using wildcards or regular-expressions|e2p_rename.so||rename0.8.1
+true|true|_Find..|plugin_find_48.png|Find and list items, using detailed criteria|e2p_find.so||find0.8.1
+true|true|_Pack..|plugin_pack_48.png|Build an archive containing the selected item(s)|e2p_pack.so||pack0.8.1
+true|false|_Unpack|plugin_unpack_48.png|Unpack archive (tar, tar.gz, tar.bz2, zip, 7z, rar, arj, zoo) into a temporary directory|e2p_unpack.so||unpack0.8.1
+true|true|Copy _names|plugin_clip_48.png|Copy path or name of each selected item to the clipboard|e2p_names_clip.so||names_clip0.8.1
+false|false|_Copy|plugin_copy_48.png||e2p_cpbar.so||
+	false|false|_Copy||Copy selected item(s), with displayed progress details|||0-cpbar0.8.1
+	false|false|Copy with _times||Copy selected item(s), with preserved time-properties and displayed progress details|||1-cpbar0.8.1
+false|false|_Move|plugin_move_48.png|Move selected item(s), with displayed progress details|e2p_mvbar.so||
+false|false|Change _times..|plugin_timeset_48.png|Change any of the time properties of selected items|e2p_times.so||
+false|false|C_ompare|plugin_dircmp_48.png|Select active-pane items which are duplicated in the other pane|e2p_dircmp.so||
+false|false|_Access|plugin_acl_48.png||e2p_acl.so||
+	false|false|Change _ACLs..||Change extended permissions of selected items|||0-acl0.8.1
+	false|false|_Replicate||Recursively apply ACLs of selected items to matching items in the other pane|||1-acl0.8.1
+false|false|_Configure..|plugin_config_48.png|Export or import configuration data|e2p_config.so||
+false|false|C_lone..|plugin_clone_48.png|Copy selected item(s), each with new name, to the current directory|e2p_clone.so||
+false|false|_View||Open the first selected item with the emelFM2 text-file viewer|e2p_view.so||
+false|false|Extension _sort|plugin_extsort_48.png|Sort the active file pane by filename extension|e2p_sort_by_ext.so||
+true|true|_Disk usage|plugin_du_48.png|Calculate the disk usage of selected item(s)|e2p_du.so||du0.8.1
 >
 # opacity
 window-opacity=100
@@ -409,6 +409,8 @@ custom-list-font=false
 list-font=Sans 10
 # date format
 date-string=Default: May 20 09:11
+# custom date/time format string:
+custom-date-format=%c
 # size format
 size-string=exact
 # show parent directory entry '..' in file lists
@@ -643,7 +645,7 @@ cp|true|cp -i \2
 rm|true|rm -i \2
 clear|true|output.clear
 quit|true|command.quit
-help|true|file.view_at /usr/share/doc/emelfm2-0.7.5/USAGE [commands]
+help|true|file.view_at /usr/share/doc/emelfm2-0.8.1/USAGE [commands]
 keys|true|output.help keys \2
 e2ps|true|children.list
 wget|true|\1 --progress=bar:force \2
