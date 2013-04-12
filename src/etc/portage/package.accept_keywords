@@ -24,7 +24,6 @@
 =app-emulation/open-vm-tools-kmod-2012.10.14*
 =app-emulation/virtualbox-guest-additions-4.2.8*
 =x11-drivers/xf86-video-virtualbox-4.2.8*
-=dev-util/kbuild-0.1.9998_pre20120806*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*
