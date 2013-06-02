@@ -52,7 +52,6 @@
 /usr/share/icu/
 /usr/share/NetworkManager/
 /usr/share/openrc/
-/usr/share/openvpn/
 /usr/share/readline/
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
@@ -194,7 +193,6 @@
 # Individual unnecessary files
 /usr/bin/gdk*pixbuf*source
 /usr/bin/g-ir-*
-/usr/bin/glsl_compiler
 /usr/bin/compile_et
 /usr/bin/dbus-binding-tool
 /usr/bin/gs

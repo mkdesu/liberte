@@ -1,4 +1,4 @@
-# virtual/mta (sudo, gnupg, procmail)
+# virtual/mta (gnupg, procmail)
 mail-mta/nullmailer-0
 
 # virtual/mailx (smartmontools)
