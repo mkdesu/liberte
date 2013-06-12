@@ -455,6 +455,8 @@ sed -n '/^\//p' ${HOME}/config/rootfs.nosuid | while read file caps; do
     chmod a-s "${file}"
     if [ -n "${caps}" ]; then
         setcap "${caps}" "${file}"
+    elif getcap "${file}" | grep -q ^; then
+        setcap -r "${file}"
     fi
 done
 

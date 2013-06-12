@@ -25,7 +25,12 @@
 # The PPP/PPTP daemon is invoked by NetworkManager daemon
 /usr/sbin/pppd
 
+# Limit cdrecord real-time scheduling class to root
+# udev ACLs are sufficient for dev=/dev/cdrom params
 # Limit Remote-SCSI operation to root
+/usr/bin/cdrecord
+/usr/bin/cdda2wav
+/usr/bin/readcd
 /usr/sbin/rscsi
 
 # POSIX.1e capabilities
