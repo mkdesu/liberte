@@ -20,6 +20,12 @@ buser=KBUILD_BUILD_USER=liberte
 bhost=KBUILD_BUILD_HOST=dee.su
 
 
+# Module signing keys
+sbdir=/usr/local/addons/secureboot
+sb_kmod=${sbdir}/Liberte-SecureBoot-Kernel-1
+sighash=sha256
+
+
 # Paths
 kernsrc=/usr/src/linux-${kversion}
 mainobj=/usr/src/linux-main
@@ -42,10 +48,23 @@ rmake="make -s ${makeopts} -C ${kernsrc} ${bver} ${bts} ${buser} ${bhost}"
 make="sudo -n -u bin ${rmake}"
 
 
+# Ensure presence of module signing keys / certs
+# (MODSECKEY / MODPUBKEY do not affect kernel/modsign_certificate.o)
+if [ ! -e ${mainobj}/signing_key.x509 ]; then
+    ln -s    ${sb_kmod}.der ${mainobj}/signing_key.x509
+    ln -s    ${sb_kmod}.key ${mainobj}/signing_key.priv
+    touch -d 1970-01-01     ${mainobj}/x509.genkey
+    truncate -s 0           ${mainobj}/extra_certificates
+    chown -h bin:bin        ${mainobj}/signing_key.{x509,priv} \
+                            ${mainobj}/x509.genkey             \
+                            ${mainobj}/extra_certificates
+fi
+
+
 # Handle kernel preparation for building external modules
 if [ "${cmd}" = prepare ]; then
     # sudo might not be available at this stage
-    su - -s /bin/sh bin -c "${rmake} O=${mainobj} modules_prepare" 2>/dev/null
+    su - -s /bin/sh bin -c "${rmake} O=${mainobj} modules_prepare"
     exit
 elif [ "${cmd}" = modules ]; then
     # vmlinux is necessary for System.map (although initramfs may not exist yet,
@@ -62,6 +81,15 @@ elif [ "${cmd}" = modules ]; then
 
     rm ${mainmod}/{build,source}
     chmod go= ${mainmod}
+
+    # Sign out-of-tree modules
+    find ${mainmod} -mindepth 2 ! -path "${mainmod}/kernel/*" -type f -name '*.ko' | \
+    while read mod; do
+        if ! grep -q '~Module signature appended~' "${mod}"; then
+            ${kernsrc}/scripts/sign-file ${sighash} ${sb_kmod}.key ${sb_kmod}.der "${mod}"
+        fi
+    done
+
     exit
 fi
 

@@ -15,10 +15,12 @@ export RANDFILE=${sbdirtmp}/openssl.rnd
 
 sb_ca=${sbdirtmp}/Liberte-SecureBoot-CA
 sb_sign=${sbdirtmp}/Liberte-SecureBoot-Cert-1
+sb_kmod=${sbdirtmp}/Liberte-SecureBoot-Kernel-1
 sb_srl=${sbdirtmp}/Liberte-SecureBoot.srl
 
 sb_ca_dn="/C=SU/O=Liberte Linux/CN=Secure Boot CA/emailAddress=liberte@dee.su"
 sb_sign_dn="/C=SU/O=Liberte Linux/CN=Secure Boot Cert 1/emailAddress=liberte@dee.su"
+sb_kmod_dn="/C=SU/O=Liberte Linux/CN=Kernel Modules Cert 1/emailAddress=liberte@dee.su"
 
 keybits=4096
 keycipher=-aes-256-cbc
@@ -26,9 +28,12 @@ crtdgst=-sha256
 crtdays=18300
 
 
+# For non-test certs, it is probably best to locally decrypt the private keys
+# (especially the kernel module signing key)
 if [ "$1" = test ]; then
     sb_ca_dn="${sb_ca_dn%/email*} (TEST ONLY)/emailAddress=test@example.com"
     sb_sign_dn="${sb_sign_dn%/email*} (TEST ONLY)/emailAddress=test@example.com"
+    sb_kmod_dn="${sb_kmod_dn%/email*} (TEST ONLY)/emailAddress=test@example.com"
     keycipher=
 fi
 
@@ -41,6 +46,8 @@ if [ ! -e ${sbdir} ]; then
                     -out ${sb_ca}.key
     openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:${keybits} ${keycipher} \
                     -out ${sb_sign}.key
+    openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:${keybits} ${keycipher} \
+                    -out ${sb_kmod}.key
 
     openssl req   -batch -new -utf8 -subj "${sb_ca_dn}" \
                   -key ${sb_ca}.key                     \
@@ -56,14 +63,29 @@ if [ ! -e ${sbdir} ]; then
                        -extfile ${sslconf} -extensions sb_sign \
                        -out ${sb_sign}.crt
 
+    openssl req -batch -new -utf8 -subj "${sb_kmod_dn}"        \
+                -key ${sb_kmod}.key                            \
+        | openssl x509 -req -days ${crtdays} ${crtdgst}        \
+                       -CA ${sb_ca}.crt -CAkey ${sb_ca}.key    \
+                       -CAcreateserial -CAserial ${sb_srl}     \
+                       -extfile ${sslconf} -extensions sb_kmod \
+                       -out ${sb_kmod}.crt
+
     openssl verify -x509_strict -check_ss_sig -policy_check \
                    -CApath /dev/null -CAfile ${sb_ca}.crt   \
                    ${sb_ca}.crt ${sb_sign}.crt
 
+    openssl verify -x509_strict -check_ss_sig -policy_check \
+                   -CApath /dev/null -CAfile ${sb_ca}.crt   \
+                   ${sb_ca}.crt ${sb_kmod}.crt
+
     openssl x509 -in ${sb_ca}.crt   -outform DER -out ${sb_ca}.der
     openssl x509 -in ${sb_sign}.crt -outform DER -out ${sb_sign}.der
+    openssl x509 -in ${sb_kmod}.crt -outform DER -out ${sb_kmod}.der
 
     chmod go= ${sb_ca}.key ${sb_sign}.key
+    chmod o=  ${sb_kmod}.key
+    chgrp bin ${sb_kmod}.key
 
     rm -f ${RANDFILE}
     mv -T ${sbdirtmp} ${sbdir}

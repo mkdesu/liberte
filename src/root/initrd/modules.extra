@@ -15,6 +15,7 @@ nls_utf8
 # USB input devices
 usbhid
 
+
 # USB storage devices
 usb-storage
 xhci-hcd

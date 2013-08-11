@@ -2,6 +2,7 @@
 
 # sys-kernel/linux-firmware sublist
 fwlst=/etc/portage/savedconfig/sys-kernel/linux-firmware
+fwpath=/usr/local/addons/shipped-fw
 
 # initramfs image
 initrd=/usr/src/linux-main/usr/initramfs_data.cpio.xz
@@ -28,10 +29,16 @@ done
 
 
 # Check for unneeded linux-firmware entries
-echo ${fwfiles} | tr ' ' '\n'                         \
-    | comm -13 - <(sed -n '/^[^#]/p' ${fwlst} | sort) \
-    | sed '/^brcm\/bcm43xx/d; /^v4l-/d'               \
+echo ${fwfiles} | tr ' ' '\n'                                   \
+    | comm -13 - <(sed -n '/^[^#]/p' ${fwlst} | sort)           \
+    | sed '/^brcm\/bcm43xx/d; /^v4l-/d; /^rtlwifi\/rtl8723fw/d' \
     | sed 's/^/unneeded: /'
+
+
+# Check for unlisted shipped firmware entries
+comm -13 <(find /lib/firmware ! -type d -printf '%P\n' | sort)                       \
+         <(find ${fwpath}     ! -type d ! -name 'bnx2-mips-*' -printf '%P\n' | sort) \
+    | sed 's/^/unlisted: /'
 
 
 # Ensure that initramfs modules do not require any firmware

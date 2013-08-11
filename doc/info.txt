@@ -73,6 +73,12 @@ libgcrypt users: cryptsetup, gnupg, gnome-keyring, libotr(pidgin-otr),
 Encryption
 ==========
 
+Secure Boot
+  + RSA-4096 / SHA-256 EFI images signing
+
+Kernel
+  + RSA-4096 / SHA-256 module signing
+
 LUKS
   + AES-256 / XTS (w/ double key size)
   + SHA-512 LUKS header hashing

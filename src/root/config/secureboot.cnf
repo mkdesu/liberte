@@ -30,3 +30,15 @@ authorityInfoAccess    = caIssuers;URI:http://dee.su/liberte
 basicConstraints       = critical, CA:FALSE
 keyUsage               = critical, digitalSignature
 extendedKeyUsage       = critical, codeSigning, msCodeInd
+
+
+[ sb_kmod ]
+
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+
+authorityInfoAccess    = caIssuers;URI:http://dee.su/liberte
+
+basicConstraints       = critical, CA:FALSE
+keyUsage               = critical, digitalSignature
+extendedKeyUsage       = critical, codeSigning

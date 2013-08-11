@@ -10,8 +10,6 @@ xzmem=20
 
 protected="/etc/._cfg????_locale.gen"
 
-kpatches=${HOME}/patches/kernel-patches.sha256
-
 
 sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
@@ -117,19 +115,11 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     chown -hR bin:bin /usr/src/linux-{main,kexec{,-64}}
 
 
-    sinfo "Downloading kernel patches"
-    for url in `sed -n 's/^# URL //p' ${kpatches}`; do
-        urldest=`sed -n "\@^# URL ${url}@{n; s/.*  //p}" ${kpatches}`
-        mkdir -p "${urldest%/*}"
-        su - -s /bin/sh nobody -c "wget -q -O - \"${url}\"" > "${urldest}"
-        sed -i '/^diff --git /,/^-- /{/^-- /d; b}; d' "${urldest}"
-    done
-    sha256sum --quiet -c ${HOME}/patches/kernel-patches.sha256
-
-
+    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v17&id2=f6161aa153581da4a3867a2d1a7caf4be19b6ec9
+    # (#480548)
     sinfo "Applying kernel patches"
-    spatch /usr/local/portage/distfiles/overlayfs.v13-3.4-rc7.patch -d /usr/src/linux-${kversion} -p1
-    spatch ${HOME}/patches/pax-linux-3.4.7-test27-29-diff.patch     -d /usr/src/linux-${kversion} -p1
+    spatch ${HOME}/patches/overlayfs.v17.patch -d /usr/src/linux-${kversion} -p1
+    sed -i 's/reset_page_mapcount/page_mapcount_reset/' /usr/src/linux-${kversion}/mm/slob.c
 
 
     # Filter locales before remerging libc
@@ -282,7 +272,7 @@ gcc  ${cflags} -o /usr/local/sbin/slay               /usr/local/src/slay.c
 gcc  ${cflags} -o /usr/local/sbin/privsh             /usr/local/src/privsh.c
 gcc  ${cflags} -o /usr/local/bin/log-limit           /usr/local/src/log-limit.c
 
-cflags="-Wall `portageq envvar CFLAGS`"
+cflags="-std=c99 -Wall `portageq envvar CFLAGS`"
 mkdir -p /usr/local/addons/initrd
 klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.c
 
@@ -476,6 +466,10 @@ find /etc/dconf/db -maxdepth 1 -type f -delete
 dconf update
 
 
+sinfo "Generating Secure Boot test certificates"
+${helpdir}/gen-sb-cert test
+
+
 sinfo "Building kernel modules"
 ${helpdir}/gen-kernel modules
 
@@ -523,10 +517,6 @@ ${helpdir}/gen-syslinux
 
 sinfo "Generating EFI GRUB configuration"
 ${helpdir}/gen-efi
-
-
-sinfo "Generating Secure Boot test certificates"
-${helpdir}/gen-sb-cert test
 
 
 sinfo "Done."

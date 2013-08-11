@@ -20,10 +20,10 @@
 =app-accessibility/florence-0.6.0*
 
 # Guest virtualization
-=app-emulation/open-vm-tools-2012.10.14*
-=app-emulation/open-vm-tools-kmod-2012.10.14*
-=app-emulation/virtualbox-guest-additions-4.2.10*
-=x11-drivers/xf86-video-virtualbox-4.2.10*
+=app-emulation/open-vm-tools-2013.04.16*
+=app-emulation/open-vm-tools-kmod-2013.04.16*
+=app-emulation/virtualbox-guest-additions-4.2.14*
+=x11-drivers/xf86-video-virtualbox-4.2.14*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*
@@ -38,8 +38,3 @@
 sys-firmware/amd-ucode
 sys-firmware/b43-firmware
 sys-firmware/b43legacy-firmware
-sys-firmware/iwl2000-ucode
-sys-firmware/iwl2030-ucode
-sys-firmware/iwl5150-ucode
-sys-firmware/iwl6005-ucode
-sys-firmware/iwl6030-ucode

@@ -102,5 +102,6 @@ app-misc/joy2key
 net-print/ink
 
 # Virtualization
-app-emulation/open-vm-tools
+# (#474636)
+# app-emulation/open-vm-tools
 app-emulation/virtualbox-guest-additions

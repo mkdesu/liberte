@@ -9,11 +9,6 @@ sinfo() {
 }
 
 
-sinfo "Unnecessary unmasking:"
-comm -23 <(sed -n 's/^[=<]\(.*\)-[0-9].*/\1/; /^[^#]/p' ${keyworded} | sort) \
-         <(eix --installed-unstable --only-names | sort)
-
-
 sinfo "Unincluded firmware:"
 NEWLINE=true eix -sr '\<(ucode|firmware|microcode|fw)\>' -\* --testing \
     --format '{!installed}<bestversion*:NAMEVERSION>\t <description>{}'
@@ -35,6 +30,11 @@ sed -n '/^$\|^[^#]/p' ${linuxfw} | while read fw; do
     fi
 done
 echo
+
+
+sinfo "Unnecessary unmasking:"
+comm -23 <(sed -n 's/^[=<]\(.*\)-[0-9].*/\1/; /^[^#]/p' ${keyworded} | sort) \
+         <(eix --installed-unstable --only-names | sort)
 
 
 sinfo "Done."

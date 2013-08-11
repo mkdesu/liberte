@@ -1,12 +1,24 @@
 # --- Wireless ---
 
+# AR5523
+ar5523.bin
+
 # ATH9K_HTC
 htc_7010.fw
 htc_9271.fw
 
+# BRCMFMAC
+brcm/brcmfmac43236b.bin
+# (missing)
+brcm/brcmfmac43143.bin
+brcm/brcmfmac43242a.bin
+
 # BRCMSMAC
 brcm/bcm43xx-0.fw
 brcm/bcm43xx_hdr-0.fw
+
+# CARL9170
+carl9170-1.fw
 
 # HERMES
 agere_ap_fw.bin
@@ -18,20 +30,35 @@ symbol_sp24t_prim_fw
 symbol_sp24t_sec_fw
 
 # IWL{3945,4965,WIFI}
-iwlwifi-100-5.ucode
-iwlwifi-105-6.ucode
-iwlwifi-135-6.ucode
 iwlwifi-3945-2.ucode
 iwlwifi-4965-2.ucode
+iwlwifi-100-5.ucode
+iwlwifi-1000-5.ucode
+iwlwifi-105-6.ucode
+iwlwifi-135-6.ucode
+iwlwifi-2000-6.ucode
+iwlwifi-2030-6.ucode
+iwlwifi-5000-5.ucode
+iwlwifi-5150-2.ucode
+iwlwifi-6000-4.ucode
+iwlwifi-6000g2a-6.ucode
+iwlwifi-6000g2b-6.ucode
+iwlwifi-6050-5.ucode
+# (missing)
+# iwlwifi-6000-6.ucode
+iwlwifi-3160-6.ucode
+iwlwifi-7260-6.ucode
 
 # MWIFIEX
+mrvl/usb8797_uapsta.bin
 # (missing)
 mrvl/pcie8766_uapsta.bin
+mrvl/pcie8897_uapsta.bin
 
 # MWL8K
 mwl8k/helper_8366.fw
 mwl8k/fmimage_8366.fw
-mwl8k/fmimage_8366_ap-2.fw
+mwl8k/fmimage_8366_ap-3.fw
 mwl8k/helper_8687.fw
 mwl8k/fmimage_8687.fw
 # (missing)
@@ -56,13 +83,18 @@ rt2870.bin
 # rt3070.bin
 # rt3071.bin
 
-# RTL8192{CE,CU,SE,DE}
+# RTL{8192{CE,CU,SE,DE},8723AE}
 rtlwifi/rtl8192cfw.bin
 rtlwifi/rtl8192cufw.bin
 rtlwifi/rtl8192sefw.bin
 rtlwifi/rtl8192defw.bin
 rtlwifi/rtl8192cfwU.bin
 rtlwifi/rtl8192cfwU_B.bin
+rtlwifi/rtl8723fw.bin
+rtlwifi/rtl8723fw_B.bin
+# (missing)
+rtlwifi/rtl8723aefw.bin
+rtlwifi/rtl8723aefw_B.bin
 
 
 # --- Bluetooth ---
@@ -86,6 +118,15 @@ i2400m-fw-usb-1.5.sbcf
 i6050-fw-usb-1.5.sbcf
 
 
+# --- UWB ---
+
+# UWB_I1480U
+# (missing)
+i1480-pre-phy-0.0.bin
+i1480-phy-0.0.bin
+i1480-usb-0.0.bin
+
+
 # --- Ethernet ---
 
 # ACENIC
@@ -97,7 +138,7 @@ adaptec/starfire_rx.bin
 adaptec/starfire_tx.bin
 
 # BNX2
-bnx2/bnx2-mips-06-6.2.1.fw
+bnx2/bnx2-mips-06-6.2.3.fw
 bnx2/bnx2-mips-09-6.2.1b.fw
 bnx2/bnx2-rv2p-06-6.0.15.fw
 bnx2/bnx2-rv2p-09-6.0.17.fw
@@ -110,6 +151,7 @@ e100/d102e_ucode.bin
 
 # R8169
 rtl_nic/rtl8105e-1.fw
+rtl_nic/rtl8106e-1.fw
 rtl_nic/rtl8168d-1.fw
 rtl_nic/rtl8168d-2.fw
 rtl_nic/rtl8168e-1.fw
@@ -117,6 +159,9 @@ rtl_nic/rtl8168e-2.fw
 rtl_nic/rtl8168e-3.fw
 rtl_nic/rtl8168f-1.fw
 rtl_nic/rtl8168f-2.fw
+rtl_nic/rtl8168g-1.fw
+rtl_nic/rtl8402-1.fw
+rtl_nic/rtl8411-1.fw
 
 # TIGON3
 tigon/tg3.bin
@@ -178,14 +223,24 @@ radeon/RS780_me.bin
 v4l-cx23418-apu.fw
 v4l-cx23418-cpu.fw
 v4l-cx23418-dig.fw
+dvb-fe-xc5000-1.6.114.fw
+# (missing)
+dvb-cx18-mpc718-mt352.fw
+dvb-fe-xc5000c-4.1.30.7.fw
+xc3028-v27.fw
+xc3028L-v36.fw
 
 # VIDEO_IVTV
+v4l-cx231xx-avcore-01.fw
+v4l-cx23885-avcore-01.fw
 v4l-cx25840.fw
 # (missing)
+v4l-cx2341x-init.mpg
 v4l-cx2341x-dec.fw
 v4l-cx2341x-enc.fw
 v4l-pvrusb2-24xxx-01.fw
 v4l-pvrusb2-29xxx-01.fw
+v4l-pvrusb2-73xxx-01.fw
 
 
 # --- Miscellaneous ---
@@ -202,3 +257,11 @@ cis/3CCFEM556.cis
 cis/3CXEM556.cis
 cis/DP83903.cis
 cis/PCMLM28.cis
+
+# USB_STORAGE_ENE_UB6250
+ene-ub6250/ms_init.bin
+ene-ub6250/ms_rdwr.bin
+ene-ub6250/msp_rdwr.bin
+ene-ub6250/sd_init1.bin
+ene-ub6250/sd_init2.bin
+ene-ub6250/sd_rdwr.bin
