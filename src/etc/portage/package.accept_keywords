@@ -1,7 +1,5 @@
 # System
 =app-crypt/gnupg-pkcs11-scd-0.7.3*
-=sys-apps/elfix-0.8.3*
-=dev-python/pypax-0.8.3*
 
 # Boot process (cdrtools: EFI platform support)
 =sys-boot/grub-2.00*:2
@@ -11,7 +9,6 @@
 
 # Network
 =net-wireless/reaver-1.4*
-=net-proxy/obfsproxy-0.1.4*
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.93*
@@ -31,10 +28,10 @@
 # Library-only Javascript for PolKit (#437520)
 =dev-lang/spidermonkey-1.8.7*:0/mozjs187
 
-# Hardened compilation issues (#444246)
-=sys-boot/gnu-efi-3.0s*
-
 # Firmware
 sys-firmware/amd-ucode
 sys-firmware/b43-firmware
 sys-firmware/b43legacy-firmware
+
+# Hardened compilation issues (#456238)
+=sys-process/numactl-2.0.8*

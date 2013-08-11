@@ -17,11 +17,11 @@ case "${profile}" in
         # SSH: disable Tor SOCKS proxy
         sed -i 's/^ProxyCommand\>/# &/'               /home/anon/config/ssh/config
 
-        # XChat: disable Tor SOCKS proxy, and enable automatic DCC IP,
-        #        restore default servers list
-        sed -i 's/^\(net_proxy_type =\) 3$/\1 0/'     /home/anon/config/xchat/xchat.conf
-        sed -i 's/^\(dcc_ip_from_server =\) 0$/\1 1/' /home/anon/config/xchat/xchat.conf
-        rm -f                                         /home/anon/config/xchat/servlist_.conf
+        # HexChat: disable Tor SOCKS proxy, and enable automatic DCC IP,
+        #          restore default servers list
+        sed -i 's/^\(net_proxy_type =\) 3$/\1 0/'     /home/anon/config/hexchat/hexchat.conf
+        sed -i 's/^\(dcc_ip_from_server =\) 0$/\1 1/' /home/anon/config/hexchat/hexchat.conf
+        rm -f                                         /home/anon/config/hexchat/servlist_.conf
 
         # Pidgin: disable Tor SOCKS proxy, and enable automatic IP detection
         sed -i 's/\<socks5\>/none/'                   /home/anon/config/purple/prefs.xml

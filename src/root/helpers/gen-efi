@@ -72,8 +72,8 @@ memdisk() {
 
     tar -cf ${build}/memdisk.tar -C ${build} grub
 
-    # NOTE: -C has no effect      (#424527), (Savannah: #36770)
-    # NOTE: -p must come after -m (#424521), (Savannah: #36771)
+    # NOTE: -C has no effect (Savannah: #36770)
+    # NOTE: -p must come after -m
     grub2-mkimage -C xz -O ${arch} -m ${build}/memdisk.tar -p "(memdisk)/grub" \
                   -o ${out} memdisk tar xzio gcry_crc
     rm -r ${build}

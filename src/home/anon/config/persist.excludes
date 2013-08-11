@@ -26,7 +26,7 @@
 
 # Instant messaging
 # /config/purple/xmpp-caps.xml
-/config/xchat/scrollback/
+/config/hexchat/scrollback/
 
 # Miscellaneous
 /config/audacious/plugin-registry

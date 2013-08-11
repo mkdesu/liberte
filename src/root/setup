@@ -245,6 +245,10 @@ perl-cleaner --ph-clean --modules -- -q
 # python-updater -dmanual -- -q
 
 
+sinfo "Rebuilding packages that use old libraries"
+emerge -q @preserved-rebuild
+
+
 sinfo "Checking linking consistency"
 revdep-rebuild -qi
 
@@ -264,8 +268,6 @@ fi
 
 
 sinfo "Compiling custom executables"
-mkdir -p /usr/lib/xchat/plugins
-
 cflags="-std=c99 -Wall -pedantic `portageq envvar CFLAGS` `portageq envvar LDFLAGS`"
 gcc  ${cflags} -o /usr/local/sbin/udev-watchdog      /usr/local/src/udev-watchdog.c -ludev
 gcc  ${cflags} -o /usr/local/sbin/slay               /usr/local/src/slay.c
