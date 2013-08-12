@@ -75,13 +75,10 @@ rt73.bin
 
 # RT2800PCI
 rt2860.bin
-# rt3090.bin
-# rt3290.bin
+rt3290.bin
 
 # RT2800USB
 rt2870.bin
-# rt3070.bin
-# rt3071.bin
 
 # RTL{8192{CE,CU,SE,DE},8723AE}
 rtlwifi/rtl8192cfw.bin
