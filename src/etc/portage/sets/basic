@@ -71,7 +71,6 @@ net-mail/cables
 
 # Peripheral utilities
 sys-apps/irqbalance
-sys-process/numactl
 sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpufrequtils
