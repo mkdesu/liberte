@@ -403,7 +403,7 @@ rm -f  /var/log/wtmp
 
 
 sinfo "Replacing laptop-mode drive-waking hdparm calls"
-sed -i 's/\<hdparm -[SW]\>/fast-&/' /usr/share/laptop-mode-tools/modules/hdparm
+sed -i 's/`\(hdparm -[SW]\)\>/`fast-\1/' /usr/share/laptop-mode-tools/modules/hdparm
 
 
 # "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
