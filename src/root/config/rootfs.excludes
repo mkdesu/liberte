@@ -162,8 +162,6 @@
 /usr/bin/gsettings-schema-convert
 # net-misc/rsync: non-essential auxiliary scripts
 /usr/share/rsync/
-# media-sound/alsa-utils: Bash script that depends on gettext
-/usr/sbin/alsaconf
 # app-misc/ca-certificates: depends on run-parts
 /usr/sbin/update-ca-certificates
 # net-dialup/pptpclient: not needed by networkmanager-pptp
