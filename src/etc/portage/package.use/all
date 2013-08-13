@@ -55,6 +55,7 @@ media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass
 media-libs/gst-plugins-base             theora
 media-libs/libtheora            encode
 net-im/pidgin                   -gstreamer
+media-libs/libass               -harfbuzz
 
 # Unnecessary functionality (geoclue: (#416331))
 sys-libs/ncurses                minimal
