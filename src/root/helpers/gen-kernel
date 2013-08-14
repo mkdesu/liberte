@@ -64,7 +64,7 @@ fi
 # Handle kernel preparation for building external modules
 if [ "${cmd}" = prepare ]; then
     # sudo might not be available at this stage
-    su - -s /bin/sh bin -c "${rmake} O=${mainobj} modules_prepare"
+    su - -s /bin/sh bin -c "${rmake} O=${mainobj} modules_prepare" 2>/dev/null
     exit
 elif [ "${cmd}" = modules ]; then
     # vmlinux is necessary for System.map (although initramfs may not exist yet,
@@ -82,7 +82,7 @@ elif [ "${cmd}" = modules ]; then
     rm ${mainmod}/{build,source}
     chmod go= ${mainmod}
 
-    # Sign out-of-tree modules
+    # Sign out-of-tree modules (#447352)
     find ${mainmod} -mindepth 2 ! -path "${mainmod}/kernel/*" -type f -name '*.ko' | \
     while read mod; do
         if ! grep -q '~Module signature appended~' "${mod}"; then
