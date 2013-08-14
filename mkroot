@@ -57,10 +57,10 @@ fi
 rm ${LIVECD}/mirror/fs-test
 
 
-# latest-stage3.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
+# latest-stage3-i686.txt contains YYYYMMDD/stage3-i686-YYYYMMDD.tar.bz2
 sinfo "Fetching latest-stage3.txt"
-wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3.txt
-stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3.txt`
+wget -N -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/latest-stage3-i686.txt
+stage3=`grep stage3-i686 ${LIVECD}/mirror/stage3/latest-stage3-i686.txt`
 stage3file=`basename ${stage3}`
 
 # If a new stage3 is available, remove old mirrors
@@ -70,7 +70,9 @@ fi
 
 
 sinfo "Downloading ${stage3file}"
-wget -c -nv -P ${LIVECD}/mirror/stage3 ${stage3base}/${stage3}.DIGESTS.asc \
+wget -c -nv -P ${LIVECD}/mirror/stage3  \
+    ${stage3base}/${stage3}.DIGESTS.asc \
+    ${stage3base}/${stage3}.CONTENTS    \
     ${stage3base}/${stage3}
 
 sinfo "Downloading portage-latest.tar.bz2"
@@ -126,6 +128,7 @@ sed '/^# WHIRLPOOL HASH$/{N; s/.*/\n/}' ${LIVECD}/mirror/stage3/${stage3file}.DI
 
 
 sinfo "Removing ${LIVECD}/src"
+chattr -f -a ${LIVECD}/src/tmp/.private || :
 rm -rf --one-file-system ${LIVECD}/src
 mkdir -m 755 ${LIVECD}/src
 
