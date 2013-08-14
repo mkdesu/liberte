@@ -95,7 +95,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     sinfo "Compiling uname wrapper"
     gcc -ansi -Wall -pedantic -O2 -s -o /usr/local/bin/uname /usr/local/src/uname.c
 
-    # Kernel sources should be present when sys-fs/udev is compiled
+    # Kernel sources should be present when sys-fs/udev is compiled,
+    # also this part is often error-prone, so better do early.
     # Maintainer note: after non-fresh kernel update+compile, do
     # emerge -q1 dev-libs/klibc sys-apps/v86d
     #            app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
@@ -169,6 +170,9 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     USE="-X -consolekit" emerge -qeu   @system
     rm -f ${protected}
     rebuild_locales
+
+    # Also rebuild hardened-sources dependencies (#461848)
+    emerge -q1 sys-devel/bc
 
 
     sinfo "Removing non-system packages"
