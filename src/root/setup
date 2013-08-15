@@ -440,8 +440,9 @@ groupadd -g 9001 nofw   || [ $? = 9 ]
 useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon                  anon  || [ $? = 9 ]
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 
-usermod -G wheel,plugdev,lp,games,vmware,vboxguest anon
-usermod -G legion                                  cable
+# "vmware" disabled (#474636)
+usermod -G wheel,plugdev,lp,games,vboxguest anon
+usermod -G legion                           cable
 
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
