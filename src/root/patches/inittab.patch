@@ -31,4 +31,4 @@
 +c2:2345:wait:/sbin/mingetty --autologin root tty2 linux
  
  # SERIAL CONSOLES
- #s0:12345:respawn:/sbin/agetty 115200 ttyS0 vt100
+ #s0:12345:respawn:/sbin/agetty -L 115200 ttyS0 vt100
