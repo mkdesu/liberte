@@ -89,7 +89,8 @@ sys-libs/gpm
 net-wireless/bluez
 sys-fs/obexfs
 dev-libs/opensc
-net-wireless/irda-utils
+# (#469632)
+# net-wireless/irda-utils
 sys-apps/usb_modeswitch
 sys-power/acpid
 sys-apps/lm_sensors
