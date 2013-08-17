@@ -10,7 +10,7 @@ case ${action} in
         # ntpd gracefully adds/removes interfaces
         if ! /etc/init.d/ntpd -q status; then
             logger -p 6 -t nm.dispatch "Starting NTP service (${iface})"
-            /etc/init.d/ntpd -q start
+            /etc/init.d/ntpd -qS start
         fi
         ;;
 esac

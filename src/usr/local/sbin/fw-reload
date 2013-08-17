@@ -84,10 +84,10 @@ iptables -A OUTPUT -p icmp --icmp-type echo-reply   -m state --state ESTABLISHED
 # --- Loopback ---
 # NOTE: owner match doesn't work with the INPUT chain
 
-# NTP server [disabled] modification permission to ntpd user only (or root in pre-DNS phase)
-# iptables -A OUTPUT -o lo -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp -j ACCEPT
-# iptables -A OUTPUT -o lo -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
-# iptables -A OUTPUT -o lo -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
+# NTP server modification permission to ntpd user only (or root in pre-DNS phase)
+iptables -A OUTPUT -o lo -p udp -m owner --uid-owner root -d 127.0.0.1 --dport ntp -j ACCEPT
+iptables -A OUTPUT -o lo -p udp -m owner --uid-owner ntp  -d 127.0.0.1 --dport ntp -j ACCEPT
+iptables -A OUTPUT -o lo -p udp                           -d 127.0.0.1 --dport ntp -j LOGREJECT
 
 # Hidden service server access only for Tor
 iptables -A OUTPUT -o lo -p tcp -m owner --uid-owner tor      --syn -d 127.0.0.1 --dport 9080 -j ACCEPT
@@ -114,13 +114,16 @@ iptables -A OUTPUT -o lo -j ACCEPT
 
 # --- External Communications ---
 
-# DHCP and NTP client [disabled] communication
+# DHCP and NTP client communication
 iptables -A OUTPUT -p udp                              --sport bootpc --dport bootps -j ACCEPT
-# iptables -A OUTPUT -p udp                              --sport ntp    --dport ntp    -j ACCEPT
+iptables -A OUTPUT -p udp                              --sport ntp    --dport ntp    -j ACCEPT
 
-# DNS use for NTP server [disabled, resolves as root] and non-firewalled user.
-# NOTE: uid-owner does not work for dns with nscd
+# DNS use for NTP server [resolves as root] and non-firewalled user.
+# NetworkManager applet also resolved VPN hostnames as root (via D-Bus)
+# NOTE: NTP will possibly resolve as uid=ntp starting with 4.2.7
+iptables -A OUTPUT -p udp -m owner --uid-owner root          --dport domain -j ACCEPT
 iptables -A OUTPUT -p udp -m owner --uid-owner ${nofw}       --dport domain -j ACCEPT
+iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn --dport domain -j ACCEPT
 iptables -A OUTPUT -p tcp -m owner --uid-owner ${nofw} --syn --dport domain -j ACCEPT
 
 # In "noanon" profile, Privoxy can use DNS

@@ -51,6 +51,7 @@
 /usr/share/i18n/
 /usr/share/icu/
 /usr/share/NetworkManager/
+/usr/share/ntp/
 /usr/share/openrc/
 /usr/share/readline/
 /usr/share/vala/
@@ -130,6 +131,9 @@
 /usr/bin/sensors-conf-convert
 # gnome-base/libglade: old versions ui upgrade
 /usr/bin/libglade-convert
+# net-misc/ntp: servers chain tracer, ntpq loop wrapper
+/usr/bin/ntptrace
+/usr/bin/ntp-wait
 # dev-util/strace: nice strace output
 /usr/bin/strace-graph
 # app-text/aspell: old dictionaries import
