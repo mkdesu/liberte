@@ -79,7 +79,7 @@ else
     fi
 
     mkdir -p -m 755 ${LIVECD}/usr/local/addons
-    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${LIVECD}/../mirror/keys ${LIVECD}/usr/local/addons
+    ${RSYNC} --chmod=u=rwX,go=rX -i --delete-excluded -C ${SRC}/../conf/certs ${LIVECD}/usr/local/addons
 
     # rwX------
     ${RSYNC} --chmod=u=rwX,go=   -i --delete \

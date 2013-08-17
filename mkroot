@@ -36,7 +36,7 @@ fi
 
 # Extract stage3 + portage snapshot to fresh directory
 # Download stage3 + portage snapshot
-mkdir -p ${LIVECD}/mirror/stage3 ${LIVECD}/mirror/portage ${LIVECD}/mirror/keys
+mkdir -p ${LIVECD}/mirror/stage3 ${LIVECD}/mirror/portage
 mkdir -p -m 700 ${LIVECD}/mirror/gnupg
 
 sinfo "Testing for required utilities"
@@ -79,18 +79,14 @@ sinfo "Downloading portage-latest.tar.bz2"
 wget -N -nv -P ${LIVECD}/mirror/portage ${portage}.gpgsig ${portage}
 
 
-sinfo "Copying certificates and PGP keys"
-cp ${FROM}/conf/certs/mfpl.crt ${LIVECD}/mirror/keys
-
+sinfo "Verifying PGP keys fingerprints"
 for key in ${gpg_keys}; do
     org=`echo ${key} | cut -d: -f1`
     fpr=`echo ${key} | cut -d: -f2`
     keyid=`echo -n ${fpr} | tail -c -8`
 
-    cp ${FROM}/conf/certs/${org}-${keyid}.asc ${LIVECD}/mirror/keys
-
     gpg -q --homedir ${LIVECD}/mirror/gnupg --no-default-keyring \
-        --keyring ${org}.gpg --import ${LIVECD}/mirror/keys/${org}-${keyid}.asc
+        --keyring ${org}.gpg --import ${FROM}/conf/certs/${org}-${keyid}.asc
 
     fpr2=`gpg -q --homedir ${LIVECD}/mirror/gnupg --keyring ${org}.gpg \
               --fingerprint --with-colons 0x${fpr} | sed -n '/^fpr:/p' | cut -d: -f10`
@@ -100,8 +96,6 @@ for key in ${gpg_keys}; do
     fi
 done
 
-
-sinfo "Verifying keyrings"
 for keyring in `echo "${gpg_keys}" | cut -d: -f1 | sort -u`; do
     keyids=`gpg -q -k --homedir ${LIVECD}/mirror/gnupg --keyring ${keyring}.gpg \
                 --fingerprint --with-colons | sed -n '/^fpr:/p' | cut -d: -f10 | sort`

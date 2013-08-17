@@ -74,7 +74,7 @@ rm -f /etc/portage/savedconfig/*/*-[0-9]*
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     sinfo "Updating portage"
 
-    gpg -q --homedir /etc/portage/gnupg --import /usr/local/addons/keys/gentoo-*.asc
+    gpg -q --homedir /etc/portage/gnupg --import /usr/local/addons/certs/gentoo-*.asc
     eix-sync -qw -C -q
 fi
 
@@ -462,9 +462,9 @@ done
 
 sinfo "Initializing a secondary PGP keyring"
 sudo -n -u anon gpg -q --homedir /home/anon/persist/security/pgp --no-default-keyring \
-    --keyring liberte.gpg --import /usr/local/addons/keys/liberte-*.asc
+    --keyring liberte.gpg --import /usr/local/addons/certs/liberte-*.asc
 install -p -o anon -g legion -m 600 -t /home/anon/persist/security/pgp \
-    /usr/local/addons/keys/mfpl.crt
+    /usr/local/addons/certs/mfpl.crt
 
 # clear pam_mktemp's append-only attribute to allow later livecd directory removal
 chattr -f -a /tmp/.private || :
