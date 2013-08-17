@@ -4,10 +4,6 @@ luser=anon
 nofw=nofw
 cable=cable
 
-# Assumes the actual IP is in /etc/hosts (cf. /etc/conf.d/tlsdated)
-tlsdate=tlsdate
-tlsdateip=www.google.com
-
 # ReachableAddresses ports in /etc/tor/torrc [uid=tor]
 # (allow high ports in order to support most bridges)
 torports=80,443,1024:65535
@@ -132,9 +128,6 @@ if [ ${luser} = ${nofw} ]; then
     iptables -A OUTPUT -p udp -m owner --uid-owner privoxy       --dport domain -j ACCEPT
     iptables -A OUTPUT -p tcp -m owner --uid-owner privoxy --syn --dport domain -j ACCEPT
 fi
-
-# Time synchronization via tlsdate
-iptables -A OUTPUT -p tcp -m owner --uid-owner ${tlsdate} --syn -d ${tlsdateip} --dport https   -j ACCEPT
 
 # VPN connections (root-initiated)
 iptables -A OUTPUT -p tcp -m owner --uid-owner root    --syn -m multiport --dports ${vpntports} -j ACCEPT

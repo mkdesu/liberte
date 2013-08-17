@@ -42,8 +42,6 @@ fi
 
 webhost=torproject.org
 webip=38.229.72.16
-
-tlsdatehost=https://www.google.com
 onionhost=3g2upl4pq6kufc4m.onion
 
 ccuser=`cat /home/anon/persist/security/cable/certs/username`
@@ -80,9 +78,6 @@ stest fail "Fetch .org w/o proxy as root"                          curl -fsSI -x
 stest pass "Fetch .org w/o proxy as nofw"          sudo -n -u nofw curl -fsSI -x "" ${webhost}
 stest fail "Fetch .org w/o proxy as anon"          sudo -n -u anon curl -fsSI -x "" ${webhost}
 stest fail "Fetch .org w/o proxy as tor"           sudo -n -u tor  curl -fsSI -x "" ${webhost}
-
-stest fail "Fetch tlsdate w/o proxy as anon"       sudo -n -u anon    curl -fsSI -x "" ${tlsdatehost}
-stest pass "Fetch tlsdate w/o proxy as tlsdate"    sudo -n -u tlsdate curl -fsSI -x "" ${tlsdatehost}
 
 # Darknet access via HTTP/SOCKS
 stest pass "Fetch .onion via HTTP  proxy as anon"  sudo -n -u anon curl -fsSI -x 127.0.0.1:8118                ${onionhost}
