@@ -301,9 +301,9 @@ sinfo "Fixing miscellaneous directory permissions"
 chmod go=u-w /var/log/wimax
 
 # (#444734, FreeDesktop: #58787)
-chown root:polkitd /etc/polkit-1/rules.d
-chmod 750          /etc/polkit-1/rules.d
-chown root:root    {/etc,/usr/share}/polkit-1/rules.d/* /usr/share/polkit-1/rules.d
+chown root:polkitd {/etc,/usr/share}/polkit-1/rules.d
+chmod 750          {/etc,/usr/share}/polkit-1/rules.d
+chown root:root    {/etc,/usr/share}/polkit-1/rules.d/*
 chmod 644          {/etc,/usr/share}/polkit-1/rules.d/*
 
 

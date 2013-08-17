@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Permissions augmented in /etc/polkit-1/localauthority/30-site.d/10-su.dee.liberte.consolekit.pkla
+# Permissions augmented in /etc/polkit-1/rules.d/10-su.dee.liberte.consolekit.rules
 # (inactive permissions due to different VT, multiple-users due to possible root login)
 ckm=org.freedesktop.ConsoleKit.Manager
 ckmo=/org/freedesktop/ConsoleKit/Manager
