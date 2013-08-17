@@ -29,7 +29,7 @@ modules_io="search hashsum gcry_sha256 read"
 modules="${modules_core} ${modules_fs} ${modules_boot} ${modules_arch} ${modules_io}"
 
 
-# Building a memdisk (see grub2-mkstandalone (Savannah: #36772))
+# Building a memdisk (see grub2-mkstandalone (Savannah: #36772, #39796))
 memdisk() {
     local out="$1" arch="$2" mods="$3"
     local build=`mktemp -d`

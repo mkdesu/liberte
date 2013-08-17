@@ -7,7 +7,6 @@ silentflag=/var/run/nologo
 xorgdir=/etc/X11
 xorglog=/var/log/Xorg.0.log
 xorgdrv=/usr/lib/xorg/modules/drivers
-xorgdrvtype=native
 
 amixerrst=/usr/local/bin/reset-mixer
 asoundrc=/etc/asound.conf
@@ -62,28 +61,21 @@ start() {
     if get_bootparam 'nox'; then
         ewarn Skipping X server configuration
     else
-        # Temporarily mount native/VESA/fbdev-only drivers directory if requested
-        if get_bootparam 'xvesa'; then
-            ewarn Forcing VESA X server driver
-            xorgdrvtype=vesa
-        elif get_bootparam 'xfb'; then
-            ewarn Forcing framebuffer X server driver
-            xorgdrvtype=fbdev
-        elif get_bootparam 'xkms'; then
-            ewarn Forcing modesetting X server driver
-            xorgdrvtype=modesetting
-        fi
-        mount -rB ${xorgdrv}.${xorgdrvtype} ${xorgdrv}
-
-        ebegin Configuring X server
+        ebegin "Configuring X server"
         rm -f ${xorgdir}/xorg.conf.new
-        HOME=${xorgdir} Xorg -configure 2>/dev/null
-        if [ ! -e ${xorgdir}/xorg.conf.new  -a  ${xorgdrvtype} = native ]; then
-            ewarn Falling back to VESA X server driver
-            umount ${xorgdrv} && mount -rB ${xorgdrv}.vesa ${xorgdrv}
-            HOME=${xorgdir} Xorg -configure 2>/dev/null
+
+        if   get_bootparam 'xvesa'; then
+            tryxconf vesa        ewarn  "[fallback] VESA X server driver"
+        elif get_bootparam 'xfb';   then
+            tryxconf fbdev       ewarn  "[fallback] Framebuffer X server driver"
+        elif get_bootparam 'xkms';  then
+            tryxconf modesetting ewarn  "[fallback] Modesetting X server driver"
+        else
+            tryxconf native      einfo  "Native X server driver"
+            tryxconf modesetting ewarn  "[fallback] Modesetting X server driver"
+            tryxconf vesa        ewarn  "[fallback] VESA X server driver"
+            tryxconf fbdev       ewarn  "[fallback] Framebuffer X server driver"
         fi
-        umount ${xorgdrv}
 
         # Empty last line means no section writing was stopped in the middle
         if [ -e ${xorgdir}/xorg.conf.new ]  &&  [ "`tail -1 ${xorgdir}/xorg.conf.new`" = "" ]; then
@@ -95,5 +87,22 @@ start() {
             false
         fi
         eend $?
+    fi
+}
+
+
+tryxconf() {
+    local drvtype="$1" msgtype="$2" msg="$3"
+
+    if [ ! -e ${xorgdir}/xorg.conf.new ]; then
+        eindent
+        ${msgtype} "${msg}"
+
+        # Temporarily bind-mount specific drivers directory
+        mount -rB ${xorgdrv}.${drvtype} ${xorgdrv}
+        HOME=${xorgdir} Xorg -configure 2>/dev/null
+        umount ${xorgdrv}
+
+        eoutdent
     fi
 }
