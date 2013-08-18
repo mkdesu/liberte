@@ -8,7 +8,7 @@ bootdir=`dirname $0`/boot
 
 cdrom="if=virtio,format=raw,media=cdrom,aio=native,cache=none"
 
-params="loop=/ cdroot_hash=FSHASH video=800x600-32 quiet loglevel=4"
+params="loop=/ cdroot_hash=FSHASH quiet loglevel=4"
 
 export QEMU_AUDIO_DRV=alsa
 

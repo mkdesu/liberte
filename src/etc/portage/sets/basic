@@ -85,7 +85,6 @@ sys-apps/pciutils
 sys-fs/lsscsi
 sys-apps/usbutils
 sys-apps/pcmciautils
-sys-apps/v86d
 sys-libs/gpm
 net-wireless/bluez
 sys-fs/obexfs

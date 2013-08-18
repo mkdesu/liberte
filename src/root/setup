@@ -98,8 +98,7 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled,
     # also this part is often error-prone, so better do early.
     # Maintainer note: after non-fresh kernel update+compile, do
-    # emerge -q1 dev-libs/klibc sys-apps/v86d
-    #            app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
+    # emerge -q1 app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
@@ -368,7 +367,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 sinfo "Configuring start-up services"
 svcsysinit="udev"
 svcboot="consolefont irqbalance haveged metalog
-         iptables consolekit lockdown fbinit"
+         iptables consolekit lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown
             acpid smartd laptop_mode gpm
             autofs NetworkManager privoxy"

@@ -5,6 +5,9 @@
 sys-kernel/hardened-sources
 dev-util/patchutils
 
+# Initramfs executables compilation
+dev-libs/klibc
+
 # Syslinux bootloader
 sys-boot/syslinux
 
