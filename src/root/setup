@@ -310,10 +310,10 @@ sinfo "Setting dash as POSIX shell"
 eselect sh set dash
 
 
-# No sub-pixel rendering, since LCD / cable type is unknown
+# Use RGB sub-pixel rendering (slight degradation on non-RGB LCD / non-DVI cable)
 sinfo "Configuring fontconfig"
 for fconf in \
-    10-no-sub-pixel.conf \
+    10-sub-pixel-rgb.conf \
     20-unhint-small-dejavu-sans.conf \
     20-unhint-small-dejavu-sans-mono.conf \
     20-unhint-small-dejavu-serif.conf \
