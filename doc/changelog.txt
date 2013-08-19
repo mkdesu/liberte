@@ -3,6 +3,7 @@
   * Release naming convention is YYYY.MM from now on
 
   * Kernel 3.9.9 with module signing and BFQ I/O scheduler
+  * Support for installation to GPT media
   * Better support for QEMU mouse virtualization
   * Xorg server 1.13
   * Firewire SBP-2 module is blacklisted to prevent Firewire RAM access

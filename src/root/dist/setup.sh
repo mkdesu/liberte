@@ -5,8 +5,8 @@ set -e
 sysver=SYSVER
 sysbin=syslinux
 extbin=extlinux
-sysmbr=/usr/share/syslinux/mbr_c.bin
-sysmbr2=/usr/lib/syslinux/mbr_c.bin
+sysmbr=/usr/share/syslinux
+sysmbr2=/usr/lib/syslinux
 mattrbin=mattrib
 
 # Directories for ldlinux.sys and bundled syslinux binary
@@ -30,6 +30,8 @@ You need the following installed.
         [if unavailable, bundled 32-bit version will be used]
     udev + sysfs  (Gentoo: sys-fs/udev)
         [available on most modern Linux distributions]
+    gdisk (Gentoo: sys-apps/gptfdisk)
+        [for GUID partition tables support]
 
 Run setup.sh as:
 
@@ -123,7 +125,7 @@ sysok=0
 extok=0
 if ! ${sysbin} -v 1>/dev/null 2>&1; then
     echo "Syslinux v4+ not found, will use bundled binary"
-elif [ ! -e ${sysmbr}  -a  ! -e ${sysmbr2} ]; then
+elif [ ! -e ${sysmbr}/mbr.bin  -a  ! -e ${sysmbr2}/mbr.bin ]; then
     echo "${sysmbr} or ${sysmbr2} not found, will use bundled Syslinux"
 else
     # Check for wrong Syslinux version (exact match required)
@@ -132,7 +134,7 @@ else
         echo "Syslinux v${havesysver} detected, need v${sysver}"
     else
         sysok=1
-        if [ -e ${sysmbr2} ]; then
+        if [ -e ${sysmbr2}/mbr.bin ]; then
             sysmbr=${sysmbr2}
         fi
 
@@ -231,7 +233,7 @@ if [ ${devfs} = fat ]; then
         tar -xpjf ${mntdir}${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
         sysbin=${systmpdir}/syslinux
-        sysmbr=${systmpdir}/mbr_c.bin
+        sysmbr=${systmpdir}
 
         mattrbin=${systmpdir}/mattrib
         export PATH=${systmpdir}:"${PATH}"
@@ -290,7 +292,7 @@ elif [ ${devfs} = ext2 ]; then
         tar -xpjf "${devdir}"${sysdir}/syslinux-x86.tbz -C ${systmpdir}
 
         extbin=${systmpdir}/extlinux
-        sysmbr=${systmpdir}/mbr_c.bin
+        sysmbr=${systmpdir}
 
         checkexec ${extbin}
     fi
@@ -342,8 +344,12 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
     # Check that the partition table is MSDOS
     ptable=`udevprop "${rdevpath}" ID_PART_TABLE_TYPE`
-    if [ "${ptable}" != dos ]; then
-        error "Partition table is of type [${ptable}], need MS-DOS"
+    if [ "${ptable}" = dos ]; then
+        sysmbr=${sysmbr}/mbr_c.bin
+    elif [ "${ptable}" = gpt ]; then
+        sysmbr=${sysmbr}/gptmbr_c.bin
+    else
+        error "Partition table is of type [${ptable}], need MS-DOS or GUID"
     fi
 
 
@@ -355,11 +361,18 @@ if [ -z "${nombr}" -a ${devtype} = partition ]; then
 
 
     # Install Syslinux's MBR (less than 512B, doesn't overwrite the partition table)
-    if ! type sfdisk 1>/dev/null 2>&1; then
-        error "sfdisk not found, cannot mark partition ${devpart} active"
+    if [ "${ptable}" = dos ]; then
+        if ! type sfdisk 1>/dev/null 2>&1; then
+            error "sfdisk not found, cannot mark partition ${devpart} active"
+        fi
+        sfdisk -q -A"${devpart}" "${rdev}"
+    elif [ "${ptable}" = gpt ]; then
+        if ! type sgdisk 1>/dev/null 2>&1; then
+            error "sgdisk not found, cannot mark partition ${devpart} legacy-bootable"
+        fi
+        sgdisk -A "${devpart}":set:2 "${rdev}"
     fi
 
-    sfdisk -q -A"${devpart}" "${rdev}"
     dd bs=440 count=1 iflag=fullblock conv=notrunc if=${sysmbr} of="${rdev}"
 fi
 

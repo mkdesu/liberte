@@ -17,7 +17,7 @@ sysbins=${sysroot}/syslinux-x86.tbz
 modules="syslinux.exe isolinux.bin menu.c32 chain.c32 hdt.c32 reboot.c32 poweroff.com"
 binaries="-C /usr/bin            syslinux mtools mcopy mmove mattrib
           -C /sbin               extlinux
-          -C /usr/share/syslinux mbr_c.bin"
+          -C /usr/share/syslinux mbr_c.bin gptmbr_c.bin"
 
 
 rm    -f /boot/boot
