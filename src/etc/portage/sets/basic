@@ -22,6 +22,7 @@ sys-fs/inotify-tools
 sys-fs/ntfs3g
 sys-fs/dosfstools
 sys-fs/udftools
+sys-fs/extundelete
 net-fs/autofs
 
 # System / security utilities
