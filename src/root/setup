@@ -411,13 +411,16 @@ sinfo "Replacing laptop-mode drive-waking hdparm calls"
 sed -i 's/`\(hdparm -[SW]\)\>/`fast-\1/' /usr/share/laptop-mode-tools/modules/hdparm
 
 
-# "wheel"     group: necessary for su/sudo PAM authentication + GRSEC TPE (= 10)
-#                    + stop/restart PolicyKit permissions + lid events
-# "plugdev"   group: ModemManager control PolicyKit permissions;
-#                    + NetworkManager modify system connections
-#                    + wireless/bluetooth rfkill switch
-# "lp"        group: D-Bus communication with bluetoothd
-# ["uucp"]    group: access to RFCOMM devices (e.g., obexftp)
+# "wheel"     group: necessary for su/sudo PAM authentication (pam_wheel)
+#                    GRSEC TPE (GRKERNSEC_TPE_TRUSTED_GID)
+#                    stop/restart permissions (custom PolKit via ConsoleKit)
+#                    lid events (custom /var/run/lid-events)
+# "plugdev"   group: ModemManager control permissions (PolKit)
+#                    NetworkManager modify system connections (PolKit)
+#                    gnome-bluetooth rfkill switch (udev)
+#                    libmtp devices (udev)
+# "lp"        group: communication with bluez daemon (D-Bus)
+# ["uucp"]    group: access to RFCOMM devices (e.g., obexftp) (udev)
 # "games"     group: prevent games complaining about not keeping scores
 # "vmware"    group: VMware's drag-n-drop feature for file exchange (when enabled)
 # "vboxguest" group: VirtualBox seamless mode, auto-resize and clipboard
