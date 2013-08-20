@@ -23,6 +23,8 @@ sys-fs/inotify-tools
 sys-fs/ntfs3g
 sys-fs/dosfstools
 sys-fs/udftools
+sys-fs/fuse-exfat
+sys-fs/exfat-utils
 sys-fs/extundelete
 net-fs/autofs
 

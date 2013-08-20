@@ -4,6 +4,7 @@
 
   * Kernel 3.9.9 with module signing and BFQ I/O scheduler
   * Support for installation to GPT media
+  * Added support for exFAT filesystem
   * Better support for QEMU mouse virtualization
   * Xorg server 1.13
   * Firewire SBP-2 module is blacklisted to prevent Firewire RAM access

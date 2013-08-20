@@ -111,7 +111,7 @@ File permissions
 ================
 
 Boot media
-  [anon] rw-r----- / rwx--x---
+  [anon] rw------- / rwx------
 
 Home directory
   umask 077
@@ -121,8 +121,8 @@ Persistence directory (cryptsetup)
   [anon] rw------- / rwx------
 
 Automounted directories
-  [anon] rw-r----- / rwx--x--- [rw]
-  [anon] r--r----- / r-x--x--- [ro]
+  [anon] rw------- / rwx------ [rw]
+  [anon] r-------- / r-x------ [ro]
 
 
 
