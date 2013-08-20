@@ -85,7 +85,7 @@ elif [ "${cmd}" = modules ]; then
     # Sign out-of-tree modules (#447352)
     find ${mainmod} -mindepth 2 ! -path "${mainmod}/kernel/*" -type f -name '*.ko' | \
     while read mod; do
-        if ! grep -q '~Module signature appended~' "${mod}"; then
+        if [ -z "`modinfo -F sig_key ${mod}`" ]; then
             ${kernsrc}/scripts/sign-file ${sighash} ${sb_kmod}.key ${sb_kmod}.der "${mod}"
         fi
     done
