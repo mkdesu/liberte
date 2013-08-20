@@ -90,6 +90,22 @@ elif [ "${cmd}" = modules ]; then
         fi
     done
 
+    # Verify all module signatures
+    echo "Verifying installed modules signatures"
+    sigkey="`openssl x509 -inform der -in ${sb_kmod}.der -noout -text \
+             | sed -n '/\<X509v3 Subject Key Identifier:/{n; s/^ *//p}'`"
+    find ${mainmod} -type f -name '*.ko' | while read mod; do
+        mod_sigkey="`modinfo -F sig_key ${mod}`"
+        mod_sighash="`modinfo -F sig_hashalgo ${mod}`"
+        if [ -z "${mod_sigkey}" ]; then
+            echo "${mod} is unsigned"
+            exit 1
+        elif [ "${mod_sigkey}" != "${sigkey}"  -o  "${mod_sighash}" != "${sighash}" ]; then
+            echo "${mod} is signed with unexpected sigkey/sighash"
+            exit 1
+        fi
+    done
+
     exit
 fi
 
