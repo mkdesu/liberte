@@ -1,2 +1,2 @@
-event=button/lid [^ ]+ close .*
+event=button/lid [^ ]+ close\>
 action=touch /var/run/lid-events/close.flag
