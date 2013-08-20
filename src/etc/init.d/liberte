@@ -72,6 +72,8 @@ start() {
             mount -o remount,rw ${boot} && /usr/bin/test -w ${boot}
             mediaro=$?
             eend ${mediaro}
+        elif [ ! -e ${mediadev} ]; then
+            ewarn Boot media device lost, not remounting
         else
             ewarn Boot media is read-only, not remounting
         fi
