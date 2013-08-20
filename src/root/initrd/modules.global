@@ -1,8 +1,32 @@
-# User may want to boot from a PATA/SATA hard disk
-ata
+# USB 1.1/2/3/W hosts and storage devices
+drivers/usb/host
+drivers/usb/storage
 
-# This includes CDROM support
-scsi
+# SD/MMC hosts and cards
+drivers/mmc/host
+drivers/mmc/card
+
+# Support booting from a PATA/SATA hard disk
+drivers/ata
+
+# SCSI includes CDROM and VM disks support
+drivers/scsi
 
 # Fusion MPT (e.g., for newer VMWare LSI Logic SCSI controller)
-message/fusion
+drivers/message/fusion
+
+# PCMCIA-attached storage
+drivers/pcmcia
+
+
+# USB input devices
+drivers/hid/usbhid
+
+
+# Filesystem modules
+fs/squashfs
+fs/fat
+fs/isofs
+fs/ext4
+fs/hfsplus
+fs/nls

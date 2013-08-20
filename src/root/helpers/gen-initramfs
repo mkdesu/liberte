@@ -27,7 +27,7 @@ image=/usr/local/addons/initrd/initrd-x86.cpio
 extmods=`sed -n '/^[^#]/p' ${extralst}`
 globmods=
 for globmod in `sed -n '/^[^#]/p' ${globlst}`; do
-    globmods="${globmods} "`find /lib/modules/${kversion}/kernel/drivers/${globmod} \
+    globmods="${globmods} "`find /lib/modules/${kversion}/kernel/${globmod} \
                                  -name '*.ko' -printf '%f\n' | sed 's/\.ko$//'`
 done
 

@@ -1,35 +1,7 @@
-# Filesystem modules
+# Loop devices
 loop
-squashfs
 
-vfat
-isofs
-ext4
-hfsplus
-
-nls_cp437
-nls_iso8859-1
-nls_utf8
-
-
-# USB input devices
-usbhid
-
-
-# USB storage devices
-usb-storage
-xhci-hcd
-ehci-hcd
-uhci-hcd
-ohci-hcd
 
 # Virtio storage (e.g., QEMU)
 virtio_pci
 virtio_blk
-
-# SD/MMC cards
-mmc_block
-
-# PCMCIA-attached storage
-yenta_socket
-pcmcia
