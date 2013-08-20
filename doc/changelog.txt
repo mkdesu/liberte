@@ -10,9 +10,10 @@
   * Reduced the number of SUID binaries via POSIX.1e capabilities
 
   * Replaced htpdate with NTP for time synchronization
+  * Added "gentoo=nontp" boot parameter for disabling NTP
   * Added "gentoo=obfs" boot parameter for obfsproxy Tor bridges
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
-  * More robust Xorg autoconfiguration
+  * More robust Xorg autoconfiguration with sequential fallbacks
   * Added ASCII virtual keyboard table for OTFE password entry
 
   * Added UFRaw, a RAW images viewer and converter

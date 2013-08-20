@@ -55,6 +55,14 @@ start() {
     fi
 
 
+    # Disable NTP if requested
+    if get_bootparam 'nontp'; then
+        ewarn Disabling NTP time synchronization
+        chmod a-x /etc/NetworkManager/dispatcher.d/01-ntp
+        eend $?
+    fi
+
+
     # Support non-anonymous mode
     if get_bootparam 'noanon'; then
         ewarn Non-anonymous profile has been selected via boot options
