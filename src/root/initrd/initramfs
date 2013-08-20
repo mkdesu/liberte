@@ -17,7 +17,6 @@ dir   stage          0755 0 0
 dir   stage/boot     0755 0 0
 dir   stage/live     0755 0 0
 dir   stage/rwroot   0755 0 0
-dir   stage/union    0755 0 0
 
 # Busybox
 dir   bin            0755 0 0
@@ -27,6 +26,4 @@ file  bin/busybox       /bin/busybox              0755 0 0
 dir   proc           0755 0 0
 dir   sys            0755 0 0
 
-# Module directories
-dir   lib            0755 0 0
-dir   lib/modules    0755 0 0
+# Entries added in gen-initramfs below

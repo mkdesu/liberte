@@ -1,3 +1,16 @@
+# === Individual modules ===
+
+# Loop devices
+loop
+
+# Virtio storage (e.g., QEMU)
+virtio_pci
+virtio_blk
+
+
+
+# === Module packages ===
+
 # USB 1.1/2/3/W hosts and storage devices
 drivers/usb/host
 drivers/usb/storage

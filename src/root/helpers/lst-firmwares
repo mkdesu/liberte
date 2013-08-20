@@ -41,7 +41,8 @@ comm -13 <(find /lib/firmware ! -type d -printf '%P\n' | sort)                  
     | sed 's/^/unlisted: /'
 
 
-# Ensure that initramfs modules do not require any firmware
-strings -a -n 10 $(bsdtar tf ${initrd} 'lib/modules/*.ko' | sed 's:^:/:') \
-    | sed -n 's/^firmware=//p' | sort -u                                  \
+# Ensure that initramfs modules do not require unincluded firmware
+diff <(bsdtar tf ${initrd} 'lib/firmware/*.*' | sed 's:^lib/firmware/::' | sort -u) \
+     <(modinfo -k ${kversion} -F firmware \
+       $(bsdtar tf ${initrd} 'lib/modules/*.ko' | sed 's:^.*/\(.*\)\.ko:\1:') | sort -u) \
     | sed 's/^/initramfs: /'

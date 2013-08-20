@@ -65,11 +65,11 @@ start() {
         rm -f ${xorgdir}/xorg.conf.new
 
         if   get_bootparam 'xvesa'; then
-            tryxconf vesa        ewarn  "[fallback] VESA X server driver"
+            tryxconf vesa        ewarn  "[forced] VESA X server driver"
         elif get_bootparam 'xfb';   then
-            tryxconf fbdev       ewarn  "[fallback] Framebuffer X server driver"
+            tryxconf fbdev       ewarn  "[forced] Framebuffer X server driver"
         elif get_bootparam 'xkms';  then
-            tryxconf modesetting ewarn  "[fallback] Modesetting X server driver"
+            tryxconf modesetting ewarn  "[forced] Modesetting X server driver"
         else
             tryxconf native      einfo  "Native X server driver"
             tryxconf modesetting ewarn  "[fallback] Modesetting X server driver"

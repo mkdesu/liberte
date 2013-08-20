@@ -1,4 +1,4 @@
-# Modules to force-load during initramfs stage (see modules.extra)
+# Modules to force-load during initramfs stage (see modules.init)
 # (no module autoloading on mount in Busybox)
 force_load_fs="squashfs vfat isofs ext4 hfsplus nls_cp437 nls_iso8859-1 nls_utf8"
 
