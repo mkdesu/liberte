@@ -9,7 +9,7 @@ drivers/mmc/card
 # Support booting from a PATA/SATA hard disk
 drivers/ata
 
-# SCSI includes CDROM and VM disks support
+# SCSI includes USB storage, CDROM and VM disks support
 drivers/scsi
 
 # Fusion MPT (e.g., for newer VMWare LSI Logic SCSI controller)

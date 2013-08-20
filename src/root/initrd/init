@@ -247,7 +247,7 @@ umount /proc || bad_msg 'Failed to unmount /proc'
 
 cd ${slive}
 mount -o move /dev ${slive}/dev
-exec switch_root -c /dev/console ${slive} /sbin/init
+exec env - ${param_tz:+TZ=:"${param_tz#:}"} ${TERM:+TERM="${TERM}"} switch_root -c /dev/console ${slive} /sbin/init
 
 
 # If we get here, something bad has happened

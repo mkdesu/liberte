@@ -10,6 +10,7 @@
   * Reduced the number of SUID binaries via POSIX.1e capabilities
 
   * Replaced htpdate with NTP for time synchronization
+  * Added "tz" boot parameter for RTC timezone specification
   * Added "gentoo=nontp" boot parameter for disabling NTP
   * Added "gentoo=obfs" boot parameter for obfsproxy Tor bridges
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver

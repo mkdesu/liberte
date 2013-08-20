@@ -3,7 +3,7 @@ export LESS="-R -M --shift 16 -Swi -x4"
 export GZIP=-9
 
 export LANG=en_GB.UTF-8
-export TZ=:UTC
+# export TZ=:UTC
 
 if [ "${TERM}" = linux ]; then
     setterm -blength 0
