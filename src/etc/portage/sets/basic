@@ -8,6 +8,7 @@ net-dialup/mingetty
 # Disk utilities
 sys-apps/hdparm
 sys-apps/sdparm
+sys-apps/gptfdisk
 sys-apps/smartmontools
 sys-apps/dcfldd
 app-arch/libarchive
