@@ -24,7 +24,6 @@ app-misc/emelfm2
 # app-cdr/graveman
 app-cdr/cdrtools
 app-cdr/isomaster
-media-sound/audacious
 media-video/totem
 media-gfx/gpicview
 media-gfx/geeqie
@@ -33,6 +32,7 @@ media-gfx/graphicsmagick
 media-gfx/ufraw
 media-gfx/nip2
 media-sound/sox
+media-sound/mpg123
 media-sound/vorbis-tools
 app-editors/gedit
 gnome-extra/gucharmap

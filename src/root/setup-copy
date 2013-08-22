@@ -202,7 +202,6 @@ update-desktop-database -q /usr/share/applications
 # http://www.freedesktop.org/wiki/Specifications/mime-actions-spec
 sinfo "Modifying MIME actions ordering preferences"
 sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
-        s/\<totem.desktop;audacious.desktop;/audacious.desktop;totem.desktop;/ ;
         s/\<file-roller.desktop;evince.desktop;/evince.desktop;file-roller.desktop;/' \
     /usr/share/applications/mimeinfo.cache
 

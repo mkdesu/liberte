@@ -22,6 +22,7 @@
   * Added proxychains, a heterogeneous chaining proxyfier
   * Removed experimental I2P support and JamVM
   * Removed FBReader due to its transition to Qt
+  * Removed Audacious due to plugin location bugs
   * Replaced XChat with HexChat
 
 

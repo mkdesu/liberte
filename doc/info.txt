@@ -50,7 +50,6 @@ glib-networking         gnutls                  gnutls          libsoup
 libsoup                 gnutls                  gnutls          gst-plugins-soup, totem, webkit-gtk
 libmicrohttpd           gnutls                  -               cables
 curl                    ssl, gnutls, nss        ssl             cables, gnupg, quvi, uget
-neon                    ssl, gnutls             ssl             audacious-plugins
 wget                    ssl, gnutls             ssl             portage, libqalculate(forex)
 
 claws-mail              gnutls                  gnutls
@@ -179,15 +178,11 @@ Tor                              (127.0.0.1:9050)
             xombrero
             NetworkManager       (connectivity checking)
             gst-plugins-soup     (GStreamer HTTP plugin, http_proxy envvar is supported)
-        neon                     (HTTP/WebDav library)
-          audacious-plugins
       libxml2                    (NanoHTTP)
       libmms
           gst-plugins-libmms     (GStreamer MMS plugin)
-          audacious-plugins[mms] (Audacious MMS plugin)
     explicit configuration
       gFTP                       (HTTP only)
-      audacious-plugins[cddb]    (Audacious CDDB) plugin)
       uim                        (custom-http.scm)
   explicit configuration
     Pidgin                       (GConf is supported)

@@ -50,7 +50,6 @@ media-video/totem               -youtube nsplugin
 virtual/ffmpeg                  -X -encode -truetype -speex
 media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -hardcoded-tables  -speex -v4l
 media-sound/sox                 encode
-media-plugins/audacious-plugins lame libsamplerate mms mtp
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 media-libs/gst-plugins-base             theora
 media-libs/libtheora            encode
