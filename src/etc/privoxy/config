@@ -11,7 +11,7 @@ actionsfile     match-all.action        # Actions that are applied to all sites 
 # actionsfile     user.action             # User customizations
 
 # filterfile      default.filter          # Main filters file
-filterfile      user.filter             # User filters file
+# filterfile      user.filter             # User filters file
 
 logfile         privoxy.log
 
