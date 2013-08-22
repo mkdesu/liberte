@@ -39,7 +39,9 @@ x86info -a                           > 01-x86
 sudo -n -u nobody x86info -a         > 01-x86-npriv
 lsmsr -a -V 4                        > 01-msr
 cp /proc/cpuinfo                       02-cpu
-cpufreq-info                         > 02-cpu-freq
+cpupower -c all info                 > 02-cpu-freq
+cpupower -c all idle-info           >> 02-cpu-freq
+cpupower -c all frequency-info      >> 02-cpu-freq
 
 echo System ...
 biosdecode                           > 03-bios

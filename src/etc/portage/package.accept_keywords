@@ -1,5 +1,6 @@
 # System
 =app-crypt/gnupg-pkcs11-scd-0.7.3*
+=sys-power/cpupower-3.8*
 
 # Boot process (cdrtools: EFI platform support)
 =sys-boot/grub-2.00*:2

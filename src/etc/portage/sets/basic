@@ -78,7 +78,7 @@ net-mail/cables
 sys-apps/irqbalance
 sys-apps/x86info
 sys-apps/dmidecode
-sys-power/cpufrequtils
+sys-power/cpupower
 sys-power/powertop
 # sys-process/latencytop
 app-laptop/laptop-mode-tools
