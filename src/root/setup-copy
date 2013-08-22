@@ -40,7 +40,6 @@ rm /etc/portage/package.use/temporary
 # (equery requires gentoolkit, so copy ebuilds early)
 sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
-         app-mobilephone/obexftp
          dev-libs/gobject-introspection
          gnome-base/libglade
          media-libs/vips
@@ -73,9 +72,7 @@ sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 # pptpclient:              not needed when used by networkmanager-pptp
 # lm_sensors:              sensors-detect, sensors-conf-convert
 # vpnc:                    pcf2vpnc
-# obexftp:                 not needed (#398113)
 sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
-sed -i 's/^inherit /GENTOO_DEPEND_ON_PERL="no"\n&/' ${ebuild_obexftp}
 
 # [debianutils]            ca-certificates:  update-ca-certificates
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
