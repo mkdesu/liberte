@@ -102,7 +102,7 @@ sinfo "Recompiling build-dependent packages"
 emerge -quDN @world
 
 
-# (#432020)
+# (#432020, SourceWare: #14498)
 # sinfo "Creating NSS databases"
 # make -C /var/db > /dev/null
 

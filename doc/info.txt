@@ -15,7 +15,6 @@ rsync
   [/etc/portage/make.conf]
 
 HKP(S)
-  + https://zimmermann.mayfirst.org/pks/lookup [mkroot]
   + hkp://2eghzlv2wwcq7u7y.onion               [anon]
   + [alt: hkps://zimmermann.mayfirst.org]
   + [alt: hkps://keys.indymedia.org]
@@ -67,14 +66,23 @@ libgcrypt users: cryptsetup, gnupg, gnome-keyring, libotr(pidgin-otr),
 
 
 
-Encryption
-==========
+Encryption / Signing
+====================
 
 Secure Boot
   + RSA-4096 / SHA-256 EFI images signing
 
+GRUB EFI images
+  + SHA-256 of chained GRUB configuration
+
+GRUB (chained configuration)
+  + SHA-256 of kernel+initramfs
+
 Kernel
   + RSA-4096 / SHA-256 module signing
+
+SquashFS image
+  + SHA-256 verification in initramfs
 
 LUKS
   + AES-256 / XTS (w/ double key size)
@@ -145,5 +153,49 @@ configuration persistence
   + NTFS: user.* xattrs correspond to NTFS streams
   + ext2/3/4 removable media is mounted with ACLs and user.* xattrs
 
-SquashFS LZMA support is available as a patch (PLD Linux) as of kernel 2.6.36,
-and natively (XZ format) as of kernel 2.6.38.
+
+Proxification
+=============
+
+Tor                              (127.0.0.1:9050)
+  Privoxy                        (127.0.0.1:8118)
+    environment variables        (http(s)_proxy, no_proxy)
+      curl
+        cables
+        uGet
+        GnuPG
+        mpg123
+        vorbis-tools[ogg123]
+      wget
+        Qalculate!
+      libproxy[-gnome]
+        glib-networking[-gnome]  (glib GIO modules)
+          libsoup                (HTTP library)
+            libsoup-gnome        (GNOME libsoup plugin)
+              Epiphany
+              Totem              (Playlist parser)
+            WebKit-GTK
+              <browsers>
+            xombrero
+            NetworkManager       (connectivity checking)
+            gst-plugins-soup     (GStreamer HTTP plugin, http_proxy envvar is supported)
+        neon                     (HTTP/WebDav library)
+          audacious-plugins
+      libxml2                    (NanoHTTP)
+      libmms
+          gst-plugins-libmms     (GStreamer MMS plugin)
+          audacious-plugins[mms] (Audacious MMS plugin)
+    explicit configuration
+      gFTP                       (HTTP only)
+      audacious-plugins[cddb]    (Audacious CDDB) plugin)
+      uim                        (custom-http.scm)
+  explicit configuration
+    Pidgin                       (GConf is supported)
+    HexChat
+    SSH
+    OpenVPN
+  torify
+    Claws-Mail
+    gFTP                         (FTP only)
+    whois
+    eboard
