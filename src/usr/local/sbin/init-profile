@@ -21,7 +21,7 @@ case "${profile}" in
         #          restore default servers list
         sed -i 's/^\(net_proxy_type =\) 3$/\1 0/'     /home/anon/config/hexchat/hexchat.conf
         sed -i 's/^\(dcc_ip_from_server =\) 0$/\1 1/' /home/anon/config/hexchat/hexchat.conf
-        rm -f                                         /home/anon/config/hexchat/servlist_.conf
+        rm -f                                         /home/anon/config/hexchat/servlist.conf
 
         # Pidgin: disable Tor SOCKS proxy, and enable automatic IP detection
         sed -i 's/\<socks5\>/none/'                   /home/anon/config/purple/prefs.xml
