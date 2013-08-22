@@ -91,7 +91,8 @@ sys-apps/usbutils
 sys-apps/pcmciautils
 sys-libs/gpm
 net-wireless/bluez
-sys-fs/obexfs
+# (#231645, #482146)
+# sys-fs/obexfs
 dev-libs/opensc
 # (#469632)
 # net-wireless/irda-utils
