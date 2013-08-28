@@ -1,0 +1,141 @@
+#!/bin/sh -e
+
+# Variables
+noroot="sudo -n -u nobody"
+
+cdroot=/mnt/boot/cdroot
+vmstage=/mnt/boot/vmstage
+imagepfx=/mnt/boot/liberte-${LVERSION}
+
+logosvg=/home/anon/config/images/liberte-logo-nofont.svg
+
+ovftemplate=${HOME}/config/liberte.ovf
+ovfpfx=${vmstage}/liberte-${LVERSION}
+ovfschema=http://schemas.dmtf.org/ovf/envelope/1/dsp8023_1.0.0.xsd
+
+ovfpath=${ovfpfx}.ovf
+mfpath=${ovfpfx}.mf
+diskpath=${ovfpfx}-disk.vmdk  # matches ovf:href[ovf:id="disk0"] in OVF
+logopath=${ovfpfx}-icon.png   # matches ovf:href[ovf:id="icon0"] in OVF
+
+disksize=512                  # matches ovf:capacity in OVF (MiB)
+logowidth=128                 # matches ovf:width    in OVF
+
+volume="Liberté Linux"
+efilabel=LIBERTE_EFI
+efiextrablocks=32             # extra settings space on EFI partition (KiB)
+
+sysmbr=/usr/share/syslinux/mbr_c.bin
+sysdir=/liberte/boot/syslinux
+
+
+# Prepare a staging directory
+rm -rf ${vmstage}
+mkdir  ${vmstage}
+
+
+# Initialize raw virtual disk
+truncate -s ${disksize}M ${diskpath}.flat
+
+
+echo "Partitioning raw disk image and writing EFI partition"
+efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | cut -f1`
+efisize=$(((efiblocks + 6 + efiextrablocks) * 4))
+
+sfdisk -qL --no-reread -u B ${diskpath}.flat 1>/dev/null 2>&1 <<EOF
+4,${efisize},ef
+$((4 + efisize)),+,L,*
+EOF
+
+truncate -s ${efisize}K ${diskpath}.flat.efi
+mkdosfs -n "${efilabel}" -I ${diskpath}.flat.efi 1>/dev/null
+MTOOLS_SKIP_CHECK=1 mcopy -i ${diskpath}.flat.efi -smQ ${cdroot}/EFI ::
+
+dd bs=440 count=1 iflag=fullblock conv=notrunc if=${sysmbr} of=${diskpath}.flat 2>/dev/null
+dd if=${diskpath}.flat.efi of=${diskpath}.flat bs=4K seek=1 conv=notrunc        2>/dev/null
+
+
+echo "Installing EXTLINUX and writing main partition"
+mainsize=$((disksize * 1024 - 4 - efisize))
+
+truncate -s ${mainsize}K ${diskpath}.flat.main
+mke2fs -q -m0 -T largefile -L "${volume}" -O ^resize_inode,^dir_index,sparse_super \
+       -F ${diskpath}.flat.main
+tune2fs -c 0 -i 0 ${diskpath}.flat.main 1>/dev/null
+
+mkdir ${diskpath}.flat.main.mnt
+mount -t ext2 -o loop=/dev/loop,noatime ${diskpath}.flat.main ${diskpath}.flat.main.mnt
+rsync -aHS ${cdroot}/liberte ${diskpath}.flat.main.mnt
+
+extlinux -i ${diskpath}.flat.main.mnt${sysdir} 2>/dev/null
+umount -d ${diskpath}.flat.main.mnt
+
+dd if=${diskpath}.flat.main of=${diskpath}.flat bs=4K seek=$((1 + efisize/4)) conv=notrunc 2>/dev/null
+
+
+echo "Verifying raw VMDK disk structure"
+ptdesc=`sfdisk -d ${diskpath}.flat | sed -n '/0, Id= 0$/d; s/^.*, size= *//p' | tr '\n' :`
+ptexp="$((efisize * 2)), Id=ef:$((mainsize * 2)), Id=83, bootable:"
+disktotal=`du -b ${diskpath}.flat | cut -f1`
+
+if [ "${ptdesc}" != "${ptexp}" -o ${disktotal} != $((disksize * 1024 * 1024)) ]; then
+    echo "Raw VMDK disk structure verification failed"
+    exit 1
+fi
+
+rm ${diskpath}.flat.efi ${diskpath}.flat.main
+
+
+echo "Converting raw disk to streamOptimized VMDK format"
+mkdir ${diskpath}.sandbox
+chown nobody:nobody ${diskpath}.sandbox
+
+chmod 755 ${VBOX_APP_HOME}/VBoxManage
+${noroot} HOME=${diskpath}.sandbox ${VBOX_APP_HOME}/VBoxManage convertfromraw \
+          ${diskpath}.flat ${diskpath}.sandbox/${diskpath##*/} --format VMDK --variant Stream 2>/dev/null
+
+chmod -R go=u-w ${diskpath}.sandbox
+mv ${diskpath}.sandbox/${diskpath##*/} ${diskpath}
+chown -h root:root ${diskpath}
+
+rm ${diskpath}.flat
+
+
+# Rasterize logo
+rsvg-convert -a -w ${logowidth} -f png -o ${logopath} ${logosvg}
+
+
+echo "Creating OVF envelope and OVA bundle"
+diskbytes=`du -b ${diskpath} | cut -f1`
+logobytes=`du -b ${logopath} | cut -f1`
+
+sed "s/VERSION/${LVERSION}/g;  \
+     s/11111111/${diskbytes}/; \
+     s/22222222/${logobytes}/" \
+    ${ovftemplate} > ${ovfpath}
+
+
+# Validate OVF (slow + fetches schemas)
+# xmllint --schema ${ovfschema} --noout ${ovfpath}
+
+
+# Create manifest
+# (useful since USTAR has no file checksums)
+# NOTE: VirtualBox chokes on icon in .mf, so no ${logopath} below
+#       (contrary to DSP0243, especially v2.0)
+openssl sha1 ${ovfpath} ${diskpath} \
+    | sed "s:${vmstage}/::" > ${mfpath}
+
+
+# Create OVA bundle
+# (order: ovf + mf/cert + disk/logo (order=<References>))
+tar -c --format=ustar -f ${imagepfx}.ova \
+    -C ${vmstage}           \
+    ${ovfpath#${vmstage}/}  \
+    ${mfpath#${vmstage}/}   \
+    ${diskpath#${vmstage}/} \
+    ${logopath#${vmstage}/}
+
+
+# Remove staging directory
+rm -r ${vmstage}

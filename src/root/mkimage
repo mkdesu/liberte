@@ -1,8 +1,5 @@
 #!/bin/sh -e
 
-export LC_ALL=C
-
-
 sinfo() {
     echo ${BASH:+-e} "\033[1;33;41m$@\033[0m"
 }
@@ -17,15 +14,8 @@ rootfspfx=${HOME}/config/rootfs
 cdroot=/mnt/boot/cdroot
 imagepfx=/mnt/boot/liberte-${LVERSION}
 
-efilabel=LIBERTE_EFI
-efiboot=${cdroot}/boot/efiboot.img
-efisbpfx=/usr/local/addons/secureboot/Liberte-SecureBoot
-
-ziimage=${cdroot}/liberte/boot/kernel-x86.zi
 sqimage=${cdroot}/liberte/boot/root-x86.sfs
 sqsort=${live}/tmp/transient/pkg/squashfs.sort
-
-sysver=`syslinux -v 2>&1 | cut -d' ' -f2`
 
 
 mibsize() {
@@ -70,27 +60,12 @@ if [ -e ${cdroot}/liberte/boot/packages.lst ]; then
 fi
 
 
-sinfo "Copying image add-ons"
-rm -rf ${cdroot}
-mkdir  ${cdroot}
-
-rsync -aHS --delete-excluded ${HOME}/dist/  ${cdroot}/liberte
-sed -i "s/SYSVER/${sysver}/" ${cdroot}/liberte/setup.sh
-
-
-sinfo "Copying image /boot"
-rsync -aHS --delete-excluded ${live}/boot ${cdroot}/liberte
-mv ${cdroot}/liberte/boot/EFI ${cdroot}
-
-
-sinfo "Converting text files to DOS line endings"
-find ${cdroot} \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
-    -exec sed -i 's/$/\r/' {} \;
-
-
 # Using default block size of 128KiB
 # (chmod due to GRKERNSEC_HIDESYM)
 sinfo "Creating SquashFS image"
+
+rm -rf ${cdroot}
+mkdir  ${cdroot} ${cdroot}/liberte ${cdroot}/liberte/boot
 
 # NOTE: POSIX ACLs are not supported by SquashFS
 #       Non-PaX user xattrs are not supported by tmpfs
@@ -101,34 +76,8 @@ mksquashfs ${live} ${sqimage}                \
 chmod go= ${sqimage}
 
 
-sinfo "Adapting Syslinux and GRUB configuration"
-
-fshash=`sha256sum ${sqimage}`
-sed -i "s/FSHASH/${fshash%% *}/"                  \
-    ${cdroot}/liberte/boot/syslinux/syslinux.cfg  \
-    ${cdroot}/liberte/boot/grub/grub.cfg          \
-    ${cdroot}/liberte/qemulate.sh
-
-sha256sum ${cdroot}/liberte/boot/grub/* ${ziimage}  \
-    | sed "/\<grub\.\(cfg\|mf\)\>/d; s:${cdroot}::" \
-    > ${cdroot}/liberte/boot/grub/grub.mf
-
-grub1hash=`sha256sum ${cdroot}/liberte/boot/grub/grub.cfg`
-grub2hash=`sha256sum ${cdroot}/liberte/boot/grub/grub.mf`
-sed -i "s/replace_hash_\{50\}01/${grub1hash%% *}/ ; \
-        s/replace_hash_\{50\}02/${grub2hash%% *}/"  \
-    ${cdroot}/EFI/BOOT/*.EFI
-
-
-sinfo "Signing EFI GRUB images"
-
-cp -p ${efisbpfx}-CA.der ${cdroot}/EFI/
-for efiimg in ${cdroot}/EFI/BOOT/*.EFI; do
-    sbsign   --cert ${efisbpfx}-Cert-1.crt --key ${efisbpfx}-Cert-1.key \
-             --output ${efiimg}.signed ${efiimg}
-    sbverify --cert ${efisbpfx}-CA.crt ${efiimg}.signed
-    mv ${efiimg}.signed ${efiimg}
-done
+sinfo "Initializing boot environment"
+${helpdir}/mk-boot
 
 
 # UEFI Spec 2.3.1 Err. A, Sec. 12.3.3: "UEFI implementations may allow
@@ -139,46 +88,18 @@ rm -f ${imagepfx}.zip
 unzip -qt ${imagepfx}.zip
 
 
-# Add two extra 4K blocks (may need adjustment)
-sinfo "Creating EFI boot image for El-Torito"
-
-mkdir ${cdroot}/boot
-efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | cut -f1`
-truncate -s $(((efiblocks + 2) * 4))K ${efiboot}
-
-mkdosfs -n "${efilabel}" -I -f 1 -r 16 -R 1 ${efiboot}
-MTOOLS_SKIP_CHECK=1 mcopy -i ${efiboot} -smQ ${cdroot}/EFI ::
-
-
-# Hide root directories on Windows, and reset volume information
-# Allow '-' in filenames, since ISOLINUX doesn't support RockRidge/Joliet
-# (translation equivalent to mount's map=normal is still performed)
 sinfo "Creating ISO image ${imagepfx##*/}.iso"
-
-mkdir ${cdroot}/boot/syslinux
-cp -p ${cdroot}/liberte/boot/syslinux/syslinux.cfg \
-      ${cdroot}/boot/syslinux/syslinux.cfg
-
-set -- -quiet -iso-level 2 -relaxed-filenames -R -no-pad \
-       -sysid '' -V '' -A ''                             \
-       -no-emul-boot -boot-load-size 4 -boot-info-table  \
-       -c boot/eltorito.cat                              \
-       -b liberte/boot/syslinux/isolinux.bin             \
-       -eltorito-alt-boot -no-emul-boot                  \
-       -eltorito-platform efi -b boot/efiboot.img        \
-       -hidden boot -hidden liberte -m EFI
-mkisofs "$@" -o ${imagepfx}.iso ${cdroot}
-isovfy ${imagepfx}.iso
+${helpdir}/mk-iso
 
 
-sinfo "Creating ISO image ${imagepfx##*/}-bootstrap.iso"
-mkisofs "$@" -m ${sqimage##*/} -o ${imagepfx}-bootstrap.iso ${cdroot}
-isovfy ${imagepfx}-bootstrap.iso
+sinfo "Creating OVA bundle ${imagepfx##*/}.zip"
+${helpdir}/mk-ova
 
 
 echo "Disk usage: `du -s --apparent-size -B 1M ${cdroot} | cut -f1` MiB"
 echo "ZIP size:   `mibsize ${imagepfx}.zip` MiB"
 echo "ISO size:   `mibsize ${imagepfx}.iso` MiB"
+echo "OVA size:   `mibsize ${imagepfx}.ova` MiB"
 
 
 sinfo "Done."

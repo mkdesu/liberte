@@ -58,20 +58,24 @@ memdisk() {
     mods=`echo "${mods}" | sed "s:.*:${libdir}/${arch}/&.mod:"`
     cp -p ${mods} ${moddir}
 
-    sed "s@VERSION@${LVERSION}@" ${templearlycfg} \
+    cat ${templearlycfg}               \
+        | sed "/^##/d ;                \
+               s@VERSION@${LVERSION}@" \
         > ${memroot}/grub.cfg
 
     # Compress all files (*.mod, *.lst, grub.cfg)
     xz -C crc32 --lzma2=dict=1MiB `find ${memroot} -type f`
     rename .xz ""                 `find ${memroot} -type f`
 
-    # Add bogus manifest (to be patched in mkimage)
+    # Add bogus manifest (to be patched in mk-boot)
     echo "replace_hash__________________________________________________01  /liberte${grubcfg}"        > ${memroot}/grub.mf
     echo "replace_hash__________________________________________________02  /liberte${grubcfg%.*}.mf" >> ${memroot}/grub.mf
 
     tar -cf ${build}/memdisk.tar -C ${build} boot
 
     # NOTE: -C has no effect (Savannah: #36770)
+    # grub2-mkstandalone -C xz -O ${arch} -o ${out} --compress=xz --install-modules="${modules}"
+    #                    --themes=none --fonts=none --locales=none (Savannah: #36772)
     grub2-mkimage -C xz -O ${arch} -m ${build}/memdisk.tar \
                   -o ${out} memdisk tar xzio gcry_crc
     rm -r ${build}
@@ -92,7 +96,7 @@ cp -p /usr/share/grub/${consolefont} ${grubroot}
 
 # Substitute and copy template
 cat ${templcfg}                           \
-    | sed "/^##/d ;
+    | sed "/^##/d ;                       \
            s@VERSION@${LVERSION}@ ;       \
            s@CONSOLEFONT@${consolefont}@" \
     > ${grubcfg}

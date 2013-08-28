@@ -1,0 +1,47 @@
+#!/bin/sh -e
+
+# Variables
+cdroot=/mnt/boot/cdroot
+imagepfx=/mnt/boot/liberte-${LVERSION}
+
+efilabel=LIBERTE_EFI
+efiboot=${cdroot}/boot/efiboot.img
+
+
+rm -rf ${cdroot}/boot
+mkdir  ${cdroot}/boot ${cdroot}/boot/syslinux
+
+
+# Add two extra 4K blocks (may need adjustment)
+echo "Creating EFI boot image for El-Torito"
+
+efiblocks=`du -s -B 4K --apparent-size ${cdroot}/EFI | cut -f1`
+truncate -s $(((efiblocks + 2) * 4))K ${efiboot}
+
+mkdosfs -n "${efilabel}" -I -f 1 -r 16 -R 1 ${efiboot} 1>/dev/null
+MTOOLS_SKIP_CHECK=1 mcopy -i ${efiboot} -smQ ${cdroot}/EFI ::
+
+
+# Hide root directories on Windows, and reset volume information
+# Allow '-' in filenames, since ISOLINUX doesn't support RockRidge/Joliet
+# (translation equivalent to mount's map=normal is still performed)
+echo "Creating ISO image ${imagepfx##*/}.iso"
+
+cp -p ${cdroot}/liberte/boot/syslinux/syslinux.cfg \
+      ${cdroot}/boot/syslinux/syslinux.cfg
+
+set -- -quiet -iso-level 2 -relaxed-filenames -R -no-pad \
+       -sysid '' -V '' -A '' errctl="ABORT|ALL *"        \
+       -no-emul-boot -boot-load-size 4 -boot-info-table  \
+       -c boot/eltorito.cat                              \
+       -b liberte/boot/syslinux/isolinux.bin             \
+       -eltorito-alt-boot -no-emul-boot                  \
+       -eltorito-platform efi -b boot/efiboot.img        \
+       -hidden boot -hidden liberte -m EFI
+mkisofs "$@" -o ${imagepfx}.iso ${cdroot}
+isovfy -i ${imagepfx}.iso 1>/dev/null
+
+
+echo "Creating ISO image ${imagepfx##*/}-bootstrap.iso"
+mkisofs "$@" -m "*.sfs" -o ${imagepfx}-bootstrap.iso ${cdroot}
+isovfy -i ${imagepfx}-bootstrap.iso 1>/dev/null

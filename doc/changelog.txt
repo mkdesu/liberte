@@ -25,6 +25,8 @@
   * Removed Audacious due to plugin location bugs
   * Replaced XChat with HexChat
 
+  * OVA image creation is fully integrated into build process
+
 
 2012-09-01
   + 2012.3 release

@@ -40,8 +40,8 @@ gunzip ${sysroot}/${consolefont}.gz
 
 # Substitute and copy template
 cat ${templcfg}                           \
-    | sed "/^##/d ;
-           s@VERSION@${LVERSION}@ ;
+    | sed "/^##/d ;                       \
+           s@VERSION@${LVERSION}@ ;       \
            s@CONSOLEFONT@${consolefont}@" \
     | iconv -f UTF-8 -t ${encoding}       \
     > ${syscfg}

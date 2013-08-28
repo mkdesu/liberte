@@ -19,8 +19,8 @@ media-fonts/terminus-font
 sys-fs/squashfs-tools
 sys-fs/mtools
 
-# OVA image creation (qemu-img)
-app-emulation/qemu
+# OVA image creation (VBoxManage)
+app-emulation/virtualbox-bin
 
 # Portage tools
 app-portage/portage-utils

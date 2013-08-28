@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh
+set -e
 
 # TODO: add "-device virtio-rng" once it is supported by QEMU
 

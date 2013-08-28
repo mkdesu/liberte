@@ -112,17 +112,23 @@ sinfo "Mounting system directories"
 
 [ "${tty#/dev/pts/}" = "${tty}" ] || tty=
 [ -L ${LIVECD}/dev/fd ] || ln -sfT /proc/self/fd ${LIVECD}/dev/fd
+loop=`losetup -f`
 
-for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts ${tty}; do
-    if [ ! -e ${LIVECD}${mp} ]; then
+for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts ${loop} ${tty}; do
+    if [ ${mp#/dev/loop} = ${mp} ]; then
+        lmp=${LIVECD}${mp}
+    else
+        lmp=${LIVECD}/dev/loop
+    fi
+    if [ ! -e ${lmp} ]; then
         if   [ -d ${mp} ]; then
-            mkdir -m 755 ${LIVECD}${mp}
+            mkdir -m 755 ${lmp}
         elif [ -e ${mp} ]; then
-            touch ${LIVECD}${mp}
+            touch ${lmp}
         fi
     fi
-    mount -B ${mp} ${LIVECD}${mp}
-    mounted="${LIVECD}${mp} ${mounted}"
+    mount -B ${mp} ${lmp}
+    mounted="${lmp} ${mounted}"
 done
 mount -rB -o remount ${LIVECD}/proc
 
@@ -160,10 +166,8 @@ fi
 
 umount -l ${mounted}
 
-# Condition is false for empty ${tty} and for block-device ${tty} (i.e., unmount failed)
-if [ -f ${LIVECD}${tty} ]; then
-    rm ${LIVECD}${tty}
-fi
+# Condition is false for empty and for block-device ${tty} (i.e., unmount failed)
+[ ! -f ${LIVECD}${tty} ] || rm ${LIVECD}${tty}
 
 
 exit ${retval}

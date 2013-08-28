@@ -87,7 +87,7 @@ dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
 app-misc/geoclue                -*
-app-emulation/qemu              -aio -alsa -bluetooth -smartcard -curl -ncurses -seccomp -vhost-net -vnc
+app-emulation/virtualbox-bin    headless -additions -chm
 
 # Extra functionality
 # (ppp[ipv6]: #440696)
