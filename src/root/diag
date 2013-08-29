@@ -9,9 +9,9 @@ sinfo() {
 }
 
 
-sinfo "Unincluded firmware:"
-NEWLINE=true eix -sr '\<(ucode|firmware|microcode|fw)\>' -\* --testing \
-    --format '{!installed}<bestversion*:NAMEVERSION>\t <description>{}'
+# sinfo "Unincluded firmware:"
+# NEWLINE=true eix -sr '\<(ucode|firmware|microcode|fw)\>' -\* --testing \
+#     --format '{!installed}<bestversion*:NAMEVERSION>\t <description>{}'
 
 
 sinfo "Missing from linux-firmware:"

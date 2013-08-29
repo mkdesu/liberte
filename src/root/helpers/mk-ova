@@ -73,13 +73,13 @@ umount -d ${diskpath}.flat.main.mnt
 dd if=${diskpath}.flat.main of=${diskpath}.flat bs=4K seek=$((1 + efisize/4)) conv=notrunc 2>/dev/null
 
 
-echo "Verifying raw VMDK disk structure"
+echo "Verifying raw disk structure"
 ptdesc=`sfdisk -d ${diskpath}.flat | sed -n '/0, Id= 0$/d; s/^.*, size= *//p' | tr '\n' :`
 ptexp="$((efisize * 2)), Id=ef:$((mainsize * 2)), Id=83, bootable:"
 disktotal=`du -b ${diskpath}.flat | cut -f1`
 
 if [ "${ptdesc}" != "${ptexp}" -o ${disktotal} != $((disksize * 1024 * 1024)) ]; then
-    echo "Raw VMDK disk structure verification failed"
+    echo "Raw disk structure verification failed"
     exit 1
 fi
 

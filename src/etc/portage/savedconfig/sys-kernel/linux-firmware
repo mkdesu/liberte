@@ -214,30 +214,14 @@ radeon/RS780_pfp.bin
 radeon/RS780_me.bin
 
 
-# --- Video ---
+# --- Radio ---
 
-# VIDEO_CX18
-v4l-cx23418-apu.fw
-v4l-cx23418-cpu.fw
-v4l-cx23418-dig.fw
+# MEDIA_SUBDRV_AUTOSELECT
 dvb-fe-xc5000-1.6.114.fw
 # (missing)
-dvb-cx18-mpc718-mt352.fw
 dvb-fe-xc5000c-4.1.30.7.fw
 xc3028-v27.fw
 xc3028L-v36.fw
-
-# VIDEO_IVTV
-v4l-cx231xx-avcore-01.fw
-v4l-cx23885-avcore-01.fw
-v4l-cx25840.fw
-# (missing)
-v4l-cx2341x-init.mpg
-v4l-cx2341x-dec.fw
-v4l-cx2341x-enc.fw
-v4l-pvrusb2-24xxx-01.fw
-v4l-pvrusb2-29xxx-01.fw
-v4l-pvrusb2-73xxx-01.fw
 
 
 # --- Miscellaneous ---
