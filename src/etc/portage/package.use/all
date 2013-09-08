@@ -65,6 +65,7 @@ sys-apps/util-linux             -suid
 sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
+sys-apps/usb_modeswitch         jimtcl
 sys-fs/lvm2                     -static-libs
 app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
@@ -78,7 +79,6 @@ sys-apps/busybox                -pam
 sys-apps/gradm                  -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
-dev-lang/tcl                    -threads
 x11-misc/xdg-utils              -perl
 gnome-extra/zenity              -compat
 dev-libs/m17n-lib               -spell
@@ -106,6 +106,7 @@ media-plugins/gst-plugins-v4l2  udev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive
+app-portage/eix                 strong-security
 app-arch/p7zip                  rar
 app-office/abiword              gnome
 app-text/evince                 gnome
@@ -118,6 +119,7 @@ net-dialup/ppp                  ipv6
 app-i18n/uim                    -linguas_*
 app-text/aspell                 -linguas_* linguas_en
 sys-apps/portage                -linguas_*
+app-portage/eix                 -linguas_*
 sys-apps/man-pages              -linguas_*
 sys-apps/groff                  -linguas_*
 app-text/ghostscript-gpl        -linguas_*

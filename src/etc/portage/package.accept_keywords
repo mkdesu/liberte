@@ -6,7 +6,6 @@
 =sys-boot/grub-2.00*:2
 =app-cdr/cdrtools-3.01_alpha*
 =sys-boot/efibootmgr-0.5.4*
-=app-crypt/sbsigntool-0.6*
 
 # Network
 =net-wireless/reaver-1.4*
