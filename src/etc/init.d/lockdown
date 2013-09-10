@@ -46,11 +46,11 @@ start() {
     fi
 
 
-    # Unblock [wifi wimax wwan], block [bluetooth uwb gps fm]
+    # Unblock [wifi wwan], block [bluetooth wimax uwb gps fm]
     if [ -e /dev/rfkill ]; then
         ebegin Blocking all radios except Wi-Fi
         rfkill block all
-        rfkill unblock wifi && rfkill unblock wwan && rfkill unblock wimax
+        rfkill unblock wifi && rfkill unblock wwan
         eend $?
     fi
 

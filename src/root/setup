@@ -296,9 +296,6 @@ sed -ri '/\<(text|icon|box)-shadow:|\<inset / s/([0-9])px\>/\1/g' /usr/share/the
 
 
 sinfo "Fixing miscellaneous directory permissions"
-# (#431920)
-chmod go=u-w /var/log/wimax
-
 # (#444734, FreeDesktop: #58787)
 chown root:polkitd {/etc,/usr/share}/polkit-1/rules.d
 chmod 750          {/etc,/usr/share}/polkit-1/rules.d

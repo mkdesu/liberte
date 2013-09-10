@@ -46,7 +46,6 @@ ebuilds="app-misc/ca-certificates
          net-dialup/pptpclient
          net-im/pidgin
          net-misc/vpnc
-         net-wireless/wimax
          sys-apps/lm_sensors
          sys-apps/portage
          x11-libs/xcb-util-wm"
@@ -72,16 +71,14 @@ sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 # pptpclient:              not needed when used by networkmanager-pptp
 # lm_sensors:              sensors-detect, sensors-conf-convert
 # vpnc:                    pcf2vpnc
-sed -i s:dev-lang/perl::                            ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
+sed -i s:dev-lang/perl:: ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
 
 # [debianutils]            ca-certificates:  update-ca-certificates
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
 # [liboil]                 vips:             not needed              (#416815)
-# [linux-headers]          wimax:            not needed              (#431988)
-sed -i 's:\<sys-apps/debianutils\>::'                    ${ebuild_cacertificates}
-sed -i 's:\<x11-proto/xcb-proto\>::'                     ${ebuild_xcbutilwm}
-sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'          ${ebuild_vips}
-sed -i 's:>=sys-kernel/linux-headers-[^[:blank:]"]*\>::' ${ebuild_wimax}
+sed -i 's:\<sys-apps/debianutils\>::'           ${ebuild_cacertificates}
+sed -i 's:\<x11-proto/xcb-proto\>::'            ${ebuild_xcbutilwm}
+sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::' ${ebuild_vips}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}
@@ -90,7 +87,7 @@ for ebuild in ${!ebuild_*}; do
 done
 rm -f /var/cache/edb/vdb_*.pickle
 
-# [gettext] coreutils, powertop: not needed (#398983 (fixed in 8.21), #398977 (fixed in 2.2-r1)))
+# [gettext] coreutils: not needed (#398983 (fixed in 8.21))
 echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 

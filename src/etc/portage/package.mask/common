@@ -1,7 +1,3 @@
-# Unqualified dependencies of net-wireless/iw and net-wireless/crda
-# pull multi-slot libnl
-dev-libs/libnl:3
-
 # Prefer smaller dev-libs/libelf
 dev-libs/elfutils
 
