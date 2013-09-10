@@ -97,8 +97,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     # Kernel sources should be present when sys-fs/udev is compiled,
     # also this part is often error-prone, so better do early.
-    # Maintainer note: after non-fresh kernel update+compile, do
-    # emerge -q1 app-emulation/{open-vm-tools-kmod,virtualbox-guest-additions}
+    # Maintainer note: after non-fresh kernel update+compile, run
+    #                  emerge -q1 @module-rebuild
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
     emerge -q1 =sys-kernel/hardened-sources-${hsversion}
