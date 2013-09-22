@@ -194,8 +194,6 @@ if [ "${param_loop}" != / ]; then
     # Let 'notoram' override 'toram' enforcement for CDs
     [ -z "${param_notoram}" ] || param_toram=
 
-    # If copying squashfs image to RAM, force read-only losetup
-    # (BusyBox does not do that automatically (Busybox: #4784), fixed in git: 2012-06-21)
     if [ -n "${param_toram}" ]; then
         good_msg 'Copying filesystem image to RAM ...'
         rootimgram=${srwroot}/cache/root.sfs
@@ -203,8 +201,6 @@ if [ "${param_loop}" != / ]; then
         mkdir -m 700  ${srwroot}/cache
         cp "${rootimg}" ${rootimgram} || rm ${rootimgram}
         rootimg=${rootimgram}
-
-        mount -o remount,ro ${srwroot}
     fi
 
     verifyroot "${rootimg}"
@@ -214,8 +210,6 @@ if [ "${param_loop}" != / ]; then
     modprobe -b squashfs
     mount -r -t squashfs -o loop,${fs_flags_squashfs} "${rootimg}" ${slive}
     test_success 'mount compressed filesystem'
-
-    [ -z "${param_toram}" ] || mount -o remount,rw ${srwroot}
 
     # Move boot mountpoint under live
     mount -o move ${sboot} ${mboot}
