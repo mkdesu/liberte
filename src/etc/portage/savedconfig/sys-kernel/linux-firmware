@@ -1,3 +1,10 @@
+# --- CPU ---
+
+# AMD
+amd-ucode/microcode_amd.bin
+amd-ucode/microcode_amd_fam15h.bin
+
+
 # --- Wireless ---
 
 # AR5523
@@ -30,6 +37,7 @@ symbol_sp24t_prim_fw
 symbol_sp24t_sec_fw
 
 # IWL{3945,4965,WIFI}
+# grep -rhE '^#define.*API_(MAX|OK|MIN)' /usr/src/linux/drivers/net/wireless/iwlwifi
 iwlwifi-3945-2.ucode
 iwlwifi-4965-2.ucode
 iwlwifi-100-5.ucode
@@ -45,15 +53,17 @@ iwlwifi-6000g2a-6.ucode
 iwlwifi-6000g2b-6.ucode
 iwlwifi-6050-5.ucode
 # (missing)
+# only -4 in linux-firmware
 # iwlwifi-6000-6.ucode
+# only -7 in linux-firmware
 iwlwifi-3160-6.ucode
 iwlwifi-7260-6.ucode
 
 # MWIFIEX
 mrvl/usb8797_uapsta.bin
+mrvl/pcie8897_uapsta.bin
 # (missing)
 mrvl/pcie8766_uapsta.bin
-mrvl/pcie8897_uapsta.bin
 
 # MWL8K
 mwl8k/helper_8366.fw

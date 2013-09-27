@@ -2,7 +2,6 @@
 
 # CPUs
 sys-apps/microcode-data
-sys-firmware/amd-ucode
 
 # GPUs
 x11-drivers/radeon-ucode

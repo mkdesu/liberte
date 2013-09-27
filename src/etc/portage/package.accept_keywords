@@ -30,7 +30,6 @@
 =dev-lang/spidermonkey-1.8.7*:0/mozjs187
 
 # Firmware
-sys-firmware/amd-ucode
 sys-firmware/b43-firmware
 sys-firmware/b43legacy-firmware
 

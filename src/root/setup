@@ -85,8 +85,6 @@ patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
 # (#437446)
 patch_ebuild ${HOME}/patches/portage/nip2.patch
-# (#446514)
-patch_ebuild ${HOME}/patches/portage/amd-ucode.patch
 # (#448228, fixed in polkit-0.111)
 patch_ebuild ${HOME}/patches/portage/polkit.patch
 

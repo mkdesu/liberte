@@ -31,7 +31,8 @@ done
 # Check for unneeded linux-firmware entries
 echo ${fwfiles} | tr ' ' '\n'                                   \
     | comm -13 - <(sed -n '/^[^#]/p' ${fwlst} | sort)           \
-    | sed '/^brcm\/bcm43xx/d; /^v4l-/d; /^rtlwifi\/rtl8723fw/d' \
+    | sed '/^brcm\/bcm43xx/d; /^v4l-/d; /^rtlwifi\/rtl8723fw/d;
+           /^amd-ucode\/microcode_amd/d; /^rt3290\.bin/d'       \
     | sed 's/^/unneeded: /'
 
 
