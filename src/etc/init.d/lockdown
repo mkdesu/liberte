@@ -36,14 +36,10 @@ start() {
 
 
     # Arm the poweroff watchdog
-    if mountpoint -q ${boot}; then
-        ebegin Arming power-off on boot media removal
-        mediadev=/dev/block/`mountpoint -d ${boot}`
-        start-stop-daemon -S -p ${pidfile} -bm -x ${launcher} -- ${mediadev}
-        eend $?
-    else
-        ewarn Skipping boot media removal watchdog
-    fi
+    ebegin Arming power-off on boot media removal
+    mediadev=/dev/block/`mountpoint -d ${boot}`
+    start-stop-daemon -S -p ${pidfile} -bm -x ${launcher} -- ${mediadev}
+    eend $?
 
 
     # Unblock [wifi wwan], block [bluetooth wimax uwb gps fm]

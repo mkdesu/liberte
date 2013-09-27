@@ -13,10 +13,7 @@ depend() {
 }
 
 start() {
-    mediadev=none
-    if mountpoint -q ${boot}; then
-        mediadev=$(readlink -f /dev/block/$(mountpoint -d ${boot}))
-    fi
+    mediadev=$(readlink -f /dev/block/$(mountpoint -d ${boot}))
 
     # Put ATA/SCSI drives into quiet mode
     # /dev/disk/by-path does not cover all physical devices (some lack ID_PATH)

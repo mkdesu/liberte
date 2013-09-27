@@ -124,3 +124,9 @@ sys-apps/man-pages              -linguas_*
 sys-apps/groff                  -linguas_*
 app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
+
+# Static libraries (for initramfs cryptsetup)
+sys-apps/util-linux             static-libs
+sys-libs/e2fsprogs-libs         static-libs
+dev-libs/popt                   static-libs
+dev-libs/libgpg-error           static-libs

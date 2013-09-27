@@ -1,0 +1,53 @@
+#!/bin/sh -e
+
+# Variables
+helpdir=${HOME}/helpers
+rootfspfx=${HOME}/config/rootfs
+
+live=/mnt/live
+cdroot=/mnt/boot/cdroot
+
+sqimage=${cdroot}/liberte/boot/root-x86.sfs
+sqsort=${live}/tmp/transient/pkg/squashfs.sort
+sqhash=${live}/tmp/transient/verity
+
+hashalg=sha256
+
+
+# NOTE: POSIX ACLs are not supported by SquashFS
+#       Non-PaX user xattrs are not supported by tmpfs
+mksquashfs ${live} ${sqimage}                \
+    -noappend -no-progress -no-exports       \
+    -always-use-fragments -comp xz -Xbcj x86 \
+    -sort ${sqsort} -ef ${rootfspfx}.ignore
+chmod go= ${sqimage}
+
+
+# Append DM-Verity data
+sqsize=`du -b ${sqimage} | cut -f1`
+${helpdir}/veritywrapper format --hash=${hashalg} --hash-offset=${sqsize} ${sqimage} ${sqimage} > ${sqhash}
+
+
+# Verify superblock properties (same verification in initramfs)
+hashdesc=`sed -n 's/^.*:[[:blank:]]*//; 3p; 5,7p' ${sqhash} | tr '\n' :`
+if [ "${hashdesc}" != 1:4096:4096:${hashalg}: ]; then
+    echo "Unexpected hash descriptor: ${hashdesc}"
+    exit 1
+fi
+
+
+# Build FSHASH string
+roothash=`tail -1 ${sqhash} | sed 's/^.*:[[:blank:]]*//'`
+hashblks=`du -b ${sqimage} | cut -f1`
+hashblks=$(((hashblks - sqsize) / 4096))
+
+
+# Verify SquashFS image wrt. DM-Verity data
+sqsize=`du -b ${sqimage} | cut -f1`
+sqsize=$((sqsize - hashblks * 4096))
+
+${helpdir}/veritywrapper verify --hash-offset=${sqsize} ${sqimage} ${sqimage} ${roothash}
+
+
+# Write FSHASH string
+echo ${hashblks}:${roothash} > ${sqhash}.fshash

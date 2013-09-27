@@ -7,6 +7,11 @@ loop
 virtio_pci
 virtio_blk
 
+# DM-Verity (kernel crypto backend)
+dm_verity
+algif_hash
+sha1_generic
+
 
 
 # === Module packages ===

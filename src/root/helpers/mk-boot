@@ -5,7 +5,7 @@ cdroot=/mnt/boot/cdroot
 live=/mnt/live
 
 ziimage=${cdroot}/liberte/boot/kernel-x86.zi
-sqimage=${cdroot}/liberte/boot/root-x86.sfs
+sqhash=${live}/tmp/transient/verity.fshash
 
 efisbpfx=/usr/local/addons/secureboot/Liberte-SecureBoot
 
@@ -26,11 +26,10 @@ find ${cdroot}/liberte \( -name '*.txt' -o -name '*.bat' -o -name '*.cfg' \) \
 
 echo "Adapting Syslinux and GRUB configuration"
 
-fshash=`sha256sum ${sqimage}`
-sed -i "s/FSHASH/${fshash%% *}/"                  \
+fshash=`cat ${sqhash}`
+sed -i "s/FSHASH/${fshash}/"                      \
     ${cdroot}/liberte/boot/syslinux/syslinux.cfg  \
-    ${cdroot}/liberte/boot/grub/grub.cfg          \
-    ${cdroot}/liberte/qemulate.sh
+    ${cdroot}/liberte/boot/grub/grub.cfg
 
 sha256sum ${cdroot}/liberte/boot/grub/* ${ziimage}  \
     | sed "/\<grub\.\(cfg\|mf\)\>/d; s:${cdroot}::" \

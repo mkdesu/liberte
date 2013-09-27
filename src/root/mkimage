@@ -14,9 +14,6 @@ rootfspfx=${HOME}/config/rootfs
 cdroot=/mnt/boot/cdroot
 imagepfx=/mnt/boot/liberte-${LVERSION}
 
-sqimage=${cdroot}/liberte/boot/root-x86.sfs
-sqsort=${live}/tmp/transient/pkg/squashfs.sort
-
 
 mibsize() {
     local bytes=`stat -c %s "$1"`
@@ -67,13 +64,7 @@ sinfo "Creating SquashFS image"
 rm -rf ${cdroot}
 mkdir  ${cdroot} ${cdroot}/liberte ${cdroot}/liberte/boot
 
-# NOTE: POSIX ACLs are not supported by SquashFS
-#       Non-PaX user xattrs are not supported by tmpfs
-mksquashfs ${live} ${sqimage}                \
-    -noappend -no-progress -no-exports       \
-    -always-use-fragments -comp xz -Xbcj x86 \
-    -sort ${sqsort} -ef ${rootfspfx}.ignore
-chmod go= ${sqimage}
+${helpdir}/mk-squashfs
 
 
 sinfo "Initializing boot environment"

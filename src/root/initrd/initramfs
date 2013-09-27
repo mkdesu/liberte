@@ -22,6 +22,9 @@ dir   stage/rwroot   0755 0 0
 dir   bin            0755 0 0
 file  bin/busybox       /bin/busybox              0755 0 0
 
+# Verity
+file  sbin/veritysetup  /sbin/veritysetup         0755 0 0
+
 # Mount points
 dir   proc           0755 0 0
 dir   sys            0755 0 0

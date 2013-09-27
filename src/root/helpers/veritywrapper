@@ -1,0 +1,6 @@
+#!/bin/sh -e
+# Run non-initramfs veritysetup (does not use kernel for hashing)
+
+live=/mnt/live
+
+LD_PRELOAD=${live}/usr/lib/libcryptsetup.so exec ${live}/sbin/veritysetup "$@"

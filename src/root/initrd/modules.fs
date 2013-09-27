@@ -1,6 +1,6 @@
 # Modules to force-load during initramfs stage (see modules.init)
 # (no module autoloading on mount in Busybox)
-force_load_fs="squashfs vfat isofs ext4 hfsplus nls_cp437 nls_iso8859-1 nls_utf8"
+force_load_fs="vfat isofs ext4 hfsplus nls_cp437 nls_iso8859-1 nls_utf8"
 
 
 # Default filesystem mount flags
@@ -24,7 +24,7 @@ fs_flags_auto=noatime,nosuid,nodev
 #   + had_cdroot_flags    0 if param_cdroot_flags was empty, 1 otherwise
 set_cdroot_type() {
     case "${param_cdroot_type:=auto}" in
-        vfat|iso9660|ext[234]|hfsplus|squashfs|auto)
+        vfat|iso9660|ext[234]|hfsplus|auto)
             ;;
         *)
             warn_msg "Unknown cdroot_type, using 'auto'"

@@ -81,7 +81,7 @@ Kernel
   + RSA-4096 / SHA-256 module signing
 
 SquashFS image
-  + SHA-256 verification in initramfs
+  + SHA-256 DM-Verity in initramfs
 
 LUKS
   + AES-256 / XTS (w/ double key size)

@@ -76,7 +76,7 @@ good_msg 'Loading modules'
 
 # Specify required filesystem modules (no autoloading on mount)
 # Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
-force_load="loop ${force_load_fs} ehci-hcd"
+force_load="${force_load_fs} ehci-hcd"
 
 oldmods=
 newmods=" ${force_load} "
@@ -174,56 +174,73 @@ done
 
 # Setup the loopback mounts
 verifyroot() {
-    local image="$1"
+    local imgdev="$1"
 
     if [ -n "${param_cdroot_hash}" ]; then
-        good_msg 'Verifying filesystem image ...'
-        sfshash=`sha256sum "${image}"`
-        param_cdroot_hash=`echo "${param_cdroot_hash}" | tr A-F a-f`
+        good_msg 'Setting up DM-Verity for filesystem image'
 
-        [ "${param_cdroot_hash}" = "${sfshash%% *}" ]
-        test_success "verify filesystem image hash"
+        # Load required modules (no module autoloading)
+        modprobe -b dm_verity
+        modprobe -b algif_hash
+        modprobe -b sha1_generic
+
+        [ "${param_cdroot_hash%:*}" -gt 0 -a "${param_cdroot_hash%:*}" != "${param_cdroot_hash}" ] 2>/dev/null
+        test_success 'parse DM-Verity hash descriptor'
+
+        sfsbytes=`blockdev --getsize64 ${imgdev}`
+        sfsoffset=$((sfsbytes - ${param_cdroot_hash%:*} * 4096))
+        hashdesc=`veritysetup dump --hash-offset=${sfsoffset} ${imgdev} | sed -n 's/^.*:[[:blank:]]*//; 3p; 5,7p' | tr '\n' :`
+
+        [ "${hashdesc}" = 1:4096:4096:sha256: ]
+        test_success 'verify DM-Verity superblock'
+
+        veritysetup create --hash-offset=${sfsoffset} rootfs ${imgdev} ${imgdev} "${param_cdroot_hash#*:}"
+        test_success 'setup DM-Verity mapping'
+
+        veritysetup status rootfs | grep -qs '^[[:blank:]]*status:[[:blank:]]*verified$'
+        test_success 'setup DM-Verity mapping with given root hash'
+
+        # Remove modules used only for veritysetup's crypto backend init
+        modprobe -r sha1_generic
+        modprobe -r algif_hash
+
+        rootdev=/dev/mapper/rootfs
     else
         warn_msg 'Skipping filesystem image verification'
     fi
 }
 
-if [ "${param_loop}" != / ]; then
-    rootimg=${sboot}"${param_loop}"
+# Let 'notoram' override 'toram' enforcement for CDs
+rootimg=${sboot}"${param_loop}"
+if [ -n "${param_toram}" -a -z "${param_notoram}" ]; then
+    good_msg 'Copying filesystem image to RAM ...'
+    rootimgram=${srwroot}/cache/root.sfs
 
-    # Let 'notoram' override 'toram' enforcement for CDs
-    [ -z "${param_notoram}" ] || param_toram=
-
-    if [ -n "${param_toram}" ]; then
-        good_msg 'Copying filesystem image to RAM ...'
-        rootimgram=${srwroot}/cache/root.sfs
-
-        mkdir -m 700  ${srwroot}/cache
-        cp "${rootimg}" ${rootimgram} || rm ${rootimgram}
-        rootimg=${rootimgram}
-    fi
-
-    verifyroot "${rootimg}"
-
-    # CONFIG_FEATURE_DEVFS must be disabled for BusyBox
-    good_msg 'Mounting SquashFS filesystem'
-    modprobe -b squashfs
-    mount -r -t squashfs -o loop,${fs_flags_squashfs} "${rootimg}" ${slive}
-    test_success 'mount compressed filesystem'
-
-    # Move boot mountpoint under live
-    mount -o move ${sboot} ${mboot}
-else
-    # Treat boot mountpoint as live mountpoint
-    verifyroot ${mediadev}
-    mount -o move ${sboot} ${slive}
+    mkdir -m 700  ${srwroot}/cache
+    cp "${rootimg}" ${rootimgram} || rm ${rootimgram}
+    rootimg=${rootimgram}
 fi
 
+# Set up DM-Verity (sets rootdev=/dev/mapper/...)
+rootdev=/dev/loop0
+modprobe -b loop
+losetup -r ${rootdev} "${rootimg}"
+verifyroot ${rootdev}
+
+# CONFIG_FEATURE_DEVFS must be disabled for BusyBox
+good_msg 'Mounting SquashFS filesystem'
+modprobe -b squashfs
+mount -r -t squashfs -o ${fs_flags_squashfs} ${rootdev} ${slive}
+test_success 'mount compressed filesystem'
+
+# Move boot mountpoint under live
+mount -o move ${sboot} ${mboot}
+
 # Bind extra live mountpoint under live
-mount -r -o bind ${slive}   ${mlive}
+mount -r -o bind ${slive} ${mlive}
 
 # Move rwroot mountpoint under live
-mount -o move    ${srwroot} ${mrwroot}
+mount -o move ${srwroot} ${mrwroot}
 
 
 # Run debug shell again if requested

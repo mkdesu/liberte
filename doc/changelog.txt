@@ -3,6 +3,7 @@
   * Release naming convention is YYYY.MM from now on
 
   * Kernel 3.9.9 with module signing and BFQ I/O scheduler
+  * DM-Verity for faster SquashFS image verification
   * Support for installation to GPT media
   * Added support for exFAT filesystem
   * Better support for QEMU mouse virtualization
@@ -26,6 +27,7 @@
   * Replaced XChat with HexChat
 
   * OVA image creation is fully integrated into build process
+  * Removed qemulate.sh script
 
 
 2012-09-01
