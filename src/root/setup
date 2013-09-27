@@ -85,8 +85,6 @@ patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
 # (#437446)
 patch_ebuild ${HOME}/patches/portage/nip2.patch
-# (#448228, fixed in polkit-0.111)
-patch_ebuild ${HOME}/patches/portage/polkit.patch
 
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
@@ -455,6 +453,9 @@ sed -n '/^\//p' ${HOME}/config/rootfs.nosuid | while read file caps; do
         setcap -r "${file}"
     fi
 done
+
+# (#485910, #485908)
+paxctl-ng -d /usr/lib/polkit-1/polkitd || :
 
 
 sinfo "Initializing a secondary PGP keyring"

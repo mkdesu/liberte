@@ -27,7 +27,8 @@
 =dev-libs/m17n-lib-1.6.3*
 
 # Library-only Javascript for PolKit (#437520)
-=dev-lang/spidermonkey-1.8.7*:0/mozjs187
+=sys-auth/polkit-0.112*
+=dev-lang/spidermonkey-17.0.0*:17
 
 # Firmware
 sys-firmware/b43-firmware
