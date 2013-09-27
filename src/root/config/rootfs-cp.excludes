@@ -10,7 +10,7 @@
 /usr/portage/**
 
 # Sources
-/usr/src/linux*
+/usr/src/linux-*/**
 /usr/lib/klibc/
 
 # Documentation

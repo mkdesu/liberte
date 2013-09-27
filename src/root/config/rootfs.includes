@@ -32,3 +32,7 @@
 
 # Transient directories (excluded during image creation)
 /tmp/transient/***
+
+# Support linux-info.eclass ("copy" phase only)
+/usr/src/linux-[0-9]*/Makefile
+/usr/src/linux-main/.config
