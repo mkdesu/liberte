@@ -30,11 +30,10 @@ case "${profile}" in
         # GnuPG: replace .onion keyserver
         sed -i 's/^keyserver\>/# &/; s/^# \[noanon\] //' /home/anon/config/pgp/gpg.conf
 
-        # Epiphany: replace default homepage and .onion search bookmarks
-        cp  /home/anon/info/browser-noanon.html /home/anon/info/browser.html
-        sed -i 's@http://3g2upl4pq6kufc4m.onion@https://duckduckgo.com@' \
-            /etc/dconf/db/anon.d/db.ini                                  \
-            /home/anon/config/gnome2/epiphany/bookmarks.rdf
+        # Browser: disable Tor SOCKS proxy, replace default homepage and .onion search bookmarks
+        sed -i 's/\("network\.proxy\.type",\) 1/\1 5/' /home/anon/config/firefox/profile.anon/prefs.js
+        sed -i 's/browser\.html/browser-noanon.html/'  /home/anon/config/firefox/profile.anon/prefs.js
+        # sed -i 's@http://3g2upl4pq6kufc4m.onion@https://duckduckgo.com@'
 
         rm -f /etc/dconf/db/anon
         dconf update

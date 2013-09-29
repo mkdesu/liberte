@@ -12,6 +12,7 @@ gnome-extra/libgsf              -gtk
 x11-apps/xinput_calibrator      -gtk
 x11-misc/redshift               -gtk
 dev-lang/python                 -ncurses -readline
+app-text/hunspell               -ncurses
 net-im/pidgin                   -ncurses
 sys-apps/gawk                   -readline
 dev-lang/lua                    -readline
@@ -40,23 +41,23 @@ net-analyzer/netcat             -crypt
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
 app-i18n/uim                    -ssl
-www-client/epiphany             -nss
 net-libs/glib-networking        -gnome
 net-irc/hexchat                 -libproxy
 
 # Multimedia
 # [ffmpeg/libav: encode-only flags: mp3 aac aacplus faac theora vorbis x264 xvid]
-media-video/totem               -youtube nsplugin
+media-video/totem               -youtube
 virtual/ffmpeg                  -X -encode -truetype -speex
 media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -hardcoded-tables  -speex -v4l
 media-sound/sox                 encode
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 media-libs/gst-plugins-base             theora
 media-libs/libtheora            encode
+www-client/firefox              -alsa gstreamer  system-sqlite -wifi
 net-im/pidgin                   -gstreamer
 media-libs/libass               -harfbuzz
 
-# Unnecessary functionality (geoclue: (#416331))
+# Unnecessary functionality
 sys-libs/ncurses                minimal
 dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
@@ -86,7 +87,6 @@ app-editors/nano                -spell
 dev-libs/libxslt                -crypt
 media-libs/libwmf               -expat
 app-text/ghostscript-gpl        -djvu -idn
-app-misc/geoclue                -*
 app-emulation/virtualbox-bin    headless -additions -chm
 
 # Extra functionality
@@ -107,6 +107,8 @@ media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 media-libs/libquvi-scripts      offensive
 app-portage/eix                 strong-security
+dev-db/sqlite                   secure-delete
+dev-lang/python                 sqlite
 app-arch/p7zip                  rar
 app-office/abiword              gnome
 app-text/evince                 gnome
@@ -117,7 +119,7 @@ net-dialup/ppp                  ipv6
 
 # Internationalization
 app-i18n/uim                    -linguas_*
-app-text/aspell                 -linguas_* linguas_en
+app-text/hunspell               -linguas_* linguas_en linguas_ru
 sys-apps/portage                -linguas_*
 app-portage/eix                 -linguas_*
 sys-apps/man-pages              -linguas_*

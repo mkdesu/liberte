@@ -61,7 +61,7 @@ Plugin {
     type = launchbar
     Config {
         Button {
-            id=/usr/share/applications/epiphany.desktop
+            id=/usr/share/applications/firefox.desktop
         }
         Button {
             id=/usr/share/applications/claws-mail.desktop

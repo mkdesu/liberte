@@ -47,11 +47,12 @@ openvpn                 ssl, polarssl           ssl             networkmanager-o
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup
-libsoup                 gnutls                  gnutls          gst-plugins-soup, totem, webkit-gtk
+libsoup                 gnutls                  gnutls          gst-plugins-soup, totem
 libmicrohttpd           gnutls                  -               cables
 curl                    ssl, gnutls, nss        ssl             cables, gnupg, quvi, uget
 wget                    ssl, gnutls             ssl             portage, libqalculate(forex)
 
+firefox                 nss                     nss
 claws-mail              gnutls                  gnutls
 libetpan                ssl, gnutls             gnutls          claws-mail
 cyrus-sasl              ssl                     ssl             pidgin
@@ -171,11 +172,7 @@ Tor                              (127.0.0.1:9050)
         glib-networking[-gnome]  (glib GIO modules)
           libsoup                (HTTP library)
             libsoup-gnome        (GNOME libsoup plugin)
-              Epiphany
               Totem              (Playlist parser)
-            WebKit-GTK
-              <browsers>
-            xombrero
             NetworkManager       (connectivity checking)
             gst-plugins-soup     (GStreamer HTTP plugin, http_proxy envvar is supported)
       libxml2                    (NanoHTTP)
@@ -185,6 +182,7 @@ Tor                              (127.0.0.1:9050)
       gFTP                       (HTTP only)
       uim                        (custom-http.scm)
   explicit configuration
+    Firefox                      (environment and GConf are supported)
     Pidgin                       (GConf is supported)
     HexChat
     SSH

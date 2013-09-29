@@ -13,7 +13,6 @@ export XDG_DATA_HOME=${XDG_CONFIG_HOME}/local
 export XDG_CACHE_HOME=${TMPDIR}/cache
 export SECURITY_HOME=${HOME}/persist/security
 
-export ASPELL_CONF="per-conf ${XDG_CONFIG_HOME}/aspell/aspell.conf; home-dir ${XDG_CONFIG_HOME}/aspell"
 export DCONF_PROFILE=${USER}
 export GTK2_RC_FILES=${XDG_CONFIG_HOME}/gtk-2.0/gtkrc
 export GNUPGHOME=${SECURITY_HOME}/pgp
@@ -39,7 +38,7 @@ export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 
 # Application settings
-export BROWSER=epiphany
+export BROWSER=firefox
 export LESS="-R -M --shift 16 -Swi -x4"
 export LESSHISTFILE=-
 export EDITOR=nano

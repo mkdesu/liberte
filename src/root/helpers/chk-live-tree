@@ -54,8 +54,7 @@ for lib in `find . -name 'lib*.so'`; do
 done
 
 sinfo "Docs:"
-find . \( -name '*.info*' ! -path './usr/lib/aspell*.info' \) \
-        -o -name '*.htm*' -o -name '*.1.bz2'
+find . -name '*.info*' -o -name '*.htm*' -o -name '*.1.bz2'
 
 sinfo "Hidden:"
 find . -mindepth 1 -name '.*' ! \( -path './home/anon/*' -o -path './root/*' \
@@ -84,7 +83,7 @@ getfacl -psR .
 
 
 sinfo "STACK / TEXTRELs / PaX markings:"
-find . -type f \( -name '*.so*' -o -perm /111 \) ! -path './usr/lib/paxtest/*' -print0 \
+find . -type f \( -name '*.so*' -o -perm /111 \) -print0 \
     | xargs -0 scanelf -qtex
 
 
@@ -98,8 +97,9 @@ if [ -e ${regexps} ]; then
     xzgrep -iE "${regexps}" \
         /usr/src/linux-{main,kexec{,-64}}/usr/initramfs_data.cpio.xz
 
-    find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws' \
-        ! -name 'libgucharmap*.so.*' ! -name oui.txt ! -name iab.txt -print0 \
+    find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws'  \
+        ! -name 'libgucharmap*.so.*' ! -name oui.txt ! -name iab.txt \
+        ! -path '*/usr/share/myspell/*' ! -path '*/extensions/langpack-*' -print0 \
         | xargs -0 grep -liE "${regexps}"
 else
     echo "checkregexp file not found, skipping"

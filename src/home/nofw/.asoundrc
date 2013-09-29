@@ -1,4 +1,4 @@
-# GStreamer video plugins in WebKit-based browsers fail without
+# GStreamer video plugins in GStreamer-based browsers fail without
 # access to audio devices. An alternative to disabling audio in
 # ALSA is temporarily granting playback access:
 #   setfacl -m u:nofw:rw /dev/snd/{control*,pcm*p}

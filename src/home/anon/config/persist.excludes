@@ -6,10 +6,16 @@
 /config/images/liberte-logo-wallpaper.png
 
 # Browsing
-/config/gnome2/epiphany/cookies.sqlite
-/config/gnome2/epiphany/ephy-history.db
-/config/gnome2/epiphany/ephy-bookmarks.xml
-/config/gnome2/epiphany/session_crashed.xml
+/config/firefox/profile.anon/*[Cc]ache/
+/config/firefox/profile.anon/**backup*
+/config/firefox/profile.anon/*lock
+/config/firefox/profile.anon/safebrowsing/
+/config/firefox/profile.anon/downloads.sqlite
+/config/firefox/profile.anon/formhistory.sqlite
+/config/firefox/profile.anon/extensions.sqlite
+/config/firefox/profile.anon/extensions.ini
+/config/firefox/profile.anon/compatibility.ini
+/config/firefox/profile.anon/pluginreg.dat
 
 # Mail
 /config/claws-mail/menurc
@@ -41,8 +47,6 @@
 /config/gftp/cache/
 /config/nip2/tmp/
 /config/emelfm2/*.save
-/config/local/epiphany/
-/config/local/webkit/
 /config/local/geeqie/metadata/
 /config/local/geeqie/trash/
 /config/local/Trash/

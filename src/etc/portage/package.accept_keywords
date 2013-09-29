@@ -13,8 +13,6 @@
 
 # GTK+ 3
 =x11-themes/light-themes-0.1.93*
-=www-client/epiphany-3.4.3*
-=www-client/epiphany-extensions-3.4*
 =app-accessibility/florence-0.6.0*
 
 # Guest virtualization

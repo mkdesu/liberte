@@ -35,5 +35,5 @@ export GST_REGISTRY=/var/cache/gstreamer/registry.bin
 export GST_REGISTRY_UPDATE=no
 
 
-# Run Epiphany
-exec epiphany -p file:///home/nofw/info/warning.html
+# Run browser
+exec firefox file:///home/nofw/info/warning.html

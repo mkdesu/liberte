@@ -93,6 +93,7 @@
 
 # Miscellaneous
 .keep*
+.mkdir.done
 /root/**
 /boot/memtest86plus/memtest.*
 /home/anon/persist/security/pgp/*~
@@ -117,8 +118,6 @@
 /usr/share/tor/
 /usr/share/misc/*.ids.*
 /usr/share/smartmontools/*.h.*
-# (Geoclue providers are disabled)
-/usr/share/geoclue-providers/**
 
 # Statically linked binaries (and symlinks)
 /sbin/ldconfig
@@ -135,8 +134,8 @@
 /usr/bin/ntp-wait
 # dev-util/strace: nice strace output
 /usr/bin/strace-graph
-# app-text/aspell: old dictionaries import
-/usr/bin/aspell-import
+# app-text/hunspell: ispell affix tables converter
+/usr/bin/ispellaff2myspell
 # dev-libs/openssl: optional functionality for update-ca-certificates,
 # helper for "openssl ca", improvement of CA.sh; an alternative to ssl-ts
 /usr/bin/c_rehash
@@ -204,8 +203,7 @@
 /usr/share/avconv/
 /usr/sbin/vboxguest-service
 /lib/firmware/microcode.dat
-/usr/lib/tclConfig.sh
 /usr/sbin/fix_libtool_files.sh
 /usr/share/gcc-data/fixlafiles.awk
 /usr/bin/c[89]9
-/usr/bin/sudoedit
+/usr/lib/firefox/dictionaries/

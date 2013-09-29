@@ -19,6 +19,7 @@
   * More robust Xorg autoconfiguration with sequential fallbacks
   * Added ASCII virtual keyboard table for OTFE password entry
 
+  * Replaced Epiphany with Firefox
   * Added UFRaw, a RAW images viewer and converter
   * Added proxychains, a heterogeneous chaining proxyfier
   * Removed experimental I2P support and JamVM
