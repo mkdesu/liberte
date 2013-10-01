@@ -34,7 +34,6 @@ x11-base/xorg-drivers           -video_cards_nv
 # Networking, including SSL/TLS
 net-libs/libetpan               gnutls
 net-libs/libmicrohttpd          -ssl
-net-wireless/wpa_supplicant     -ssl  gnutls
 net-misc/networkmanager         gnutls -nss
 net-im/pidgin                   gnutls sasl
 net-analyzer/netcat             -crypt
@@ -116,6 +115,7 @@ media-gfx/ufraw                 gnome contrast timezone
 media-gfx/graphicsmagick        imagemagick
 media-libs/vips                 imagemagick
 net-dialup/ppp                  ipv6
+net-wireless/wpa_supplicant     ap p2p
 
 # Internationalization
 app-i18n/uim                    -linguas_*

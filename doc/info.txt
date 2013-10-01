@@ -41,7 +41,7 @@ libevent                ssl                     ssl             tor
 aircrack-ng             ssl                     ssl
 
 networkmanager          gnutls, nss             gnutls
-wpa_supplicant          ssl, gnutls, libtom     gnutls          networkmanager
+wpa_supplicant          ssl, gnutls, libtom     ssl             networkmanager
 vpnc                    ssl, gnutls             gnutls          networkmanager-vpnc
 openvpn                 ssl, polarssl           ssl             networkmanager-openvpn
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
