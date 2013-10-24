@@ -4,8 +4,6 @@
 
 # Boot process (cdrtools: EFI platform support)
 =sys-boot/grub-2.00*:2
-=app-cdr/cdrtools-3.01_alpha*
-=sys-boot/efibootmgr-0.5.4*
 =sys-fs/cryptsetup-1.6.2*
 
 # Network
@@ -16,10 +14,10 @@
 =app-accessibility/florence-0.6.0*
 
 # Guest virtualization
-=app-emulation/open-vm-tools-2013.04.16*
-=app-emulation/open-vm-tools-kmod-2013.04.16*
-=app-emulation/virtualbox-guest-additions-4.2.16*
-=x11-drivers/xf86-video-virtualbox-4.2.16*
+=app-emulation/open-vm-tools-2013.09.16*
+=app-emulation/open-vm-tools-kmod-2013.09.16*
+=app-emulation/virtualbox-guest-additions-4.2.18*
+=x11-drivers/xf86-video-virtualbox-4.2.18*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*

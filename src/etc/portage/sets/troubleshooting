@@ -2,3 +2,4 @@
 # (can be disabled in release)
 
 dev-util/strace
+net-analyzer/tcpdump

@@ -1,5 +1,5 @@
---- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.16.ebuild	2013-06-24 10:57:30.000000000 +0000
-+++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.16.ebuild	2013-08-11 03:34:50.091510612 +0000
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.18.ebuild	2013-06-24 10:57:30.000000000 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.18.ebuild	2013-08-11 03:34:50.091510612 +0000
 @@ -52,7 +52,7 @@
  
  pkg_setup() {
