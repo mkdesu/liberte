@@ -1,19 +1,19 @@
 diff --git a/Documentation/filesystems/Locking b/Documentation/filesystems/Locking
-index 0706d32..4331290 100644
+index fe7afe2..853a1fe 100644
 --- a/Documentation/filesystems/Locking
 +++ b/Documentation/filesystems/Locking
-@@ -66,6 +66,7 @@ prototypes:
- 	int (*atomic_open)(struct inode *, struct dentry *,
+@@ -65,6 +65,7 @@ prototypes:
  				struct file *, unsigned open_flag,
  				umode_t create_mode, int *opened);
+ 	int (*tmpfile) (struct inode *, struct dentry *, umode_t);
 +	int (*dentry_open)(struct dentry *, struct file *, const struct cred *);
  
  locking rules:
  	all may block
-@@ -93,6 +94,7 @@ removexattr:	yes
- fiemap:		no
+@@ -93,6 +94,7 @@ fiemap:		no
  update_time:	no
  atomic_open:	yes
+ tmpfile:	no
 +dentry_open:	no
  
  	Additionally, ->rmdir(), ->unlink() and ->rename() have ->i_mutex on
@@ -224,11 +224,11 @@ index 0000000..00dbab0
 +the behavior of the overlay is undefined, though it will not result in
 +a crash or deadlock.
 diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
-index bc4b06b..f64a4d1 100644
+index f93a882..f596be7 100644
 --- a/Documentation/filesystems/vfs.txt
 +++ b/Documentation/filesystems/vfs.txt
-@@ -362,6 +362,7 @@ struct inode_operations {
- 	int (*atomic_open)(struct inode *, struct dentry *,
+@@ -364,6 +364,7 @@ struct inode_operations {
+ } ____cacheline_aligned;
  				struct file *, unsigned open_flag,
  				umode_t create_mode, int *opened);
 +	int (*dentry_open)(struct dentry *, struct file *, const struct cred *);
@@ -249,10 +249,10 @@ index bc4b06b..f64a4d1 100644
    invalidatepage: If a page has PagePrivate set, then invalidatepage
          will be called when part or all of the page is to be removed
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 9561658..9ea89b8 100644
+index bf61e04..4cd82d9 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -5872,6 +5872,13 @@ F:	drivers/scsi/osd/
+@@ -6122,6 +6122,13 @@ F:	drivers/scsi/osd/
  F:	include/scsi/osd_*
  F:	fs/exofs/
  
@@ -267,7 +267,7 @@ index 9561658..9ea89b8 100644
  M:	Christian Lamparter <chunkeey@googlemail.com>
  L:	linux-wireless@vger.kernel.org
 diff --git a/fs/Kconfig b/fs/Kconfig
-index 780725a..9e2ccd5 100644
+index c229f82..60291d5 100644
 --- a/fs/Kconfig
 +++ b/fs/Kconfig
 @@ -67,6 +67,7 @@ source "fs/quota/Kconfig"
@@ -279,10 +279,10 @@ index 780725a..9e2ccd5 100644
  config GENERIC_ACL
  	bool
 diff --git a/fs/Makefile b/fs/Makefile
-index 9d53192..479a720 100644
+index 4fe6df3..9506dd7 100644
 --- a/fs/Makefile
 +++ b/fs/Makefile
-@@ -107,6 +107,7 @@ obj-$(CONFIG_QNX6FS_FS)		+= qnx6/
+@@ -105,6 +105,7 @@ obj-$(CONFIG_QNX6FS_FS)		+= qnx6/
  obj-$(CONFIG_AUTOFS4_FS)	+= autofs4/
  obj-$(CONFIG_ADFS_FS)		+= adfs/
  obj-$(CONFIG_FUSE_FS)		+= fuse/
@@ -291,10 +291,10 @@ index 9d53192..479a720 100644
  obj-$(CONFIG_SUN_OPENPROMFS)	+= openpromfs/
  obj-$(CONFIG_OMFS_FS)		+= omfs/
 diff --git a/fs/ecryptfs/main.c b/fs/ecryptfs/main.c
-index e924cf4..8b0957e 100644
+index eb1c597..87dcf25 100644
 --- a/fs/ecryptfs/main.c
 +++ b/fs/ecryptfs/main.c
-@@ -567,6 +567,13 @@ static struct dentry *ecryptfs_mount(struct file_system_type *fs_type, int flags
+@@ -566,6 +566,13 @@ static struct dentry *ecryptfs_mount(struct file_system_type *fs_type, int flags
  	s->s_maxbytes = path.dentry->d_sb->s_maxbytes;
  	s->s_blocksize = path.dentry->d_sb->s_blocksize;
  	s->s_magic = ECRYPTFS_SUPER_MAGIC;
@@ -309,7 +309,7 @@ index e924cf4..8b0957e 100644
  	inode = ecryptfs_get_inode(path.dentry->d_inode, s);
  	rc = PTR_ERR(inode);
 diff --git a/fs/internal.h b/fs/internal.h
-index 507141f..89481ac 100644
+index 7c5f01c..6092481 100644
 --- a/fs/internal.h
 +++ b/fs/internal.h
 @@ -42,11 +42,6 @@ static inline int __sync_blockdev(struct block_device *bdev, int wait)
@@ -324,8 +324,21 @@ index 507141f..89481ac 100644
   * namespace.c
   */
  extern int copy_mount_options(const void __user *, unsigned long *);
+@@ -134,12 +129,6 @@ extern ssize_t __kernel_write(struct file *, const char *, size_t, loff_t *);
+ extern int rw_verify_area(int, struct file *, const loff_t *, size_t);
+ 
+ /*
+- * splice.c
+- */
+-extern long do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
+-		loff_t *opos, size_t len, unsigned int flags);
+-
+-/*
+  * pipe.c
+  */
+ extern const struct file_operations pipefifo_fops;
 diff --git a/fs/namei.c b/fs/namei.c
-index 57ae9c8..e1cffbd 100644
+index 8b61d10..9fc067a 100644
 --- a/fs/namei.c
 +++ b/fs/namei.c
 @@ -402,6 +402,7 @@ int __inode_permission(struct inode *inode, int mask)
@@ -336,7 +349,7 @@ index 57ae9c8..e1cffbd 100644
  
  /**
   * sb_permission - Check superblock-level permissions
-@@ -2867,9 +2868,12 @@ finish_open_created:
+@@ -2848,9 +2849,12 @@ finish_open_created:
  	error = may_open(&nd->path, acc_mode, open_flag);
  	if (error)
  		goto out;
@@ -353,13 +366,22 @@ index 57ae9c8..e1cffbd 100644
  			goto stale_open;
  		goto out;
 diff --git a/fs/namespace.c b/fs/namespace.c
-index 50ca17d..9791b4e 100644
+index 7b1ca9b..455e6ea 100644
 --- a/fs/namespace.c
 +++ b/fs/namespace.c
-@@ -1399,6 +1399,24 @@ void drop_collected_mounts(struct vfsmount *mnt)
- 	release_mounts(&umount_list);
+@@ -1442,6 +1442,33 @@ void drop_collected_mounts(struct vfsmount *mnt)
+ 	namespace_unlock();
  }
  
++/**
++ * clone_private_mount - create a private clone of a path
++ *
++ * This creates a new vfsmount, which will be the clone of @path.  The new will
++ * not be attached anywhere in the namespace and will be private (i.e. changes
++ * to the originating mount won't be propagated into this).
++ *
++ * Release with mntput().
++ */
 +struct vfsmount *clone_private_mount(struct path *path)
 +{
 +	struct mount *old_mnt = real_mount(path->mnt);
@@ -371,8 +393,8 @@ index 50ca17d..9791b4e 100644
 +	down_read(&namespace_sem);
 +	new_mnt = clone_mnt(old_mnt, path->dentry, CL_PRIVATE);
 +	up_read(&namespace_sem);
-+	if (!new_mnt)
-+		return ERR_PTR(-ENOMEM);
++	if (IS_ERR(new_mnt))
++		return ERR_CAST(new_mnt);
 +
 +	return &new_mnt->mnt;
 +}
@@ -382,10 +404,10 @@ index 50ca17d..9791b4e 100644
  		   struct vfsmount *root)
  {
 diff --git a/fs/open.c b/fs/open.c
-index 6835446..b9d9f9e 100644
+index d53e298..fbbfd19 100644
 --- a/fs/open.c
 +++ b/fs/open.c
-@@ -828,8 +828,7 @@ struct file *dentry_open(const struct path *path, int flags,
+@@ -800,8 +800,7 @@ struct file *dentry_open(const struct path *path, int flags,
  	f = get_empty_filp();
  	if (!IS_ERR(f)) {
  		f->f_flags = flags;
@@ -395,7 +417,7 @@ index 6835446..b9d9f9e 100644
  		if (!error) {
  			/* from now on we need fput() to dispose of f */
  			error = open_check_o_direct(f);
-@@ -846,6 +845,26 @@ struct file *dentry_open(const struct path *path, int flags,
+@@ -818,6 +817,26 @@ struct file *dentry_open(const struct path *path, int flags,
  }
  EXPORT_SYMBOL(dentry_open);
  
@@ -453,10 +475,10 @@ index 0000000..8f91889
 +overlayfs-objs := super.o inode.o dir.o readdir.o copy_up.o
 diff --git a/fs/overlayfs/copy_up.c b/fs/overlayfs/copy_up.c
 new file mode 100644
-index 0000000..eef85e0
+index 0000000..b171e1f
 --- /dev/null
 +++ b/fs/overlayfs/copy_up.c
-@@ -0,0 +1,385 @@
+@@ -0,0 +1,388 @@
 +/*
 + *
 + * Copyright (C) 2011 Novell Inc.
@@ -532,6 +554,8 @@ index 0000000..eef85e0
 +{
 +	struct file *old_file;
 +	struct file *new_file;
++	loff_t old_pos = 0;
++	loff_t new_pos = 0;
 +	int error = 0;
 +
 +	if (len == 0)
@@ -549,7 +573,6 @@ index 0000000..eef85e0
 +
 +	/* FIXME: copy up sparse files efficiently */
 +	while (len) {
-+		loff_t offset = new_file->f_pos;
 +		size_t this_len = OVL_COPY_UP_CHUNK_SIZE;
 +		long bytes;
 +
@@ -561,12 +584,14 @@ index 0000000..eef85e0
 +			break;
 +		}
 +
-+		bytes = do_splice_direct(old_file, &offset, new_file, this_len,
-+				 SPLICE_F_MOVE);
++		bytes = do_splice_direct(old_file, &old_pos,
++					 new_file, &new_pos,
++					 this_len, SPLICE_F_MOVE);
 +		if (bytes <= 0) {
 +			error = bytes;
 +			break;
 +		}
++		WARN_ON(old_pos != new_pos);
 +
 +		len -= bytes;
 +	}
@@ -1909,10 +1934,10 @@ index 0000000..1cba38f
 +int ovl_copy_up_truncate(struct dentry *dentry, loff_t size);
 diff --git a/fs/overlayfs/readdir.c b/fs/overlayfs/readdir.c
 new file mode 100644
-index 0000000..4c18abf
+index 0000000..d1b4403
 --- /dev/null
 +++ b/fs/overlayfs/readdir.c
-@@ -0,0 +1,566 @@
+@@ -0,0 +1,567 @@
 +/*
 + *
 + * Copyright (C) 2011 Novell Inc.
@@ -1943,6 +1968,8 @@ index 0000000..4c18abf
 +};
 +
 +struct ovl_readdir_data {
++	struct dir_context ctx;
++	bool is_merge;
 +	struct rb_root *root;
 +	struct list_head *list;
 +	struct list_head *middle;
@@ -2040,13 +2067,12 @@ index 0000000..4c18abf
 +	return 0;
 +}
 +
-+static int ovl_fill_lower(void *buf, const char *name, int namelen,
-+			    loff_t offset, u64 ino, unsigned int d_type)
++static int ovl_fill_lower(struct ovl_readdir_data *rdd,
++			  const char *name, int namelen,
++			  loff_t offset, u64 ino, unsigned int d_type)
 +{
-+	struct ovl_readdir_data *rdd = buf;
 +	struct ovl_cache_entry *p;
 +
-+	rdd->count++;
 +	p = ovl_cache_entry_find(rdd->root, name, namelen);
 +	if (p) {
 +		list_move_tail(&p->l_node, rdd->middle);
@@ -2072,17 +2098,20 @@ index 0000000..4c18abf
 +	INIT_LIST_HEAD(list);
 +}
 +
-+static int ovl_fill_upper(void *buf, const char *name, int namelen,
++static int ovl_fill_merge(void *buf, const char *name, int namelen,
 +			  loff_t offset, u64 ino, unsigned int d_type)
 +{
 +	struct ovl_readdir_data *rdd = buf;
 +
 +	rdd->count++;
-+	return ovl_cache_entry_add_rb(rdd, name, namelen, ino, d_type);
++	if (!rdd->is_merge)
++		return ovl_cache_entry_add_rb(rdd, name, namelen, ino, d_type);
++	else
++		return ovl_fill_lower(rdd, name, namelen, offset, ino, d_type);
 +}
 +
 +static inline int ovl_dir_read(struct path *realpath,
-+			       struct ovl_readdir_data *rdd, filldir_t filler)
++			       struct ovl_readdir_data *rdd)
 +{
 +	struct file *realfile;
 +	int err;
@@ -2091,10 +2120,11 @@ index 0000000..4c18abf
 +	if (IS_ERR(realfile))
 +		return PTR_ERR(realfile);
 +
++	rdd->ctx.pos = 0;
 +	do {
 +		rdd->count = 0;
 +		rdd->err = 0;
-+		err = vfs_readdir(realfile, filler, rdd);
++		err = iterate_dir(realfile, &rdd->ctx);
 +		if (err >= 0)
 +			err = rdd->err;
 +	} while (!err && rdd->count);
@@ -2164,20 +2194,25 @@ index 0000000..4c18abf
 +
 +static inline int ovl_dir_read_merged(struct path *upperpath,
 +				      struct path *lowerpath,
-+				      struct ovl_readdir_data *rdd)
++				      struct list_head *list)
 +{
 +	int err;
 +	struct rb_root root = RB_ROOT;
 +	struct list_head middle;
++	struct ovl_readdir_data rdd = {
++		.ctx.actor = ovl_fill_merge,
++		.list = list,
++		.root = &root,
++		.is_merge = false,
++	};
 +
-+	rdd->root = &root;
 +	if (upperpath->dentry) {
-+		rdd->dir = upperpath->dentry;
-+		err = ovl_dir_read(upperpath, rdd, ovl_fill_upper);
++		rdd.dir = upperpath->dentry;
++		err = ovl_dir_read(upperpath, &rdd);
 +		if (err)
 +			goto out;
 +
-+		err = ovl_dir_mark_whiteouts(rdd);
++		err = ovl_dir_mark_whiteouts(&rdd);
 +		if (err)
 +			goto out;
 +	}
@@ -2185,13 +2220,12 @@ index 0000000..4c18abf
 +	 * Insert lowerpath entries before upperpath ones, this allows
 +	 * offsets to be reasonably constant
 +	 */
-+	list_add(&middle, rdd->list);
-+	rdd->middle = &middle;
-+	err = ovl_dir_read(lowerpath, rdd, ovl_fill_lower);
++	list_add(&middle, rdd.list);
++	rdd.middle = &middle;
++	rdd.is_merge = true;
++	err = ovl_dir_read(lowerpath, &rdd);
 +	list_del(&middle);
 +out:
-+	rdd->root = NULL;
-+
 +	return err;
 +}
 +
@@ -2209,17 +2243,16 @@ index 0000000..4c18abf
 +	list_move_tail(&od->cursor, l);
 +}
 +
-+static int ovl_readdir(struct file *file, void *buf, filldir_t filler)
++static int ovl_iterate(struct file *file, struct dir_context *ctx)
 +{
 +	struct ovl_dir_file *od = file->private_data;
 +	int res;
 +
-+	if (!file->f_pos)
++	if (!ctx->pos)
 +		ovl_dir_reset(file);
 +
 +	if (od->is_real) {
-+		res = vfs_readdir(od->realfile, filler, buf);
-+		file->f_pos = od->realfile->f_pos;
++		res = iterate_dir(od->realfile, ctx);
 +
 +		return res;
 +	}
@@ -2227,37 +2260,31 @@ index 0000000..4c18abf
 +	if (!od->is_cached) {
 +		struct path lowerpath;
 +		struct path upperpath;
-+		struct ovl_readdir_data rdd = { .list = &od->cache };
 +
 +		ovl_path_lower(file->f_path.dentry, &lowerpath);
 +		ovl_path_upper(file->f_path.dentry, &upperpath);
 +
-+		res = ovl_dir_read_merged(&upperpath, &lowerpath, &rdd);
++		res = ovl_dir_read_merged(&upperpath, &lowerpath, &od->cache);
 +		if (res) {
-+			ovl_cache_free(rdd.list);
++			ovl_cache_free(&od->cache);
 +			return res;
 +		}
 +
 +		od->cache_version = ovl_dentry_version_get(file->f_path.dentry);
 +		od->is_cached = true;
 +
-+		ovl_seek_cursor(od, file->f_pos);
++		ovl_seek_cursor(od, ctx->pos);
 +	}
 +
 +	while (od->cursor.next != &od->cache) {
-+		int over;
-+		loff_t off;
 +		struct ovl_cache_entry *p;
 +
 +		p = list_entry(od->cursor.next, struct ovl_cache_entry, l_node);
-+		off = file->f_pos;
 +		if (!p->is_whiteout) {
-+			over = filler(buf, p->name, p->len, off, p->ino,
-+				      p->type);
-+			if (over)
++			if (!dir_emit(ctx, p->name, p->len, p->ino, p->type))
 +				break;
 +		}
-+		file->f_pos++;
++		ctx->pos++;
 +		list_move(&od->cursor, &p->l_node);
 +	}
 +
@@ -2365,7 +2392,7 @@ index 0000000..4c18abf
 +const struct file_operations ovl_dir_operations = {
 +	.read		= generic_read_dir,
 +	.open		= ovl_dir_open,
-+	.readdir	= ovl_readdir,
++	.iterate	= ovl_iterate,
 +	.llseek		= ovl_dir_llseek,
 +	.fsync		= ovl_dir_fsync,
 +	.release	= ovl_dir_release,
@@ -2377,12 +2404,11 @@ index 0000000..4c18abf
 +	struct path lowerpath;
 +	struct path upperpath;
 +	struct ovl_cache_entry *p;
-+	struct ovl_readdir_data rdd = { .list = list };
 +
 +	ovl_path_upper(dentry, &upperpath);
 +	ovl_path_lower(dentry, &lowerpath);
 +
-+	err = ovl_dir_read_merged(&upperpath, &lowerpath, &rdd);
++	err = ovl_dir_read_merged(&upperpath, &lowerpath, list);
 +	if (err)
 +		return err;
 +
@@ -3171,10 +3197,10 @@ index 0000000..9473e79
 +module_init(ovl_init);
 +module_exit(ovl_exit);
 diff --git a/fs/splice.c b/fs/splice.c
-index 718bd00..0e8f44a 100644
+index 3b7ee65..3459483 100644
 --- a/fs/splice.c
 +++ b/fs/splice.c
-@@ -1308,6 +1308,7 @@ long do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
+@@ -1309,6 +1309,7 @@ long do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
  
  	return ret;
  }
@@ -3183,10 +3209,10 @@ index 718bd00..0e8f44a 100644
  static int splice_pipe_to_pipe(struct pipe_inode_info *ipipe,
  			       struct pipe_inode_info *opipe,
 diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 2c28271..3353de6 100644
+index 9818747..1bb28e6 100644
 --- a/include/linux/fs.h
 +++ b/include/linux/fs.h
-@@ -244,6 +244,12 @@ struct iattr {
+@@ -245,6 +245,12 @@ struct iattr {
   */
  #include <linux/quota.h>
  
@@ -3199,7 +3225,7 @@ index 2c28271..3353de6 100644
  /** 
   * enum positive_aop_returns - aop return codes with specific semantics
   *
-@@ -1320,6 +1326,11 @@ struct super_block {
+@@ -1328,6 +1334,11 @@ struct super_block {
  
  	/* Being remounted read-only */
  	int s_readonly_remount;
@@ -3211,15 +3237,15 @@ index 2c28271..3353de6 100644
  };
  
  /* superblock cache pruning functions */
-@@ -1573,6 +1584,7 @@ struct inode_operations {
- 	int (*atomic_open)(struct inode *, struct dentry *,
+@@ -1587,6 +1598,7 @@ struct inode_operations {
  			   struct file *, unsigned open_flag,
  			   umode_t create_mode, int *opened);
+ 	int (*tmpfile) (struct inode *, struct dentry *, umode_t);
 +	int (*dentry_open)(struct dentry *, struct file *, const struct cred *);
  } ____cacheline_aligned;
  
  ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
-@@ -2006,6 +2018,7 @@ extern struct file *file_open_name(struct filename *, int, umode_t);
+@@ -2020,6 +2032,7 @@ extern struct file *file_open_name(struct filename *, int, umode_t);
  extern struct file *filp_open(const char *, int, umode_t);
  extern struct file *file_open_root(struct dentry *, struct vfsmount *,
  				   const char *, int);
@@ -3227,7 +3253,7 @@ index 2c28271..3353de6 100644
  extern struct file * dentry_open(const struct path *, int, const struct cred *);
  extern int filp_close(struct file *, fl_owner_t id);
  
-@@ -2211,6 +2224,7 @@ extern sector_t bmap(struct inode *, sector_t);
+@@ -2220,6 +2233,7 @@ extern sector_t bmap(struct inode *, sector_t);
  #endif
  extern int notify_change(struct dentry *, struct iattr *);
  extern int inode_permission(struct inode *, int);
@@ -3235,11 +3261,21 @@ index 2c28271..3353de6 100644
  extern int generic_permission(struct inode *, int);
  
  static inline bool execute_ok(struct inode *inode)
+@@ -2425,6 +2439,9 @@ extern ssize_t generic_file_splice_write(struct pipe_inode_info *,
+ 		struct file *, loff_t *, size_t, unsigned int);
+ extern ssize_t generic_splice_sendpage(struct pipe_inode_info *pipe,
+ 		struct file *out, loff_t *, size_t len, unsigned int flags);
++extern long do_splice_direct(struct file *in, loff_t *ppos, struct file *out,
++		loff_t *opos, size_t len, unsigned int flags);
++
+ 
+ extern void
+ file_ra_state_init(struct file_ra_state *ra, struct address_space *mapping);
 diff --git a/include/linux/mount.h b/include/linux/mount.h
-index d7029f4..344a262 100644
+index 73005f9..435f281 100644
 --- a/include/linux/mount.h
 +++ b/include/linux/mount.h
-@@ -66,6 +66,9 @@ extern void mnt_pin(struct vfsmount *mnt);
+@@ -68,6 +68,9 @@ extern void mnt_pin(struct vfsmount *mnt);
  extern void mnt_unpin(struct vfsmount *mnt);
  extern int __mnt_is_readonly(struct vfsmount *mnt);
  

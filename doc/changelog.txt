@@ -1,8 +1,8 @@
-2013-09-XX
-  + 2013.09 release
+2013-11-XX
+  + 2013.11 release
   * Release naming convention is YYYY.MM from now on
 
-  * Kernel 3.9.9 with module signing and BFQ I/O scheduler
+  * Kernel 3.11.2 with module signing
   * DM-Verity for faster SquashFS image verification
   * Support for installation to GPT media
   * Added support for exFAT filesystem

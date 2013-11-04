@@ -14,6 +14,15 @@ ar5523.bin
 htc_7010.fw
 htc_9271.fw
 
+# ATH10K
+# (missing)
+ath10k/QCA988X/hw1.0/firmware.bin
+ath10k/QCA988X/hw1.0/otp.bin
+ath10k/QCA988X/hw1.0/board.bin
+ath10k/QCA988X/hw2.0/firmware.bin
+ath10k/QCA988X/hw2.0/otp.bin
+ath10k/QCA988X/hw2.0/board.bin
+
 # BRCMFMAC
 brcm/brcmfmac43236b.bin
 # (missing)
@@ -49,15 +58,11 @@ iwlwifi-2030-6.ucode
 iwlwifi-5000-5.ucode
 iwlwifi-5150-2.ucode
 iwlwifi-6000-4.ucode
-iwlwifi-6000g2a-6.ucode
+iwlwifi-6000g2a-5.ucode
 iwlwifi-6000g2b-6.ucode
 iwlwifi-6050-5.ucode
-# (missing)
-# only -4 in linux-firmware
-# iwlwifi-6000-6.ucode
-# only -7 in linux-firmware
-iwlwifi-3160-6.ucode
-iwlwifi-7260-6.ucode
+iwlwifi-3160-7.ucode
+iwlwifi-7260-7.ucode
 
 # MWIFIEX
 mrvl/usb8797_uapsta.bin
@@ -91,6 +96,8 @@ rt3290.bin
 rt2870.bin
 
 # RTL{8192{CE,CU,SE,DE},8723AE}
+# grep -r MODULE_FIRMWARE /usr/src/linux/drivers/net/wireless/rtlwifi
+rtlwifi/rtl8188efw.bin
 rtlwifi/rtl8192cfw.bin
 rtlwifi/rtl8192cufw.bin
 rtlwifi/rtl8192sefw.bin
@@ -99,9 +106,6 @@ rtlwifi/rtl8192cfwU.bin
 rtlwifi/rtl8192cfwU_B.bin
 rtlwifi/rtl8723fw.bin
 rtlwifi/rtl8723fw_B.bin
-# (missing)
-rtlwifi/rtl8723aefw.bin
-rtlwifi/rtl8723aefw_B.bin
 
 
 # --- Bluetooth ---
@@ -141,8 +145,10 @@ e100/d101s_ucode.bin
 e100/d102e_ucode.bin
 
 # R8169
+# grep '^#define FIRMWARE_' /usr/src/linux/drivers/net/ethernet/realtek/r8169.c
 rtl_nic/rtl8105e-1.fw
 rtl_nic/rtl8106e-1.fw
+rtl_nic/rtl8106e-2.fw
 rtl_nic/rtl8168d-1.fw
 rtl_nic/rtl8168d-2.fw
 rtl_nic/rtl8168e-1.fw
@@ -150,9 +156,11 @@ rtl_nic/rtl8168e-2.fw
 rtl_nic/rtl8168e-3.fw
 rtl_nic/rtl8168f-1.fw
 rtl_nic/rtl8168f-2.fw
-rtl_nic/rtl8168g-1.fw
+rtl_nic/rtl8168g-2.fw
+rtl_nic/rtl8168g-3.fw
 rtl_nic/rtl8402-1.fw
 rtl_nic/rtl8411-1.fw
+rtl_nic/rtl8411-2.fw
 
 # TIGON3
 tigon/tg3.bin

@@ -3,7 +3,6 @@
 =sys-power/cpupower-3.11*
 
 # Boot process (cdrtools: EFI platform support)
-=sys-boot/grub-2.00*:2
 =sys-fs/cryptsetup-1.6.2*
 
 # Network
