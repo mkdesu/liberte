@@ -31,3 +31,6 @@ sys-firmware/b43legacy-firmware
 
 # Hardened compilation issues (#456238)
 =sys-process/numactl-2.0.8*
+
+# Compilation failure (#317539)
+=net-wireless/irda-utils-0.9.18*
