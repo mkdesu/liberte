@@ -71,9 +71,7 @@ app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
 net-misc/tlsdate                -dbus
 net-libs/neon                   -pkcs11
-# (#490326)
-# sys-apps/kexec-tools            -zlib -lzma
-sys-apps/kexec-tools            -lzma
+sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
 x11-libs/libXfont               -bzip2
 dev-libs/libxml2                -lzma
