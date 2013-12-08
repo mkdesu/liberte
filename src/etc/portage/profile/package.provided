@@ -11,4 +11,4 @@ media-fonts/font-sony-misc-0
 media-fonts/urw-fonts-2.4.9
 
 # Unneeded (app-emulation/virtualbox-bin)
-app-emulation/virtualbox-modules-4.1.26
+app-emulation/virtualbox-modules-4.2.18
