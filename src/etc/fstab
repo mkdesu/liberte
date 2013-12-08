@@ -7,9 +7,9 @@
 
 # Mounted by init.d services (before localmount):
 # (if not mounted; fstab is consulted except for /sys/*)
-# sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...,/openrc}}}
+# sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...,/openrc}},/firmware/efi/efivars,/fs/fuse/connections}
 # udev-mount: /dev
-# devfs:      /dev{/pts,/shm}
+# devfs:      /dev{/pts,/shm[disabled]}
 
 # Empty writable directories (/mnt/rwroot's mountpoint options)
 /mnt/rwroot/tmp /tmp none bind 0 0

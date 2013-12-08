@@ -52,7 +52,7 @@ media-sound/sox                 encode
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 media-libs/gst-plugins-base             theora
 media-libs/libtheora            encode
-www-client/firefox              -alsa gstreamer  system-sqlite -wifi
+www-client/firefox              -alsa gstreamer  system-jpeg system-cairo system-sqlite system-icu  -wifi
 net-im/pidgin                   -gstreamer
 media-libs/libass               -harfbuzz
 

@@ -54,7 +54,8 @@ for lib in `find . -name 'lib*.so'`; do
 done
 
 sinfo "Docs:"
-find . -name '*.info*' -o -name '*.htm*' -o -name '*.1.bz2'
+find . -name '*.info*' -o -name '*.1.bz2' \
+        -o \( -name '*.htm*' ! -path './usr/lib/firefox/*/bookmarks.html' \)
 
 sinfo "Hidden:"
 find . -mindepth 1 -name '.*' ! \( -path './home/anon/*' -o -path './root/*' \

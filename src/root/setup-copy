@@ -48,7 +48,6 @@ ebuilds="app-misc/ca-certificates
          net-misc/vpnc
          sys-apps/lm_sensors
          sys-apps/portage
-         www-client/firefox
          x11-libs/xcb-util-wm"
 
 # /usr/portage is bind-mounted ro
@@ -75,11 +74,9 @@ sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
 sed -i s:dev-lang/perl:: ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
 
 # [debianutils]            ca-certificates:  update-ca-certificates
-# [binutils]               firefox:          not needed              (#486394)
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
 # [liboil]                 vips:             not needed              (#416815)
 sed -i 's:\<sys-apps/debianutils\>::'             ${ebuild_cacertificates}
-sed -i 's:>=sys-devel/binutils[^[:blank:]"]*\>::' ${ebuild_firefox}
 sed -i 's:\<x11-proto/xcb-proto\>::'              ${ebuild_xcbutilwm}
 sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'   ${ebuild_vips}
 

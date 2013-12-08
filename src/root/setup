@@ -354,7 +354,7 @@ sed -i 's/^# include /include /' /etc/nanorc
 
 
 sinfo "Configuring start-up services"
-svcsysinit="udev"
+svcsysinit="udev kmod-static-nodes"
 svcboot="consolefont irqbalance haveged metalog
          iptables consolekit lockdown"
 svcdefault="liberte identity cabled persist xconfig vmconfig spindown
@@ -378,8 +378,6 @@ for runlevel in boot default shutdown; do
         [ ! -e /etc/runlevels/${runlevel}/${svc} ] || rc-update del ${svc} ${runlevel}
     done
 done
-
-rc-update -u
 
 
 # /run/lock prevents a dangling symlink
@@ -455,7 +453,7 @@ sinfo "Disabling PaX markings"
 # (#485910, #485908)
 paxctl-ng -d /usr/lib/polkit-1/polkitd || :
 # Not necessary for any plugins
-paxctl-ng -d /usr/lib/firefox/plugin-container || :
+paxctl-ng -d /usr/lib/firefox/{firefox,firefox-bin,plugin-container} || :
 
 
 sinfo "Initializing a secondary PGP keyring"

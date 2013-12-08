@@ -11,9 +11,6 @@
 /usr/bin/chage
 /usr/bin/expiry
 
-# pt_chown is not used with devpts
-/usr/lib/misc/glibc/pt_chown
-
 # Limit mounting to root
 /usr/bin/fusermount
 /sbin/mount.vboxsf
