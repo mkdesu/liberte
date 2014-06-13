@@ -80,10 +80,7 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (#424816, VirtualBox: #11335)
-patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
-patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
-# (virtualbox-modules is in package.provided)
+
 groupadd -f -r vboxusers
 # (#437446)
 patch_ebuild ${HOME}/patches/portage/nip2.patch
@@ -111,12 +108,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     cp ${HOME}/config/linux-${kversion%-r*}-kexec-64.config /usr/src/linux-kexec-64/.config
 
     chown -hR bin:bin /usr/src/linux-{main,kexec{,-64}}
-
-
-    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v19&id2=3b2f64d00c46e1e4e9bd0bb9bb12619adac27a4b
-    sinfo "Applying kernel patches"
-    spatch ${HOME}/patches/kernel/overlayfs.v19.patch  -d /usr/src/linux-${kversion} -p1
-
 
     # Filter locales before remerging libc
     sinfo "Filtering locales"
@@ -386,8 +377,6 @@ done
 sinfo "Initializing /run"
 find /run -mindepth 1 ! -path /run/lock -delete
 install -d -g uucp -m 775 /run/lock
-
-
 # (lastlog is not sparse on overlayfs, wtmp has no growth limit)
 # /var/run/utmp is created in bootmisc (which is disabled)
 sinfo "Disabling non-rotating logs"
