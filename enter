@@ -110,6 +110,11 @@ mounted=
 
 sinfo "Mounting system directories"
 
+# had some crap error due to this not being mounted. yay @suqdiq
+mkdir -p -m 755  ${LIVECD}/dev/shm
+mount -o rw,nosuid,nodev,relatime -t tmpfs tmpfs ${LIVECD}/dev/shm
+# who cares at least it builds now.
+
 [ "${tty#/dev/pts/}" = "${tty}" ] || tty=
 [ -L ${LIVECD}/dev/fd ] || ln -sfT /proc/self/fd ${LIVECD}/dev/fd
 loop=`losetup -f`
