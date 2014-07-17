@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<gconf>
-	<entry name="scheme" mtime="1263298899" type="string">
-		<stringvalue>classic</stringvalue>
-	</entry>
-</gconf>

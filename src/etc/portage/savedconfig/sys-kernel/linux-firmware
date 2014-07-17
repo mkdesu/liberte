@@ -1,6 +1,7 @@
 # --- CPU ---
 
 # AMD
+# see arch/x86/kernel/cpu/microcode/amd.c
 amd-ucode/microcode_amd.bin
 amd-ucode/microcode_amd_fam15h.bin
 
@@ -16,17 +17,14 @@ htc_9271.fw
 
 # ATH10K
 # (missing)
-ath10k/QCA988X/hw1.0/firmware.bin
-ath10k/QCA988X/hw1.0/otp.bin
-ath10k/QCA988X/hw1.0/board.bin
 ath10k/QCA988X/hw2.0/firmware.bin
 ath10k/QCA988X/hw2.0/otp.bin
 ath10k/QCA988X/hw2.0/board.bin
 
 # BRCMFMAC
+brcm/brcmfmac43143.bin
 brcm/brcmfmac43236b.bin
 # (missing)
-brcm/brcmfmac43143.bin
 brcm/brcmfmac43242a.bin
 
 # BRCMSMAC
@@ -61,13 +59,15 @@ iwlwifi-6000-4.ucode
 iwlwifi-6000g2a-5.ucode
 iwlwifi-6000g2b-6.ucode
 iwlwifi-6050-5.ucode
-iwlwifi-3160-7.ucode
-iwlwifi-7260-7.ucode
+iwlwifi-3160-8.ucode
+iwlwifi-7260-8.ucode
+# iwlwifi-7265-8.ucode
 
 # MWIFIEX
 mrvl/usb8797_uapsta.bin
 mrvl/pcie8897_uapsta.bin
 # (missing)
+mrvl/usb8897_uapsta.bin
 mrvl/pcie8766_uapsta.bin
 
 # MWL8K
@@ -90,6 +90,7 @@ rt73.bin
 
 # RT2800PCI
 rt2860.bin
+# see drivers/net/wireless/rt2x00/rt2800pci.c:
 rt3290.bin
 
 # RT2800USB
@@ -99,11 +100,14 @@ rt2870.bin
 # grep -r MODULE_FIRMWARE /usr/src/linux/drivers/net/wireless/rtlwifi
 rtlwifi/rtl8188efw.bin
 rtlwifi/rtl8192cfw.bin
-rtlwifi/rtl8192cufw.bin
-rtlwifi/rtl8192sefw.bin
-rtlwifi/rtl8192defw.bin
 rtlwifi/rtl8192cfwU.bin
 rtlwifi/rtl8192cfwU_B.bin
+rtlwifi/rtl8192cufw.bin
+rtlwifi/rtl8192cufw_A.bin
+rtlwifi/rtl8192cufw_B.bin
+rtlwifi/rtl8192cufw_TMSC.bin
+rtlwifi/rtl8192sefw.bin
+rtlwifi/rtl8192defw.bin
 rtlwifi/rtl8723fw.bin
 rtlwifi/rtl8723fw_B.bin
 
@@ -248,3 +252,6 @@ ene-ub6250/msp_rdwr.bin
 ene-ub6250/sd_init1.bin
 ene-ub6250/sd_init2.bin
 ene-ub6250/sd_rdwr.bin
+
+# SND_HDA_CODEC_CA0132_DSP
+ctefx.bin

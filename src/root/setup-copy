@@ -42,9 +42,7 @@ sinfo "Patching copies of selected ebuilds"
 ebuilds="app-misc/ca-certificates
          dev-libs/gobject-introspection
          gnome-base/libglade
-         media-libs/vips
          net-dialup/pptpclient
-         net-im/pidgin
          net-misc/vpnc
          sys-apps/lm_sensors
          sys-apps/portage
@@ -58,14 +56,13 @@ done
 
 # Make portage think it doesn't need Python
 # (allows depclean after python unmerge + shadow copy)
-sed -i 's/[^"]*\(\${python_dep\(_ssl\)\?}\|\<xattr?\)[^"]*//' ${ebuild_portage}
+sed -i 's/[^"]*\${python_dep\(_ssl\)\?}[^"]*//' ${ebuild_portage}
 
 # Python
-# libglade:                libglade-convert            (#398955)
-# gobject-introspection:   g-ir-* + giscanner package  (build-time for other pkgs)
-# pidgin:                  purple-{url-handler,remote} (#398961)
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade} ${ebuild_gobjectintrospection}
-sed -i 's:\<dev-python/dbus-python\>::'  ${ebuild_pidgin}
+# libglade:                libglade-convert            (#398955, fixed in 2.6.4-r2)
+# gobject-introspection:   g-ir-* + giscanner package  (#493802, build-time for other pkgs)
+sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade}
+sed -i 's:${PYTHON_DEPS}::'              ${ebuild_gobjectintrospection}
 
 # Perl
 # pptpclient:              not needed when used by networkmanager-pptp
@@ -75,10 +72,8 @@ sed -i s:dev-lang/perl:: ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc
 
 # [debianutils]            ca-certificates:  update-ca-certificates
 # [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
-# [liboil]                 vips:             not needed              (#416815)
 sed -i 's:\<sys-apps/debianutils\>::'             ${ebuild_cacertificates}
 sed -i 's:\<x11-proto/xcb-proto\>::'              ${ebuild_xcbutilwm}
-sed -i 's:>=dev-libs/liboil-[^[:blank:]"]*\>::'   ${ebuild_vips}
 
 for ebuild in ${!ebuild_*}; do
     eval ebuild=\$${ebuild}
@@ -86,9 +81,6 @@ for ebuild in ${!ebuild_*}; do
     echo liberte > /var/db/pkg/`echo ${ebuild%.ebuild} | cut -d/ -f5,7`/repository
 done
 rm -f /var/cache/edb/vdb_*.pickle
-
-# [gettext] coreutils: not needed (#398983 (fixed in 8.21))
-echo sys-devel/gettext-0.18.1.1 >> /etc/portage/profile/package.provided
 
 
 # This recompiles packages with TEMP flags in package.use
@@ -99,15 +91,6 @@ emerge -quDN @world
 # (#432020, SourceWare: #14498)
 # sinfo "Creating NSS databases"
 # make -C /var/db > /dev/null
-
-
-sinfo "Compiling Lua scripts"
-find /usr/share/libquvi-scripts/lua -type f -name '*.lua' -exec luac -s -o {} {} \;
-
-
-sinfo "Configuring version-specific paths"
-nip2ver=`portageq best_version / media-gfx/nip2`
-mv /home/anon/.{nip2,${nip2ver#*/}}
 
 
 sinfo "Keeping gcc/libtool shared libs"
@@ -197,10 +180,8 @@ update-desktop-database -q /usr/share/applications
 
 
 # http://www.freedesktop.org/wiki/Specifications/mime-actions-spec
-sinfo "Modifying MIME actions ordering preferences"
-sed -i 's/\<geeqie.desktop;gpicview.desktop;/gpicview.desktop;geeqie.desktop;/ ;
-        s/\<file-roller.desktop;evince.desktop;/evince.desktop;file-roller.desktop;/' \
-    /usr/share/applications/mimeinfo.cache
+# sinfo "Modifying MIME actions ordering preferences"
+# sed -i ... /usr/share/applications/mimeinfo.cache
 
 
 sinfo "Generating GIO modules cache"
@@ -216,8 +197,6 @@ chmod -R go=u,go-w /var/cache/gstreamer
 sinfo "Uncompressing selected files"
 gunzip `find /usr/share/consolefonts -name '*.gz'` \
        `find /usr/share/keymaps      -name '*.gz'`
-
-gunzip /usr/share/gedit-2/plugins/taglist/*.gz
 
 
 sinfo "Creating specialized Xorg driver directories"

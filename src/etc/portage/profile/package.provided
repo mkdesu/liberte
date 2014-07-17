@@ -4,11 +4,11 @@ mail-mta/nullmailer-0
 # virtual/mailx (smartmontools)
 mail-client/mailx-0
 
+# Unneeded (app-emulation/virtualbox-bin)
+app-emulation/virtualbox-modules-4.2.24
+
 # Unneeded (app-i18n/uim (#404463))
 media-fonts/font-sony-misc-0
 
-# Mostly unneeded (ghostscript-gpl)
-media-fonts/urw-fonts-2.4.9
-
-# Unneeded (app-emulation/virtualbox-bin)
-app-emulation/virtualbox-modules-4.2.18
+# Unneeded (media-gfx/graphicsmagick[truetype])
+media-fonts/urw-fonts-0

@@ -34,7 +34,6 @@ app-shells/dash
 app-admin/eselect-sh
 app-admin/metalog
 app-admin/sudo
-lxde-base/lxpolkit
 app-misc/hatools
 x11-misc/alock
 net-misc/ssh-askpass-fullscreen
@@ -80,6 +79,7 @@ sys-apps/x86info
 sys-apps/dmidecode
 sys-power/cpupower
 sys-power/powertop
+sys-power/upower-pm-utils
 # sys-process/latencytop
 app-laptop/laptop-mode-tools
 app-emulation/virt-what

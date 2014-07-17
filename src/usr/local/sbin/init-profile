@@ -23,10 +23,6 @@ case "${profile}" in
         sed -i 's/^\(dcc_ip_from_server =\) 0$/\1 1/' /home/anon/config/hexchat/hexchat.conf
         rm -f                                         /home/anon/config/hexchat/servlist.conf
 
-        # Pidgin: disable Tor SOCKS proxy, and enable automatic IP detection
-        sed -i 's/\<socks5\>/none/'                   /home/anon/config/purple/prefs.xml
-        sed -i 's/\(\<auto_ip\>.*\)\<0\>/\11/'        /home/anon/config/purple/prefs.xml
-
         # GnuPG: replace .onion keyserver
         sed -i 's/^keyserver\>/# &/; s/^# \[noanon\] //' /home/anon/config/pgp/gpg.conf
 
@@ -42,9 +38,7 @@ case "${profile}" in
         rm -f /home/anon/config/local/applications/unsafe-browser.desktop
 
         # Remove torification wrappers
-        rm -f /home/anon/bin/wrappers/whois \
-              /home/anon/bin/wrappers/gftp  \
-              /home/anon/bin/wrappers/eboard
+        rm -f /home/anon/bin/wrappers/whois
         ;;
 
 

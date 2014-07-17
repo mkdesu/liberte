@@ -9,7 +9,7 @@
 description="NetworkManager daemon."
 
 command=/usr/sbin/NetworkManager
-pidfile=/var/run/NetworkManager.pid
+pidfile=/run/NetworkManager.pid
 command_args="--pid-file=${pidfile}"
 
 depend() {

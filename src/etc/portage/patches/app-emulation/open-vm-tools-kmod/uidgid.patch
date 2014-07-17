@@ -1,0 +1,99 @@
+diff -rupN orig/lib/include/hgfsDevLinux.h new/lib/include/hgfsDevLinux.h
+--- orig/lib/include/hgfsDevLinux.h	2013-09-23 07:57:48.000000000 +0200
++++ new/lib/include/hgfsDevLinux.h	2014-05-04 22:57:13.656197000 +0200
+@@ -40,6 +40,7 @@
+ #ifndef _HGFS_DEV_H_
+ #define _HGFS_DEV_H_
+ 
++#include <linux/uidgid.h>
+ #include "vm_basic_types.h"
+ #include "hgfs.h"
+ 
+@@ -62,9 +63,9 @@ typedef struct HgfsMountInfo {
+    uint32 version;            // protocol version
+    uint32 fd;                 // file descriptor of client file
+ #ifndef sun
+-   uid_t uid;                 // desired owner of files
++   kuid_t uid;                 // desired owner of files
+    Bool uidSet;               // is the owner actually set?
+-   gid_t gid;                 // desired group of files
++   kgid_t gid;                 // desired group of files
+    Bool gidSet;               // is the group actually set?
+    unsigned short fmask;      // desired file mask
+    unsigned short dmask;      // desired directory mask
+diff -rupN orig/lib/include/hgfsProto.h new/lib/include/hgfsProto.h
+--- orig/lib/include/hgfsProto.h	2013-09-23 07:57:48.000000000 +0200
++++ new/lib/include/hgfsProto.h	2014-05-04 22:57:21.230197000 +0200
+@@ -47,6 +47,7 @@
+ #define INCLUDE_ALLOW_DISTRIBUTE
+ #include "includeCheck.h"
+ 
++#include <linux/uidgid.h>
+ #include "vm_basic_types.h"
+ #include "hgfs.h"
+ 
+@@ -519,8 +520,8 @@ struct HgfsAttrV2 {
+                                   * Windows */
+    HgfsAttrFlags flags;          /* Various flags and Windows 'attributes' */
+    uint64 allocationSize;        /* Actual size of file on disk */
+-   uint32 userId;                /* User identifier, ignored by Windows */
+-   uint32 groupId;               /* group identifier, ignored by Windows */
++   kuid_t userId;                /* User identifier, ignored by Windows */
++   kgid_t groupId;               /* group identifier, ignored by Windows */
+    uint64 hostFileId;            /* File Id of the file on host: inode_t on Linux */
+    uint32 volumeId;              /* volume identifier, non-zero is valid. */
+    uint32 effectivePerms;        /* Permissions in effect for the user on the host. */
+diff -rupN orig/modules/linux/vmhgfs/fsutil.c new/modules/linux/vmhgfs/fsutil.c
+--- orig/modules/linux/vmhgfs/fsutil.c	2013-09-23 07:57:48.000000000 +0200
++++ new/modules/linux/vmhgfs/fsutil.c	2014-05-04 22:56:56.646197000 +0200
+@@ -1747,8 +1747,8 @@ HgfsStatusConvertToLinux(HgfsStatus hgfs
+ void
+ HgfsSetUidGid(struct inode *parent,     // IN: parent inode
+               struct dentry *dentry,    // IN: dentry of file to update
+-              uid_t uid,                // IN: uid to set
+-              gid_t gid)                // IN: gid to set
++              kuid_t uid,                // IN: uid to set
++              kgid_t gid)                // IN: gid to set
+ {
+    struct iattr setUidGid;
+ 
+diff -rupN orig/modules/linux/vmhgfs/fsutil.h new/modules/linux/vmhgfs/fsutil.h
+--- orig/modules/linux/vmhgfs/fsutil.h	2013-09-23 07:57:48.000000000 +0200
++++ new/modules/linux/vmhgfs/fsutil.h	2014-05-04 22:57:05.964197000 +0200
+@@ -56,8 +56,8 @@ typedef struct HgfsAttrInfo {
+    HgfsPermissions otherPerms;     /* Other permissions bits */
+    HgfsPermissions effectivePerms; /* Permissions in effect for the user on the
+                                       host. */
+-   uint32 userId;                  /* UID */
+-   uint32 groupId;                 /* GID */
++   kuid_t userId;                  /* UID */
++   kgid_t groupId;                 /* GID */
+    uint64 hostFileId;              /* Inode number */
+ } HgfsAttrInfo;
+ 
+@@ -92,8 +92,8 @@ int HgfsGetHandle(struct inode *inode,
+ int HgfsStatusConvertToLinux(HgfsStatus hgfsStatus);
+ void HgfsSetUidGid(struct inode *parent,
+                    struct dentry *dentry,
+-                   uid_t uid,
+-                   gid_t gid);
++                   kuid_t uid,
++                   kgid_t gid);
+ struct inode *HgfsGetInode(struct super_block *sb, ino_t ino);
+ void HgfsDoReadInode(struct inode *inode);
+ 
+diff -rupN orig/modules/linux/vmhgfs/module.h new/modules/linux/vmhgfs/module.h
+--- orig/modules/linux/vmhgfs/module.h	2013-09-23 07:57:48.000000000 +0200
++++ new/modules/linux/vmhgfs/module.h	2014-05-04 22:57:24.960197000 +0200
+@@ -110,9 +110,9 @@ extern int LOGLEVEL_THRESHOLD;
+ 
+ /* Data kept in each superblock in sb->u. */
+ typedef struct HgfsSuperInfo {
+-   uid_t uid;                       /* UID of user who mounted this fs. */
++   kuid_t uid;                       /* UID of user who mounted this fs. */
+    Bool uidSet;                     /* Was the UID specified at mount-time? */
+-   gid_t gid;                       /* GID of user who mounted this fs. */
++   kgid_t gid;                       /* GID of user who mounted this fs. */
+    Bool gidSet;                     /* Was the GID specified at mount-time? */
+    mode_t fmask;                    /* File permission mask. */
+    mode_t dmask;                    /* Directory permission mask. */

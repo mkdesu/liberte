@@ -114,7 +114,7 @@ sinfo "Mounting system directories"
 [ -L ${LIVECD}/dev/fd ] || ln -sfT /proc/self/fd ${LIVECD}/dev/fd
 loop=`losetup -f`
 
-for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts ${loop} ${tty}; do
+for mp in /proc /dev/null /dev/random /dev/urandom /dev/tty /dev/ptmx /dev/pts /dev/shm ${loop} ${tty}; do
     if [ ${mp#/dev/loop} = ${mp} ]; then
         lmp=${LIVECD}${mp}
     else

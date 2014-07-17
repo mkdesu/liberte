@@ -1,4 +1,0 @@
-#!/bin/sh
-
-mkdir -p ${XDG_CACHE_HOME}/nip2
-exec /usr/bin/nip2 "$@"

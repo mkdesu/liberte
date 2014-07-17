@@ -1,7 +1,6 @@
 #!/bin/sh -e
 
 # Variables
-helpdir=${HOME}/helpers
 rootfspfx=${HOME}/config/rootfs
 
 live=/mnt/live

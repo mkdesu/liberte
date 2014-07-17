@@ -1,13 +1,6 @@
 #!/bin/bash -e
 
-helpdir=${HOME}/helpers
-noroot="sudo -n -u nobody"
-
-hsversion=`cat ${HOME}/config/kversion`
-kversion=${hsversion/-/-hardened-}
-[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
 xzmem=20
-
 protected="/etc/._cfg????_locale.gen"
 
 
@@ -15,33 +8,8 @@ sinfo() {
     echo -e "\033[1;33;41m$@\033[0m"
 }
 
-spatch() {
-    local pname=$1; shift
-    local pcat=cat
-    local revok=
-
-    if [ "${pname##*.}" = gz ]; then
-        pcat=zcat
-    fi
-
-    revres=0
-    ${pcat} ${pname} | patch --dry-run -R -Ns -r /tmp/patch-rejects "$@" 1>/dev/null || revres=$?
-
-    if ${pcat} ${pname} | patch -Ns -r /tmp/patch-rejects "$@" 1>/dev/null; then
-        echo "Successfully applied patch: ${pname}"
-    else
-        if [ ${revres} != 0 ]; then
-            echo "Failed to apply patch: ${pname}"
-            return 1
-        else
-            echo "Patch already applied: ${pname}"
-        fi
-    fi
-    rm -f /tmp/patch-rejects
-}
-
 patch_ebuild() {
-    spatch "$1" -p0
+    ${helpdir}/hlp-patch "$1" -p0
     ebuild `awk '{print $2; exit}' "$1"` manifest
 }
 
@@ -80,13 +48,11 @@ fi
 
 
 sinfo "Applying temporary portage patches"
-# (#424816, VirtualBox: #11335)
+# (#424816)
 patch_ebuild ${HOME}/patches/portage/virtualbox-guest-additions.patch
 patch_ebuild ${HOME}/patches/portage/xf86-video-virtualbox.patch
 # (virtualbox-modules is in package.provided)
 groupadd -f -r vboxusers
-# (#437446)
-patch_ebuild ${HOME}/patches/portage/nip2.patch
 
 
 if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
@@ -96,26 +62,26 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # Kernel sources should be present when sys-fs/udev is compiled,
     # also this part is often error-prone, so better do early.
     # Maintainer note: after non-fresh kernel update+compile, run
-    #                  emerge -q1 @module-rebuild
+    #                  emerge -q @module-rebuild
     sinfo "Downloading kernel ${kversion}"
     rm -rf /usr/src/linux-${kversion} /lib/modules
-    emerge -q1 =sys-kernel/hardened-sources-${hsversion}
+    emerge -q =sys-kernel/hardened-sources-${hsversion}
 
 
     sinfo "Preparing kernel build environments"
-    rm -rf /usr/src/linux-{main,kexec{,-64}}
-    mkdir  /usr/src/linux-{main,kexec{,-64}}
+    rm -rf /usr/src/linux-{main,kexec}
+    mkdir  /usr/src/linux-{main,kexec}
 
-    cp ${HOME}/config/linux-${kversion%-r*}.config          /usr/src/linux-main/.config
-    cp ${HOME}/config/linux-${kversion%-r*}-kexec.config    /usr/src/linux-kexec/.config
-    cp ${HOME}/config/linux-${kversion%-r*}-kexec-64.config /usr/src/linux-kexec-64/.config
+    cp ${HOME}/config/linux-hardened.config       /usr/src/linux-main/.config
+    cp ${HOME}/config/linux-hardened-kexec.config /usr/src/linux-kexec/.config
 
-    chown -hR bin:bin /usr/src/linux-{main,kexec{,-64}}
+    chown -hR bin:bin /usr/src/linux-{main,kexec}
 
 
-    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v19&id2=3b2f64d00c46e1e4e9bd0bb9bb12619adac27a4b
+    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v21&id2=d6e0a2dd12f4067a5bcefb8bbd8ddbeff800afbc
+    # https://dev.openwrt.org/export/41309/trunk/target/linux/generic/patches-3.14/100-overlayfs.patch
     sinfo "Applying kernel patches"
-    spatch ${HOME}/patches/kernel/overlayfs.v19.patch  -d /usr/src/linux-${kversion} -p1
+    ${helpdir}/hlp-patch ${HOME}/patches/kernel/overlayfs.v21.patch  -d /usr/src/linux-${kversion} -p1
 
 
     # Filter locales before remerging libc
@@ -130,8 +96,8 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
 
     sinfo "Recompiling toolchain"
     oldgcc=`find /var/db/pkg/sys-devel -maxdepth 1 -type d -name 'gcc-[0-9]*'`
-    emerge -q1 sys-devel/binutils
-    emerge -q1 sys-devel/gcc
+    emerge -q sys-devel/binutils
+    emerge -q sys-devel/gcc
 
     # consider removing old gcc only if it still exists after emerge
     # (emerge was in a new slot, or same version)
@@ -145,16 +111,16 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
         # unmerge only if the "new" gcc has a different version
         if [ -n "${newgccprof}" ]; then
             gcc-config "${newgccprof}"
-            emerge -qC --deselect=n =sys-devel/`basename ${oldgcc}`
+            emerge -qC =sys-devel/`basename ${oldgcc}`
         fi
     fi
     env-update
     source /etc/profile
 
     # necessary after gcc upgrades
-    emerge -q1 sys-devel/libtool
+    emerge -q sys-devel/libtool
 
-    emerge -q1 sys-libs/glibc
+    emerge -q sys-libs/glibc
     rm -f ${protected}
 
 
@@ -167,13 +133,13 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     rebuild_locales
 
     # Also rebuild hardened-sources dependencies (#461848)
-    emerge -q1 sys-devel/bc
+    emerge -q sys-devel/bc
 
 
     sinfo "Removing non-system packages"
     mv /etc/portage/sets/all{,.off}
     echo sys-kernel/hardened-sources > /etc/portage/sets/all
-    emerge -qc --deselect=n
+    emerge -qc
     mv /etc/portage/sets/all{.off,}
 
 
@@ -227,7 +193,7 @@ eselect news purge
 
 
 sinfo "Removing unnecessary packages"
-emerge -qc --deselect=n
+emerge -qc
 
 
 sinfo "Performing package move updates"
@@ -285,8 +251,8 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-sinfo "Fixing Ambiance/Radiance themes"
-sed -ri '/\<(text|icon|box)-shadow:|\<inset / s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
+# sinfo "Fixing Ambiance/Radiance themes"
+# sed -ri '/\<(text|icon|box)-shadow:|\<inset / s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
 
 
 sinfo "Fixing miscellaneous directory permissions"
@@ -302,13 +268,13 @@ eselect sh set dash
 
 
 # Use RGB sub-pixel rendering (slight degradation on non-RGB LCD / non-DVI cable)
+# 44-wqy-zenhei.conf disabled: (#490412)
 sinfo "Configuring fontconfig"
 for fconf in \
     10-sub-pixel-rgb.conf \
     20-unhint-small-dejavu-sans.conf \
     20-unhint-small-dejavu-sans-mono.conf \
     20-unhint-small-dejavu-serif.conf \
-    44-wqy-zenhei.conf \
     57-dejavu-sans.conf \
     57-dejavu-sans-mono.conf \
     57-dejavu-serif.conf \
@@ -320,12 +286,6 @@ do
         eselect fontconfig enable ${fconf}
     fi
 done
-
-# Ghostscript has its urw-fonts dependency stripped
-if [ -e /usr/share/fonts/default ]; then
-    rm    /usr/share/fonts/default/ghostscript
-    rmdir /usr/share/fonts/default
-fi
 
 
 # http://www.x.org/wiki/GalliumStatus
@@ -350,7 +310,7 @@ sed "s@VERSION@${LVERSION}@" ${HOME}/config/issue > /etc/issue
 sinfo "Patching init scripts"
 initpatches="inittab system-auth autofs iptables"
 for p in ${initpatches}; do
-    spatch ${HOME}/patches/${p}.patch -p0
+    ${helpdir}/hlp-patch ${HOME}/patches/${p}.patch -p0
 done
 sed -i 's/^# include /include /' /etc/nanorc
 
@@ -408,7 +368,6 @@ sed -i 's/`\(hdparm -[SW]\)\>/`fast-\1/' /usr/share/laptop-mode-tools/modules/hd
 #                    NetworkManager modify system connections (PolKit)
 #                    gnome-bluetooth rfkill switch (udev)
 #                    libmtp devices (udev)
-# "lp"        group: communication with bluez daemon (D-Bus)
 # ["uucp"]    group: access to RFCOMM devices (e.g., obexftp) (udev)
 # "games"     group: prevent games complaining about not keeping scores
 # "vmware"    group: VMware's drag-n-drop feature for file exchange (when enabled)
@@ -434,8 +393,8 @@ useradd -u 2101 -g legion -c "Anonymous"            -d /home/anon               
 useradd -u 2102 -g nofw   -c "Non-firewalled"       -d /home/nofw -s /sbin/nologin nofw  || [ $? = 9 ]
 
 # "vmware" disabled (#474636)
-usermod -G wheel,plugdev,lp,games,vboxguest anon
-usermod -G legion                           cable
+usermod -G wheel,plugdev,games,vboxguest anon
+usermod -G legion                        cable
 
 useradd -c slay    -d /dev/null -s /sbin/nologin -r slay || [ $? = 9 ]
 
@@ -452,10 +411,8 @@ done
 
 
 sinfo "Disabling PaX markings"
-# (#485910, #485908)
-paxctl-ng -d /usr/lib/polkit-1/polkitd || :
 # Not necessary for any plugins
-paxctl-ng -d /usr/lib/firefox/{firefox,firefox-bin,plugin-container} || :
+paxctl-ng -d /usr/lib/firefox/{firefox,firefox-bin,plugin-container}
 
 
 sinfo "Initializing a secondary PGP keyring"
@@ -495,18 +452,16 @@ kernxz=arch/x86/boot/compressed/vmlinux.bin.xz
 
 head -c -4 /usr/src/linux-main/${kernxz}     | xz -t -M $((2 * ${xzmem}))MiB
 head -c -4 /usr/src/linux-kexec/${kernxz}    | xz -t -M $((2 * ${xzmem}))MiB
-head -c -4 /usr/src/linux-kexec-64/${kernxz} | xz -t -M $((2 * ${xzmem}))MiB
 
-xz -t -M ${xzmem}MiB /usr/src/linux-{main,kexec{,-64}}/usr/initramfs_data.cpio.xz
+xz -t -M ${xzmem}MiB /usr/src/linux-{main,kexec}/usr/initramfs_data.cpio.xz
 
 
 sinfo "Kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-r*}.config          /usr/src/linux-main/.config     || :
+diff ${HOME}/config/linux-hardened.config       /usr/src/linux-main/.config  || :
 
 
 sinfo "Kexec kernel config differences:"
-diff ${HOME}/config/linux-${kversion%-r*}-kexec.config    /usr/src/linux-kexec/.config    || :
-diff ${HOME}/config/linux-${kversion%-r*}-kexec-64.config /usr/src/linux-kexec-64/.config || :
+diff ${HOME}/config/linux-hardened-kexec.config /usr/src/linux-kexec/.config || :
 
 
 if [ -e /etc/portage/savedconfig/sys-apps/busybox-* ]; then

@@ -47,21 +47,18 @@ openvpn                 ssl, polarssl           ssl             networkmanager-o
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup
-libsoup                 gnutls                  gnutls          gst-plugins-soup, totem
-libmicrohttpd           gnutls                  -               cables
-curl                    ssl, gnutls, nss        ssl             cables, gnupg, quvi, uget
-wget                    ssl, gnutls             ssl             portage, libqalculate(forex)
+libsoup                 gnutls                  gnutls          gst-plugins-soup
+libmicrohttpd           gnutls                  gnutls          cables
+curl                    ssl, gnutls, nss        ssl             cables, gnupg
+wget                    ssl, gnutls             ssl             portage
 
 firefox                 nss                     nss
 claws-mail              gnutls                  gnutls
 libetpan                ssl, gnutls             gnutls          claws-mail
-cyrus-sasl              ssl                     ssl             pidgin
 hexchat                 ssl                     ssl
-pidgin                  gnutls, nss             gnutls
-gftp                    ssl                     ssl
 
 
-libgcrypt users: cryptsetup, gnupg, gnome-keyring, libotr(pidgin-otr),
+libgcrypt users: cryptsetup, gnupg, gnome-keyring,
                  networkmanager, glib-networking, gnupg-pkcs11-scd, ntfs3g
 
 
@@ -162,12 +159,10 @@ Tor                              (127.0.0.1:9050)
     environment variables        (http(s)_proxy, no_proxy)
       curl
         cables
-        uGet
         GnuPG
         mpg123
         vorbis-tools[ogg123]
       wget
-        Qalculate!
       libproxy[-gnome]
         glib-networking[-gnome]  (glib GIO modules)
           libsoup                (HTTP library)
@@ -179,16 +174,12 @@ Tor                              (127.0.0.1:9050)
       libmms
           gst-plugins-libmms     (GStreamer MMS plugin)
     explicit configuration
-      gFTP                       (HTTP only)
       uim                        (custom-http.scm)
   explicit configuration
     Firefox                      (environment and GConf are supported)
-    Pidgin                       (GConf is supported)
     HexChat
     SSH
     OpenVPN
   torify
     Claws-Mail
-    gFTP                         (FTP only)
     whois
-    eboard

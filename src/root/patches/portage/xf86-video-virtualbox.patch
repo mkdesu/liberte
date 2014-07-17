@@ -1,25 +1,6 @@
---- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.18.ebuild	2013-06-24 10:57:30.000000000 +0000
-+++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.2.18.ebuild	2013-08-11 03:34:50.091510612 +0000
-@@ -52,7 +52,7 @@
- 
- pkg_setup() {
- 	linux-mod_pkg_setup
--	BUILD_PARAMS="KERN_DIR=${KV_DIR} KERNOUT=${KV_OUT_DIR}"
-+	BUILD_PARAMS="KERN_DIR=${KV_OUT_DIR} KERNOUT=${KV_OUT_DIR}"
- 
- 	python-single-r1_pkg_setup
- }
-@@ -89,6 +89,9 @@
- 	if gcc-specs-now ; then
- 		epatch "${FILESDIR}/${PN}-link-lazy.patch"
- 	fi
-+
-+	# Fix split kernels includes
-+	sed -i 's@\<kernelpath\>\(.*/generated\>\)@VBOX_LINUX_SRC\1@' "${S}"/Config.kmk
- }
- 
- src_configure() {
-@@ -99,6 +102,7 @@
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.10.ebuild	2014-07-15 20:34:49.198049924 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.10.ebuild	2014-07-15 20:35:24.425567671 +0000
+@@ -103,6 +103,7 @@
  		--disable-sdl-ttf \
  		--disable-pulse \
  		--disable-alsa \

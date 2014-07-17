@@ -7,12 +7,6 @@
 cmd="$1"
 
 
-# Kernel version
-hsversion=`cat ${HOME}/config/kversion`
-kversion=${hsversion/-/-hardened-}
-[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
-
-
 # Build host anonymity
 bver=KBUILD_BUILD_VERSION=0
 bts=KBUILD_BUILD_TIMESTAMP=`date -u +%F`
@@ -30,13 +24,11 @@ sighash=sha256
 kernsrc=/usr/src/linux-${kversion}
 mainobj=/usr/src/linux-main
 kexecobj=/usr/src/linux-kexec
-kexec64obj=/usr/src/linux-kexec-64
 
 mainimg=/boot/kernel-x86.zi
 mainmod=/lib/modules/${kversion}
 initrd=/usr/local/addons/initrd/initrd-x86.cpio
 kexecimg=/usr/local/boot/kernel-kexec.zi
-kexec64img=/usr/local/boot/kernel-kexec-64.zi
 
 bzimage=arch/x86/boot/bzImage
 fwpath=/usr/local/addons/shipped-fw
@@ -117,11 +109,7 @@ cp ${mainobj}/${bzimage} ${mainimg}
 chmod go= ${mainimg}
 
 
-# Build KEXEC kernel
-${make} O=${kexecobj} bzImage 2>/dev/null
-cp ${kexecobj}/${bzimage} ${kexecimg}
-
 # Cross-compile 64-bit KEXEC kernel
 # (x86_64-gcc is a wrapper, x86_64-{ar,ld,nm,objcopy} are symlinks)
-${make} O=${kexec64obj} ARCH=x86_64 CROSS_COMPILE=x86_64- bzImage 2>/dev/null
-cp ${kexec64obj}/${bzimage} ${kexec64img}
+${make} O=${kexecobj} ARCH=x86_64 CROSS_COMPILE=x86_64- bzImage 2>/dev/null
+cp ${kexecobj}/${bzimage} ${kexecimg}

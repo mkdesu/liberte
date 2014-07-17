@@ -26,12 +26,12 @@ Liberté Linux.
 
 You need the following installed.
 
-    Syslinux ${sysver} (Gentoo: sys-boot/syslinux)
+    Syslinux ${sysver} (Gentoo: sys-boot/syslinux, Debian: syslinux)
         [if unavailable, bundled 32-bit version will be used]
-    udev + sysfs  (Gentoo: sys-fs/udev)
-        [available on most modern Linux distributions]
-    gdisk (Gentoo: sys-apps/gptfdisk)
+    gdisk              (Gentoo: sys-apps/gptfdisk, Debian: gdisk)
         [for GUID partition tables support]
+    udev + sysfs
+        [available on most modern Linux distributions]
 
 Run setup.sh as:
 

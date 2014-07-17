@@ -1,11 +1,5 @@
 #!/bin/bash -e
 
-# Kernel version
-hsversion=`cat ${HOME}/config/kversion`
-kversion=${hsversion/-/-hardened-}
-[ ${kversion} != ${hsversion} ] || kversion=${hsversion}-hardened
-
-
 # Modules / module directories to add to initramfs
 modlst=${HOME}/initrd/modules.init
 fwlst=${HOME}/initrd/modules.fw

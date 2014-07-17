@@ -26,6 +26,7 @@
 
 # Pruned directories
 /usr/share/claws-mail/themes/**
+/usr/share/icons/HighContrast/
 
 # Executables requiring development libraries
 /usr/bin/cairo-trace
@@ -34,5 +35,4 @@
 # Unnecessary libraries (verified with revdep-rebuild)
 # (#177402, #416817, #444248)
 /usr/lib/libunrar.so*
-/usr/lib/libvipsCC.so*
 /usr/lib/libchromeXvMC*.so*

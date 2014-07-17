@@ -67,9 +67,6 @@ Plugin {
             id=/usr/share/applications/claws-mail.desktop
         }
         Button {
-            id=/usr/share/applications/abiword.desktop
-        }
-        Button {
             id=/usr/share/applications/sakura.desktop
         }
     }

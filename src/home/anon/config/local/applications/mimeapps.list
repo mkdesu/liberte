@@ -1,8 +1,3 @@
 
 [Added Associations]
 x-scheme-handler/mailto=claws-mail.desktop;
-
-[Removed Associations]
-text/plain=abiword.desktop;
-# image/svg+xml=gpicview.desktop;geeqie.desktop;
-# image/svg-xml=gpicview.desktop;geeqie.desktop;

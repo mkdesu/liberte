@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<gconf>
-	<entry name="sidebar_width" mtime="1329073416" type="int" value="200"/>
-	<entry name="window_height" mtime="1329073416" type="int" value="480"/>
-	<entry name="window_width" mtime="1329073416" type="int" value="600"/>
-	<entry name="view_folders" mtime="1329073373" type="bool" value="true"/>
-</gconf>

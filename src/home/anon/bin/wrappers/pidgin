@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec /usr/bin/pidgin -c ${XDG_CONFIG_HOME}/purple "$@"

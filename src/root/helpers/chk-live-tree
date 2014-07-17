@@ -41,8 +41,7 @@ sinfo "Sources:"
 find . -name '*.h' -o \( -name '*.inc' ! -path './usr/share/keymaps/*' \) \
         -o -name '*.c' -o -name '*.cpp' \
         -o -name '*.m4' -o -name '*.el' -o -name '*.py' \
-        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm' \
-        -o \( -name '*.lua' ! -path './usr/share/libquvi-scripts/lua/*' \)
+        -o -name '*.defs' -o -name '*.pl' -o -name '*.pm'
 
 sinfo "Objects:"
 find . -name '*.o' -o -name '*.a' -o -name '*.pc' \
@@ -59,7 +58,7 @@ find . -name '*.info*' -o -name '*.1.bz2' \
 
 sinfo "Hidden:"
 find . -mindepth 1 -name '.*' ! \( -path './home/anon/*' -o -path './root/*' \
-        -o -path './dev/*' \) ! -path './usr/share/gnumeric/*.category'
+        -o -path './dev/*' \)
 
 sinfo "Cache, backup, and temp:"
 find . -name '*.cache' -o -name '*.loaders' -o -name '*.immodules'
@@ -93,10 +92,10 @@ if [ -e ${regexps} ]; then
     regexps=`cat ${regexps} | tr '\n' '|' | sed 's/^/(/; s/|$/)/'`
 
     grep   -iE "${regexps}" \
-        /usr/src/linux-{main,kexec{,-64}}/arch/*/boot/compressed/vmlinux.bin
+        /usr/src/linux-{main,kexec}/arch/*/boot/compressed/vmlinux.bin
 
     xzgrep -iE "${regexps}" \
-        /usr/src/linux-{main,kexec{,-64}}/usr/initramfs_data.cpio.xz
+        /usr/src/linux-{main,kexec}/usr/initramfs_data.cpio.xz
 
     find . -type f ! -name '*.mo' ! -name 'words.*' ! -name '*.rws'  \
         ! -name 'libgucharmap*.so.*' ! -name oui.txt ! -name iab.txt \

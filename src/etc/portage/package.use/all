@@ -4,38 +4,33 @@ media-fonts/terminus-font       -pcf
 sys-apps/groff                  -X
 sys-process/psmisc              -X
 dev-libs/m17n-lib               -X
-media-gfx/fbida                 -X
-app-text/ghostscript-gpl        -X
-sys-devel/gcc                   -gtk
 net-dialup/ppp                  -gtk
-gnome-extra/libgsf              -gtk
 x11-apps/xinput_calibrator      -gtk
 x11-misc/redshift               -gtk
 dev-lang/python                 -ncurses -readline
 app-text/hunspell               -ncurses
-net-im/pidgin                   -ncurses
+sys-devel/gettext               -ncurses
 sys-apps/gawk                   -readline
 dev-lang/lua                    -readline
 dev-libs/libpcre                -readline
 dev-libs/libxml2                -readline
-sci-visualization/gnuplot       -readline
 dev-db/sqlite                   -readline
+dev-libs/gobject-introspection  -cairo
 app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
 # Drivers
+# [xf86-video-ati[glamor] requires mesa[egl,gbm]]
 # [xf86-video-vmware requires mesa[xa]]
 # [xf86-video-virtualbox[dri] conflicts w/ mprotect]
-media-libs/mesa                 xa -egl -llvm
+media-libs/mesa                 xa gbm -llvm
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 x11-base/xorg-drivers           -video_cards_nv
 
 # Networking, including SSL/TLS
 net-libs/libetpan               gnutls
-net-libs/libmicrohttpd          -ssl
 net-misc/networkmanager         gnutls -nss
-net-im/pidgin                   gnutls sasl
 net-analyzer/netcat             -crypt
 net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
@@ -44,16 +39,13 @@ net-libs/glib-networking        -gnome
 net-irc/hexchat                 -libproxy
 
 # Multimedia
-# [ffmpeg/libav: encode-only flags: mp3 aac aacplus faac theora vorbis x264 xvid]
-media-video/totem               -youtube
+# [ffmpeg/libav: encode-only flags: mp3 aac faac theora vorbis x264 xvid]
 virtual/ffmpeg                  -X -encode -truetype -speex
-media-video/libav               -X -encode -truetype -alsa -ssl -qt-faststart  -hardcoded-tables  -speex -v4l
+media-video/libav               -X -encode -truetype -alsa -network -ssl -qt-faststart  -hardcoded-tables  -speex -v4l  avx
 media-sound/sox                 encode
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 media-libs/gst-plugins-base             theora
-media-libs/libtheora            encode
 www-client/firefox              -alsa gstreamer  system-jpeg system-cairo system-sqlite system-icu  -wifi
-net-im/pidgin                   -gstreamer
 media-libs/libass               -harfbuzz
 
 # Unnecessary functionality
@@ -66,11 +58,11 @@ sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-apps/usb_modeswitch         jimtcl
-sys-fs/lvm2                     -static-libs
+sys-fs/lvm2                     -udev
+media-libs/libcanberra          -udev
 app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
 net-misc/tlsdate                -dbus
-net-libs/neon                   -pkcs11
 sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
 x11-libs/libXfont               -bzip2
@@ -80,12 +72,11 @@ sys-apps/gradm                  -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
 x11-misc/xdg-utils              -perl
-gnome-extra/zenity              -compat
+dev-util/strace                 -perl
 dev-libs/m17n-lib               -spell
 app-editors/nano                -spell
 dev-libs/libxslt                -crypt
-media-libs/libwmf               -expat
-app-text/ghostscript-gpl        -djvu -idn
+www-client/links                -*
 app-emulation/virtualbox-bin    headless -additions -chm
 
 # Extra functionality
@@ -98,22 +89,14 @@ sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
 virtual/udev                    gudev
 sys-fs/udev                     gudev
-sys-apps/util-linux             udev
-sys-fs/cryptsetup               udev
-x11-drivers/xf86-video-ati      udev
-media-plugins/gst-plugins-v4l2  udev
 media-libs/openjpeg             tools
 gnome-base/librsvg              tools
-media-libs/libquvi-scripts      offensive
+dev-util/strace                 aio
 app-portage/eix                 strong-security
 dev-db/sqlite                   secure-delete
 dev-lang/python                 sqlite
 app-arch/p7zip                  rar
-app-office/abiword              gnome
-app-text/evince                 gnome
-media-gfx/ufraw                 gnome contrast timezone
 media-gfx/graphicsmagick        imagemagick
-media-libs/vips                 imagemagick
 net-dialup/ppp                  ipv6
 net-wireless/wpa_supplicant     ap p2p
 
@@ -124,7 +107,6 @@ sys-apps/portage                -linguas_*
 app-portage/eix                 -linguas_*
 sys-apps/man-pages              -linguas_*
 sys-apps/groff                  -linguas_*
-app-text/ghostscript-gpl        -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Static libraries (for initramfs cryptsetup)

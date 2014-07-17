@@ -2,7 +2,6 @@
 
 # Configuration
 gnome-base/dconf
-gnome-extra/gconf-editor
 x11-misc/xdg-utils
 x11-misc/xdg-user-dirs
 
@@ -11,53 +10,32 @@ app-text/tree
 sys-apps/less
 app-editors/nano
 app-editors/hexedit
-app-editors/e3
 
 # Applications
 gnome-extra/zenity
 x11-terms/sakura
-x11-misc/parcellite
-app-accessibility/florence
-app-arch/file-roller
 x11-misc/pcmanfm
-app-misc/emelfm2
-# app-cdr/graveman
 app-cdr/cdrtools
-app-cdr/isomaster
-media-video/totem
 media-gfx/gpicview
-media-gfx/geeqie
-media-gfx/fbida
 media-gfx/graphicsmagick
-media-gfx/ufraw
-media-gfx/nip2
 media-sound/sox
 media-sound/mpg123
 media-sound/vorbis-tools
-app-editors/gedit
 gnome-extra/gucharmap
 app-text/evince
-app-office/abiword
-app-office/gnumeric
 www-client/firefox
 mail-client/claws-mail
 app-crypt/gpa
-sci-calculators/qalculate-gtk
+sci-libs/libqalculate
 net-irc/hexchat
-net-im/pidgin
-net-ftp/gftp
-www-client/uget
 
 # Plugins
 mail-client/claws-mail-notification
 mail-client/claws-mail-acpi-notifier
 mail-client/claws-mail-att-remover
 mail-client/claws-mail-archive
-# mail-client/claws-mail-fancy (depends: webkit-gtk:2)
 media-plugins/gst-plugins-meta:0.10
 media-plugins/gst-plugins-jpeg:0.10
 media-plugins/gst-plugins-libpng:0.10
 media-plugins/gst-plugins-speex:0.10
 media-plugins/gst-plugins-ximagesrc:0.10
-x11-plugins/pidgin-otr
-x11-plugins/pidgin-libnotify

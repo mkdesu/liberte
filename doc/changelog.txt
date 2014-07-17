@@ -1,13 +1,13 @@
-2013-11-XX
-  + 2013.11 release
+2014-07-XX
+  + 2014.07 release
   * Release naming convention is YYYY.MM from now on
 
-  * Kernel 3.11.2 with module signing
+  * Kernel 3.14 with module signing
   * DM-Verity for faster SquashFS image verification
   * Support for installation to GPT media
   * Added support for exFAT filesystem
   * Better support for QEMU mouse virtualization
-  * Xorg server 1.14
+  * Xorg server 1.15
   * Firewire SBP-2 module is blacklisted to prevent Firewire RAM access
   * Reduced the number of SUID binaries via POSIX.1e capabilities
 
@@ -20,12 +20,10 @@
   * Added ASCII virtual keyboard table for OTFE password entry
 
   * Replaced Epiphany with Firefox
-  * Added UFRaw, a RAW images viewer and converter
   * Added proxychains, a heterogeneous chaining proxyfier
-  * Removed experimental I2P support and JamVM
-  * Removed FBReader due to its transition to Qt
-  * Removed Audacious due to plugin location bugs
   * Replaced XChat with HexChat
+  * Removed experimental I2P support and JamVM
+  * Removed many packages due to shift of project focus
 
   * OVA image creation is fully integrated into build process
   * Removed qemulate.sh script

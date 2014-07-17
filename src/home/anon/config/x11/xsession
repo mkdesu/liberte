@@ -55,7 +55,6 @@ ${prefix}/lid-xlock & LIDXLOCK_PID=$!
 syndaemon -d -t -k -i 2 &
 
 # Launch clipboard, NetworkManager and Bluetooth applets (use tray -> after panel)
-# parcellite &
 nm-applet --sm-disable &
 bluetooth-applet &
 
@@ -65,7 +64,7 @@ uim-xim --engine=direct &
 uim-toolbar-gtk &
 
 # Launch authenticating dialog agent for PolKit
-/usr/libexec/lxpolkit &
+/usr/libexec/polkit-gnome-authentication-agent-1 &
 
 # Launch shared clipboard / seamless display / display resize services on VirtualBox
 if VBoxControl -nologo guestproperty get /VirtualBox/HostInfo/VBoxVer 1>/dev/null 2>&1; then

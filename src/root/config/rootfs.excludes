@@ -4,8 +4,8 @@
 /usr/share/man/
 /usr/share/info/
 /usr/share/doc/
+/usr/share/help/
 /usr/share/gtk-doc/
-/usr/share/gnumeric/[0-9]*/doc
 # (no gnome-extra/yelp with "-gnome")
 /usr/share/omf/
 /usr/share/gnome/
@@ -43,11 +43,10 @@
 /usr/share/baselayout/
 /usr/share/awk/
 /usr/share/et/
-/usr/share/florence/*.rnc
-/usr/share/florence/svg11/
 /usr/share/getopt/
 /usr/share/gir-[0-9]*/
 /usr/share/gobject-introspection-[0-9]*/
+/usr/share/graphite2/
 /usr/share/i18n/
 /usr/share/icu/
 /usr/share/NetworkManager/
@@ -78,12 +77,6 @@
 /usr/share/mime/packages/
 /usr/share/themes/*/**
 /usr/share/claws-mail/themes/**
-/usr/share/games/eboard/themeconf.extras*
-/usr/share/games/eboard/[A-Z]*.png
-/usr/share/games/eboard/*[^1].wav
-/usr/share/nip2/compat/
-/usr/share/nip2/data/examples/
-/usr/share/nip2/data/HP5000_UVDuraImageGlossMaxQ.icc
 
 # Temporary directories
 /tmp/**
@@ -110,7 +103,6 @@
 /etc/ca-certificates.conf
 /usr/lib/cracklib_dict.*
 /usr/share/sounds/alsa/
-/usr/share/ghostscript/*/Resource/CIDFSubst/
 /usr/local/bin/uname*
 /usr/local/bin/file
 /usr/local/bin/x86_64-gcc
@@ -132,8 +124,6 @@
 # net-misc/ntp: servers chain tracer, ntpq loop wrapper
 /usr/bin/ntptrace
 /usr/bin/ntp-wait
-# dev-util/strace: nice strace output
-/usr/bin/strace-graph
 # app-text/hunspell: ispell affix tables converter
 /usr/bin/ispellaff2myspell
 # dev-libs/openssl: optional functionality for update-ca-certificates,
@@ -157,11 +147,6 @@
 /usr/bin/event_rpcgen.py
 # x11-libs/gtksourceview: *.lang files development
 /usr/share/gtksourceview-*/language-specs/convert.py
-# net-im/pidgin: non-separated dbus-python dependency
-/usr/bin/purple-remote
-/usr/bin/purple-url-handler
-# gnome-base/gconf: semi-automatic GConf to GSettings schema conversion
-/usr/bin/gsettings-schema-convert
 # net-misc/rsync: non-essential auxiliary scripts
 /usr/share/rsync/
 # app-misc/ca-certificates: depends on run-parts
@@ -174,8 +159,6 @@
 /usr/bin/pcf2vpnc
 # media-libs/gst-plugins-base: input audio visualization
 /usr/bin/gst-visualise*
-# media-video/totem: bug reporting
-/usr/libexec/totem/totem-bugreport.py
 # sys-apps/fbset: modeline to fb.modes translator
 /usr/bin/modeline2fb
 # sys-apps/pcsc-lite: LD_PRELOAD=/usr/lib/libpcscspy.so wrapper
@@ -195,7 +178,6 @@
 /usr/bin/g-ir-*
 /usr/bin/compile_et
 /usr/bin/dbus-binding-tool
-/usr/bin/gs
 /usr/bin/vp8_scalable_patterns
 /usr/bin/luac
 /usr/bin/ffmpeg

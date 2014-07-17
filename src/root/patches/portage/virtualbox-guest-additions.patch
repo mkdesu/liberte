@@ -1,29 +1,10 @@
---- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.2.18.ebuild	2013-06-24 10:58:49.000000000 +0000
-+++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.2.18.ebuild	2013-08-11 03:33:14.113055078 +0000
-@@ -49,7 +49,7 @@
- 
- pkg_setup() {
- 		linux-mod_pkg_setup
--		BUILD_PARAMS="KERN_DIR=${KV_DIR} KERNOUT=${KV_OUT_DIR}"
-+		BUILD_PARAMS="KERN_DIR=${KV_OUT_DIR} KERNOUT=${KV_OUT_DIR}"
- 		enewgroup vboxguest
- 		enewuser vboxguest -1 /bin/sh /dev/null vboxguest
- }
-@@ -83,6 +83,9 @@
- 				"${WORKDIR}/${mdir}/${vboxheader}"
- 		done
- 	done
-+
-+	# Fix split kernels includes
-+	sed -i 's@\<kernelpath\>\(.*/generated\>\)@VBOX_LINUX_SRC\1@' "${S}"/Config.kmk
- }
- 
- src_configure() {
-@@ -92,6 +95,7 @@
- 		--disable-sdl-ttf \
- 		--disable-pulse \
- 		--disable-alsa \
-+		--with-linux=${KV_OUT_DIR} \
- 		--build-headless || die "configure failed"
+--- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.10.ebuild	2014-07-15 20:43:25.482992744 +0000
++++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.10.ebuild	2014-07-15 20:43:43.226748144 +0000
+@@ -95,6 +95,7 @@
+ 	--disable-sdl-ttf \
+ 	--disable-pulse \
+ 	--disable-alsa \
++	--with-linux=${KV_OUT_DIR} \
+ 	--build-headless || die "configure failed"
  }
  

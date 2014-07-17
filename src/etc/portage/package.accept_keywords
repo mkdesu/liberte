@@ -1,31 +1,30 @@
 # System
 =app-crypt/gnupg-pkcs11-scd-0.7.3*
-=sys-power/cpupower-3.11*
 
 # Network
 =net-wireless/reaver-1.4*
 
-# GTK+ 3
-=x11-themes/light-themes-0.1.93*
-=app-accessibility/florence-0.6.0*
-
 # Guest virtualization
 =app-emulation/open-vm-tools-2013.09.16*
 =app-emulation/open-vm-tools-kmod-2013.09.16*
+=app-emulation/virtualbox-guest-additions-4.3.10*
+=x11-drivers/xf86-video-virtualbox-4.3.10*
+=dev-util/kbuild-0.1.9998_pre20131130*
 
 # Removes X dependencies
 =dev-libs/m17n-lib-1.6.3*
 
-# Library-only Javascript for PolKit (#437520)
+# Library-only Javascript for PolKit (#437520, #485910)
 =sys-auth/polkit-0.112*
-=dev-lang/spidermonkey-17.0.0*:17
 
 # Firmware
+sys-kernel/linux-firmware
 sys-firmware/b43-firmware
 sys-firmware/b43legacy-firmware
 
-# Hardened compilation issues (#456238)
-=sys-process/numactl-2.0.8*
-
 # Compilation failure (#317539)
 =net-wireless/irda-utils-0.9.18*
+
+# Stabilization (#511502)
+=net-libs/libpcap-1.5.3
+=net-analyzer/tcpdump-4.5.1-r1

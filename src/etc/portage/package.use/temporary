@@ -1,6 +1,9 @@
 # Quirks
 # (removed in setup-copy)
 
+# xattr support requires dev-python/pyxattr
+sys-apps/portage                xattr
+
 # app-text/gnome-doc-utils build-time dependency
 dev-libs/libxml2                python
 

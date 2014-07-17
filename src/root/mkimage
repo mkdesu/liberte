@@ -6,8 +6,6 @@ sinfo() {
 
 
 # Variables
-helpdir=${HOME}/helpers
-
 live=/mnt/live
 rootfspfx=${HOME}/config/rootfs
 

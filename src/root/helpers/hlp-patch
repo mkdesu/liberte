@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+# Patch file
+pname=`realpath "$1"`
+shift
+
+# Check whether reverse-patching works
+if   patch --dry-run -R -Ns -i "${pname}" -r /tmp/patch-rejects "$@" 1>/dev/null; then
+    echo "Patch already applied: ${pname}"
+elif patch              -Ns -i "${pname}" -r /tmp/patch-rejects "$@"; then
+    echo "Successfully applied patch: ${pname}"
+else
+    echo "Failed to apply patch: ${pname}"
+    exit 1
+fi
+
+rm -f /tmp/patch-rejects
