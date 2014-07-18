@@ -18,7 +18,8 @@
  */
 int main(int agrc, char *const argv[]) {
     if (setreuid(geteuid(), -1) == 0  &&  setregid(getegid(), -1) == 0) {
-        setregid(0, 0);
+        if (setregid(0, 0) != 0)
+            /* ignore */ ;
         execv("/bin/sh", argv);
     }
 
