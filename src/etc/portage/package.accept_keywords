@@ -25,6 +25,9 @@ sys-firmware/b43legacy-firmware
 # Compilation failure (#317539)
 =net-wireless/irda-utils-0.9.18*
 
+# Python dependency (#398955)
+=gnome-base/libglade-2.6.4*
+
 # Stabilization (#511502)
 =net-libs/libpcap-1.5.3
 =net-analyzer/tcpdump-4.5.1-r1

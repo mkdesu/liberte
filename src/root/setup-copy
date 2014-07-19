@@ -5,25 +5,6 @@ sinfo() {
 }
 
 
-rezip() {
-    zip=$1
-    dir=${zip}.tmp
-
-    unzip -qd ${dir} ${zip}
-    rm ${zip}
-    (cd ${dir}; zip -qrm0 ../`basename ${zip}` .)
-    rmdir ${dir}
-}
-
-regzip() {
-    gz=$1
-
-    # -0 switch is unique to pigz
-    gunzip  ${gz}
-    gzip -0 ${gz%.gz}
-}
-
-
 # Sanity check
 if [ ${PHASE} != copy ]; then
     echo "This is phase [${PHASE}], run $0 in phase [copy]."
@@ -34,53 +15,6 @@ fi
 sinfo "Cleaning up portage configuration"
 sed -i '/^@temporary$/d' /etc/portage/sets/all
 rm /etc/portage/package.use/temporary
-
-
-# The dependency patches below are intended for depclean
-# (equery requires gentoolkit, so copy ebuilds early)
-sinfo "Patching copies of selected ebuilds"
-ebuilds="app-misc/ca-certificates
-         dev-libs/gobject-introspection
-         gnome-base/libglade
-         net-dialup/pptpclient
-         net-misc/vpnc
-         sys-apps/lm_sensors
-         sys-apps/portage
-         x11-libs/xcb-util-wm"
-
-# /usr/portage is bind-mounted ro
-for ebuild in ${ebuilds}; do
-    rsync -a /usr/portage/${ebuild%:*} /usr/local/portage/`dirname ${ebuild}`
-    eval ebuild_`basename ${ebuild//[-+:]}`=`equery which ${ebuild}`
-done
-
-# Make portage think it doesn't need Python
-# (allows depclean after python unmerge + shadow copy)
-sed -i 's/[^"]*\${python_dep\(_ssl\)\?}[^"]*//' ${ebuild_portage}
-
-# Python
-# libglade:                libglade-convert            (#398955, fixed in 2.6.4-r2)
-# gobject-introspection:   g-ir-* + giscanner package  (#493802, build-time for other pkgs)
-sed -i 's:^\(inherit\>.*\) python\>:\1:' ${ebuild_libglade}
-sed -i 's:${PYTHON_DEPS}::'              ${ebuild_gobjectintrospection}
-
-# Perl
-# pptpclient:              not needed when used by networkmanager-pptp
-# lm_sensors:              sensors-detect, sensors-conf-convert
-# vpnc:                    pcf2vpnc
-sed -i s:dev-lang/perl:: ${ebuild_lm_sensors} ${ebuild_pptpclient} ${ebuild_vpnc}
-
-# [debianutils]            ca-certificates:  update-ca-certificates
-# [xcb-proto]              xcb-util-wm:      not needed              (#398953, upstream)
-sed -i 's:\<sys-apps/debianutils\>::'             ${ebuild_cacertificates}
-sed -i 's:\<x11-proto/xcb-proto\>::'              ${ebuild_xcbutilwm}
-
-for ebuild in ${!ebuild_*}; do
-    eval ebuild=\$${ebuild}
-    ebuild ${ebuild} manifest
-    echo liberte > /var/db/pkg/`echo ${ebuild%.ebuild} | cut -d/ -f5,7`/repository
-done
-rm -f /var/cache/edb/vdb_*.pickle
 
 
 # This recompiles packages with TEMP flags in package.use
@@ -99,9 +33,30 @@ sed -i '\:^... /usr/lib/libltdl.*\.so\>:d' /var/db/pkg/sys-devel/libtool-[0-9]*/
 echo sys-devel/libtool-2.2.10 >> /etc/portage/profile/package.provided
 
 
+sinfo "Patching selected ebuilds for depclean"
+
+# Python
+# portage:               pretend it doesn't need Python (allows orphaned packages depclean)
+# gobject-introspection: g-ir-* + giscanner package  (#493802, build-time for other pkgs)
+#                        virtual/pkg-config          (#505408)
+${helpdir}/flt-ebuild sys-apps/portage               '\<(dev-lang/python|dev-python)\>'
+${helpdir}/flt-ebuild dev-libs/gobject-introspection '\<(dev-lang/python|virtual/pkgconfig)\>'
+
+# Perl
+# pptpclient:            not needed when used by networkmanager-pptp
+# lm_sensors:            sensors-detect, sensors-conf-convert
+# vpnc:                  pcf2vpnc
+${helpdir}/flt-ebuild net-dialup/pptpclient '\<dev-lang/perl\>'
+${helpdir}/flt-ebuild sys-apps/lm_sensors   '\<dev-lang/perl\>'
+${helpdir}/flt-ebuild net-misc/vpnc         '\<dev-lang/perl\>'
+
+# [debianutils]          ca-certificates:  update-ca-certificates
+${helpdir}/flt-ebuild app-misc/ca-certificates '\<sys-apps/debianutils\>'
+
+
 sinfo "Unmerging build and temporary dependencies"
 mv /etc/portage/profile/packages{.off,}
-emerge -qc --with-bdeps n
+emerge -qc --with-bdeps=n
 
 
 # Any problem will cause a fatal error
@@ -118,7 +73,7 @@ mv /var/db/pkg/dev-lang/python-* ${dbpython}
 # revdep-rebuild is unavailable after this point
 sinfo "Unmerging orphaned packages"
 sed -i '/^@temporary-late$/d' /etc/portage/sets/all
-emerge -qc --with-bdeps n
+emerge -qc --with-bdeps=n
 
 ln -s python3 /usr/bin/python-wrapper
 
@@ -143,8 +98,9 @@ env-update
 
 
 sinfo "Unmerging portage"
-sed -i '\:^... /usr/lib/portage/:d' /var/db/pkg/`echo ${ebuild_portage%.ebuild} | cut -d/ -f5,7`/CONTENTS
-FEATURES="${FEATURES} -sandbox -usersandbox" ebuild ${ebuild_portage} unmerge 1>/dev/null
+eb_portage=`find /var/db/pkg/sys-apps -path '/var/db/pkg/sys-apps/portage-*/portage-*.ebuild'`
+sed -i '\:^... /usr/lib/portage/:d' ${eb_portage%/*}/CONTENTS
+FEATURES="-sandbox -usersandbox" ebuild ${eb_portage} unmerge 1>/dev/null
 rm -r /usr/lib/portage/
 
 

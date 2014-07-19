@@ -1,4 +1,7 @@
 # Temporary dependencies
 # (removed in setup-copy at late stage)
 
+# revdep-rebuild
 app-portage/gentoolkit
+# revdep-rebuild requires objdump
+sys-devel/binutils

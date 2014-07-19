@@ -119,8 +119,6 @@
 # sys-apps/lm_sensors: sensors detection and config file helper
 /usr/sbin/sensors-detect
 /usr/bin/sensors-conf-convert
-# gnome-base/libglade: old versions ui upgrade
-/usr/bin/libglade-convert
 # net-misc/ntp: servers chain tracer, ntpq loop wrapper
 /usr/bin/ntptrace
 /usr/bin/ntp-wait

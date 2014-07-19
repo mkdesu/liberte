@@ -1,0 +1,45 @@
+#!/bin/sh -e
+
+# Filter ebuild's runtime dependencies for the
+# purpose of emerge -pc --with-bdeps=n
+main=/usr/portage
+repo=/usr/local/portage
+db=/var/db/pkg
+cache=/var/cache/edb
+
+
+# Package name, optionally followed by slot number (e.g.: app-misc/ca-certificates:0)
+pkg="$1"
+
+# Extended regular expression of atoms to filter
+pattern="$2"
+
+
+# Copy the package directory to local repository
+rsync -a ${main}/"${pkg%:*}" ${repo}/"${pkg%/*}"
+
+# Determine ebuild path and installed packages DB directory
+ebuild=`equery which ${pkg}`
+dbdir=${db}/`echo "${ebuild%.ebuild}" | cut -d/ -f5,7`
+
+
+# Create a pseudo-ebuild
+# http://devmanual.gentoo.org/ebuild-writing/variables/
+echo liberte > ${dbdir}/repository
+cat /dev/null > ${ebuild}
+for var in EAPI DESCRIPTION HOMEPAGE LICENSE SLOT KEYWORDS IUSE REQUIRED_USE RESTRICT DEPEND PDEPEND; do
+    if [ -e ${dbdir}/${var} ]; then
+        echo "${var}=\"`cat ${dbdir}/${var}`\"" >> ${ebuild}
+    fi
+done
+
+
+# Filter runtime dependencies
+filtered=$(cat ${dbdir}/RDEPEND | tr ' ' '\n' | grep -vE -e "${pattern}" \
+             | tr '\n' ' ' | sed 's/|| ( ) //g; s/ $//')
+echo "RDEPEND=\"${filtered}\"" >> ${ebuild}
+echo "${filtered}" > ${dbdir}/RDEPEND
+
+
+# Clean related portage cache
+rm -f ${cache}/vdb_*.pickle
