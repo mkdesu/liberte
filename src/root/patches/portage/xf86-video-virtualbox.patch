@@ -1,5 +1,5 @@
---- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.10.ebuild	2014-07-15 20:34:49.198049924 +0000
-+++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.10.ebuild	2014-07-15 20:35:24.425567671 +0000
+--- /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.12.ebuild	2014-07-15 20:34:49.198049924 +0000
++++ /usr/portage/x11-drivers/xf86-video-virtualbox/xf86-video-virtualbox-4.3.12.ebuild	2014-07-15 20:35:24.425567671 +0000
 @@ -103,6 +103,7 @@
  		--disable-sdl-ttf \
  		--disable-pulse \
