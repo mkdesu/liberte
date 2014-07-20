@@ -11,11 +11,9 @@ dev-lang/python                 -ncurses -readline
 app-text/hunspell               -ncurses
 sys-devel/gettext               -ncurses
 sys-apps/gawk                   -readline
-dev-lang/lua                    -readline
 dev-libs/libpcre                -readline
 dev-libs/libxml2                -readline
 dev-db/sqlite                   -readline
-dev-libs/gobject-introspection  -cairo
 app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
 
@@ -36,7 +34,6 @@ net-misc/iputils                -ssl
 dev-libs/opensc                 -ssl
 app-i18n/uim                    -ssl
 net-libs/glib-networking        -gnome
-net-irc/hexchat                 -libproxy
 
 # Multimedia
 # [ffmpeg/libav: encode-only flags: mp3 aac faac theora vorbis x264 xvid]
@@ -44,13 +41,11 @@ virtual/ffmpeg                  -X -encode -truetype -speex
 media-video/libav               -X -encode -truetype -alsa -network -ssl -qt-faststart  -hardcoded-tables  -speex -v4l  avx
 media-sound/sox                 encode
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
-media-libs/gst-plugins-base             theora
 www-client/firefox              -alsa gstreamer  system-jpeg system-cairo system-sqlite system-icu  -wifi
 media-libs/libass               -harfbuzz
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal
-dev-util/dialog                 minimal
 media-libs/libsndfile           minimal
 dev-lang/spidermonkey           minimal
 sys-apps/util-linux             -suid
@@ -58,7 +53,6 @@ sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
 sys-apps/usbutils               -zlib
 sys-apps/usb_modeswitch         jimtcl
-sys-fs/lvm2                     -udev
 media-libs/libcanberra          -udev
 app-crypt/gnupg                 -usb
 net-firewall/iptables           -netlink
@@ -83,13 +77,12 @@ app-emulation/virtualbox-bin    headless -additions -chm
 # (ppp[ipv6]: #440696)
 sys-boot/syslinux               -custom-cflags
 sys-boot/grub                   -custom-cflags
-sys-apps/busybox                static savedconfig
+sys-apps/busybox                savedconfig
 sys-kernel/linux-firmware       savedconfig
 sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
 virtual/udev                    gudev
 sys-fs/udev                     gudev
-media-libs/openjpeg             tools
 gnome-base/librsvg              tools
 dev-util/strace                 aio
 app-portage/eix                 strong-security
