@@ -1,0 +1,11 @@
+--- orig/modules/linux/vmhgfs/link.c	2014-07-22 13:20:21.138165190 +0000
++++ new/modules/linux/vmhgfs/link.c	2014-07-22 13:08:50.579897944 +0000
+@@ -185,7 +185,7 @@ HgfsReadlink(struct dentry *dentry,  //
+       } else {
+          LOG(6, (KERN_DEBUG "VMware hgfs: %s: calling vfs_readlink %s\n",
+                  __func__, fileName));
+-         error = vfs_readlink(dentry, buffer, buflen, fileName);
++         error = readlink_copy(buffer, buflen, fileName);
+          LOG(6, (KERN_DEBUG "VMware hgfs: %s: vfs_readlink %s ret %dn",
+                  __func__, fileName, error));
+       }
