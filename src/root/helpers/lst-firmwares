@@ -11,7 +11,7 @@ initrd=/usr/src/linux-main/usr/initramfs_data.cpio.xz
 # Firmware requested by kernel modules
 fwfiles=$(modinfo -k ${kversion} -F firmware \
     $(find /lib/modules -name '*.ko' -printf '%f\n' | sed 's/\.ko$//') \
-    | sort -u | sed -r 's/(^iwlwifi-(3160|7260))-7\.ucode/\1-8.ucode/')
+    | sort -u | sed -r 's/(^iwlwifi-(3160|7260|7265))-8\.ucode/\1-9.ucode/')
 
 for fw in ${fwfiles}; do
     if [ ! -e /lib/firmware/${fw} ] && ! grep -q "^${fw}\$" ${fwlst}; then

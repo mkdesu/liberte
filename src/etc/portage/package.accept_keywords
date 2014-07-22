@@ -21,6 +21,7 @@
 sys-kernel/linux-firmware
 sys-firmware/b43-firmware
 sys-firmware/b43legacy-firmware
+x11-drivers/radeon-ucode
 
 # Compilation failure (#317539)
 =net-wireless/irda-utils-0.9.18*
