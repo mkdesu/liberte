@@ -80,10 +80,9 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     chown -hR bin:bin /usr/src/linux-{main,kexec}
 
 
-    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v21&id2=d6e0a2dd12f4067a5bcefb8bbd8ddbeff800afbc
-    # https://dev.openwrt.org/export/41309/trunk/target/linux/generic/patches-3.14/100-overlayfs.patch
+    # https://git.kernel.org/cgit/linux/kernel/git/mszeredi/vfs.git/diff/?id=overlayfs.v22&id2=4b660a7f5c8099d88d1a43d8ae138965112592c7
     sinfo "Applying kernel patches"
-    ${helpdir}/hlp-patch ${HOME}/patches/kernel/overlayfs.v21.patch  -d /usr/src/linux-${kversion} -p1
+    ${helpdir}/hlp-patch ${HOME}/patches/kernel/overlayfs.v22.patch  -d /usr/src/linux-${kversion} -p1
 
 
     # Filter locales before remerging libc

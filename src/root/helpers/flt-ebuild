@@ -16,6 +16,8 @@ pattern="$2"
 
 
 # Copy the package directory to local repository
+# NOTE: another approach is to use emerge -c --dynamic-deps=n, but this
+#       would require rebuilding all packages with changed source ebuilds
 rsync -a ${main}/"${pkg%:*}" ${repo}/"${pkg%/*}"
 
 # Determine ebuild path and installed packages DB directory
@@ -34,7 +36,8 @@ for var in EAPI DESCRIPTION HOMEPAGE LICENSE SLOT KEYWORDS IUSE REQUIRED_USE RES
 done
 
 
-# Filter runtime dependencies
+# Ebuild's RDEPEND augments dynamic dependencies (--dynamic-deps)
+# VDB's RDEPEND augments slotted dependencies (which have no dynamic deps)
 filtered=$(cat ${dbdir}/RDEPEND | tr ' ' '\n' | grep -vE -e "${pattern}" \
              | tr '\n' ' ' | sed 's/|| ( ) //g; s/ $//')
 echo "RDEPEND=\"${filtered}\"" >> ${ebuild}
