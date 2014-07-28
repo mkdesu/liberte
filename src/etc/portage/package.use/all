@@ -36,10 +36,11 @@ app-i18n/uim                    -ssl
 net-libs/glib-networking        -gnome
 
 # Multimedia
-# [ffmpeg/libav: encode-only flags: mp3 aac faac theora vorbis x264 xvid]
-virtual/ffmpeg                  -X -encode -truetype -speex
-media-video/libav               -X -encode -truetype -alsa -network -ssl -qt-faststart  -hardcoded-tables  -speex -v4l  avx
+# [ffmpeg/libav: encode-only flags: mp3 aac faac fdk theora vorbis x264 xvid]
+virtual/ffmpeg                  -X -encode -truetype
+media-video/libav               -X -encode -truetype -alsa -network -ssl  -hardcoded-tables  -v4l
 media-sound/sox                 encode
+media-sound/vorbis-tools        speex
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 www-client/firefox              -alsa gstreamer  system-jpeg system-cairo system-sqlite system-icu  -wifi
 media-libs/libass               -harfbuzz
@@ -75,13 +76,12 @@ app-emulation/virtualbox-bin    headless -additions -chm
 
 # Extra functionality
 # (ppp[ipv6]: #440696)
-sys-boot/syslinux               -custom-cflags
-sys-boot/grub                   -custom-cflags
 sys-apps/busybox                savedconfig
 sys-kernel/linux-firmware       savedconfig
 sys-devel/gcc                   cxx
 sys-devel/binutils              cxx
-virtual/udev                    gudev
+www-client/firefox              custom-cflags custom-optimization
+media-video/libav               custom-cflags cpudetection 3dnow 3dnowext ssse3 avx
 sys-fs/udev                     gudev
 gnome-base/librsvg              tools
 dev-util/strace                 aio

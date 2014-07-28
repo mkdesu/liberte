@@ -47,7 +47,7 @@ openvpn                 ssl, polarssl           ssl             networkmanager-o
 pkcs11-helper           !ssl, gnutls, nss       ssl             openvpn
 
 glib-networking         gnutls                  gnutls          libsoup
-libsoup                 gnutls                  gnutls          gst-plugins-soup
+libsoup                 gnutls                  gnutls
 libmicrohttpd           gnutls                  gnutls          cables
 curl                    ssl, gnutls, nss        ssl             cables, gnupg
 wget                    ssl, gnutls             ssl             portage
@@ -169,7 +169,6 @@ Tor                              (127.0.0.1:9050)
             libsoup-gnome        (GNOME libsoup plugin)
               Totem              (Playlist parser)
             NetworkManager       (connectivity checking)
-            gst-plugins-soup     (GStreamer HTTP plugin, http_proxy envvar is supported)
       libxml2                    (NanoHTTP)
       libmms
           gst-plugins-libmms     (GStreamer MMS plugin)
