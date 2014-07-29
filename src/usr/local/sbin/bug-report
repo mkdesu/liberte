@@ -59,6 +59,8 @@ lsscsi -HLv                          > 06-scsi-host
 lsscsi -HLtv                         > 06-scsi-top
 lspcmcia                             > 07-pcmcia
 pkcs11-tool --module opensc-pkcs11.so -Lv > 07-pcsc
+tpm_version                          > 07-tpm
+tpm_selftest                        >> 07-tpm
 
 echo Network ...
 ifconfig -a -v                       > 08-net-eth
