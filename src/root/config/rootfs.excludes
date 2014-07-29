@@ -7,7 +7,6 @@
 /usr/share/help/
 /usr/share/gtk-doc/
 # (no gnome-extra/yelp with "-gnome")
-/usr/share/omf/
 /usr/share/gnome/
 /usr/share/gdm/
 
@@ -43,16 +42,13 @@
 /usr/share/baselayout/
 /usr/share/awk/
 /usr/share/et/
-/usr/share/getopt/
 /usr/share/gir-[0-9]*/
 /usr/share/gobject-introspection-[0-9]*/
 /usr/share/graphite2/
 /usr/share/i18n/
 /usr/share/icu/
-/usr/share/NetworkManager/
 /usr/share/ntp/
 /usr/share/openrc/
-/usr/share/readline/
 /usr/share/vala/
 /usr/share/glib-[0-9]*/gettext/
 
@@ -143,8 +139,6 @@
 /usr/lib/claws-mail/tools/tb2claws-mail
 # dev-libs/libevent: marshaling code generator
 /usr/bin/event_rpcgen.py
-# x11-libs/gtksourceview: *.lang files development
-/usr/share/gtksourceview-*/language-specs/convert.py
 # net-misc/rsync: non-essential auxiliary scripts
 /usr/share/rsync/
 # app-misc/ca-certificates: depends on run-parts
@@ -177,8 +171,6 @@
 /usr/bin/compile_et
 /usr/bin/dbus-binding-tool
 /usr/bin/vp8_scalable_patterns
-/usr/bin/luac
-/usr/bin/ffmpeg
 /usr/bin/avconv
 /usr/share/avconv/
 /usr/sbin/vboxguest-service
