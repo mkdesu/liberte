@@ -5,7 +5,7 @@
 EAPI="4"
 
 # no mime types, so no need to inherit fdo-mime
-inherit eutils
+inherit eutils user
 
 DESCRIPTION="Secure and anonymous serverless email-like communication."
 HOMEPAGE="http://dee.su/cables"
