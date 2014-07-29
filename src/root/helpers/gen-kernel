@@ -41,15 +41,13 @@ make="sudo -n -u bin ${rmake}"
 
 
 # Ensure presence of module signing keys / certs
-# (MODSECKEY / MODPUBKEY do not affect kernel/modsign_certificate.o)
+# (MODSECKEY / MODPUBKEY do not affect kernel/system_certificates.o)
 if [ ! -e ${mainobj}/signing_key.x509 ]; then
     ln -s    ${sb_kmod}.der ${mainobj}/signing_key.x509
     ln -s    ${sb_kmod}.key ${mainobj}/signing_key.priv
     touch -d 1970-01-01     ${mainobj}/x509.genkey
-    truncate -s 0           ${mainobj}/extra_certificates
     chown -h bin:bin        ${mainobj}/signing_key.{x509,priv} \
-                            ${mainobj}/x509.genkey             \
-                            ${mainobj}/extra_certificates
+                            ${mainobj}/x509.genkey
 fi
 
 
