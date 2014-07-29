@@ -16,12 +16,14 @@ dev-libs/libxml2                -readline
 dev-db/sqlite                   -readline
 app-i18n/uim                    gtk3
 x11-themes/light-themes         gtk3
+app-text/poppler                cairo
 
 # Drivers
 # [xf86-video-ati[glamor] requires mesa[egl,gbm]]
 # [xf86-video-vmware requires mesa[xa]]
 # [xf86-video-virtualbox[dri] conflicts w/ mprotect]
 media-libs/mesa                 xa gbm -llvm
+x11-libs/libdrm                 libkms
 x11-drivers/xf86-video-virtualbox -dri
 app-emulation/open-vm-tools     -X
 x11-base/xorg-drivers           -video_cards_nv

@@ -44,7 +44,7 @@ rm -f /etc/portage/savedconfig/*/*-[0-9]*
 if [ -x /usr/bin/gpg  -a  -x /usr/bin/eix ]; then
     sinfo "Updating portage"
 
-    gpg -q --homedir /etc/portage/gnupg --import /usr/local/addons/certs/gentoo-*.asc
+    gpg -q --homedir /etc/portage/gnupg --trust-model direct --import /usr/local/addons/certs/gentoo-*.asc
     eix-sync -qw -C -q
 fi
 
@@ -131,6 +131,11 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     USE="-X -consolekit" emerge -qeupv @system
     USE="-X -consolekit" emerge -qeu   @system
     rm -f ${protected}
+
+    # (#518524)
+    sinfo "Rebuilding packages that use old libraries"
+    emerge -q @preserved-rebuild
+
     rebuild_locales
 
     # Also rebuild hardened-sources dependencies (#461848)

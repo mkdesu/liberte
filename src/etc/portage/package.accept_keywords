@@ -25,3 +25,7 @@ x11-drivers/radeon-ucode
 
 # Compilation failure (#317539)
 =net-wireless/irda-utils-0.9.18*
+
+# Stabilization, compilation faulure (#510204)
+=app-crypt/tpm-tools-1.3.8
+=dev-libs/opencryptoki-2.4.3*
