@@ -86,7 +86,7 @@ emerge -qC sys-apps/sandbox
 
 
 sinfo "Removing development files"
-rm /etc/env.d/{??binutils,??gcc-i686-pc-linux-gnu,??nss}
+rm /etc/env.d/{??binutils,??gcc-i686-pc-linux-gnu,??nss-x86}
 rm /lib/cpp /usr/bin/cc
 for f in /usr/bin/i686-pc-linux-gnu-*; do
     rm ${f} /usr/bin/${f#/usr/bin/i686-pc-linux-gnu-}
