@@ -99,10 +99,6 @@ net-wireless/wpa_supplicant     ap p2p
 # Internationalization
 app-i18n/uim                    -linguas_*
 app-text/hunspell               -linguas_* linguas_en linguas_ru
-sys-apps/portage                -linguas_*
-app-portage/eix                 -linguas_*
-sys-apps/man-pages              -linguas_*
-sys-apps/groff                  -linguas_*
 media-fonts/terminus-font       quote ru-dv ru-i
 
 # Static libraries (for initramfs cryptsetup)

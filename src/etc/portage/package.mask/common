@@ -1,6 +1,9 @@
 # Prefer smaller dev-libs/libelf
 dev-libs/elfutils
 
+# Prefer non-DB sys-apps/man
+sys-apps/man-db
+
 # Prefer media-video/libav + media-libs/libpostproc
 media-video/ffmpeg
 
