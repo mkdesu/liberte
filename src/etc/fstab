@@ -9,15 +9,15 @@
 # (if not mounted; fstab is consulted except for /sys/*)
 # sysfs:      /sys{,/kernel{/security,/debug,/config,/cgroup{,/cpu,...,/openrc}},/firmware/efi/efivars,/fs/fuse/connections}
 # udev-mount: /dev
-# devfs:      /dev{/pts,/shm[disabled]}
+# devfs:      /dev{/mqueue,/pts,/shm[disabled]}
 
 # Empty writable directories (/mnt/rwroot's mountpoint options)
 /mnt/rwroot/tmp /tmp none bind 0 0
 
 # Overlayed subdirectories mounted into ro /
-overlayfs /etc  overlayfs nodev,lowerdir=/mnt/live/etc,upperdir=/mnt/rwroot/etc   0 0
-overlayfs /var  overlayfs nodev,lowerdir=/mnt/live/var,upperdir=/mnt/rwroot/var   0 0
-overlayfs /home overlayfs nodev,lowerdir=/mnt/live/home,upperdir=/mnt/rwroot/home 0 0
+overlayfs /etc  overlayfs nodev,lowerdir=/mnt/live/etc,upperdir=/mnt/rwroot/etc,workdir=/mnt/rwroot/etc-work    0 0
+overlayfs /var  overlayfs nodev,lowerdir=/mnt/live/var,upperdir=/mnt/rwroot/var,workdir=/mnt/rwroot/var-work    0 0
+overlayfs /home overlayfs nodev,lowerdir=/mnt/live/home,upperdir=/mnt/rwroot/home,workdir=/mnt/rwroot/home-work 0 0
 
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc

@@ -40,7 +40,8 @@ mount -t sysfs sysfs /sys
 #   + nodev:              overlayfs mount option
 # (however, nodev still affects bind mounts)
 mount -t tmpfs -o mode=700,nosuid,nodev,noexec,size=${rwrootsz} tmpfs ${srwroot}
-mkdir -m  755 ${srwroot}/etc ${srwroot}/var ${srwroot}/home
+mkdir -m  755 ${srwroot}/etc      ${srwroot}/var      ${srwroot}/home
+mkdir -m  700 ${srwroot}/etc-work ${srwroot}/var-work ${srwroot}/home-work
 mkdir -m 1777 ${srwroot}/tmp
 
 # /etc and /home can be allowed to exec new/modified executables:
