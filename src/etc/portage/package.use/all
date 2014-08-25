@@ -10,6 +10,7 @@ x11-misc/redshift               -gtk
 dev-lang/python                 -ncurses -readline
 app-text/hunspell               -ncurses
 sys-devel/gettext               -ncurses
+sys-fs/lvm2                     -readline
 sys-apps/gawk                   -readline
 dev-libs/libpcre                -readline
 dev-libs/libxml2                -readline
@@ -52,6 +53,7 @@ media-libs/libass               -harfbuzz
 sys-libs/ncurses                minimal
 media-libs/libsndfile           minimal
 dev-lang/spidermonkey           minimal
+sys-fs/lvm2                     device-mapper-only
 sys-apps/util-linux             -suid
 sys-apps/kmod                   -zlib -lzma
 sys-apps/pciutils               -zlib
@@ -65,7 +67,7 @@ sys-apps/kexec-tools            -zlib -lzma
 media-libs/freetype             -bzip2
 x11-libs/libXfont               -bzip2
 dev-libs/libxml2                -lzma
-sys-apps/busybox                -pam
+sys-apps/busybox                -pam -static
 sys-apps/gradm                  -pam
 net-misc/openvpn                -pam
 sys-apps/grep                   -pcre
@@ -100,9 +102,3 @@ net-wireless/wpa_supplicant     ap p2p
 app-i18n/uim                    -linguas_*
 app-text/hunspell               -linguas_* linguas_en linguas_ru
 media-fonts/terminus-font       quote ru-dv ru-i
-
-# Static libraries (for initramfs cryptsetup)
-sys-apps/util-linux             static-libs
-sys-libs/e2fsprogs-libs         static-libs
-dev-libs/popt                   static-libs
-dev-libs/libgpg-error           static-libs

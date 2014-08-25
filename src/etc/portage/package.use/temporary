@@ -8,5 +8,5 @@ dev-libs/libxml2                python
 net-libs/libproxy               -networkmanager
 
 # initramfs cryptsetup
-sys-fs/cryptsetup               static      -udev  kernel -gcrypt
-sys-fs/lvm2                     static-libs -udev
+sys-fs/cryptsetup               -udev  kernel -gcrypt  -nls
+sys-fs/lvm2                     -udev

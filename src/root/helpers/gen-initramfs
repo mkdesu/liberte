@@ -15,6 +15,23 @@ mainobj=/usr/src/linux-main
 image=/usr/local/addons/initrd/initrd-x86.cpio
 
 
+# Prepare dynamic libraries
+for f in `awk '/^file\>/ { print $3 }' ${initramfs}`; do
+    if [ application/x-sharedlib = "`file -bL --mime-type ${f}`" ]; then
+        for lib in `ldd ${f} | grep -Eo '/[^[:blank:]]*'`; do
+            lib=`realpath ${lib}`
+            mkdir -p ${stagedir}${lib%/*}
+            cp -pdu ${lib} ${stagedir}${lib}
+        done
+    fi
+done
+
+mkdir ${stagedir}/etc
+find ${stagedir} -mindepth 1 -type d -name 'lib*' -printf '/%P\n' > ${stagedir}/etc/ld.so.conf
+ldconfig -r ${stagedir}
+rm ${stagedir}/etc/ld.so.conf
+
+
 # Prepare initramfs kernel modules
 sed -n '/^[^#]/p' ${modlst} | while read mod; do
     # Determine module names to add to initramfs (not necessarily canonical)
@@ -32,8 +49,8 @@ done | while read mod; do
 done | sed -n 's/^insmod //p' | sort -u | while read mod; do
     # Copy modules and compute their dependencies and map
     # (depmod will fail if not all dependencies are present)
-    mkdir -p     ${stagedir}`dirname ${mod}`
-    cp -p ${mod} ${stagedir}`dirname ${mod}`
+    mkdir -p     ${stagedir}${mod%/*}
+    cp -p ${mod} ${stagedir}${mod}
 done
 cp /lib/modules/${kversion}/modules.{builtin,order} ${stagedir}/lib/modules/${kversion}
 depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
@@ -43,20 +60,22 @@ depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
 sed -n '/^[^#]/p' ${fwlst} | while read fw; do
     find /lib/firmware/${fw} ! -type d
 done | while read fw; do
-    mkdir -p    ${stagedir}`dirname ${fw}`
-    cp -p ${fw} ${stagedir}`dirname ${fw}`
+    mkdir -p    ${stagedir}${fw%/*}
+    cp -p ${fw} ${stagedir}${fw}
 done
 
 
 # Build complete initramfs file list
 cp ${initramfs} ${stagebase}
 find ${stagedir} -mindepth 1 -type d \
-    -printf 'dir  %P    0755 0 0\n' >> ${initlst}
+    -printf 'dir   %P    0%m 0 0\n' >> ${initlst}
+find ${stagedir} -mindepth 1 -type l \
+    -printf 'slink %P %l 0%m 0 0\n' >> ${initlst}
 find ${stagedir} -mindepth 1 -type f \
-    -printf 'file %P %p 0644 0 0\n' >> ${initlst}
+    -printf 'file  %P %p 0%m 0 0\n' >> ${initlst}
 
-if [ -n "`find ${stagedir} ! -type d ! -type f`" ]; then
-    echo "Enexpected modules/firmware file types"
+if [ -n "`find ${stagedir} ! -type d ! -type f ! \( -type l -xtype f \)`" ]; then
+    echo "Unexpected library/modules/firmware file types"
     exit 1
 fi
 

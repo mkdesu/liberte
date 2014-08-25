@@ -29,4 +29,5 @@ file  sbin/veritysetup  /sbin/veritysetup         0755 0 0
 dir   proc           0755 0 0
 dir   sys            0755 0 0
 
-# Entries added in gen-initramfs below
+# Entries added in gen-initramfs below:
+# dynamic libraries, kernel modules, firmwares

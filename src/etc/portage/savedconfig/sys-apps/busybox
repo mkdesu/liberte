@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.21.0
-# Sun Sep 22 01:51:08 2013
+# Sat Aug 23 17:39:55 2014
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -55,8 +55,8 @@ CONFIG_BUSYBOX_EXEC_PATH="/bin/busybox"
 #
 # Build Options
 #
-CONFIG_STATIC=y
-# CONFIG_PIE is not set
+# CONFIG_STATIC is not set
+CONFIG_PIE=y
 # CONFIG_NOMMU is not set
 # CONFIG_BUILD_LIBBUSYBOX is not set
 # CONFIG_FEATURE_INDIVIDUAL is not set
@@ -426,7 +426,6 @@ CONFIG_FEATURE_XARGS_SUPPORT_ZERO_TERM=y
 # CONFIG_BOOTCHARTD is not set
 # CONFIG_FEATURE_BOOTCHARTD_BLOATED_HEADER is not set
 # CONFIG_FEATURE_BOOTCHARTD_CONFIG_FILE is not set
-# CONFIG_GINIT is not set
 CONFIG_HALT=y
 # CONFIG_FEATURE_CALL_TELINIT is not set
 CONFIG_TELINIT_PATH=""
