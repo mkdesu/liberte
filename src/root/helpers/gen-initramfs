@@ -19,9 +19,7 @@ image=/usr/local/addons/initrd/initrd-x86.cpio
 for f in `awk '/^file\>/ { print $3 }' ${initramfs}`; do
     if [ application/x-sharedlib = "`file -bL --mime-type ${f}`" ]; then
         for lib in `ldd ${f} | grep -Eo '/[^[:blank:]]*'`; do
-            lib=`realpath ${lib}`
-            mkdir -p ${stagedir}${lib%/*}
-            cp -pdu ${lib} ${stagedir}${lib}
+            rsync -aR `realpath ${lib}` ${stagedir}
         done
     fi
 done
@@ -49,10 +47,9 @@ done | while read mod; do
 done | sed -n 's/^insmod //p' | sort -u | while read mod; do
     # Copy modules and compute their dependencies and map
     # (depmod will fail if not all dependencies are present)
-    mkdir -p     ${stagedir}${mod%/*}
-    cp -p ${mod} ${stagedir}${mod}
+    rsync -aR ${mod} ${stagedir}
 done
-cp /lib/modules/${kversion}/modules.{builtin,order} ${stagedir}/lib/modules/${kversion}
+rsync -aR /lib/modules/${kversion}/modules.{builtin,order} ${stagedir}
 depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
 
 
@@ -60,9 +57,12 @@ depmod -b ${stagedir} -e -F ${mainobj}/System.map ${kversion}
 sed -n '/^[^#]/p' ${fwlst} | while read fw; do
     find /lib/firmware/${fw} ! -type d
 done | while read fw; do
-    mkdir -p    ${stagedir}${fw%/*}
-    cp -p ${fw} ${stagedir}${fw}
+    rsync -aR ${fw} ${stagedir}
 done
+
+
+# Prepare extra packages
+rsync -aR `qlist -eos sys-apps/kmod | sed -r '/share|include|pkgconfig|init\.d/d'` ${stagedir}
 
 
 # Build complete initramfs file list

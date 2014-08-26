@@ -76,8 +76,7 @@ fi
 good_msg 'Loading modules'
 
 # Specify required filesystem modules (no autoloading on mount)
-# Load EHCI unconditionally, otherwise USB 1.1 might be forced if OHCI/UHCI comes up first
-force_load="${force_load_fs} ehci-hcd"
+force_load="${force_load_fs}"
 
 oldmods=
 newmods=" ${force_load} "
