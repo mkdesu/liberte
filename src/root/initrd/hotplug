@@ -1,9 +1,0 @@
-#!/bin/busybox sh
-
-# Redirect input/output to console
-exec </dev/null 1>/dev/console 2>&1
-
-
-if [ "${ACTION}" = add  -a  -n "${MODALIAS}" ]; then
-    exec /sbin/modprobe -qb "${MODALIAS}"
-fi

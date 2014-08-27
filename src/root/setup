@@ -247,10 +247,11 @@ gcc  ${cflags} -o /usr/local/bin/log-limit           /usr/local/src/log-limit.c
 
 cflags="-std=c99 -Wall `portageq envvar CFLAGS`"
 mkdir -p /usr/local/addons/initrd
+klcc ${cflags} -o /usr/local/addons/initrd/hotplug    /usr/local/src/hotplug.c
 klcc ${cflags} -o /usr/local/addons/initrd/init-kexec /usr/local/src/init-kexec.c
 
 strip -s /usr/local/{sbin/{udev-watchdog,slay,privsh},bin/log-limit} \
-         /usr/local/addons/initrd/init-kexec
+         /usr/local/addons/initrd/{hotplug,init-kexec}
 
 
 sinfo "Generating localization, timezone and keyboard layout menus"
