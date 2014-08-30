@@ -20,6 +20,7 @@ overlayfs /var  overlayfs nodev,lowerdir=/mnt/live/var,upperdir=/mnt/rwroot/var,
 overlayfs /home overlayfs nodev,lowerdir=/mnt/live/home,upperdir=/mnt/rwroot/home,workdir=/mnt/rwroot/home-work 0 0
 
 # Overlayed subdirectories -- only for testing purposes
+# Running changed executables also requires "mount -o remount,exec /mnt/rwroot"
 overlayfs /usr  overlayfs noauto,nodev,lowerdir=/mnt/live/usr,upperdir=/mnt/rwroot/usr,workdir=/mnt/rwroot/usr-work 0 0
 
 # Mounted by init.d services (after localmount):
