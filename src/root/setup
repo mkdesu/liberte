@@ -13,19 +13,6 @@ patch_ebuild() {
     ebuild `awk '{print $2; exit}' "$1"` manifest
 }
 
-rebuild_locales() {
-    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen.new
-    # (#517400), http://comments.gmane.org/gmane.comp.lib.glibc.alpha/31543
-    sed -i '/^bo_/d' /etc/locale.gen.new
-    if cmp -s /etc/locale.gen{.new,}; then
-        rm /etc/locale.gen.new
-    else
-        sinfo "Rebuilding locales"
-        mv /etc/locale.gen{.new,}
-        locale-gen -q
-    fi
-}
-
 
 # Sanity check
 if [ ${PHASE} != src ]; then
@@ -85,11 +72,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     ${helpdir}/hlp-patch ${HOME}/patches/kernel/overlayfs.v22.patch  -d /usr/src/linux-${kversion} -p1
 
 
-    # Filter locales before remerging libc
-    sinfo "Filtering locales"
-    grep UTF-8 /usr/share/i18n/SUPPORTED > /etc/locale.gen
-
-
     # Some news are delayed until first emerge
     eselect news read all
     eselect news purge
@@ -135,8 +117,6 @@ if [ "$1" = fresh  -o  ! -e /usr/src/linux-${kversion}/incremental ]; then
     # (#518524)
     sinfo "Rebuilding packages that use old libraries"
     emerge -q @preserved-rebuild
-
-    rebuild_locales
 
     # Also rebuild hardened-sources dependencies (#461848)
     emerge -q sys-devel/bc
@@ -225,7 +205,6 @@ revdep-rebuild -qi
 
 rm -f ${protected}
 etc-update
-rebuild_locales
 
 
 sinfo "Listing GLSAs"
@@ -414,7 +393,7 @@ done
 
 
 sinfo "Disabling PaX markings"
-Not necessary for any plugins
+# Not necessary for any plugins
 paxctl-ng -d /usr/lib/firefox/plugin-container
 
 

@@ -24,6 +24,7 @@
   * Replaced XChat with HexChat
   * Removed experimental I2P support and JamVM
   * Removed many packages due to shift of project focus
+  * Removed most translations due to shift of project focus
 
   * OVA image creation is fully integrated into build process
   * Removed qemulate.sh script

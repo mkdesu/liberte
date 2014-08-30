@@ -18,7 +18,7 @@
 /usr/share/info/**
 /usr/share/doc/**
 /usr/share/gtk-doc/**
-/usr/share/gnome/help/**
+/usr/share/help/**
 /usr/share/sgml/docbook/xsl-stylesheets/
 
 # Pruned directories

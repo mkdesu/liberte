@@ -7,8 +7,6 @@
 /usr/share/help/
 /usr/share/gtk-doc/
 # (no gnome-extra/yelp with "-gnome")
-/usr/share/gnome/
-/usr/share/gdm/
 
 # Portage directories
 /usr/portage/
@@ -68,7 +66,7 @@
 /usr/share/consoletrans/
 /usr/share/unimaps/
 /usr/share/keymaps/**
-/usr/share/X11/locale/*/
+/usr/share**/locale/*/
 /usr/share/fc-lang/
 /usr/share/mime/packages/
 /usr/share/themes/*/**

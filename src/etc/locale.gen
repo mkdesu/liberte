@@ -1,0 +1,15 @@
+# Format of each line: <locale> <charmap>
+# <locale> is a locale in /usr/share/i18n/locales/
+# <charmap> is a charmap in /usr/share/i18n/charmaps/
+#
+# Supported combinations: /usr/share/i18n/SUPPORTED
+# "locale-gen" rebuilds the locales into /usr/lib/locale/locale-archive
+
+en_GB.UTF-8 UTF-8
+en_US.UTF-8 UTF-8
+en_CA.UTF-8 UTF-8
+en_AU.UTF-8 UTF-8
+en_NZ.UTF-8 UTF-8
+
+ru_RU.UTF-8 UTF-8
+ru_UA.UTF-8 UTF-8

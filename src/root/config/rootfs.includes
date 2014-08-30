@@ -21,8 +21,9 @@
 /usr/share/keymaps/include/***
 /usr/share/keymaps/i386/***
 /usr/share/keymaps/mac/***
-/usr/share/X11/locale/C/***
-/usr/share/X11/locale/*.UTF-8/***
+/usr/share**/locale/C/***
+/usr/share**/locale/en*/***
+/usr/share**/locale/ru*/***
 /usr/share/themes/*/index.theme
 /usr/share/themes/*/gtk-*/***
 /usr/share/themes/*/openbox-*/***
