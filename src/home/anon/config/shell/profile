@@ -38,6 +38,7 @@ export GTK_IM_MODULE=uim
 export QT_IM_MODULE=uim
 
 # Application settings
+export BC_ENV_ARGS="-ql"
 export BROWSER=firefox
 export LESS="-R -M --shift 16 -Swi -x4"
 export LESSHISTFILE=-

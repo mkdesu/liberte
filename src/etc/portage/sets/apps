@@ -10,6 +10,7 @@ app-text/tree
 sys-apps/less
 app-editors/nano
 app-editors/hexedit
+sys-devel/bc
 
 # Applications
 gnome-extra/zenity
@@ -26,7 +27,6 @@ app-text/evince
 www-client/firefox
 mail-client/claws-mail
 app-crypt/gpa
-sci-libs/libqalculate
 net-irc/hexchat
 
 # Plugins

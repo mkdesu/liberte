@@ -12,33 +12,26 @@ vmfont=/usr/share/fonts/dejavu/DejaVuSans.ttf
 
 profile=/var/run/usage-profile
 
-timeout=120
-
-height=`xwininfo -root | sed -n 's/^  Height: //p'`
-wheight=${height}
-
-# Wait for the taskbar to come up
-w=
-while [ ${#w} -lt ${timeout}  -a  ${height} = ${wheight} ]; do
-    sleep 0.2
-
-    if xprop -root _NET_WORKAREA | grep -q =; then
-        wheight=`xprop -root '=$3' _NET_WORKAREA | cut -d= -f2`
-    fi
-
-    w=${w}X
-done
+# Single parameter is width:height of work area (see "wait-panel")
+dim=${1:-600:600}
 
 if [ ! -e ${png} ]; then
-    calc=`xprop -root '=round(min($2-$0, $3-$1\) * 2/3\)' _NET_WORKAREA | cut -d= -f2`
-    size=`qalc -t "${calc}"`
+    width=${dim%:*}
+    height=${dim#*:}
+
+    # Calculate logo size
+    size=${width}
+    if [ "${height}" -lt "${size}" ]; then
+        size=${height}
+    fi
+    size=$((size * 2/3))
 
     # Do not use the logo if gentoo=nologo has been specified
     if [ -e ${silentflag} ]; then
         cp ${silentpng} ${png}
     # Black background is needed for xlock (display +matte has no antialiasing)
     elif [ ! -s ${vmtype}  -a  ! -s ${profile} ]; then
-        exec rsvg-convert --background-color=black -h ${size} -o ${png} ${svg}
+        exec rsvg-convert --background-color=black -h "${size}" -o ${png} ${svg}
     else
         warning=
         if [ -s ${vmtype} ]; then
@@ -48,11 +41,12 @@ if [ ! -e ${png} ]; then
             warning="${warning:+${warning}\n}irregular profile\n(`cat ${profile}`)"
         fi
 
-        texty=`qalc -t "round(${size} * 3/8)"`
-        textpt=`qalc -t "${size} * 13/400"`
+        texty=$((size * 3/8))
+        textpt=$((size * 130/400))
+        textpt=`echo "${textpt}" | sed 's/.$/.\0/'`
 
-        exec rsvg-convert --background-color=black -h ${size} ${svg} \
-             | convert -font ${vmfont} -pointsize ${textpt} -fill yellow -gravity center \
+        exec rsvg-convert --background-color=black -h "${size}" ${svg} \
+             | convert -font ${vmfont} -pointsize "${textpt}" -fill yellow -gravity center \
                -draw "text 0,${texty} 'Warning:\n${warning}'" - ${png}
     fi
 fi

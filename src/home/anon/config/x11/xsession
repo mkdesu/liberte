@@ -20,6 +20,11 @@ fi
 setxkbmap ${X11_KBD_LAYOUT:+-layout ${X11_KBD_LAYOUT}} ${X11_KBD_VARIANT:+-variant ${X11_KBD_VARIANT}} \
           ${X11_KBD_COMPOSE:+-option compose:${X11_KBD_COMPOSE}} &
 
+# Must exist for gpg-agent's gnome-keyring-daemon's subdirectory
+if [ ! -e ${XDG_CACHE_HOME} ]; then
+    mkdir ${XDG_CACHE_HOME}
+fi
+
 # Launch daemons
 # assume [ -z "${DBUS_SESSION_BUS_ADDRESS}" ]
 # eval `dbus-launch --sh-syntax`
@@ -44,9 +49,10 @@ $wm & export WM_PID=$!
 lxpanel &
 
 # Delay launch of other apps until the task bar is up
-# (and generate wallpaper along the way)
-${prefix}/gen-wallpaper
-pcmanfm -d --desktop &
+dim=`${prefix}/wait-panel`
+
+# Generate and set wallpaper
+( ${prefix}/gen-wallpaper "${dim}";  exec pcmanfm -d --desktop ) &
 
 # Launch automatic lid-autolock
 ${prefix}/lid-xlock & LIDXLOCK_PID=$!
@@ -56,7 +62,6 @@ syndaemon -d -t -k -i 2 &
 
 # Launch clipboard, NetworkManager and Bluetooth applets (use tray -> after panel)
 nm-applet --sm-disable &
-bluetooth-applet &
 
 # Launch input method daemons
 # uim-toolbar-gtk-systray is squashed by lxpanel (#405025)

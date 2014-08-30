@@ -1,0 +1,25 @@
+#!/bin/sh -e
+
+# Timeout (s)
+timeout=15
+
+# Screen dimensions
+dim=`xprop -root '=$0:$1' _NET_DESKTOP_GEOMETRY`
+dim=${dim#*=}
+wdim=${dim}
+
+# Wait for the taskbar to come up
+w=0
+while [ ${w} -lt $((timeout*5))  -a  "${dim}" = "${wdim}" ]; do
+    sleep 0.2
+
+    if xprop -root _NET_WORKAREA | grep -q =; then
+        wdim=`xprop -root '=$2 - $0:$3 - $1' _NET_WORKAREA`
+        wdim=${wdim#*=}
+        wdim=`expr ${wdim%:*}`:`expr ${wdim#*:}`
+    fi
+
+    w=$((w+1))
+done
+
+echo "${wdim}"

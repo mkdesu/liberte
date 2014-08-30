@@ -258,10 +258,6 @@ sinfo "Generating localization, timezone and keyboard layout menus"
 ${helpdir}/gen-locale-menu
 
 
-# sinfo "Fixing Ambiance/Radiance themes"
-# sed -ri '/\<(text|icon|box)-shadow:|\<inset / s/([0-9])px\>/\1/g' /usr/share/themes/{Radiance,Ambiance}*/gtk-3.0/{,apps/}*.css
-
-
 sinfo "Fixing miscellaneous directory permissions"
 # (#444734, FreeDesktop: #58787)
 chown root:polkitd {/etc,/usr/share}/polkit-1/rules.d
