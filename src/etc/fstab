@@ -19,6 +19,9 @@ overlayfs /etc  overlayfs nodev,lowerdir=/mnt/live/etc,upperdir=/mnt/rwroot/etc,
 overlayfs /var  overlayfs nodev,lowerdir=/mnt/live/var,upperdir=/mnt/rwroot/var,workdir=/mnt/rwroot/var-work    0 0
 overlayfs /home overlayfs nodev,lowerdir=/mnt/live/home,upperdir=/mnt/rwroot/home,workdir=/mnt/rwroot/home-work 0 0
 
+# Overlayed subdirectories -- only for testing purposes
+overlayfs /usr  overlayfs noauto,nodev,lowerdir=/mnt/live/usr,upperdir=/mnt/rwroot/usr,workdir=/mnt/rwroot/usr-work 0 0
+
 # Mounted by init.d services (after localmount):
 # procfs:     /proc/sys/fs/binfmt_misc
 
