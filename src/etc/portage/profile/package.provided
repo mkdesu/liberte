@@ -9,6 +9,3 @@ app-emulation/virtualbox-modules-4.2.24
 
 # Unneeded (app-i18n/uim (#404463))
 media-fonts/font-sony-misc-0
-
-# Unneeded (media-gfx/graphicsmagick[truetype])
-media-fonts/urw-fonts-0

@@ -28,7 +28,7 @@ depend() {
 }
 
 start() {
-    # VM flag is used for X wallpaper
+    # VM flag may be used to warn the user
     if [ ! -e ${vmflag} ]; then
         ebegin Detecting virtualization state
         virt-what > ${vmflag}

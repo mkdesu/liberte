@@ -7,10 +7,6 @@ png=${dir}/liberte-logo-wallpaper.png
 silentflag=/var/run/nologo
 silentpng=${dir}/liberte-logo-empty.png
 
-vmtype=/var/run/vmtype
-vmfont=/usr/share/fonts/dejavu/DejaVuSans.ttf
-
-profile=/var/run/usage-profile
 
 # Single parameter is width:height of work area (see "wait-panel")
 dim=${1:-600:600}
@@ -30,23 +26,7 @@ if [ ! -e ${png} ]; then
     if [ -e ${silentflag} ]; then
         cp ${silentpng} ${png}
     # Black background is needed for xlock (display +matte has no antialiasing)
-    elif [ ! -s ${vmtype}  -a  ! -s ${profile} ]; then
-        exec rsvg-convert --background-color=black -h "${size}" -o ${png} ${svg}
     else
-        warning=
-        if [ -s ${vmtype} ]; then
-            warning="${warning:+${warning}\n}non-native environment\n(`cat ${vmtype}`)"
-        fi
-        if [ -s ${profile} ]; then
-            warning="${warning:+${warning}\n}irregular profile\n(`cat ${profile}`)"
-        fi
-
-        texty=$((size * 3/8))
-        textpt=$((size * 130/400))
-        textpt=`echo "${textpt}" | sed 's/.$/.\0/'`
-
-        exec rsvg-convert --background-color=black -h "${size}" ${svg} \
-             | convert -font ${vmfont} -pointsize "${textpt}" -fill yellow -gravity center \
-               -draw "text 0,${texty} 'Warning:\n${warning}'" - ${png}
+        exec rsvg-convert --background-color=black -h "${size}" -o ${png} ${svg}
     fi
 fi

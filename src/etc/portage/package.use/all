@@ -48,6 +48,7 @@ media-sound/vorbis-tools        speex
 media-plugins/gst-plugins-meta  dv lame theora vpx x264 xvid  a52 dts dvd libass mms mpeg  ffmpeg
 www-client/firefox              -alsa gstreamer  system-jpeg system-cairo system-sqlite system-icu  -wifi
 media-libs/libass               -harfbuzz
+media-gfx/graphicsmagick        -truetype
 
 # Unnecessary functionality
 sys-libs/ncurses                minimal
