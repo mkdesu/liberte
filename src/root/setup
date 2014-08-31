@@ -254,6 +254,7 @@ eselect sh set dash
 sinfo "Configuring fontconfig"
 for fconf in \
     10-sub-pixel-rgb.conf \
+    11-lcdfilter-default.conf \
     20-unhint-small-dejavu-sans.conf \
     20-unhint-small-dejavu-sans-mono.conf \
     20-unhint-small-dejavu-serif.conf \
