@@ -17,8 +17,6 @@ app-arch/pbzip2
 app-arch/zip
 app-arch/p7zip
 app-arch/unrar
-app-arch/arj
-app-arch/lha
 sys-fs/inotify-tools
 sys-fs/ntfs3g
 sys-fs/dosfstools
