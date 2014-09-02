@@ -8,8 +8,6 @@
 -*virtual/os-headers
 -*sys-apps/busybox
 
--*virtual/man
--*sys-apps/man-pages
 -*sys-apps/texinfo
 
 -*sys-apps/elfix

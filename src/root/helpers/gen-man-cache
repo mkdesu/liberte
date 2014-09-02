@@ -1,0 +1,70 @@
+#!/bin/sh -e
+
+noroot="sudo -n -u nobody"
+
+locales=/etc/locale.gen
+width=${MANWIDTH:-80}
+
+conf=/etc/man.conf
+man=/usr/share/man
+cache=/var/cache/man
+
+
+# "clean" parameter removes catpages for non-existing man pages
+if [ "$1" = clean ]; then
+    find ${cache} -type f | while read catpage; do
+        manpage=`echo "${catpage}" | sed "s:^${cache}:${man}:; s:/cat\([0-9]\):/man\1:"`
+        if [ ! -e "${manpage}" ]; then
+            rm "${catpage}"
+        fi
+    done
+
+    # Regenerate summaries (does not work for localized man pages)
+    sect=`find ${man} -mindepth 1 -maxdepth 1 -type d -name 'man*' ! -name 'man[023]*' -printf '%P\n' \
+          | sed 's/^man//' | sort | tr '\n' : | sed 's/:$//'`
+    MANSECT="${sect}" makewhatis ${man}
+
+    exit
+fi
+
+linguas=`portageq envvar LINGUAS`
+
+
+# Enable cache usage and clean cache directory
+sed -i 's/^NOCACHE/##&/' ${conf}
+rm -rf ${cache}
+mkdir ${cache}
+
+
+# Generate man catpages for each language in LINGUAS
+for lang in ${linguas}; do
+    # Root language-specific man directory ("en" is a special case)
+    mandir=${man} catdir=${cache}
+    if [ ${lang} != en ]; then
+        mandir=${mandir}/${lang}
+        catdir=${catdir}/${lang}
+        mkdir ${catdir}
+    fi
+
+    # Pick first matching locale (e.g., "en_US.UTF-8")
+    loc=`sed -n "/^${lang}[._]/{s/[[:blank:]].*//p; q}" ${locales}`
+
+    # Go over all section-specific directories
+    for sec in `find ${mandir} -mindepth 1 -maxdepth 1 -type d -name 'man*' ! -name 'man[023]*' -printf '%P\n'`; do
+        sec=${sec#man}
+
+        # Create corresponding catpages directory
+        mkdir ${catdir}/cat${sec}
+
+        # Generate catpages (directly via groff)
+        for page in `find ${mandir}/man${sec} -mindepth 1 -maxdepth 1 ! -type d -printf '%P\n'`; do
+            # soelim must be invoked explicitly for correct localization
+            # echo Compiling ${mandir}/man${sec}/"${page}"
+            cat ${mandir}/man${sec}/"${page}" \
+                | ${noroot} soelim -I${mandir}/man${sec} -I${mandir} -I${man}/man${sec} -I${man} \
+                | ${noroot} GROFF_ENCODING=UTF-8 GROFF_TYPESETTER=utf8 LC_MESSAGES=${loc} LC_CTYPE=${loc} \
+                  groff -mandoc -t -rLL=${width}n -rLT=${width}n \
+                > ${catdir}/cat${sec}/"${page}" 2>/dev/null
+        done
+    done
+done

@@ -14,7 +14,7 @@
 /usr/lib/klibc/
 
 # Documentation
-/usr/share/man/**/*.*
+/usr/share/man/man[023]*/
 /usr/share/info/**
 /usr/share/doc/**
 /usr/share/gtk-doc/**

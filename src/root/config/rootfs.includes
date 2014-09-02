@@ -8,9 +8,10 @@
 /usr/lib/GraphicsMagick-[0-9]**.la
 /usr/lib/mpg123/*.la
 
-# Include fontconfig and gstreamer cache
+# Include fontconfig, gstreamer and man pages cache
 /var/cache/fontconfig/***
 /var/cache/gstreamer/***
+/var/cache/man/***
 
 # Pruned directories exceptions
 /usr/bin/rc-config
@@ -24,6 +25,7 @@
 /usr/share**/locale/C/***
 /usr/share**/locale/en*/***
 /usr/share**/locale/ru*/***
+/usr/share**/man/ru*/
 /usr/share/themes/*/index.theme
 /usr/share/themes/*/gtk-*/***
 /usr/share/themes/*/openbox-*/***

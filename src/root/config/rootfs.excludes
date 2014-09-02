@@ -1,7 +1,6 @@
 # Exclusions: copy -> clean
 
 # Documentation directories
-/usr/share/man/
 /usr/share/info/
 /usr/share/doc/
 /usr/share/help/
@@ -67,6 +66,7 @@
 /usr/share/unimaps/
 /usr/share/keymaps/**
 /usr/share**/locale/*/
+/usr/share**/man/*/
 /usr/share/fc-lang/
 /usr/share/mime/packages/
 /usr/share/themes/*/**

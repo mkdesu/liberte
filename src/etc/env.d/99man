@@ -1,0 +1,2 @@
+MANWIDTH=80
+MANPAGER="less -isRL"

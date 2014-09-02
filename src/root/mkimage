@@ -33,6 +33,7 @@ fi
 
 
 sinfo "Pruning the temporary copy"
+chattr -f -a ${live}/tmp/.private || :
 rsync -aHAXS -x -i --delete-excluded        \
     --include-from=${rootfspfx}.includes    \
     --exclude-from=${rootfspfx}.excludes    \

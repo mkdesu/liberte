@@ -18,6 +18,7 @@
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
   * More robust Xorg autoconfiguration with sequential fallbacks
   * Added ASCII virtual keyboard table for OTFE password entry
+  * Added preformatted man pages
 
   * Replaced Epiphany with Firefox
   * Added proxychains, a heterogeneous chaining proxyfier

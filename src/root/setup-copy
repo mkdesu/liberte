@@ -53,6 +53,13 @@ ${helpdir}/flt-ebuild net-misc/vpnc         '\<dev-lang/perl\>'
 # [debianutils]          ca-certificates:  update-ca-certificates
 ${helpdir}/flt-ebuild app-misc/ca-certificates '\<sys-apps/debianutils\>'
 
+# [groff]                man:  not needed with preformatted pages
+${helpdir}/flt-ebuild sys-apps/man '\<(sys-apps/groff|app-doc/heirloom-doctools)\>'
+
+
+sinfo "Generating man pages cache"
+${helpdir}/gen-man-cache
+
 
 sinfo "Unmerging build and temporary dependencies"
 mv /etc/portage/profile/packages{.off,}
@@ -124,6 +131,10 @@ find /usr/share/icons -mindepth 1 -maxdepth 1 -type d \
     -exec gtk-update-icon-cache -q -f -i    {} \;
 find /usr/share -mindepth 3 -type d -name hicolor \
     -exec gtk-update-icon-cache -q -f -i -t {} \;
+
+
+sinfo "Trimming man pages cache"
+${helpdir}/gen-man-cache clean
 
 
 sinfo "Regenerating fonts cache"

@@ -30,6 +30,9 @@
 /usr/bin/readcd
 /usr/sbin/rscsi
 
+# man does not use cache
+/usr/bin/man
+
 # POSIX.1e capabilities
 /sbin/unix_chkpwd cap_dac_read_search+ep
 /bin/ping         cap_net_raw+ep
