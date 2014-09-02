@@ -25,7 +25,6 @@
 /usr/share**/locale/C/***
 /usr/share**/locale/en*/***
 /usr/share**/locale/ru*/***
-/usr/share**/man/ru*/
 /usr/share/themes/*/index.theme
 /usr/share/themes/*/gtk-*/***
 /usr/share/themes/*/openbox-*/***
