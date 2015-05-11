@@ -45,20 +45,6 @@ mount_fs() {
 }
 
 
-# Resizing a filesystem with a dry run
-do_resize() {
-    echo ">> Performing a dry run"
-    if ! ntfsresize -n "$@"; then
-        return 1
-    else
-        # last command sets pipe's error status
-        # pipe must come last, so that function can be used in an "if"
-        echo ">> Performing actual resize"
-        echo y | ntfsresize "$@"
-    fi
-}
-
-
 # Accept only single parameter
 if [ $# != 1 ]; then
     cat<<EOF
@@ -72,9 +58,6 @@ on subsequent steps to succeed.
 
 The OTFE header is unaffected by the resize, so any existing header
 backup is still valid.
-
-WARNING: Disconnect all network interfaces before running otfe-resize
-         in order to avoid interfering with cables communication.
 EOF
     exit 1
 fi
@@ -103,14 +86,14 @@ oldsize=`du -b "${file}" | cut -f1`
 
 
 # More sanity checks
-# Minimum is (1M + 512B) for NTFS, and (1M + 8K) for OTFE
-if [ ${oldsize} -lt $((2*1024*1024 + 512 + 8*1024)) ]; then
+# Minimum is 2M for ext4, and (1M + 8K) for OTFE
+if [ "${oldsize}" -lt $((3*1024*1024 + 8*1024)) ]; then
     error "Sanity check failed: ${file} is too small"
 fi
 
 # Check that OTFE offset+size add up (assume 512B sectors)
 # This also ensures that OTFE file size is a multiple of 512
-if [ ${oldsize} -ne $(((otfeoffset + otfesize) * 512)) ]; then
+if [ "${oldsize}" -ne $(((otfeoffset + otfesize) * 512)) ]; then
     error "Sanity check failed: [${OTFEVOLUME}] size and offset don't match size of ${file}"
 fi
 
@@ -147,8 +130,8 @@ fi
 
 
 # See the calculation above for the minimum possible size
-if [ ${size} -lt 3 ]; then
-    error "Minimum supported size is 3 MiB"
+if [ ${size} -lt 4 ]; then
+    error "Minimum supported size is 4 MiB"
 fi
 size=$((size * 1024 * 1024))
 
@@ -162,18 +145,11 @@ if [ ${size} -ge ${oldsize} ]; then
     fi
 
 
-    # The filesystem can be unmounted just prior to
-    # NTFS resize, but there is no point in growing
-    # the file and the OTFE volume if umount fails
-    umount_fs
-
-
     # Increase OTFE file size
     echo ">> Growing ${file} to ${size} bytes"
     if ! truncate -s ${size} "${file}"; then
         echo ">> Restoring the original size of ${file}"
         truncate -s ${oldsize} "${file}"
-        mount_fs
         exit 1
     fi
 
@@ -188,20 +164,19 @@ if [ ${size} -ge ${oldsize} ]; then
     cryptsetup resize ${OTFEVOLUME}
 
 
-    # Resize the NTFS filesystem on encrypted volume
-    echo ">> Growing the NTFS filesystem on ${otfe}"
-    do_resize -fP "${otfe}"
-    mount_fs
+    # Resize the filesystem on encrypted volume
+    echo ">> Growing the filesystem on ${otfe}"
+    resize2fs -f "${otfe}"
 
 else
 
     sizediff=$((oldsize - size))
 
-    # Resize the NTFS filesystem on encrypted volume
+    # Resize the filesystem on encrypted volume
     # (assuming 512B sectors - see sanity checks above)
     umount_fs
-    echo ">> Shrinking the NTFS filesystem on ${otfe}"
-    if ! do_resize -fP -s $((otfesize*512 - sizediff)) "${otfe}"; then
+    echo ">> Shrinking the filesystem on ${otfe}"
+    if ! resize2fs -f "${otfe}" $((otfesize - sizediff/512))s; then
         mount_fs
         exit 1
     fi

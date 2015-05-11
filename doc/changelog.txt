@@ -17,6 +17,7 @@
   * Added "gentoo=obfs" boot parameter for obfsproxy Tor bridges
   * Added "gentoo=xkms" boot parameter for forcing X modesetting driver
   * More robust Xorg autoconfiguration with sequential fallbacks
+  * Changed OTFE filesystem to ext4
   * Added ASCII virtual keyboard table for OTFE password entry
   * Added preformatted man pages
 

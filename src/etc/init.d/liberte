@@ -46,7 +46,7 @@ boot=/mnt/boot
 live=/mnt/live
 autos=/var/run/auto.media
 otfefile=${boot}${OTFEFILE}
-ntfsflags=noatime,nosuid,nodev,compression,usermapping=/etc/ntfs-3g.map
+otfeflags=noatime,nosuid,nodev,acl,user_xattr
 
 
 start() {
@@ -84,7 +84,7 @@ start() {
         # Add an OTFE line to /etc/fstab, so that autofs won't mount the LVM
         # device later, and for otfe-resize script to be able to mount it
         if ! grep -q "^/dev/mapper/${OTFEVOLUME} " /etc/fstab; then
-            echo "/dev/mapper/${OTFEVOLUME} ${lmount} ntfs-3g noauto,${ntfsflags} 0 0" >> /etc/fstab
+            echo "/dev/mapper/${OTFEVOLUME} ${lmount} ext4 noauto,${otfeflags} 0 0" >> /etc/fstab
         fi
 
         # Initialize LUKS image mapping (create if it doesn't exist)
@@ -96,12 +96,13 @@ start() {
             freespace=$((`stat -fc '%a*%S' ${boot}`))
             otfesize=$((freespace * ${OTFESIZE} / (1024*1024)))
 
-            #    3 MiB is the minimum possible size (rounded up to MiB)
-            # 4095 MiB is the maximum possible file size on FAT32 (2^32-1 B)
-            if [ ${otfesize} -lt 3 ]; then
-                otfesize=3
-            elif [ ${otfesize} -gt 4095 ]; then
-                otfesize=4095
+            #   4 MiB is the minimum possible size (rounded up to MiB)
+            # 256 MiB is the limit here to avoid long OTFE creation times
+            # (see /usr/local/sbin/otfe-resize)
+            if [ ${otfesize} -lt 4 ]; then
+                otfesize=4
+            elif [ ${otfesize} -gt 256 ]; then
+                otfesize=256
             fi
 
             # FAT has no sparse files, so insufficient space will fail here
@@ -133,9 +134,8 @@ start() {
                     cryptsetup luksHeaderBackup --header-backup-file ${otfefile}-hdr.bak ${otfefile}
                     eend $?
 
-                    # LC_ALL enables UTF-8 label support
-                    ebegin Formatting encrypted storage as NTFS: ${otfefile}
-                    LC_ALL=en_GB.UTF-8 mkntfs -qfCIU -L "${OTFELABEL}" -p 0 -H 0 -S 0 /dev/mapper/${OTFEVOLUME}
+                    ebegin Formatting encrypted storage: ${otfefile}
+                    mke2fs -qF -t ext4 -T small -L "${OTFELABEL}" -m 0 /dev/mapper/${OTFEVOLUME}
                     eend $?
                 else
                     rm ${otfefile}
