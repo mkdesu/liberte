@@ -1,5 +1,5 @@
---- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.12.ebuild	2014-07-15 20:43:25.482992744 +0000
-+++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.12.ebuild	2014-07-15 20:43:43.226748144 +0000
+--- /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.18.ebuild	2014-07-15 20:43:25.482992744 +0000
++++ /usr/portage/app-emulation/virtualbox-guest-additions/virtualbox-guest-additions-4.3.18.ebuild	2014-07-15 20:43:43.226748144 +0000
 @@ -95,6 +95,7 @@
  	--disable-sdl-ttf \
  	--disable-pulse \
